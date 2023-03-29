@@ -149,7 +149,7 @@ sub APPLY_EPIC_FOCI
     }
 
     #Beastlord
-    if ($owner->GetClass() == 13) {
+    if ($owner->GetClass() == 15) {
         my $bst_epic_scalar = 1.25;
         
         # Look for Epic 1.0\Augment
