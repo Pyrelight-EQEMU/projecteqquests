@@ -61,12 +61,9 @@ sub UPDATE_PET_STATS
         # Create Scalar. The max() probably isn't needed but just to be safe
         my $pet_scalar = max(($owner->GetSpellDamage() / 125) + 1, 1);
 
-        # Do max HP adjustment and readjust current hp to original ratio
-        my $hp_ratio = $pet->GetHP() / $pet->GetMaxHP();
+        # Do max HP adjustment
         my $max_hp = ceil($owner->GetBucket("max_hp") * $pet_scalar);
-        my $cur_hp = ceil($max_hp * $hp_ratio);
         $pet->ModifyNPCStat("max_hp", $max_hp);
-        $pet->SetHP($cur_hp);
 
         # Set spellscale and healscale for the pet
         $pet->ModifyNPCStat("spellscale", ($owner->GetSpellDamage()) + 100 . "");
@@ -141,12 +138,9 @@ sub APPLY_EPIC_FOCI
             $pet->ModifyNPCStat("min_hit", $min_hit);
             $pet->ModifyNPCStat("max_hit", $max_hit);
 
-            # Do max HP adjustment and readjust current hp to original ratio
-            my $hp_ratio = $pet->GetHP() / $pet->GetMaxHP();
+            # Do max HP adjustment
             my $max_hp = ceil($pet->GetNPCStat("max_hp") * $mag_epic_scalar);
-            my $cur_hp = ceil($max_hp * $hp_ratio);
             $pet->ModifyNPCStat("max_hp", $max_hp);
-            $pet->SetHP($cur_hp);
         } elsif ($owner->GetBucket("epic_proc") eq "true") {
             $pet->RemoveMeleeProc(849);
             $pet->RemoveMeleeProc(848);
