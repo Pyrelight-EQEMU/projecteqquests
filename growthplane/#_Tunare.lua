@@ -14,14 +14,16 @@ function call_zone_to_assist(e_other)
 	local show_debug = false;
 	-- grab the entity list
 	local entity_list = eq.get_entity_list();
-	-- aggro the zone onto whoever attacked me.
-	-- do not aggro these mobs #_Tunare (127001), #Tunare (127098), a_warm_light (127004)
-	-- #BouncerMan (127097), Flighty_Viridian_Wisp (127105)
-	local exclude_npc_list = Set {127001,127004,127097,127098,127105};
+	-- aggro all of the bosses in the zone onto whoever attacked me.
+	-- only aggro these mobs #Prince Thirneg (127096), keeper of the glades (127016), Undogo Digolo (127015)
+	-- #Treah Greenroot (127021), Ail_the_Elder (127020), Rumbleroot (127019), Fayl Everstrong (127018)
+	-- Guardian of Tunare (127007), Grahl Strongback (127022), Ordro (127040), Farstride Unicorn (127093)
+	-- Galiel Spirithoof (127023), Sarik the Fang (127017)
+	local include_npc_list = Set {127096, 127016, 127015, 127007, 127022, 127040, 127093, 127023, 127017};
 	local npc_list = entity_list:GetNPCList();
 	if (npc_list ~= nil) then
 		for npc in npc_list.entries do
-			if (exclude_npc_list[npc:GetNPCTypeID()] == nil) then
+			if (include_npc_list[npc:GetNPCTypeID()] != nil) then
 				-- npc.valid will be true if the NPC is actually spawned
 				if (npc.valid) then
 					npc:AddToHateList(e_other,1);
