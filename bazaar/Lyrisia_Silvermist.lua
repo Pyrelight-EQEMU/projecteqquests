@@ -49,7 +49,16 @@ function event_say(e)
         table.sort(UNLOCKED_SPELLS, function(a, b) return compareSpells(a, b, SPELL_CLASS_ID) end)
         e.self:Say("Done.")
     elseif e.message:findi("adept_resp_4") then
-        -- Drain AA here
+        if (e.other:GetAAPoints() > 0) then
+            local drained_points = e.other:GetAAPoints()
+            local awarded_points = drained_points * 20;
+            e.other:SetBucket("SpellPoints-" .. CLASS_ID, tostring(tonumber(e.other:GetBucket("SpellPoints-" .. CLASS_ID)) + awarded_points))
+            e.other:SetAAPoints(0);
+            e.other:Message(MESSAGE_COLOR, "You have lost " .. drained_points .. " AA points and been rewarded with " .. awarded_points .. " adaptation points for " .. e.other:GetClassNam() .. " spells.")
+            e.self:Say("Excellent. I have taken your excess energy and will record your contribution. Do you wish to [" .. eq.say_link("adapt_resp_1", true, "adapt your spells") .. "] immediately?")
+        else
+            e.self:Say("You have no excess energy to donate. Please return to me when you have unspent AA points.")
+        end
     end
 end
 
