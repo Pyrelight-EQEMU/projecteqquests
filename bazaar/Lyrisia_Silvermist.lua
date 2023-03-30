@@ -82,12 +82,12 @@ end
 
 -- Define the function that will be used to compare two spells
 function compareSpells(spellId1, spellId2, spellClassId)
-    local spell1 = eq.get_spell(spellId1)
-    local spell2 = eq.get_spell(spellId2)
+    local spell1 = eq.get_spell(to_number(spellId1))
+    local spell2 = eq.get_spell(to_number(spellId2))
   
     -- Get the class value for each spell
-    local classValue1 = spell1:Classes(spellClassId) or 0
-    local classValue2 = spell2:Classes(spellClassId) or 0
+    local classValue1 = spell1:Classes(to_number(spellClassId)) or 0
+    local classValue2 = spell2:Classes(to_number(spellClassId)) or 0
   
     -- Compare the class values
     if classValue1 == classValue2 then
