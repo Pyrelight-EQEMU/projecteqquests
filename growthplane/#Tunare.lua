@@ -30,7 +30,7 @@ function send_signal_to_all_npc_in_zone(signal_to_send)
 	-- do not do anything if there are no NPC's spawned. should be an impossible check because this is in an NPC script
 	if(npc_list ~= nil) then
 		for npc in npc_list.entries do
-			if (include_npc_list[npc:GetNPCTypeID()] != nil and signal_sent_to[npc:GetNPCTypeID()] == nil) then
+			if (include_npc_list[npc:GetNPCTypeID()] ~= nil and signal_sent_to[npc:GetNPCTypeID()] == nil) then
 				-- make sure the npc is valid (again, should never fail, but better to be certain.
 				if (npc.valid) then
 					if (show_debug) then eq.zone_emote(4,"NPCID: " .. npc:GetNPCTypeID() .. " is being sent signal " .. tostring(signal_to_send) .. "."); end
@@ -41,7 +41,7 @@ function send_signal_to_all_npc_in_zone(signal_to_send)
 				end
 			elseif(signal_sent_to[npc:GetNPCTypeID()] == true) then
 				if (show_debug) then eq.zone_emote(4,"NPCID: " .. npc:GetNPCTypeID() .. " has already been sent signal " .. tostring(signal_to_send) .. "."); end
-			elseif(include_npc_list[npc:GetNPCTypeID()] != true) then
+			elseif(include_npc_list[npc:GetNPCTypeID()] ~= true) then
 				if (show_debug) then eq.zone_emote(4,"NPCID: " .. npc:GetNPCTypeID() .. " is excluded and will not be sent signal " .. tostring(signal_to_send) .. "."); end
 			end
 		end

@@ -23,7 +23,7 @@ function call_zone_to_assist(e_other)
 	local npc_list = entity_list:GetNPCList();
 	if (npc_list ~= nil) then
 		for npc in npc_list.entries do
-			if (include_npc_list[npc:GetNPCTypeID()] != nil) then
+			if (include_npc_list[npc:GetNPCTypeID()] ~= nil) then
 				-- npc.valid will be true if the NPC is actually spawned
 				if (npc.valid) then
 					npc:AddToHateList(e_other,1);
