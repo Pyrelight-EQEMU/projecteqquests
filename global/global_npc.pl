@@ -54,6 +54,8 @@ sub UPDATE_PET_STATS
 {
     my $pet = shift;
     my $owner = $pet->GetOwner()->CastToClient();
+    my $petNameKey = $client->CharacterID() . "-pet-name";
+    my $storedPetName = quest::get_data($petNameKey);
 
     if ($owner) {
         # Create Scalar. The max() probably isn't needed but just to be safe
@@ -103,6 +105,10 @@ sub UPDATE_PET_STATS
         # Set Runspeed
         my $runspeed = $owner->GetRunspeed() / 17 . "";
         $pet->ModifyNPCStat("runspeed", $runspeed);
+    }
+
+    if ($storedPetName ~= 0) {
+        # TODO: I don't know how to actually set the pet name.
     }
 }
 
