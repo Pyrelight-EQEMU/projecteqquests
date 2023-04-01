@@ -16,8 +16,8 @@ function event_signal(e)
 	elseif(e.signal == 2 and qglobals["keeper"] == nil) then
 		-- eq.set_timer("13",300000); what is this referred to?
 		eq.set_global("keeper","1",3,"H2");
-		-- supposed to be 60-85 minute timer
-		eq.set_timer("87",math.random(150000) + 360000);
+		-- supposed to be 10 minute timer (for keeper of souls)
+		eq.set_timer("87",60000);
 	end
 end
 
