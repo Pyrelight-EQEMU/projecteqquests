@@ -209,6 +209,7 @@ function event_connect(e)
     don.fix_invalid_faction_state(e.self)
 
 	check_level_flag(e)
+	convert_spellunlocks(e)
 	e.self:GrantAlternateAdvancementAbility(938, 8, true)
 
 	check_class_switch_aa(e)
@@ -250,6 +251,8 @@ function check_class_switch_aa(e)
 end
 
 function calculate_modifier(count)
+	return 1
+
     if count == 1 then
         return 1
     end
@@ -260,3 +263,18 @@ function calculate_modifier(count)
     end
     return modifier
 end
+
+
+function convert_spellunlocks(e)
+	if not e.self:GetBucket("unlocked-spells") then
+		local UNLOCKED_SPELLS = {}
+		for spell_id = 1, 44000 do
+			local unlocked = e.self:GetBucket("Spell-" .. spell_id .. "-unlocked")
+			if unlocked and unlocked ~= "" then
+				table.insert(UNLOCKED_SPELLS, spell_id)
+			end
+		end
+		e.self:SetBucket("unlocked-spells", table.concat(UNLOCKED_SPELLS, " "))
+	end
+end
+
