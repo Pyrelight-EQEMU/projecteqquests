@@ -265,7 +265,7 @@ end
 
 
 function convert_spellunlocks(e)
-	if e.self:GetBucket("unlocked-spells") == nil or e.self:GetBucket("unlocked-spells") = "" then
+	if e.self:GetBucket("unlocked-spells") == nil or e.self:GetBucket("unlocked-spells") == "" then
 		local UNLOCKED_SPELLS = {}
 		for spell_id = 1, 44000 do
 			local unlocked = e.self:GetBucket("Spell-" .. spell_id .. "-unlocked")
