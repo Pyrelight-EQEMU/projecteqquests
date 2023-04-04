@@ -251,8 +251,6 @@ function check_class_switch_aa(e)
 end
 
 function calculate_modifier(count)
-	return 1
-
     if count == 1 then
         return 1
     end
@@ -261,6 +259,7 @@ function calculate_modifier(count)
     for i=count,2,-1 do
         modifier = modifier * .90
     end
+	modifier = 1
     return modifier
 end
 
