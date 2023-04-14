@@ -6,6 +6,7 @@ sub EVENT_SPAWN
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {  
        SAVE_PET_STATS($npc);
        UPDATE_PET_STATS($npc);
+       $npc->Heal();
     }
 }
 
