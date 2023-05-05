@@ -31,10 +31,13 @@ sub EVENT_CLICKDOOR {
     if(plugin::check_hasitem($client, 69311) && !$client->KeyRingCheck(69311)) {
       $client->KeyRingAdd(69311);
     }
+    if(plugin::check_hasitem($client, 20884) && !$client->KeyRingCheck(20884)) {
+      $client->KeyRingAdd(20884);
+    }
     if(plugin::check_hasitem($client, 69312) && !$client->KeyRingCheck(69312)) {
       $client->KeyRingAdd(69312);
     }
-    if($client->KeyRingCheck(69311) || $client->KeyRingCheck(69312) || ($status > 99)) {
+    if($client->KeyRingCheck(69311) || $client->KeyRingCheck(69312) || $client->KeyRingCheck(20884) || ($status > 99)) {
       quest::movepc(108,1682,41,25.9); # Zone: veeshan
     }
     else {
