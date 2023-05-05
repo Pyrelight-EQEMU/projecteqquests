@@ -112,28 +112,12 @@ sub APPLY_FOCI
     my $pet = shift;
     my $owner = $pet->GetOwner()->CastToClient();
 
-    my $scale = 1;
-
-    #General
-    #Ritual Summoning
-    if ($owner->HasAugEquippedbyID(68094) || $owner->HasItemEquippedByID(68918) || $owner->HasItemEquippedByID(68908) || $owner->HasItemEquippedByID(68923)) {
-        $scale = 1.3
-    }
-    #Minion of Darkness
-    elsif ($owner->HasItemEquippedByID(28144)) {
-        $scale = 1.2;
-    }
-    #Summoner's Boon
-    elsif ($owner->HasAugEquippedbyID(42134)) {
-        $scale = 1.1;
-    }
-
     #Magician
     if ($owner->GetClass() == 13) {
-        my $mag_epic_scalar = $scale + .5;
+        my $mag_epic_scalar = 1.5;
         
         # Look for Epic 1.0\Augment
-        my $epic1 = $owner->HasItemEquippedByID(28034);
+        my $epic1 = $owner->CountItemEquippedByID(28034) || $owner->CountAugmentEquippedByID(2028034);
         if ($epic1 > 0) {
             # Check if we applied the proc buff already
             if ($owner->GetBucket("epic_proc") ne "true") {                
@@ -156,10 +140,10 @@ sub APPLY_FOCI
 
     #Beastlord
     if ($owner->GetClass() == 15) {
-        my $bst_epic_scalar = $scale + .25;
+        my $bst_epic_scalar = 1.25;
         
         # Look for Epic 1.0\Augment
-        my $epic1 = ($owner->HasItemEquippedByID(8495) && $owner->HasItemEquippedByID(8496));
+        my $epic1 = ($owner->CountItemEquippedByID(8495) && $owner->CountItemEquippedByID(8496)) || $owner->CountAugmentEquippedByID(208495);
         if ($epic1 > 0) {
             # Check if we applied the proc buff already
             if ($owner->GetBucket("epic_proc") ne "true") {                
@@ -174,10 +158,10 @@ sub APPLY_FOCI
 
     #Necromancer
     if ($owner->GetClass() == 11) {
-        my $nec_epic_scalar = $scale + .25;
+        my $nec_epic_scalar = 1.25;
         
         # Look for Epic 1.0\Augment
-        my $epic1 = $owner->HasItemEquippedByID(20544);
+        my $epic1 = $owner->CountItemEquippedByID(20544) || $owner->CountAugmentEquippedByID(2020544);
         if ($epic1 > 0) {
             # Check if we applied the proc buff already
             if ($owner->GetBucket("epic_proc") ne "true") {                
