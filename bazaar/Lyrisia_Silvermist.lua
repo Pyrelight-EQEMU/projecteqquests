@@ -121,12 +121,16 @@ function event_say(e)
     elseif e.message:find("%f[%a]unlock %d+") then
         local spellID = tonumber(string.match(e.message, "%f[%a]unlock (%d+)"))
         local cost = tonumber(getSpellCost(spellID, SPELL_CLASS_ID))
-        if (spellIDMatchesTable(spellID, SPELLS) and adapt_points >= cost) then
-            adapt_points = adapt_points - cost
-            e.other:SetBucket("unlocked-spells", unlocked_spells_string .. " " .. spellID)
-            e.other:SetBucket("SpellPoints-" .. CLASS_ID, tostring(adapt_points))
-            e.other:Message(MESSAGE_COLOR, "You have successfully unlocked " .. eq.get_spell(spellID):Name() .. " for " .. cost .. " adaptation points.")
-            e.other:Message(MESSAGE_COLOR, "You have " .. adapt_points .. " toward unlocking " .. e.other:GetClassName() .. " spells available.")
+        if spellIDMatchesTable(spellID, SPELLS) then
+            if adapt_points >= cost then
+                adapt_points = adapt_points - cost
+                e.other:SetBucket("unlocked-spells", unlocked_spells_string .. " " .. spellID)
+                e.other:SetBucket("SpellPoints-" .. CLASS_ID, tostring(adapt_points))
+                e.other:Message(MESSAGE_COLOR, "You have successfully unlocked " .. eq.get_spell(spellID):Name() .. " for " .. cost .. " adaptation points.")
+                e.other:Message(MESSAGE_COLOR, "You have " .. adapt_points .. " toward unlocking " .. e.other:GetClassName() .. " spells available.")
+            else            
+                e.self:Say("I'm sorry, " .. e.other:GetCleanName() .. ". You'll need to [" .. eq.say_link("adapt_resp_2", true, "provide your vital energy") .. "] to me in order to fuel the process of adapting your spells before I can help you. ")
+            end
         end   
     elseif e.message:find("^scribe%s+(%d+)%s+(%d+)$") then
         if e.message:findi("scribe") then
