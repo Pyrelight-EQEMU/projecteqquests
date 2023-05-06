@@ -61,7 +61,7 @@ sub UPDATE_PET_STATS
         my $pet_scalar = APPLY_FOCI($pet) * max(($owner->GetSpellDamage() / 100) + 1, 1);
 
         # Do max HP adjustment
-        my $max_hp = ceil($owner->GetBucket("max_hp") * $pet_scalar); 
+        my $max_hp = ceil($owner->GetBucket("max_hp") * ($pet_scalar/2)); 
         $pet->ModifyNPCStat("max_hp", $max_hp);
 
         # Set spellscale and healscale for the pet
@@ -112,9 +112,11 @@ sub APPLY_FOCI
     my $pet = shift;
     my $owner = $pet->GetOwner()->CastToClient();
 
+    my $scale = 1;
+    
     #Magician
     if ($owner->GetClass() == 13) {
-        my $mag_epic_scalar = 1.5;
+        my $mag_epic_scalar = $scale + 0.5;
         
         # Look for Epic 1.0\Augment
         my $epic1 = $owner->CountItemEquippedByID(28034) || $owner->CountAugmentEquippedByID(2028034);
@@ -135,12 +137,11 @@ sub APPLY_FOCI
             $pet->RemoveMeleeProc(848);
             $pet->BuffFadeBySpellID(847);            
         }
-        return $mag_epic_scalar;
     }
 
     #Beastlord
     if ($owner->GetClass() == 15) {
-        my $bst_epic_scalar = 1.25;
+        my $bst_epic_scalar = $scale + 0.25;
         
         # Look for Epic 1.0\Augment
         my $epic1 = ($owner->CountItemEquippedByID(8495) && $owner->CountItemEquippedByID(8496)) || $owner->CountAugmentEquippedByID(208495);
@@ -152,13 +153,12 @@ sub APPLY_FOCI
             } elsif ($owner->GetBucket("epic_proc") eq "true") {
                 $owner->DeleteBucket("epic_proc");          
             }
-        return $bst_epic_scalar;
         }
     }
 
     #Necromancer
     if ($owner->GetClass() == 11) {
-        my $nec_epic_scalar = 1.25;
+        my $nec_epic_scalar = $scale + 0.25;
         
         # Look for Epic 1.0\Augment
         my $epic1 = $owner->CountItemEquippedByID(20544) || $owner->CountAugmentEquippedByID(2020544);
@@ -170,8 +170,8 @@ sub APPLY_FOCI
             } elsif ($owner->GetBucket("epic_proc") eq "true") {
                 $owner->DeleteBucket("epic_proc");
             }
-        return $nec_epic_scalar;
         }
     }
-    return 1;
+
+    return $scale;
 }
