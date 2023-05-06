@@ -11,6 +11,12 @@ function check_level_flag(e)
 	end
 end
 
+function event_loot(e)
+    if string.sub(e.item:GetName(), 1, 7) == 'Fabled ' then
+        eq.world_emote(15,e.self:GetCleanName() .. " has claimed the " .. eq.item_link(e.item:ID()) .. "!");
+    end
+end
+
 function event_discover_item(e)
 	if e.item:HP() or e.item:Mana() or e.item:AStr() > 0 or e.item:ASta() > 0 or e.item:ADex() > 0 or e.item:AAgi() > 0 or e.item:AInt() > 0 or e.item:AWis() > 0 or e.item:ACha() > 0 or e.item:AugType() > 0 then
 		local key = e.self:CharacterID() .. "-DiscoCount";
@@ -19,7 +25,7 @@ function event_discover_item(e)
 		else
 			eq.set_data(key,tostring(tonumber(eq.get_data(key)) + 1));
 		end
-		eq.world_emote(15,e.self:GetCleanName() .. " is the first to discover " .. eq.item_link(e.item:ID()) .. ".");
+		eq.world_emote(15,e.self:GetCleanName() .. " is the first to discover " .. eq.item_link(e.item:ID()) .. "!");
 	end
 end
 
