@@ -36,7 +36,7 @@ function event_say(e)
     elseif e.message:findi("adapt_resp_1") then        
         e.other:SetBucket("Spellshaper-Intro", tostring(1))
         if next(SPELLS) then
-            if adapt_points > 0 then            
+            if adapt_points > -1 then            
                 local classLevels = {{1,10}, {11,20}, {21,30}, {31,40}, {41,50}, {51,60}, {61,65}, {66,70}, {71,75}}
                 local levelAvailability = {}
                 for _, spell in ipairs(SPELLS) do
