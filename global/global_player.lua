@@ -12,6 +12,7 @@ function check_level_flag(e)
 end
 
 function event_loot(e)
+	eq.debug("event_loot:" .. eq.get_item_name(e.item:GetID()))
     if string.find(eq.get_item_name(e.item:GetID()), "^Fabled ") ~= nil then
         eq.world_emote(15, e.self:GetCleanName() .. " has claimed the " .. eq.item_link(e.item:GetID()) .. "!");
 		eq.discord_send("ooc", e.self:GetCleanName() .. " has claimed the " .. eq.get_item_name(e.item:GetID()) .. "! (https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:GetID() ..")");
@@ -19,7 +20,7 @@ function event_loot(e)
 end
 
 function event_discover_item(e)
-	if e.item:HP() or e.item:Mana() or e.item:AStr() > 0 or e.item:ASta() > 0 or e.item:ADex() > 0 or e.item:AAgi() > 0 or e.item:AInt() > 0 or e.item:AWis() > 0 or e.item:ACha() > 0 or e.item:AugType() > 0 then
+	if e.item:HP() > 0 or e.item:Mana() > 0 or e.item:AStr() > 0 or e.item:ASta() > 0 or e.item:ADex() > 0 or e.item:AAgi() > 0 or e.item:AInt() > 0 or e.item:AWis() > 0 or e.item:ACha() > 0 or e.item:AugType() > 0 then
 		local key = e.self:CharacterID() .. "-DiscoCount";
 		if (eq.get_data(key) == nil or eq.get_data(key) == "") then
 			eq.set_data(key,tostring(1));
