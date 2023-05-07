@@ -12,8 +12,9 @@ function check_level_flag(e)
 end
 
 function event_loot(e)
-    if string.sub(e.item:GetName(), 1, 7) == 'Fabled ' then
-        eq.world_emote(15,e.self:GetCleanName() .. " has claimed the " .. eq.item_link(e.item:ID()) .. "!");
+    if string.find(eq.get_item_name(e.item:GetID()), "^Fabled ") ~= nil then
+        eq.world_emote(15, e.self:GetCleanName() .. " has claimed the " .. eq.item_link(e.item:GetID()) .. "!");
+		eq.discord_send("ooc", e.self:GetCleanName() .. " has claimed the " .. eq.get_item_name(e.item:GetID()) .. "! (https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:GetID() ..")");
     end
 end
 
@@ -26,6 +27,7 @@ function event_discover_item(e)
 			eq.set_data(key,tostring(tonumber(eq.get_data(key)) + 1));
 		end
 		eq.world_emote(15,e.self:GetCleanName() .. " is the first to discover " .. eq.item_link(e.item:ID()) .. "!");
+		eq.discord_send("ooc", e.self:GetCleanName() .. " is the first to discover " .. e.item:Name() .. "! (https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:ID() ..")");
 	end
 end
 

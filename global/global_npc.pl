@@ -94,8 +94,9 @@ sub UPDATE_PET_STATS
         $pet->ModifyNPCStat("agi", $agi);
         $pet->ModifyNPCStat("atk", $atk);
 
-        $min_hit = ceil($owner->GetBucket("min_hit") * $pet_scalar) . "";
-        $max_hit = ceil($owner->GetBucket("max_hit") * $pet_scalar) . "";
+        my $min_hit = ceil($owner->GetBucket("min_hit") * $pet_scalar) . "";
+        my $max_hit = ceil($owner->GetBucket("max_hit") * $pet_scalar) . "";
+        my $hp_regen = ceil($owner->GetBucket("hp_regen") * $pet_scalar) . "";
 
         $pet->ModifyNPCStat("min_hit", $min_hit);
         $pet->ModifyNPCStat("max_hit", $max_hit);
