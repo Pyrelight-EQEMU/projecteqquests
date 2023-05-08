@@ -11,11 +11,12 @@ function event_connect(e)
 
 	check_class_switch_aa(e)
 
-	if not e.self:GetBucket("FirstLoginAnnounce") then
-		e.self:SetBucket("FirstLoginAnnounce", "1")
-		eq.world_emote(15,e.self:GetCleanName() .. " has logged in for the first time!")
-		eq.discord_send("ooc", e.self:GetCleanName() .. " has logged in for the first time!")
-	end
+	local bucket = e.self:GetBucket("FirstLoginAnnounce")
+	if not bucket or bucket == "" then
+	  e.self:SetBucket("FirstLoginAnnounce", "1")
+	  eq.world_emote(15, e.self:GetCleanName() .. " has logged in for the first time!")
+	  eq.discord_send("ooc", e.self:GetCleanName() .. " has logged in for the first time!")
+	end	
 end
 
 function event_level_up(e)
