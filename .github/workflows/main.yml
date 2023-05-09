@@ -1,4 +1,4 @@
-name: remote ssh command
+name: Push to Servers
 on: 
   push:
     branches:
@@ -15,7 +15,7 @@ jobs:
       with:
         host: ${{ secrets.HOST_MASTER }}
         username: ${{ secrets.USERNAME_MASTER }}
-        key: ${{ secrets.KEY_MASTER }}
+        password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT_MASTER }}
         script: |
           cd /opt/eqemu/stack/server/quests
@@ -34,5 +34,5 @@ jobs:
         password: ${{ secrets.PASSWORD_DEV }}
         port: ${{ secrets.PORT_DEV }}
         script: |
-          cd /opt/eqemu/stack/server/quests
+          cd /opt/eqemu/server/quests
           git pull
