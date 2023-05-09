@@ -34,5 +34,5 @@ jobs:
         password: ${{ secrets.PASSWORD_DEV }}
         port: ${{ secrets.PORT_DEV }}
         script: |
-          cd /opt/eqemu/server/quests
+          cd /opt/eqemu-dev/server/quests/
           git pull
