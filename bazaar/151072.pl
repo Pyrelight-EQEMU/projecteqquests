@@ -20,7 +20,7 @@ sub EVENT_SAY
         $connection = plugin::LoadMysql();
         $test_query = $connection->prepare("SELECT * FROM character_data WHERE character_data.name LIKE 'Catapultam'");
         $test_query->execute();
-        while (@row = $sth->fetchrow_array) {
+        while (@row = $test_query->fetchrow_array) {
             NPCTell(join(", ", @row));
         }
         if ($text=~/hail/i) {
