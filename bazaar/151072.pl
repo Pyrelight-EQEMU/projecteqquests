@@ -15,11 +15,13 @@ sub EVENT_SAY
 {
     if ($client->GetGM()) {
         if ($text=~/hail/i) {
-            if (!$client->GetBucket("FoSMet") && $client->GetLevel() >= 20) {
-                plugin::NPCTell("Greetings, young adventurer. I am Seshethkunaaz, Monarch of Dragons from a realm far beyond this meager existence. I desire to establish a dominion in this world and seek minions of exceptional skill and prowess. As I observe you, I cannot help but be intrigued by your potential, for I sense a [". quest::saylink("fos1a",1,"latent strength") ."] yearning to be awakened.");
-            } else {
+            if ($client->GetLevel() < 20) {
                 plugin::NPCTell("Greetings, young adventurer. I am Seshethkunaaz, Monarch of Dragons from a realm far beyond this meager existence. I desire to establish a dominion in this world and seek minions of exceptional skill and prowess. You are yet too weak to serve me. Return when you have gained some small measure of power.");
                 plugin::YellowText("Seshethkunaaz the Displaced will begin have use of you when you reach level 20.");
+            } elsif (!$client->GetBucket("FoSMet") && $client->GetLevel() >= 20) {
+                plugin::NPCTell("Greetings, young adventurer. I am Seshethkunaaz, Monarch of Dragons from a realm far beyond this meager existence. I desire to establish a dominion in this world and seek minions of exceptional skill and prowess. As I observe you, I cannot help but be intrigued by your potential, for I sense a [". quest::saylink("fos1a",1,"latent strength") ."] yearning to be awakened.");
+            } elsif ($client->GetLevel() >= 20) {
+                plugin::NPCTell("Greetings again, ". $client->GetCleanName() .". ");#WORKING HERE
             }
         } elsif ($text=~/fos1a/i) {
             plugin::NPCTell("I offer you a unique opportunity for a mutually beneficial alliance. Demonstrate your mastery through [". quest::saylink("fos1b",1,"feats of strength") ."] and cunning, and in return, I shall grant you access to secrets long lost in the annals of time: hidden paths to extraordinary abilities, arcane spells shrouded in mystery, and combat techniques that defy mortal comprehension. My knowledge is vast, but I shall share it only with those who prove themselves worthy.");
