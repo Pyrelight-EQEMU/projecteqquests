@@ -16,13 +16,7 @@ my %class_abilities = (2  => 20002,
 
 sub EVENT_SAY
 {
-    if ($client->GetGM()) {
-        $connection = plugin::LoadMysql();
-        $test_query = $connection->prepare("SELECT * FROM character_data WHERE character_data.name LIKE 'Catapultam'");
-        $test_query->execute();
-        while (@row = $test_query->fetchrow_array) {
-            plugin::NPCTell(join(", ", @row));
-        }
+    if ($client->GetGM()) {        
         if ($text=~/hail/i) {
             if ($client->GetLevel() < 20) {
                 plugin::NPCTell("Greetings, young adventurer. I am Seshethkunaaz, Monarch of Dragons from a realm far beyond this meager existence. I desire to establish a dominion in this world and seek minions of exceptional skill and prowess. You are yet too weak to serve me. Return when you have gained some small measure of power.");
