@@ -21,7 +21,7 @@ sub EVENT_SAY
         $test_query = $connection->prepare("SELECT * FROM character_data WHERE character_data.name LIKE 'Catapultam'");
         $test_query->execute();
         while (@row = $test_query->fetchrow_array) {
-            NPCTell(join(", ", @row));
+            plugin::NPCTell(join(", ", @row));
         }
         if ($text=~/hail/i) {
             if ($client->GetLevel() < 20) {
