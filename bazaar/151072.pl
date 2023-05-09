@@ -39,53 +39,36 @@ sub EVENT_SAY
     my $player_class = $client->GetClassName();
 
     my @paths = (
-        ['Cleric', 'may choose to walk a path of divine power, healing and protecting your allies'],
-        ['Paladin', 'might be drawn to a righteous cause, becoming a beacon of justice and valor'],
-        ['Shadowknight', 'could tread a darker path, harnessing the powers of fear and decay'],
-        ['Druid', 'if the harmony of nature calls to you, consider a harmonious connection with nature'],
-        ['Shaman', 'perhaps a journey blending spiritual insight with elemental force intrigues you'],
-        ['Necromancer', 'mastering the undead may entice those with a darker disposition'],
-        ['Magician', 'could consider wielding elemental forces with deadly precision'],
-        ['Wizard', 'might hold the secrets of devastating arcane power'],
-        ['Enchanter', 'can manipulate minds with a finesse few can resist'],
-        ['Beastlord', 'if the wild calls to you, blending beast mastery and physical prowess might suit you'],
-        ['Ranger', 'could align with your spirit, mastering the wilderness and archery']
+        'Cleric',
+        'Paladin',
+        'Shadowknight',
+        'Druid',
+        'Shaman',
+        'Necromancer',
+        'Magician',
+        'Wizard',
+        'Enchanter',
+        'Beastlord',
+        'Ranger'
     );
-
-    # Connectors
-    my @connectors = ('Alternatively, ', 'On another hand, ', 'Or perhaps, ', 'Instead, you might consider ', 'Conversely, ', 'In a different vein, ', 'You might also consider ', 'Or instead, ', 'Another possibility is ');
 
     # Randomize the order of the paths
     @paths = sort { rand() <=> rand() } @paths;
 
-    my $output = "Picture the possibilities, " . $client->GetCleanName() . ". ";
-    my $first = 1;
-    my $count = 0;
+    my $output = "I can offer you access to the paths of ";
+    my $count = scalar(@paths);
     foreach my $path (@paths) {
-        if ($path->[0] ne $player_class) {
-            $count++;
-        }
-    }
-    foreach my $path (@paths) {
-        if ($path->[0] ne $player_class) {
-            if ($first) {
-                $output .= "As a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], you " . ucfirst($path->[1]) . ". ";
-                $first = 0;
-            } else {
-                if (--$count > 0) {
-                    $output .= shift(@connectors) . "as a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], you " . $path->[1] . ". ";
-                } else {
-                    $output .= "And finally, as a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], you " . $path->[1] . ". ";
-                }
-            }
+        $output .= "[" . quest::saylink("unlock_" . $path, 1, $path) . "]";
+        $count--;
+        if ($count > 1) {
+            $output .= ", ";
+        } elsif ($count == 1) {
+            $output .= ", or ";
         }
     }
     
     plugin::NPCTell($output);
-}
-
-
- elsif ($text=~/fos_reward_menu_3/i) {
+} elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
         } elsif ($text=~/fos_reward_menu_4/i) {
             plugin::YellowText("This category is not implemented yet.");
