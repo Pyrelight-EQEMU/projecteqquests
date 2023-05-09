@@ -31,7 +31,7 @@ jobs:
       with:
         host: ${{ secrets.HOST_DEV }}
         username: ${{ secrets.USERNAME_DEV }}
-        key: ${{ secrets.KEY_DEV }}
+        password: ${{ secrets.PASSWORD_DEV }}
         port: ${{ secrets.PORT_DEV }}
         script: |
           cd /opt/eqemu/stack/server/quests
