@@ -22,7 +22,7 @@ sub EVENT_SAY
                 plugin::YellowText("Seshethkunaaz the Displaced will begin have use of you when you reach level 20.");
             }
         } elsif ($text=~/fos1a/i) {
-            plugin::NPCTell("I offer you a unique opportunity for a mutually beneficial alliance. Demonstrate your mastery through [". quest::saylink("fos1b",1,"feats of strength") ."] and cunning, and in return, I shall grant you access to [". quest::saylink("fos1c",1,"secrets long lost") ."] in the annals of time: hidden paths to extraordinary abilities, arcane spells shrouded in mystery, and combat techniques that defy mortal comprehension. My knowledge is vast, but I shall share it only with those who prove themselves worthy.");
+            plugin::NPCTell("I offer you a unique opportunity for a mutually beneficial alliance. Demonstrate your mastery through [". quest::saylink("fos1b",1,"feats of strength") ."] and cunning, and in return, I shall grant you access to secrets long lost in the annals of time: hidden paths to extraordinary abilities, arcane spells shrouded in mystery, and combat techniques that defy mortal comprehension. My knowledge is vast, but I shall share it only with those who prove themselves worthy.");
         } elsif ($text=~/fos1b/i) {
             plugin::NPCTell("Ah, you inquire about the nature of these feats of strength. Very well, I shall enlighten you. Across this vast world, I have positioned my loyal minions in close proximity to beings of formidable power. These minions stand ready to assist you in identifying and challenging these beings and their retinues to single combat. For each victory you achieve, I shall [". quest::saylink("fos1c",1,"reward you") ."] accordingly. The powers I bestow upon you will be commensurate with your success, ranging from the arcane to the martial, expanding your repertoire and deepening your understanding of the mystical arts. The more you prove yourself, the greater the gifts you shall receive.");
         } elsif ($text=~/fos1c/i) {
@@ -36,7 +36,30 @@ sub EVENT_SAY
         if ($text=~/fos_reward_menu_1/i) {
             plugin::NPCTell("The rewards I offer are broadly divided into three types; [". quest::saylink("fos_reward_menu_2",1,"alternate classes") ."], [". quest::saylink("fos_reward_menu_3",1,"spells and disciplines") ."], and [". quest::saylink("fos_reward_menu_4",1,"other abilities") ."]");
         } elsif ($text=~/fos_reward_menu_2/i) {
+            my $player_name = 'player_name';  # replace with actual player name
+            my $player_class = $client->GetClassName();
 
+            my %classes = (
+                'Cleric' => 'healing and protecting your allies with divine power',
+                'Paladin' => 'a beacon of justice and valor',
+                'Shadowknight' => 'harnessing the powers of fear and decay',
+                'Druid' => 'the harmony of nature',
+                'Shaman' => 'channeling spirits and wielding cold, poison, and disease magic',
+                'Necromancer' => 'master of the undead',
+                'Magician' => 'wielding elemental forces with deadly precision',
+                'Wizard' => 'the secrets of devastating arcane power',
+                'Enchanter' => 'manipulating minds with a finesse few can resist',
+                'Beastlord' => 'blending beast mastery with physical prowess',
+                'Ranger' => 'a master of wilderness and archery'
+            );
+
+            my $output = "Picture the possibilities, $player_name. ";
+            foreach my $class (keys %classes) {
+                if ($class ne $player_class) {
+                    $output = $output . "As a $class, you would become " . $classes{$class} . ". ";
+                }
+            }
+            plugin::NPCTell($output);
         } elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
         } elsif ($text=~/fos_reward_menu_4/i) {
