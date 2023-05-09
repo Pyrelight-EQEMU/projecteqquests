@@ -39,31 +39,35 @@ sub EVENT_SAY
     my $player_class = $client->GetClassName();
 
     my %classes = (
-        'Cleric' => 'healing and protecting your allies with divine power',
-        'Paladin' => 'a beacon of justice and valor',
-        'Shadowknight' => 'harnessing the powers of fear and decay',
-        'Druid' => 'the harmony of nature',
+        'Cleric' => 'healing and protecting allies',
+        'Paladin' => 'being a beacon of justice and valor',
+        'Shadowknight' => 'harnessing fear and decay',
+        'Druid' => 'embracing the harmony of nature',
         'Shaman' => 'channeling spirits',
         'Necromancer' => 'mastering the undead',
-        'Magician' => 'wielding elemental forces with deadly precision',
-        'Wizard' => 'unleashing devastating arcane power',
-        'Enchanter' => 'manipulating minds with finesse',
-        'Beastlord' => 'blending beast mastery with physical prowess',
+        'Magician' => 'wielding elemental forces',
+        'Wizard' => 'unleashing arcane power',
+        'Enchanter' => 'manipulating minds',
+        'Beastlord' => 'blending beast mastery and physical prowess',
         'Ranger' => 'mastering wilderness and archery'
     );
 
     my $output = "Picture the possibilities, " . $client->GetCleanName() . ": ";
+    my $first = 1;
     foreach my $class (keys %classes) {
         if ($class ne $player_class) {
-            $output = $output . "as a [" . quest::saylink("unlock_" . $class, 1, $class) ."] $class, you'd be " . $classes{$class} . "; ";
+            if ($first) {
+                $first = 0;
+            } else {
+                $output .= ", ";
+            }
+            $output .= "as a [" . quest::saylink("unlock_" . $class, 1, $class) ."], " . $classes{$class};
         }
     }
-    # Remove the last semicolon and space, and add a period to the end.
-    $output =~ s/; $/./;
-
+    $output .= ".";
+    
     plugin::NPCTell($output);
-}
- elsif ($text=~/fos_reward_menu_3/i) {
+} elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
         } elsif ($text=~/fos_reward_menu_4/i) {
             plugin::YellowText("This category is not implemented yet.");
