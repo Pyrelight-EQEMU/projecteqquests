@@ -36,39 +36,45 @@ sub EVENT_SAY
         if ($text=~/fos_reward_menu_1/i) {
             plugin::NPCTell("The rewards I offer are broadly divided into three types; [". quest::saylink("fos_reward_menu_2",1,"alternate classes") ."], [". quest::saylink("fos_reward_menu_3",1,"spells and disciplines") ."], and [". quest::saylink("fos_reward_menu_4",1,"other abilities") ."]");
         } elsif ($text=~/fos_reward_menu_2/i) {            
-    my $player_class = $client->GetClassName();
+            my $player_class = $client->GetClassName();
 
-    my @paths = (
-        'Cleric',
-        'Paladin',
-        'Shadowknight',
-        'Druid',
-        'Shaman',
-        'Necromancer',
-        'Magician',
-        'Wizard',
-        'Enchanter',
-        'Beastlord',
-        'Ranger'
-    );
+            my @paths = (
+                'Cleric',
+                'Paladin',
+                'Shadowknight',
+                'Druid',
+                'Shaman',
+                'Necromancer',
+                'Magician',
+                'Wizard',
+                'Enchanter',
+                'Beastlord',
+                'Ranger'
+            );
 
-    # Randomize the order of the paths
-    @paths = sort { rand() <=> rand() } @paths;
+            # Randomize the order of the paths
+            @paths = sort { rand() <=> rand() } @paths;
 
-    my $output = "I can offer you access to the paths of ";
-    my $count = scalar(@paths);
-    foreach my $path (@paths) {
-        $output .= "[" . quest::saylink("unlock_" . $path, 1, $path) . "]";
-        $count--;
-        if ($count > 1) {
-            $output .= ", ";
-        } elsif ($count == 1) {
-            $output .= ", or ";
-        }
-    }
-    
-    plugin::NPCTell($output);
-} elsif ($text=~/fos_reward_menu_3/i) {
+            my $output = "I can offer you access to ";
+            my $count = scalar(@paths);
+            if ($count > 1) {
+                $output .= "the paths of ";
+                foreach my $path (@paths) {
+                    $output .= "[" . quest::saylink("unlock_" . $path, 1, $path) . "]";
+                    $count--;
+                    if ($count > 1) {
+                        $output .= ", ";
+                    } elsif ($count == 1) {
+                        $output .= ", or ";
+                    }
+                }
+            } elsif ($count == 1) {
+                $output .= "the only path remaining to you, that of the [" . quest::saylink("unlock_" . $paths[0], 1, $paths[0]) . "].";
+            }
+            
+            plugin::NPCTell($output . "Choose wisely, this choice cannot be reversed and the burden on your spirit will cause you to advance more slowly in all of your paths.");
+            plugin::YellowText("Upon choosing a class, you will gain an AA allowing you to switch to it. You will gain a permanent EXP penalty for each class you unlock.");
+        } elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
         } elsif ($text=~/fos_reward_menu_4/i) {
             plugin::YellowText("This category is not implemented yet.");
