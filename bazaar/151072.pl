@@ -39,9 +39,9 @@ sub EVENT_SAY
     my $player_class = $client->GetClassName();
 
     my %classes = (
-        'Cleric' => 'healing and protecting allies',
+        'Cleric' => 'healing and protecting your allies with divine power',
         'Paladin' => 'being a beacon of justice and valor',
-        'Shadowknight' => 'harnessing fear and decay',
+        'Shadowknight' => 'harnessing the powers of fear and decay',
         'Druid' => 'embracing the harmony of nature',
         'Shaman' => 'channeling spirits',
         'Necromancer' => 'mastering the undead',
@@ -52,22 +52,32 @@ sub EVENT_SAY
         'Ranger' => 'mastering wilderness and archery'
     );
 
-    my $output = "Picture the possibilities, " . $client->GetCleanName() . ": ";
-    my $first = 1;
+    my @intro = (
+        "You may choose to walk the path of the",
+        "Or perhaps you are drawn to the",
+        "The path of the",
+        "If the harmony of nature calls to you, the",
+        "While the",
+        "The",
+        "While the",
+        "The",
+        "And the",
+        "Perhaps the wild calls to you, drawing you to the",
+        "Or the"
+    );
+
+    my $output = "Picture the possibilities, " . $client->GetCleanName() . ". ";
+    my $i = 0;
     foreach my $class (keys %classes) {
         if ($class ne $player_class) {
-            if ($first) {
-                $first = 0;
-            } else {
-                $output .= ", ";
-            }
-            $output .= "as a [" . quest::saylink("unlock_" . $class, 1, $class) ."], " . $classes{$class};
+            $output .= $intro[$i % @intro] . " [" . quest::saylink("unlock_" . $class, 1, $class) ."], " . $classes{$class} . ". ";
+            $i++;
         }
     }
-    $output .= ".";
     
     plugin::NPCTell($output);
-} elsif ($text=~/fos_reward_menu_3/i) {
+}
+ elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
         } elsif ($text=~/fos_reward_menu_4/i) {
             plugin::YellowText("This category is not implemented yet.");
