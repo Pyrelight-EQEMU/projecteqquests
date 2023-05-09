@@ -13,10 +13,9 @@ jobs:
     - name: executing remote ssh commands using ssh key on master
       uses: appleboy/ssh-action@v0.1.8
       with:
-        host: ${{ secrets.HOST_MASTER }}
-        username: ${{ secrets.USERNAME_MASTER }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT_MASTER }}
         script: |
           cd /opt/eqemu/stack/server/quests
           git pull
