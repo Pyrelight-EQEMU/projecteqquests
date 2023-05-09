@@ -1,4 +1,7 @@
 sub EVENT_SAY {
+  
+    $client->AddAlternateCurrencyValue(10, 10);
+  
   my $charKey = $client->CharacterID() . "-MAO-Progress";
   my $progress = quest::get_data($charKey);
   if ($text=~/hail/i) {     
