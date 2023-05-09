@@ -26,7 +26,7 @@ sub EVENT_SAY
         } elsif ($text=~/fos1b/i) {
             plugin::NPCTell("Ah, you inquire about the nature of these feats of strength. Very well, I shall enlighten you. Across this vast world, I have positioned my loyal minions in close proximity to beings of formidable power. These minions stand ready to assist you in identifying and challenging these beings and their retinues to single combat. For each victory you achieve, I shall [". quest::saylink("fos1c",1,"reward you") ."] accordingly. The powers I bestow upon you will be commensurate with your success, ranging from the arcane to the martial, expanding your repertoire and deepening your understanding of the mystical arts. The more you prove yourself, the greater the gifts you shall receive.");
         } elsif ($text=~/fos1c/i) {
-            plugin::NPCTell("I understand your desire for clarity, and so I shall reveal the nature of my rewards further. As you triumph in these trials and prove your worth, I shall assign to you merits [". quest::saylink("fos_reward_menu_1",1,"that can be sent") ."] to acquire the exceptional abilities and powers I offer. In this way, you are granted the freedom to choose the abilities that best align with your aspirations and combat style. Whether you seek to unlock alternate classes, acquire potent melee skills, or master the arcane spells of the lost wizards, the choice lies in your capable hands.");
+            plugin::NPCTell("I understand your desire for clarity, and so I shall reveal the nature of my rewards further. As you triumph in these trials and prove your worth, I shall assign to you merits [". quest::saylink("fos_reward_menu_1",1,"that can be spent") ."] to acquire the exceptional abilities and powers I offer. In this way, you are granted the freedom to choose the abilities that best align with your aspirations and combat style. Whether you seek to unlock alternate classes, acquire potent melee skills, or master the arcane spells of the lost wizards, the choice lies in your capable hands.");
             plugin::NPCTell("You've done well to heed my message, though, young adventurer. I will grant you a boon - a single merit to gain access to an alternate class. ");
             plugin::YellowText("Through your heroic actions, you have gained 1 Merit Point.");
             quest::ding();
@@ -35,32 +35,35 @@ sub EVENT_SAY
         #Breaking this out seperately from that logic flow so its easier to work on.
         if ($text=~/fos_reward_menu_1/i) {
             plugin::NPCTell("The rewards I offer are broadly divided into three types; [". quest::saylink("fos_reward_menu_2",1,"alternate classes") ."], [". quest::saylink("fos_reward_menu_3",1,"spells and disciplines") ."], and [". quest::saylink("fos_reward_menu_4",1,"other abilities") ."]");
-        } elsif ($text=~/fos_reward_menu_2/i) {
-            my $player_name = 'player_name';  # replace with actual player name
-            my $player_class = $client->GetClassName();
+        } elsif ($text=~/fos_reward_menu_2/i) {            
+    my $player_class = $client->GetClassName();
 
-            my %classes = (
-                'Cleric' => 'healing and protecting your allies with divine power',
-                'Paladin' => 'a beacon of justice and valor',
-                'Shadowknight' => 'harnessing the powers of fear and decay',
-                'Druid' => 'the harmony of nature',
-                'Shaman' => 'channeling spirits and wielding cold, poison, and disease magic',
-                'Necromancer' => 'master of the undead',
-                'Magician' => 'wielding elemental forces with deadly precision',
-                'Wizard' => 'the secrets of devastating arcane power',
-                'Enchanter' => 'manipulating minds with a finesse few can resist',
-                'Beastlord' => 'blending beast mastery with physical prowess',
-                'Ranger' => 'a master of wilderness and archery'
-            );
+    my %classes = (
+        'Cleric' => 'healing and protecting your allies with divine power',
+        'Paladin' => 'a beacon of justice and valor',
+        'Shadowknight' => 'harnessing the powers of fear and decay',
+        'Druid' => 'the harmony of nature',
+        'Shaman' => 'channeling spirits',
+        'Necromancer' => 'mastering the undead',
+        'Magician' => 'wielding elemental forces with deadly precision',
+        'Wizard' => 'unleashing devastating arcane power',
+        'Enchanter' => 'manipulating minds with finesse',
+        'Beastlord' => 'blending beast mastery with physical prowess',
+        'Ranger' => 'mastering wilderness and archery'
+    );
 
-            my $output = "Picture the possibilities, $player_name. ";
-            foreach my $class (keys %classes) {
-                if ($class ne $player_class) {
-                    $output = $output . "As a $class, you would become " . $classes{$class} . ". ";
-                }
-            }
-            plugin::NPCTell($output);
-        } elsif ($text=~/fos_reward_menu_3/i) {
+    my $output = "Picture the possibilities, " . $client->GetCleanName() . ": ";
+    foreach my $class (keys %classes) {
+        if ($class ne $player_class) {
+            $output = $output . "as a [" . quest::saylink("unlock_" . $class, 1, $class) ."] $class, you'd be " . $classes{$class} . "; ";
+        }
+    }
+    # Remove the last semicolon and space, and add a period to the end.
+    $output =~ s/; $/./;
+
+    plugin::NPCTell($output);
+}
+ elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
         } elsif ($text=~/fos_reward_menu_4/i) {
             plugin::YellowText("This category is not implemented yet.");
