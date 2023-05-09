@@ -1,18 +1,38 @@
 name: remote ssh command
-on: [push]
+on: 
+  push:
+    branches:
+      - master
+      - dev
 jobs:
-
-  build:
-    name: Build
+  build_master:
+    if: github.ref == 'refs/heads/master'
+    name: Build on master
     runs-on: ubuntu-latest
     steps:
-    - name: executing remote ssh commands using ssh key
+    - name: executing remote ssh commands using ssh key on master
       uses: appleboy/ssh-action@v0.1.8
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        port: ${{ secrets.PORT }}
+        host: ${{ secrets.HOST_MASTER }}
+        username: ${{ secrets.USERNAME_MASTER }}
+        key: ${{ secrets.KEY_MASTER }}
+        port: ${{ secrets.PORT_MASTER }}
+        script: |
+          cd /opt/eqemu/stack/server/quests
+          git pull
+
+  build_dev:
+    if: github.ref == 'refs/heads/dev'
+    name: Build on dev
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using ssh key on dev
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.HOST_DEV }}
+        username: ${{ secrets.USERNAME_DEV }}
+        key: ${{ secrets.KEY_DEV }}
+        port: ${{ secrets.PORT_DEV }}
         script: |
           cd /opt/eqemu/stack/server/quests
           git pull
