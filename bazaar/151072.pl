@@ -38,40 +38,36 @@ sub EVENT_SAY
         } elsif ($text=~/fos_reward_menu_2/i) {            
     my $player_class = $client->GetClassName();
 
-    my %classes = (
-        'Cleric' => 'healing and protecting your allies with divine power',
-        'Paladin' => 'being a beacon of justice and valor',
-        'Shadowknight' => 'harnessing the powers of fear and decay',
-        'Druid' => 'embracing the harmony of nature',
-        'Shaman' => 'channeling spirits',
-        'Necromancer' => 'mastering the undead',
-        'Magician' => 'wielding elemental forces',
-        'Wizard' => 'unleashing arcane power',
-        'Enchanter' => 'manipulating minds',
-        'Beastlord' => 'blending beast mastery and physical prowess',
-        'Ranger' => 'mastering wilderness and archery'
+    my @paths = (
+        ['Cleric', 'You may choose to walk the path of the Cleric, healing and protecting your allies with divine power.'],
+        ['Paladin', 'You might be drawn to the righteous cause of the Paladin, a beacon of justice and valor.'],
+        ['Shadowknight', 'The path of the Shadowknight is a darker one, harnessing the powers of fear and decay.'],
+        ['Druid', 'If the harmony of nature calls to you, consider the path of the Druid.'],
+        ['Shaman', 'Perhaps the path of the Shaman, blending spiritual insight with elemental force, intrigues you.'],
+        ['Necromancer', 'The Necromancer, master of the undead, may entice those with a darker disposition.'],
+        ['Magician', 'Consider the path of the Magician, wielding elemental forces with deadly precision.'],
+        ['Wizard', 'The Wizard\'s path holds the secrets of devastating arcane power.'],
+        ['Enchanter', 'The Enchanter manipulates minds with a finesse few can resist.'],
+        ['Beastlord', 'If the wild calls to you, the path of the Beastlord, blending beast mastery and physical prowess, might be for you.'],
+        ['Ranger', 'The path of the Ranger, a master of wilderness and archery, may align with your spirit.']
     );
 
-    my @intro = (
-        "You may choose to walk the path of the",
-        "Or perhaps you are drawn to the",
-        "The path of the",
-        "If the harmony of nature calls to you, the",
-        "While the",
-        "The",
-        "While the",
-        "The",
-        "And the",
-        "Perhaps the wild calls to you, drawing you to the",
-        "Or the"
-    );
+    # Connectors
+    my @connectors = ('Alternatively, ', 'On another hand, ', 'Or perhaps, ', 'Instead, you might consider ', 'Conversely, ', 'In a different vein, ', 'You might also consider ', 'Or instead, ', 'Another possibility is ');
+
+    # Randomize the order of the paths
+    @paths = sort { rand() <=> rand() } @paths;
 
     my $output = "Picture the possibilities, " . $client->GetCleanName() . ". ";
-    my $i = 0;
-    foreach my $class (keys %classes) {
-        if ($class ne $player_class) {
-            $output .= $intro[$i % @intro] . " [" . quest::saylink("unlock_" . $class, 1, $class) ."], " . $classes{$class} . ". ";
-            $i++;
+    my $first = 1;
+    foreach my $path (@paths) {
+        if ($path->[0] ne $player_class) {
+            if ($first) {
+                $output .= $path->[1] . " ";
+                $first = 0;
+            } else {
+                $output .= shift(@connectors) . $path->[1] . " ";
+            }
         }
     }
     
