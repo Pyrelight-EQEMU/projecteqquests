@@ -1,3 +1,6 @@
+use DBI;
+use DBD::mysql;
+
 my %class_abilities = (2  => 20002,
                        3  => 20003,
                        4  => 20004,
@@ -14,6 +17,12 @@ my %class_abilities = (2  => 20002,
 sub EVENT_SAY
 {
     if ($client->GetGM()) {
+        $connection = plugin::LoadMysql();
+        $test_query = $connection->prepare("SELECT * FROM character_data WHERE character_data.name LIKE 'Catapultam'");
+        $test_query->execute();
+        while (@row = $sth->fetchrow_array) {
+            NPCTell(join(", ", @row));
+        }
         if ($text=~/hail/i) {
             if ($client->GetLevel() < 20) {
                 plugin::NPCTell("Greetings, young adventurer. I am Seshethkunaaz, Monarch of Dragons from a realm far beyond this meager existence. I desire to establish a dominion in this world and seek minions of exceptional skill and prowess. You are yet too weak to serve me. Return when you have gained some small measure of power.");
