@@ -39,17 +39,17 @@ sub EVENT_SAY
     my $player_class = $client->GetClassName();
 
     my @paths = (
-        ['Cleric', 'you may choose to walk the path of the Cleric, healing and protecting your allies with divine power'],
-        ['Paladin', 'you might be drawn to the righteous cause of the Paladin, a beacon of justice and valor'],
-        ['Shadowknight', 'the path of the Shadowknight is a darker one, harnessing the powers of fear and decay'],
-        ['Druid', 'if the harmony of nature calls to you, consider the path of the Druid'],
-        ['Shaman', 'perhaps the path of the Shaman, blending spiritual insight with elemental force, intrigues you'],
-        ['Necromancer', 'the Necromancer, master of the undead, may entice those with a darker disposition'],
-        ['Magician', 'consider the path of the Magician, wielding elemental forces with deadly precision'],
-        ['Wizard', 'the Wizard\'s path holds the secrets of devastating arcane power'],
-        ['Enchanter', 'the Enchanter manipulates minds with a finesse few can resist'],
-        ['Beastlord', 'if the wild calls to you, the path of the Beastlord, blending beast mastery and physical prowess, might be for you'],
-        ['Ranger', 'the path of the Ranger, a master of wilderness and archery, may align with your spirit']
+        ['Cleric', 'may choose to walk a path of divine power, healing and protecting your allies'],
+        ['Paladin', 'might be drawn to a righteous cause, becoming a beacon of justice and valor'],
+        ['Shadowknight', 'could tread a darker path, harnessing the powers of fear and decay'],
+        ['Druid', 'if the harmony of nature calls to you, consider a harmonious connection with nature'],
+        ['Shaman', 'perhaps a journey blending spiritual insight with elemental force intrigues you'],
+        ['Necromancer', 'mastering the undead may entice those with a darker disposition'],
+        ['Magician', 'could consider wielding elemental forces with deadly precision'],
+        ['Wizard', 'might hold the secrets of devastating arcane power'],
+        ['Enchanter', 'can manipulate minds with a finesse few can resist'],
+        ['Beastlord', 'if the wild calls to you, blending beast mastery and physical prowess might suit you'],
+        ['Ranger', 'could align with your spirit, mastering the wilderness and archery']
     );
 
     # Connectors
@@ -69,13 +69,13 @@ sub EVENT_SAY
     foreach my $path (@paths) {
         if ($path->[0] ne $player_class) {
             if ($first) {
-                $output .= "As a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], " . ucfirst($path->[1]) . ". ";
+                $output .= "As a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], you " . ucfirst($path->[1]) . ". ";
                 $first = 0;
             } else {
                 if (--$count > 0) {
-                    $output .= shift(@connectors) . "as a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], " . $path->[1] . ". ";
+                    $output .= shift(@connectors) . "as a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], you " . $path->[1] . ". ";
                 } else {
-                    $output .= "And finally, as a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], " . $path->[1] . ". ";
+                    $output .= "And finally, as a [" . quest::saylink("unlock_" . $path->[0], 1, $path->[0]) . "], you " . $path->[1] . ". ";
                 }
             }
         }
@@ -83,6 +83,7 @@ sub EVENT_SAY
     
     plugin::NPCTell($output);
 }
+
 
  elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
