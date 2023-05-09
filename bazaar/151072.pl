@@ -71,7 +71,7 @@ sub EVENT_SAY
                 $output .= "the only path remaining to you, that of the [" . quest::saylink("unlock_" . $paths[0], 1, $paths[0]) . "].";
             }
             
-            plugin::NPCTell($output . "Choose wisely, this choice cannot be reversed and the burden on your spirit will cause you to advance more slowly in all of your paths.");
+            plugin::NPCTell($output . ". Choose wisely, this choice cannot be reversed and the burden on your spirit will cause you to advance more slowly in all of your paths.");
             plugin::YellowText("Upon choosing a class, you will gain an AA allowing you to switch to it. You will gain a permanent EXP penalty for each class you unlock.");
         } elsif ($text=~/fos_reward_menu_3/i) {
             plugin::YellowText("This category is not implemented yet");
