@@ -46,7 +46,6 @@ sub EVENT_SAY
                 'Shaman',
                 'Necromancer',
                 'Magician',
-                'Wizard',
                 'Enchanter',
                 'Beastlord',
                 'Ranger'
@@ -55,7 +54,7 @@ sub EVENT_SAY
             # Randomize the order of the paths
             @paths = sort { rand() <=> rand() } @paths;
 
-            my $output = "I can offer you access to ";
+            my $output = "I can offer access to ";
             my $count = scalar(@paths);
             if ($count > 1) {
                 $output .= "the paths of ";
