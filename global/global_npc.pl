@@ -1,12 +1,18 @@
 use List::Util qw(max);
 use POSIX;
 
-sub EVENT_SPAWN
-{
+sub EVENT_SPAWN {
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {  
        SAVE_PET_STATS($npc);
        UPDATE_PET_STATS($npc);
        $npc->Heal();
+    }
+
+    my @lootlist = $npc->GetLootList();
+
+    # Iterate over the loot list and output each item
+    foreach my $loot (@lootlist) {
+        quest::debug("Loot: $loot");
     }
 }
 
