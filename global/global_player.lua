@@ -6,7 +6,6 @@ function event_connect(e)
     don.fix_invalid_faction_state(e.self)
 
 	check_level_flag(e)
-	convert_spellunlocks(e)
 	e.self:GrantAlternateAdvancementAbility(938, 8, true)
 
 	check_class_switch_aa(e)
