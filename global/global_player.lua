@@ -10,6 +10,8 @@ function event_connect(e)
 
 	check_class_switch_aa(e)
 
+	check_skills(e)
+
 	local bucket = e.self:GetBucket("FirstLoginAnnounce")
 	if (not bucket or bucket == "") and e.self:GetLevel() == 1 then
 	  e.self:SetBucket("FirstLoginAnnounce", "1")
@@ -19,18 +21,12 @@ function event_connect(e)
 end
 
 function event_level_up(e)
-  local free_skills =  {0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76};
+	check_skills(e)
 
-  for k,v in ipairs(free_skills) do
-    if ( e.self:MaxSkill(v) > 0 and e.self:GetRawSkill(v) < 1 and e.self:CanHaveSkill(v) ) then 
-      e.self:SetSkill(v, 1);
-    end      
-  end
-
-  if (e.self:GetLevel() % 5 == 0) then
-	eq.world_emote(15,e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
-	eq.discord_send("ooc", e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
-  end
+	if (e.self:GetLevel() % 5 == 0) then
+		eq.world_emote(15,e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
+		eq.discord_send("ooc", e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
+	end
 end
 
 function check_level_flag(e)
@@ -293,3 +289,12 @@ function convert_spellunlocks(e)
 	end
 end
 
+function check_skills(e)
+	local free_skills =  {0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76};
+
+	for k,v in ipairs(free_skills) do
+		if ( e.self:MaxSkill(v) > 0 and e.self:GetRawSkill(v) < 1 and e.self:CanHaveSkill(v) ) then 
+			e.self:SetSkill(v, 1);
+		end      
+	end
+end
