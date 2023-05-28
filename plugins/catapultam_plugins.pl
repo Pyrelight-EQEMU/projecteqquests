@@ -71,12 +71,12 @@ sub GetRoman {
 
 sub GetPotName {
     my @strings = (
-        "Divine Healing", "Divine Healing", "Divine Healing",
-        "Celestial Healing", "Celestial Healing", "Celestial Healing",
-        "Mana Restoration", "Mana Restoration", "Mana Restoration",
+        "Divine Healing", "Divine Healing", "Divine Healing", "Divine Healing", "Divine Healing", "Divine Healing",
+        "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing", "Celestial Healing",
+        "Mana Restoration",
         "Skinspikes",
-        "Replenishment",
-        "Alacrity",
+        "Replenishment", "Replenishment", "Replenishment",
+        "Alacrity", "Alacrity",
         "Immunization", "Immunization", "Immunization", "Immunization", "Immunization",
         "Antidote", "Antidote", "Antidote", "Antidote", "Antidote"
     );
