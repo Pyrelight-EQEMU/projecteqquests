@@ -76,9 +76,7 @@ sub GetPotName {
         "Mana Restoration",
         "Skinspikes",
         "Replenishment", "Replenishment", "Replenishment",
-        "Alacrity", "Alacrity",
-        "Immunization", "Immunization", "Immunization", "Immunization", "Immunization",
-        "Antidote", "Antidote", "Antidote", "Antidote", "Antidote"
+        "Alacrity",
     );
     return $strings[int(rand(@strings))];
 }
