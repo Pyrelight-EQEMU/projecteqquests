@@ -34,10 +34,8 @@ sub EVENT_KILLED_MERIT {
     my $dbh = plugin::LoadMysql();
 
     #Potions
-    if ($client && $client->GetLevelCon($npc->GetLevel()) != 6) {
-        my $bucketValue = $client->GetBucket("PotionDrop") || 0; # If bucket value does not exist, it defaults to 0
-        my $dropRate = 0.50 / (1 + $bucketValue / 100); # Modify this formula to suit your requirements for decreasing drop rate
-        $dropRate = max($dropRate, 0.05); # Ensures the drop rate never falls below 0.05
+    if ($client && $client->GetLevelCon($npc->GetLevel()) != 6) {        
+        my $dropRate = 0.1;
 
         if (rand() <= $dropRate) {
             my $pot_name = plugin::GetPotName();
@@ -52,9 +50,9 @@ sub EVENT_KILLED_MERIT {
             my ($potion_id) = $query->fetchrow_array();
 
             $npc->AddItem($potion_id);
-            $client->SetBucket("PotionDrop", $bucketValue + 1, 24 * 60 * 60);
         }
-    } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
+    } 
+    if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
         $npc->AddItem(40605); # Exp Pot
         $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
     }
