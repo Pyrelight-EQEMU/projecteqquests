@@ -35,7 +35,7 @@ sub EVENT_KILLED_MERIT {
 
     #Potions
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6) {        
-        my $dropRate = 0.1;
+        my $dropRate = 0.2;
 
         if (rand() <= $dropRate) {
             my $pot_name = plugin::GetPotName();
