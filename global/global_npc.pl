@@ -37,6 +37,8 @@ sub EVENT_KILLED_MERIT {
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6) {        
         my $dropRate = 0.2;
 
+        plugin::YellowText("You have killed a mob eligible for a potion drop. Drop Rate: " . $dropRate);  
+
         if (rand() <= $dropRate) {
             my $pot_name = plugin::GetPotName();
             my $potion = "Distillate of " . $pot_name;
@@ -50,8 +52,10 @@ sub EVENT_KILLED_MERIT {
             my ($potion_id) = $query->fetchrow_array();
 
             $npc->AddItem($potion_id);
+            plugin::YellowText("A potion should have dropped.");
         }
     } 
+    
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
         $npc->AddItem(40605); # Exp Pot
         $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
