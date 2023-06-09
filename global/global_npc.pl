@@ -6,7 +6,11 @@ sub EVENT_SPAWN {
        SAVE_PET_STATS($npc);
        UPDATE_PET_STATS($npc);
        $npc->Heal();
-    }
+    } else {
+        if ($zonesn == 'vexthal' && substr($npc->GetName(), 0, 1) ne '#' && rand() <= 0.33) {
+            $npc->Depop(1);
+        }
+    }    
 
     my @lootlist = $npc->GetLootList();
 
