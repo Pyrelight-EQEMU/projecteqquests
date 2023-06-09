@@ -8,7 +8,7 @@ sub EVENT_SPAWN {
        $npc->Heal();
     } else {
         if ($npc->GetName() ne 'zone_controller' && substr($npc->GetName(), 0, 1) ne '#' && rand() <= 0.5) {            
-            if ($zonesn eq 'vexthal') {}
+            if ($zonesn eq 'vexthal') {
                 quest::debug("Depopping: " . $npc->GetName());
                 $npc->Depop(1);
             }
