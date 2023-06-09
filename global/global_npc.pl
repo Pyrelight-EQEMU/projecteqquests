@@ -7,7 +7,7 @@ sub EVENT_SPAWN {
        UPDATE_PET_STATS($npc);
        $npc->Heal();
     } else {
-        if ($zonesn == 'vexthal' && substr($npc->GetName(), 0, 1) ne '#' && rand() <= 0.5) {            
+        if ($zonesn eq 'vexthal' && substr($npc->GetName(), 0, 1) ne '#' && rand() <= 0.5) {            
             quest::debug("Depopping: " . $npc->GetCleanName());
             $npc->Depop(1);
         }
