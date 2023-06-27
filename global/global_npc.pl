@@ -41,7 +41,7 @@ sub EVENT_KILLED_MERIT {
             my $pot_name = plugin::GetPotName();
             my $potion = "Distillate of " . $pot_name;
 
-            if ($pot_name ne "Immunization" && $pot_name ne "Antidote") {
+            if ($pot_name ne "Immunization" && $pot_name ne "Antidote" && $pot_name ne "Skinspikes") {
                 $potion .= " " . plugin::GetRoman($client->GetLevel());
             }
 
