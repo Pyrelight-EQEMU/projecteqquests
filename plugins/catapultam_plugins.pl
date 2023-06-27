@@ -71,9 +71,10 @@ sub GetRoman {
 
 sub GetPotName {
     my @strings = (
-        "Instant Healing", "Instant Healing", "Instant Healing", "Instant Healing", "Instant Healing", "Instant Healing",
-        "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing",
+        "Instant Healing", "Instant Healing", "Instant Healing",  
+        "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing", "Gradual Healing",  
         "Mana Restoration",
+        "Immunization", "Antidote",
         "Skinspikes",
         "Replenishment", "Replenishment", "Replenishment",
         "Alacrity",
