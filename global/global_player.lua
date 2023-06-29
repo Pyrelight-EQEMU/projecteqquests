@@ -55,7 +55,7 @@ function event_discover_item(e)
 			eq.set_data(key,tostring(tonumber(eq.get_data(key)) + 1));
 		end
 		eq.world_emote(15,e.self:GetCleanName() .. " is the first to discover " .. eq.item_link(e.item:ID()) .. "!")
-		eq.discord_send("ooc", e.self:GetCleanName() .. " is the first to discover [[" .. e.item:Name() .. "](https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:ID() ..")]!")
+		eq.discord_send("ooc", e.self:GetCleanName() .. " is the first to discover [[" .. e.item:Name() .. "](https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:ID() ..")]!!")
 	end
 end
 
