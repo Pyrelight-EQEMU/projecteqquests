@@ -178,7 +178,7 @@ sub UPDATE_PET {
     #quest::debug("--Syncronizing Pet Inventory--");
     my $owner = $npc->GetOwner()->CastToClient();
     my $bag_size = 200; # actual bag size limit in source
-    my $bag_id = 11703; # Box of Abu-Kar, temporary
+    my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
     if ($owner) {       
