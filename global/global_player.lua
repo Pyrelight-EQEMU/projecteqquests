@@ -9,6 +9,7 @@ function event_connect(e)
 	e.self:GrantAlternateAdvancementAbility(938, 8, true)
 
 	check_class_switch_aa(e)
+	check_starting_attunement(e)
 
 	local bucket = e.self:GetBucket("FirstLoginAnnounce")
 	if (not bucket or bucket == "") and e.self:GetLevel() == 1 then
