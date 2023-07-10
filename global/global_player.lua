@@ -317,6 +317,8 @@ end
 
 function remove_attunement(c, attunement_point)
 
+	eq.debug("Attempting to Remove an attument");
+
 	local zone_name = attunement_point["zone_name"]
 	local prefix = attunement_point["prefix"]
 	local description = attunement_point["description"]
