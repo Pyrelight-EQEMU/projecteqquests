@@ -16,7 +16,7 @@ function event_connect(e)
 	  e.self:SetBucket("FirstLoginAnnounce", "1")
 	  eq.world_emote(15, e.self:GetCleanName() .. " has logged in for the first time!")
 	  eq.discord_send("ooc", e.self:GetCleanName() .. " has logged in for the first time!")
-	end	
+	end
 end
 
 function event_level_up(e)
