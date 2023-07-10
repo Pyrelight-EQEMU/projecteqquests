@@ -360,7 +360,7 @@ function check_starting_attunement(e)
 	local race = e.self:GetRace()
 
 	-- Update attunement point for the player's race
-	local attune_set = update_attunement(e.self, attunement_points[race])
+	local attune_set = add_attunement(e.self, attunement_points[race])
 	
 	-- Remove attunement points for all other races
 	for race_id, attunement_point in pairs(attunement_points) do
