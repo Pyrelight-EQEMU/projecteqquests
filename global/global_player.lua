@@ -297,10 +297,11 @@ end
 function update_attunement(c, attunement_point)
 	
 	local zone_name = attunement_point["zone_name"]
+	local prefix = attunement_point["prefix"]
 	local description = attunement_point["description"]
 	local coordinates = attunement_point["coordinates"] -- Assuming coordinates is a table with x, y, z, and heading keys
 
-	local charKey = c:CharacterID() .. "-TL-" .. zone_name
+	local charKey = c:CharacterID() .. "-TL-" .. prefix
 	local charTL = eq.get_data(charKey)
 	
 	local locString = ":" .. zone_name .. "," .. description .. "," .. coordinates["x"] .. "," .. coordinates["y"] .. "," .. coordinates["z"] .. "," .. coordinates["heading"]
@@ -322,6 +323,7 @@ function check_starting_attunement(e)
 	if (race == 6 and not attune_set) then
 		attune_set = update_attunement(e.self, 
 						{
+							prefix = 'A'
 							zone_name = "neriakb",
 							description = "Neriak Commons",
 							coordinates = {
