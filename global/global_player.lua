@@ -335,6 +335,6 @@ function check_starting_attunement(e)
 	end
 
 	if (attune_set) then
-		quest.message(15, "Your soul has become attuned to your home city!")
+		eq.message(15, "Your soul has become attuned to your home city!")
 	end
 end
