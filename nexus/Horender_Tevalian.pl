@@ -16,7 +16,7 @@ sub EVENT_SAY {
   $teleport_zones{"The Northern Plains of Karana (Great Combine Spires)"} = ["northkarana", "The Northern Plains of Karana (Great Combine Spires)", 1215, -3690, -9, 0];
 
   if ($client->GetRace() == 6) {
-    $teleport_zones {"Neriak Commons (Home City)"} = ["neriakb, ""Neriak Commons (Home City)", -562, -45, -39, 256];
+    $teleport_zones {"Neriak Commons (Home City)"} = ["neriakb", "Neriak Commons (Home City)", -562, -45, -39, 256];
   }
 
   $teleport_zones{"Innothule Swamp (Blind)"} = ["innothule", "Innothule Swamp (Blind)", 620, -2370, -17, 35];
