@@ -293,3 +293,48 @@ function convert_spellunlocks(e)
 	end
 end
 
+function update_attunement(c, attunement_point)
+	
+	local zone_name = attunement_point["zone_name"]
+	local description = attunement_point["description"]
+	local coordinates = attunement_point["coordinates"] -- Assuming coordinates is a table with x, y, z, and heading keys
+
+	local charKey = c:CharacterID() .. "-TL-" .. zone_name
+	local charTL = quest.get_data(charKey)
+	
+	local locString = ":" .. zone_name .. "," .. description .. "," .. coordinates["x"] .. "," .. coordinates["y"] .. "," .. coordinates["z"] .. "," .. coordinates["heading"]
+	
+	if not string.find(charTL, description) and zone_name ~= "" then		
+		quest.ding()
+		quest.set_data(charKey, charTL .. locString)
+		return true;
+	elseif zone_name == "" then
+		quest.debug("Configuration Error.")
+		return false;
+	end
+end
+
+function check_starting_attunement(e)
+
+	local race = e.self:GetRace()
+	local attune_set = false
+
+	if (race == 6 and not attune_set) then
+		attune_set = update_attunement(e.self, 
+						{
+							zone_name = "neriakb",
+							description = "Neriak Commons",
+							coordinates = {
+								x = "-562",
+								y = "-45",
+								z = "-38.84",
+								heading = "256"
+							}
+						}
+					)
+	end
+
+	if (attune_set) then
+		quest.message(15, "Your soul has become attuned to your home city!")
+	end
+end
