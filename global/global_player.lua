@@ -323,7 +323,7 @@ function check_starting_attunement(e)
 	if (race == 6 and not attune_set) then
 		attune_set = update_attunement(e.self, 
 						{
-							prefix = 'A'
+							prefix = 'A',
 							zone_name = "neriakb",
 							description = "Neriak Commons",
 							coordinates = {
