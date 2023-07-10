@@ -301,16 +301,15 @@ function update_attunement(c, attunement_point)
 	local coordinates = attunement_point["coordinates"] -- Assuming coordinates is a table with x, y, z, and heading keys
 
 	local charKey = c:CharacterID() .. "-TL-" .. zone_name
-	local charTL = quest.get_data(charKey)
+	local charTL = eq.get_data(charKey)
 	
 	local locString = ":" .. zone_name .. "," .. description .. "," .. coordinates["x"] .. "," .. coordinates["y"] .. "," .. coordinates["z"] .. "," .. coordinates["heading"]
 	
-	if not string.find(charTL, description) and zone_name ~= "" then		
-		quest.ding()
-		quest.set_data(charKey, charTL .. locString)
+	if not string.find(charTL, description) and zone_name ~= "" then
+		eq.set_data(charKey, charTL .. locString)
 		return true;
 	elseif zone_name == "" then
-		quest.debug("Configuration Error.")
+		eq.debug("Configuration Error.")
 		return false;
 	end
 end
