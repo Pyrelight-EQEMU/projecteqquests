@@ -294,7 +294,7 @@ function convert_spellunlocks(e)
 	end
 end
 
-function update_attunement(c, attunement_point)
+function add_attunement(c, attunement_point)
 	
 	local zone_name = attunement_point["zone_name"]
 	local prefix = attunement_point["prefix"]
@@ -315,28 +315,62 @@ function update_attunement(c, attunement_point)
 	end
 end
 
+function remove_attunement(c, attunement_point)
+
+	local zone_name = attunement_point["zone_name"]
+	local prefix = attunement_point["prefix"]
+	local description = attunement_point["description"]
+	local coordinates = attunement_point["coordinates"] -- Assuming coordinates is a table with x, y, z, and heading keys
+
+	local charKey = c:CharacterID() .. "-TL-" .. prefix
+	local charTL = eq.get_data(charKey)
+
+	local locString = ":" .. zone_name .. "," .. description .. "," .. coordinates["x"] .. "," .. coordinates["y"] .. "," .. coordinates["z"] .. "," .. coordinates["heading"]
+
+	local start_pos, end_pos = string.find(charTL, locString)
+
+	if start_pos ~= nil then -- If the location string exists in the character's attunement data
+		local new_charTL = string.sub(charTL, 1, start_pos - 1) .. string.sub(charTL, end_pos + 1)
+		eq.set_data(charKey, new_charTL) -- Update the character's attunement data
+		return true;
+	else -- If the location string does not exist in the character's attunement data
+		return false;
+	end
+end
+
+
 function check_starting_attunement(e)
 
-	local race = e.self:GetRace()
-	local attune_set = false
+	-- Define attunement points for each race
+	local attunement_points = {
+		[6] = {
+			prefix = 'A',
+			zone_name = "neriakb",
+			description = "Neriak Commons (Home)",
+			coordinates = {
+				x = "-562",
+				y = "-45",
+				z = "-38.84",
+				heading = "256"
+			}
+		},
+		-- Add other race IDs and corresponding attunement points here
+	}
 
-	if (race == 6 and not attune_set) then
-		attune_set = update_attunement(e.self, 
-						{
-							prefix = 'A',
-							zone_name = "neriakb",
-							description = "Neriak Commons",
-							coordinates = {
-								x = "-562",
-								y = "-45",
-								z = "-38.84",
-								heading = "256"
-							}
-						}
-					)
+	local race = e.self:GetRace()
+
+	-- Update attunement point for the player's race
+	local attune_set = update_attunement(e.self, attunement_points[race])
+	
+	-- Remove attunement points for all other races
+	for race_id, attunement_point in pairs(attunement_points) do
+		if race_id ~= race then
+			remove_attunement(e.self, attunement_point)
+		end
 	end
 
 	if (attune_set) then
 		eq.message(15, "Your soul has become attuned to your home city!")
 	end
 end
+
