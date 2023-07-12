@@ -331,7 +331,7 @@ sub UPDATE_PET_STATS
 
     if ($owner) {
         # Create Scalar.
-        my $pet_scalar = APPLY_FOCI();
+        my $pet_scalar = APPLY_FOCUS();
 
         # Do max HP adjustment
         my $max_hp = ceil($owner->GetBucket("max_hp") * ($pet_scalar/2)); 
