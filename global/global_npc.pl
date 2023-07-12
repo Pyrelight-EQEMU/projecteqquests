@@ -15,7 +15,8 @@ sub EVENT_TICK
 
 sub EVENT_SPAWN {
     #Pet Scaling
-    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {  
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
+        SAVE_PET_STATS(); 
         UPDATE_PET();
         $npc->Heal();
     }
