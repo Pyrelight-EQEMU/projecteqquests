@@ -15,7 +15,7 @@ sub EVENT_TICK
 
 sub EVENT_SPAWN {
     #Pet Scaling
-    if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {  
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {  
         UPDATE_PET();
         $npc->Heal();
     }
@@ -181,6 +181,8 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
+    APPLY_FOCUS();
+
     if ($owner) {       
         my %new_pet_inventory;
         my %new_bag_inventory;
@@ -251,7 +253,6 @@ sub UPDATE_PET {
                 }
             }
         }
-
     } else {
         quest::debug("The owner is not defined");
         return;
@@ -274,4 +275,17 @@ sub GET_BAG_CONTENTS {
         }
     }
     return %new_bag_inventory;
+}
+
+sub APPLY_FOCUS {
+    my $owner = $npc->GetOwner();
+    my $inventory = $owner->GetInventory();
+
+    if ($owner->GetClass() == 13 && $inventory->CountAugmentEquippedByID(28034) > 0 && !$npc->FindBuff(847)) {
+        $npc->CastSpell(847, $npc->GetID());
+    } elsif ($npc->FindBuff(847)) {
+        $npc->BuffFadeBySpellID(847);
+        $owner->BuffFadeBySpellID(847);
+    }
+
 }
