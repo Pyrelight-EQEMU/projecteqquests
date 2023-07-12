@@ -278,7 +278,7 @@ sub GET_BAG_CONTENTS {
 }
 
 sub APPLY_FOCUS {
-    my $owner = $npc->GetOwner();
+    my $owner = $npc->GetOwner()->CastToClient();
     my $inventory = $owner->GetInventory();
 
     if ($owner->GetClass() == 13 && $inventory->CountAugmentEquippedByID(28034) > 0 && !$npc->FindBuff(847)) {
