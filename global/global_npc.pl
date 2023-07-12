@@ -281,8 +281,10 @@ sub APPLY_FOCUS {
     my $owner = $npc->GetOwner()->CastToClient();
     my $inventory = $owner->GetInventory();
 
-    if ($owner->GetClass() == 13 && $inventory->CountAugmentEquippedByID(28034) > 0 && !$npc->FindBuff(847)) {
-        $npc->CastSpell(847, $npc->GetID());
+    if ($owner->GetClass() == 13 && $inventory->CountAugmentEquippedByID(28034) > 0) {
+        if (!$npc->FindBuff(847)) {
+            $npc->CastSpell(847, $npc->GetID());
+        }
     } elsif ($npc->FindBuff(847)) {
         $npc->BuffFadeBySpellID(847);
         $owner->BuffFadeBySpellID(847);
