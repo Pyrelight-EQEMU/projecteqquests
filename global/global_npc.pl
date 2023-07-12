@@ -181,7 +181,7 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
-    APPLY_FOCUS();
+    UPDATE_PET_STATS();
 
     if ($owner) {       
         my %new_pet_inventory;
@@ -281,13 +281,102 @@ sub APPLY_FOCUS {
     my $owner = $npc->GetOwner()->CastToClient();
     my $inventory = $owner->GetInventory();
 
+    my $total_focus_scale = 1.0;
+
     if ($owner->GetClass() == 13 && $inventory->CountAugmentEquippedByID(28034) > 0) {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());
+            $total_focus_scale += 0.2;
         }
     } elsif ($npc->FindBuff(847)) {
         $npc->BuffFadeBySpellID(847);
         $owner->BuffFadeBySpellID(847);
     }
 
+
+    return $total_focus_scale;
+}
+
+sub SAVE_PET_STATS
+{
+    my $pet = $npc;
+    my $owner = $pet->GetOwner()->CastToClient();
+
+    if ($owner) {     
+        $owner->SetBucket("hp_regen", $pet->GetNPCStat("hp_regen"));        
+        $owner->SetBucket("min_hit", $pet->GetNPCStat("min_hit"));
+        $owner->SetBucket("max_hit", $pet->GetNPCStat("max_hit"));
+        $owner->SetBucket("max_hp", $pet->GetNPCStat("max_hp"));
+        $owner->SetBucket("atk", $pet->GetNPCStat("atk"));
+        $owner->SetBucket("str", $pet->GetNPCStat("str"));
+        $owner->SetBucket("sta", $pet->GetNPCStat("sta"));
+        $owner->SetBucket("dex", $pet->GetNPCStat("dex"));
+        $owner->SetBucket("agi", $pet->GetNPCStat("agi"));
+        $owner->SetBucket("ac", $pet->GetNPCStat("ac"));
+        $owner->SetBucket("mr", $pet->GetNPCStat("mr"));
+        $owner->SetBucket("fr", $pet->GetNPCStat("fr"));
+        $owner->SetBucket("cr", $pet->GetNPCStat("cr"));
+        $owner->SetBucket("dr", $pet->GetNPCStat("dr"));
+        $owner->SetBucket("pr", $pet->GetNPCStat("pr"));
+
+        # We only arrive here on initial summoning.
+        $owner->DeleteBucket("epic_proc");
+    }
+}
+
+sub UPDATE_PET_STATS
+{
+    my $pet = $npc;
+    my $owner = $pet->GetOwner()->CastToClient();
+
+    if ($owner) {
+        # Create Scalar.
+        my $pet_scalar = APPLY_FOCI();
+
+        # Do max HP adjustment
+        my $max_hp = ceil($owner->GetBucket("max_hp") * ($pet_scalar/2)); 
+        $pet->ModifyNPCStat("max_hp", $max_hp);
+
+        # Set spellscale and healscale for the pet
+        $pet->ModifyNPCStat("spellscale", ($owner->GetSpellDamage()) + 100 . "");
+        $pet->ModifyNPCStat("healscale", ($owner->GetHealAmount()) + 100 . "");
+
+        # Set Resists
+        my $mr = ceil($owner->GetBucket("mr") * $pet_scalar) . "";
+        my $fr = ceil($owner->GetBucket("fr") * $pet_scalar) . "";
+        my $cr = ceil($owner->GetBucket("cr") * $pet_scalar) . "";
+        my $dr = ceil($owner->GetBucket("dr") * $pet_scalar) . "";
+        my $pr = ceil($owner->GetBucket("pr") * $pet_scalar) . "";
+
+        $pet->ModifyNPCStat("mr", $mr);
+        $pet->ModifyNPCStat("fr", $fr);
+        $pet->ModifyNPCStat("cr", $cr);
+        $pet->ModifyNPCStat("dr", $dr);
+        $pet->ModifyNPCStat("pr", $pr);
+
+        # Set Primary Stats
+        my $str = ceil($owner->GetBucket("str") * $pet_scalar) . "";
+        my $sta = ceil($owner->GetBucket("sta") * $pet_scalar) . "";
+        my $dex = ceil($owner->GetBucket("dex") * $pet_scalar) . "";
+        my $agi = ceil($owner->GetBucket("agi") * $pet_scalar) . "";
+        my $atk = ceil($owner->GetBucket("atk") * $pet_scalar) . "";
+
+        $pet->ModifyNPCStat("str", $str);
+        $pet->ModifyNPCStat("sta", $sta);
+        $pet->ModifyNPCStat("dex", $dex);
+        $pet->ModifyNPCStat("agi", $agi);
+        $pet->ModifyNPCStat("atk", $atk);
+
+        my $min_hit = ceil($owner->GetBucket("min_hit") * $pet_scalar) . "";
+        my $max_hit = ceil($owner->GetBucket("max_hit") * $pet_scalar) . "";
+        my $hp_regen = ceil($owner->GetBucket("hp_regen") * $pet_scalar) . "";
+
+        $pet->ModifyNPCStat("min_hit", $min_hit);
+        $pet->ModifyNPCStat("max_hit", $max_hit);
+        $pet->ModifyNPCStat("hp_regen", $hp_regen);
+
+        # Set Runspeed
+        my $runspeed = $owner->GetRunspeed() / 17 . "";
+        $pet->ModifyNPCStat("runspeed", $runspeed);
+    }
 }
