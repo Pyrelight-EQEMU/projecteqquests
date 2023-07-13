@@ -294,7 +294,6 @@ sub APPLY_FOCUS {
         $owner->BuffFadeBySpellID(847);
     }
 
-
     return $total_focus_scale;
 }
 
@@ -323,7 +322,7 @@ sub UPDATE_PET_STATS
 
         my @stat_list = qw(hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
-            my $bucket_value = $owner->GetBucket($stat);
+            my $bucket_value = $owner->GetBucket($stat) * $pet_scalar;
             $pet->ModifyNPCStat($stat, $bucket_value . "");
         }
     }
