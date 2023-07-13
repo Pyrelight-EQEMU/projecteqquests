@@ -17,7 +17,7 @@
 
   # High Elf
   if ($client->GetRace() == 5) {
-    $teleport_zones{"Northern Felwithe (Traveler's Home [Racial])"} = [ "felwithea", "Northern Felwithe (Traveler's Home [Racial])", -370, 214. 3, 259];
+    $teleport_zones{"Northern Felwithe (Traveler's Home [Racial])"} = [ "felwithea", "Northern Felwithe (Traveler's Home [Racial])", -370, 214, 3, 259];
   }
 
   # Wood Elf
