@@ -14,16 +14,40 @@ sub EVENT_SAY {
    }
 
    elsif ($text eq "link_epic") {
+      $class = $client->GetClass();
+      $ornament = 0;
+      
+      # Use a hash to map the class and item id to the ornament id
+      my %class_item_to_ornament = (
+            '2_5532' => 127916,
+            '3_10099' => 127923,
+            '4_20488' => 127924,
+            '5_14383' => 127927,
+            '6_20490' => 127917,
+            '10_10651' => 127926,
+            '11_20544' => 127921,
+            '13_28034' => 127919,
+            '14_10650' => 127918,
+            '15_8495' => 127914,
+      );
 
-   }
+      # Check each item in the player's equipment
+      foreach my $item_id (keys %class_item_to_ornament) {
+            if ($client->HasItemEquippedByID($item_id)) {
+                  $ornament = $class_item_to_ornament{"${class}_$item_id"};
+                  last;  # Exit the loop once we find a match
+            }
+      }
 
-   elsif ($text eq "link_custom") {
-$response = "I can make magical trinkets which are imbued with the core enchantment of an existing artifact. 
-             When applied to other artifacts as augments, these trinkets impart some degree of the original's power, 
-             as well as allowing the augmented artifact to act as a focus or use the abilities of the original artifact. 
-             Unfortunately, right now I am so backed up that I cannot possibly take on any extra work like this, 
-             not unless you have $link_voucher.";
-   }
+      if ($ornament > 0) {
+         $response = "Amazing! I recognize that one. I know just the trick for this one; take this trinket. If you apply it as an augment to one
+                        of your weapons or other held equipment, it will take on the illusion of your relic. This won't give you any improvement to 
+                        the augmented item, but we can work on that later."
+         $client->SummonItem($ornament);
+      } else {
+          $response = "I don't see a relic among your equipment, please don't waste my time. Come back when you have one.";
+      }
+   }  
 
    plugin::NPCTell($response);
 }
@@ -31,3 +55,5 @@ $response = "I can make magical trinkets which are imbued with the core enchantm
 sub EVENT_ITEM {
   plugin::return_items(\%itemcount);
 }
+
+
