@@ -10,6 +10,7 @@ sub EVENT_SAY {
          $response = "Welcome back, $clientName. What can I do for you today? ";
       }
       $response = $response . "If you have acquired a $link_epic, I can offer you an corresponding ornament for it. If you are interested in $link_custom, we should talk!";
+      plugin::NPCTell($respnse);
    }
 }
 
