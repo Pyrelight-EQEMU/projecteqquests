@@ -4,7 +4,7 @@ sub EVENT_SAY {
    my $link_epic = "[".quest::saylink("relic", true, "response_epic")."]";
    my $link_custom = "[".quest::saylink("custom work", true, "response_custom")."]";
    if($text=~/hail/i) {
-      if (!$client->GetData("Tawnos")) {
+      if (!$client->GetBucket("Tawnos")) {
          $response = "Hail, $clientName. I am Tawnos, master artificer and enchanter! I am still setting up my facilities here in the Bazaar, but I can already offer some services. ";
       } else {
          $response = "Welcome back, $clientName. What can I do for you today? ";
