@@ -13,11 +13,11 @@ sub EVENT_SAY {
       $response = $response . "If you have acquired a $link_epic, I can offer you an corresponding ornament for it. If you are interested in $link_custom, we should talk!";            
    }
 
-   if ($text == "link_epic") {
+   elsif ($text eq "link_epic") {
 
    }
 
-   if ($text == "link_custom") {
+   elsif ($text eq "link_custom") {
 $response = "I can make magical trinkets which are imbued with the core enchantment of an existing artifact. 
              When applied to other artifacts as augments, these trinkets impart some degree of the original's power, 
              as well as allowing the augmented artifact to act as a focus or use the abilities of the original artifact. 
