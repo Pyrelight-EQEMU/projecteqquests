@@ -41,8 +41,8 @@ sub EVENT_SAY {
 
       if ($ornament > 0) {
          $response = "Amazing! I recognize that one. I know just the trick for this one; take this trinket. If you apply it as an augment to one
-                        of your weapons or other held equipment, it will take on the illusion of your relic. This won't give you any improvement to 
-                        the augmented item, but we can work on that later."
+                      of your weapons or other held equipment, it will take on the illusion of your relic. This won't give you any improvement to 
+                      the augmented item, but we can work on that later.";
          $client->SummonItem($ornament);
       } else {
           $response = "I don't see a relic among your equipment, please don't waste my time. Come back when you have one.";
