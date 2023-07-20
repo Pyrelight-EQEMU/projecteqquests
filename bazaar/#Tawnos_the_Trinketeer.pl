@@ -32,9 +32,10 @@ sub EVENT_SAY {
       );
 
       # Check each item in the player's equipment
-      foreach my $item_id (keys %class_item_to_ornament) {
-            if ($client->HasItemEquippedByID($item_id)) {
-                  $ornament = $class_item_to_ornament{"${class}_$item_id"};
+      foreach my $class_item (keys %class_item_to_ornament) {
+            my ($class_key, $item_id) = split("_", $class_item);
+            if ($class_key == $class && $client->HasItemEquippedByID($item_id)) {
+                  $ornament = $class_item_to_ornament{$class_item};
                   last;  # Exit the loop once we find a match
             }
       }
