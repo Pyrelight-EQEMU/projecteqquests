@@ -285,6 +285,7 @@ sub APPLY_FOCUS {
     my $total_focus_scale = 1.0;
     my $true_race = $owner->GetBucket("pet_race");
 
+    #Mage Epic 1.0 - Orb of Mastery
     if ($owner->GetClass() == 13 && $inventory->HasItemEquippedByID(28034)) {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());            
@@ -295,16 +296,16 @@ sub APPLY_FOCUS {
         $owner->BuffFadeBySpellID(847);
     }
     
+    #Necro Epic 1.0 - Scythe of the Shadowed Soul
     if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544)) {              
         $total_focus_scale += 0.25;
-
-        my $bucket_value = $owner->GetBucket("pet_max_hp") * 1.5;
-
         if ($npc->GetRace() == $true_race) {
             $npc->SetRace(491); # Bone Golem
+            $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") + 1000);
         }
     } elsif ($npc->GetRace() == 491) {
         $npc->SetRace($true_race);
+        $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") - 1000);
     }
 
     return $total_focus_scale;
