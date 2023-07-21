@@ -297,7 +297,7 @@ sub APPLY_FOCUS {
     }
     
     #Necro Epic 1.0 - Scythe of the Shadowed Soul
-    if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544)) {              
+    if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544) && $npc->GetBodyType() == 8)  {              
         $total_focus_scale += 0.25;
         if ($npc->GetRace() == $true_race) {
             $npc->SetRace(491); # Bone Golem
