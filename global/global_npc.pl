@@ -173,17 +173,45 @@ sub EVENT_COMBAT
 
 sub EVENT_DEATH_COMPLETE
 {
+    CHECK_CHARM_STATUS();
     quest::debug("event_death_complete");
 }
 
 sub CHECK_CHARM_STATUS
 {
-    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {
-        plugin::SEV($npc, "is_charmed", 1);
+    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {        
         quest::debug("I have been charmed.");
+
+        my @lootlist = $npc->GetLootList();
+        my @inventory;
+        foreach my $item_id (@lootlist) {
+            my $quantity = $npc->CountItem($item_id);
+            push @inventory, "$item_id:$quantity";
+        }
+
+        my $data = join(",", @inventory);
+        plugin::SEV($npc, "is_charmed", $data);
+
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
-        plugin::SEV($npc, "is_charmed", 0);
+        
+        my $data = plugin::REV($npc, "is_charmed");
+        my @inventory = split(",", $data);
+
+        my @lootlist = $npc->GetLootList();
+        while (@lootlist) { # While lootlist has elements
+            foreach my $item_id (@lootlist) {
+                $npc->RemoveItem($item_id);
+            }
+            @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
+        }
+
+        foreach my $item (@inventory) {
+            my ($item_id, $quantity) = split(":", $item);
+            $npc->AddItem($item_id, $quantity);
+        }
+
         quest::debug("I am no longer charmed.");
+        plugin::SEV($npc, "is_charmed", "");
     }
 }
 
