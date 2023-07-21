@@ -290,7 +290,7 @@ sub APPLY_FOCUS {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());            
         }
-        $total_focus_scale += 0.25;
+        $total_focus_scale += 0.30;
     } elsif ($npc->FindBuff(847)) {
         $npc->BuffFadeBySpellID(847);
         $owner->BuffFadeBySpellID(847);
