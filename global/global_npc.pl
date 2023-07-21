@@ -289,11 +289,11 @@ sub UPDATE_PET {
                 @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
             }   
 
-            while (grep { $_ > 0 } values %new_bag_inventory) { # While new_bag_inventory still has non-zero elements
+            while (grep { $_->{quantity} > 0 } values %new_bag_inventory) { # While new_bag_inventory still has non-zero elements
                 foreach my $item_id (keys %new_bag_inventory) {
-                    if ($new_bag_inventory{$item_id} > 0) {
-                        $npc->AddItem($item_id);
-                        $new_bag_inventory{$item_id}--;
+                    if ($new_bag_inventory{$item_id}->{quantity} > 0) {
+                        $npc->AddItem($item_id, 1, 0, @{$new_bag_inventory{$item_id}->{augments}});
+                        $new_bag_inventory{$item_id}->{quantity}--;
                     }
                 }
             }
@@ -312,16 +312,26 @@ sub GET_BAG_CONTENTS {
     my $rel_bag_slot = $bag_slot - $ref_general;
     my $bag_start = $ref_bags + ($rel_bag_slot * $bag_size);
     my $bag_end = $bag_start + $bag_size;
-        for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
+
+    for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
         my $item_slot = $iter - $bag_start;
         my $item_id   = $owner->GetItemIDAt($iter);
 
         if ($item_id > 0 && $owner->GetItemStat($item_id, "slots") && $owner->GetItemStat($item_id, "classes") && $owner->GetItemStat($item_id, "itemtype") != 54 && !exists($blacklist{$item_id})) {
-            $new_bag_inventory{$item_id}++;
+            my @augments;
+            for (my $aug_iter = 0; $aug_iter < 6; $aug_iter++) {
+                if ($owner->GetAugmentAt($iter, $aug_iter)) {
+                    push @augments, $owner->GetAugmentIDAt($iter, $aug_iter);
+                } else {
+                    push @augments, 0;
+                }
+            }
+            $new_bag_inventory{$item_id} = { quantity => 1, augments => \@augments };
         }
     }
     return %new_bag_inventory;
 }
+
 
 sub APPLY_FOCUS {
     my $owner = $npc->GetOwner()->CastToClient();
