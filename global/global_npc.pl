@@ -299,7 +299,7 @@ sub APPLY_FOCUS {
         $total_focus_scale += 0.25;
 
         # increase HP further
-        $owner->SetBucket("max_hp", ceil($owner->GetBucket("pet_max_hp") * 1.5) . "");
+        $npc->ModifyNPCStat("max_hp", ceil($owner->GetBucket("pet_max_hp") * 1.5) . "");
 
         if ($npc->GetRace() == $true_race) {
             $npc->SetRace(491); # Bone Golem
