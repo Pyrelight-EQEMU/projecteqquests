@@ -190,6 +190,7 @@ sub CHECK_CHARM_STATUS
         }
 
         my $data = join(",", @inventory);
+        quest::dedebug("SEV: $data");
         plugin::SEV($npc, "is_charmed", $data);
 
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
@@ -207,6 +208,7 @@ sub CHECK_CHARM_STATUS
 
         foreach my $item (@inventory) {
             my ($item_id, $quantity) = split(":", $item);
+            quest::debug("Adding: $item_id x $quantity");
             $npc->AddItem($item_id, $quantity);
         }
 
