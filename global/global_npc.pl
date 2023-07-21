@@ -14,17 +14,6 @@ sub EVENT_TICK
     }
 }
 
-sub CHECK_CHARM_STATUS
-{
-    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {
-        plugin::SEV($npc, "is_charmed", 1);
-        quest::debug("I have been charmed.");
-    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
-        plugin::SEV($npc, "is_charmed", 0);
-        quest::debug("I am no longer charmed.");
-    }
-}
-
 sub EVENT_SPAWN {
     #Pet Scaling
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
@@ -176,6 +165,7 @@ sub EVENT_DAMAGE_GIVEN
 
 sub EVENT_COMBAT 
 {
+    CHECK_CHARM_STATUS();
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
         quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
     }
@@ -184,6 +174,17 @@ sub EVENT_COMBAT
 sub EVENT_DEATH_COMPLETE
 {
     quest::debug("event_death_complete");
+}
+
+sub CHECK_CHARM_STATUS
+{
+    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {
+        plugin::SEV($npc, "is_charmed", 1);
+        quest::debug("I have been charmed.");
+    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
+        plugin::SEV($npc, "is_charmed", 0);
+        quest::debug("I am no longer charmed.");
+    }
 }
 
 sub UPDATE_PET {
