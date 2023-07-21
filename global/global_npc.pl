@@ -13,6 +13,19 @@ sub EVENT_TICK
     }
 }
 
+sub EVENT_CAST_ON {
+    quest::debug("spell_id " . $spell_id);
+    quest::debug("caster_id " . $caster_id);
+    quest::debug("caster_level " . $caster_level);
+
+    if (not $npc->Charmed() and quest::IsCharmSpell($spell_id)) {
+        quest::debug("someone is trying to charm us");
+        if ($npc->HasOwner()) {
+            quest::debug("we have an owner now...");
+        }
+    }
+}
+
 sub EVENT_SPAWN {
     #Pet Scaling
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
