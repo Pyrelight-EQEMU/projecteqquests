@@ -288,7 +288,7 @@ sub APPLY_FOCUS {
     #Mage Epic 1.0 - Orb of Mastery
     if ($owner->GetClass() == 13 && $inventory->HasItemEquippedByID(28034)) {
         if (!$npc->FindBuff(847)) {
-            $npc->CastSpell(847, $npc->GetID());            
+            $npc->CastSpell(847, $npc->GetID());       
         }
         $total_focus_scale += 0.30;
     } elsif ($npc->FindBuff(847)) {
