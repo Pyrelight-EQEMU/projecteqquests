@@ -8,16 +8,20 @@ my $dz_duration     = 604800; # 7 Days
 
 sub EVENT_TICK 
 {
-    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
-        if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {
-            plugin::SEV($npc, "is_charmed", 1);
-            quest::debug("I have been charmed.");
-        } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
-            plugin::SEV($npc, "is_charmed", 0);
-            quest::debug("I am no longer charmed.");
-        }
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {       
         
         UPDATE_PET($npc);
+    }
+}
+
+sub CHECK_CHARM_STATUS
+{
+    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {
+        plugin::SEV($npc, "is_charmed", 1);
+        quest::debug("I have been charmed.");
+    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
+        plugin::SEV($npc, "is_charmed", 0);
+        quest::debug("I am no longer charmed.");
     }
 }
 
