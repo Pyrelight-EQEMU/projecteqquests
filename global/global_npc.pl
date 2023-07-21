@@ -283,15 +283,26 @@ sub APPLY_FOCUS {
     my $inventory = $owner->GetInventory();
 
     my $total_focus_scale = 1.0;
+    my $true_race = $owner->GetBucket("pet_race");
 
-    if ($owner->GetClass() == 13 && $inventory->CountAugmentEquippedByID(28034) > 0) {
+    if ($owner->GetClass() == 13 && $inventory->HasItemEquippedByID(28034)) {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());            
         }
-        $total_focus_scale += 0.2;
+        $total_focus_scale += 0.25;
     } elsif ($npc->FindBuff(847)) {
         $npc->BuffFadeBySpellID(847);
         $owner->BuffFadeBySpellID(847);
+    }
+    
+    if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544)) {              
+        $total_focus_scale += 0.25;
+
+        if ($npc->GetRace() == $true_race) {
+            $npc->SetRace(491); # Bone Golem
+        }
+    } elsif ($npc->GetRace() == 491) {
+        $npc->SetRace($true_race);
     }
 
     return $total_focus_scale;
@@ -305,9 +316,10 @@ sub SAVE_PET_STATS
     if ($owner) {     
         my @stat_list = qw(hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
-            $owner->SetBucket($stat, $pet->GetNPCStat($stat));
+            $owner->SetBucket("pet_$stat", $pet->GetNPCStat($stat));
         }
-        # We only arrive here on initial summoning.
+        
+        $owner->SetBucket("pet_race", $pet->GetBaseRace());
     }
 }
 
