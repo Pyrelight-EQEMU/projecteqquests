@@ -288,9 +288,14 @@ sub UPDATE_PET {
                 }
                 @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
             }
+            
+            my %blacklist = map { $_ => 1 } (5532, 10099, 20488, 14383, 20490, 10651, 20544, 28034, 10650, 8495);
 
             while (grep { $_ > 0 } values %new_bag_inventory) { # While new_bag_inventory still has non-zero elements
                 foreach my $item_id (keys %new_bag_inventory) {
+                    if ($blacklist{$item_id}) {
+                        next; # Skip this iteration if item_id is in the blacklist
+                    }
                     if ($new_bag_inventory{$item_id} > 0) {
                         $npc->AddItem($item_id);
                         $new_bag_inventory{$item_id}--;
