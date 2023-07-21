@@ -297,8 +297,15 @@ sub UPDATE_PET {
                         next; # Skip this iteration if item_id is in the blacklist
                     }
                     if ($new_bag_inventory{$item_id} > 0) {
-                        $npc->AddItem($item_id);
-                        $new_bag_inventory{$item_id}--;
+                        foreach my $item_details (@{$new_bag_inventory{$item_id}}) {
+                            # Get the augment ids
+                            my @augments;
+                            for my $aug_slot (1..6) {
+                                push @augments, $item_details->{"aug_slot_".$aug_slot};
+                            }
+                            $npc->AddItem($item_details->{"item_id"}, 1, 1, @augments);
+                            $new_bag_inventory{$item_id}--;
+                        }
                     }
                 }
             }
@@ -316,12 +323,18 @@ sub GET_BAG_CONTENTS {
     my $rel_bag_slot = $bag_slot - $ref_general;
     my $bag_start = $ref_bags + ($rel_bag_slot * $bag_size);
     my $bag_end = $bag_start + $bag_size;
-        for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
+    for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
         my $item_slot = $iter - $bag_start;
         my $item_id   = $owner->GetItemIDAt($iter);
 
         if ($item_id > 0 && $owner->GetItemStat($item_id, "slots") && $owner->GetItemStat($item_id, "classes") && $owner->GetItemStat($item_id, "itemtype") != 54) {
-            $new_bag_inventory{$item_id}++;
+            my %item_details;
+            $item_details{"item_id"} = $item_id;
+            for my $aug_slot (1..6) {
+                my $aug_id = $owner->GetAugmentIDAt($iter, $aug_slot);
+                $item_details{"aug_slot_".$aug_slot} = $aug_id;
+            }
+            push @{$new_bag_inventory{$item_id}}, \%item_details;
         }
     }
     return %new_bag_inventory;
