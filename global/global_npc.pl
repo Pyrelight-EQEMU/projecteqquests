@@ -8,8 +8,8 @@ my $dz_duration     = 604800; # 7 Days
 
 sub EVENT_TICK 
 {
-    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {       
-        
+    CHECK_CHARM_STATUS();
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
         UPDATE_PET($npc);
     }
 }
