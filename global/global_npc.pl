@@ -164,8 +164,7 @@ sub EVENT_DAMAGE_GIVEN
 
 sub EVENT_COMBAT 
 {
-    quest::debug("combat_state " . $combat_state);
-    if (!$npc->IsPet() && $combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
+    if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
         quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
     }
 }
