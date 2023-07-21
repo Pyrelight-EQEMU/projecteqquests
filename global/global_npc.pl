@@ -287,15 +287,10 @@ sub UPDATE_PET {
                     $npc->RemoveItem($item_id);
                 }
                 @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
-            }
-            
-            my %blacklist = map { $_ => 1 } (5532, 10099, 20488, 14383, 20490, 10651, 20544, 28034, 10650, 8495);
+            }   
 
             while (grep { $_ > 0 } values %new_bag_inventory) { # While new_bag_inventory still has non-zero elements
                 foreach my $item_id (keys %new_bag_inventory) {
-                    if ($blacklist{$item_id}) {
-                        next; # Skip this iteration if item_id is in the blacklist
-                    }
                     if ($new_bag_inventory{$item_id} > 0) {
                         $npc->AddItem($item_id);
                         $new_bag_inventory{$item_id}--;
@@ -310,6 +305,7 @@ sub UPDATE_PET {
 }
 
 sub GET_BAG_CONTENTS {
+    my %blacklist = map { $_ => 1 } (5532, 10099, 20488, 14383, 20490, 10651, 20544, 28034, 10650, 8495);
     my ($new_bag_inventory_ref, $owner, $bag_slot, $ref_general, $ref_bags, $bag_size) = @_;
     my %new_bag_inventory = %{$new_bag_inventory_ref};
 
@@ -320,7 +316,7 @@ sub GET_BAG_CONTENTS {
         my $item_slot = $iter - $bag_start;
         my $item_id   = $owner->GetItemIDAt($iter);
 
-        if ($item_id > 0 && $owner->GetItemStat($item_id, "slots") && $owner->GetItemStat($item_id, "classes") && $owner->GetItemStat($item_id, "itemtype") != 54) {
+        if ($item_id > 0 && $owner->GetItemStat($item_id, "slots") && $owner->GetItemStat($item_id, "classes") && $owner->GetItemStat($item_id, "itemtype") != 54 && !exists($blacklist{$item_id})) {
             $new_bag_inventory{$item_id}++;
         }
     }
