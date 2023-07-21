@@ -298,6 +298,9 @@ sub APPLY_FOCUS {
     if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544)) {              
         $total_focus_scale += 0.25;
 
+        # increase HP further
+        $owner->SetBucket("max_hp", ceil($pet->GetNPCStat("max_hp") * 1.5) . "");
+
         if ($npc->GetRace() == $true_race) {
             $npc->SetRace(491); # Bone Golem
         }
