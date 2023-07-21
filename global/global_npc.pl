@@ -189,11 +189,11 @@ sub CHECK_CHARM_STATUS
             push @inventory, "$item_id:$quantity";
         }
 
-        my $data = join(",", @inventory);
+        my $data = @inventory ? join(",", @inventory) : "EMPTY";
         quest::debug("SEV: $data");
         plugin::SEV($npc, "is_charmed", $data);
 
-    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
+    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed") and plugin::REV($npc, "is_charmed") ne "EMPTY") {
         
         my $data = plugin::REV($npc, "is_charmed");
         my @inventory = split(",", $data);
@@ -216,6 +216,7 @@ sub CHECK_CHARM_STATUS
         plugin::SEV($npc, "is_charmed", "");
     }
 }
+
 
 sub UPDATE_PET {
     #quest::debug("--Syncronizing Pet Inventory--");
