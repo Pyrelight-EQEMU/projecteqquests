@@ -218,7 +218,7 @@ sub CHECK_CHARM_STATUS
 }
 
 sub UPDATE_PET {
-    quest::debug("--Syncronizing Pet Inventory--");
+    #quest::debug("--Syncronizing Pet Inventory--");
     my $owner = $npc->GetOwner()->CastToClient();
     my $bag_size = 200; # actual bag size limit in source
     my $bag_id = 199999; # Custom Item
@@ -280,7 +280,7 @@ sub UPDATE_PET {
         }
 
         if ($updated) {
-            quest::debug("--Pet Inventory Reset Triggered--");
+            #quest::debug("--Pet Inventory Reset Triggered--");
             my @lootlist = $npc->GetLootList();
             while (@lootlist) { # While lootlist has elements
                 foreach my $item_id (@lootlist) {
