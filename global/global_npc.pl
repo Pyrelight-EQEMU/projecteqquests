@@ -8,7 +8,7 @@ my $dz_duration     = 604800; # 7 Days
 
 sub EVENT_TICK 
 {
-    if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {  
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {  
        UPDATE_PET($npc);
     }
 }
@@ -181,7 +181,9 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
-    UPDATE_PET_STATS();
+    if (not $npc->Charmed()) {
+        UPDATE_PET_STATS();
+    }
 
     if ($owner) {       
         my %new_pet_inventory;
