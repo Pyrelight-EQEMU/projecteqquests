@@ -298,8 +298,7 @@ sub APPLY_FOCUS {
     if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544)) {              
         $total_focus_scale += 0.25;
 
-        # increase HP further
-        $npc->ModifyNPCStat("max_hp", ceil($owner->GetBucket("pet_max_hp") * 1.5) . "");
+        my $bucket_value = $owner->GetBucket("pet_max_hp") * 1.5;
 
         if ($npc->GetRace() == $true_race) {
             $npc->SetRace(491); # Bone Golem
@@ -337,7 +336,7 @@ sub UPDATE_PET_STATS
 
         my @stat_list = qw(hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
-            my $bucket_value = $owner->GetBucket($stat) * $pet_scalar;
+            my $bucket_value = $owner->GetBucket("pet_$stat") * $pet_scalar;
             $pet->ModifyNPCStat($stat, $bucket_value . "");
         }
     }
