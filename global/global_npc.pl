@@ -190,7 +190,7 @@ sub CHECK_CHARM_STATUS
         }
 
         my $data = join(",", @inventory);
-        quest::dedebug("SEV: $data");
+        quest::debug("SEV: $data");
         plugin::SEV($npc, "is_charmed", $data);
 
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
