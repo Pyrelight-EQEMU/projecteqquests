@@ -1,4 +1,4 @@
-, sub EVENT_SAY {
+sub EVENT_SAY {
 
   my $charKey = $client->CharacterID() . "-TL";
   my $MAOcharKey = $client->CharacterID() . "-MAO-Progress";

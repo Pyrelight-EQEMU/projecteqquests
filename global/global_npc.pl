@@ -363,6 +363,11 @@ sub APPLY_FOCUS {
         $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") - 1000);
     }
 
+    #Beastlord Epic 1.0 - Claw of the Savage Spirit
+    if ($owner->GetClass() == 15 && $inventory->HasItemEquippedByID(8495) && $npc->GetBodyType() == 21)  {
+        $total_focus_scale += 0.30;
+    }
+
     return $total_focus_scale;
 }
 
