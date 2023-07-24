@@ -147,7 +147,11 @@ sub EVENT_KILLED_MERIT {
         $query->execute();
         my ($potion_id) = $query->fetchrow_array();
 
-        $npc->AddItem($potion_id);
+        if ($potion_id) {
+            $npc->AddItem($potion_id);
+        } else {
+            quest::debug("Invalid Potion Query: $query");
+        }
     } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
         $npc->AddItem(40605); # Exp Pot
         $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
