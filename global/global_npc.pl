@@ -38,7 +38,9 @@ sub EVENT_SPAWN {
         # Get the packed data for the instance
         #my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
         #my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
-    } 
+    }
+
+    quest::debug("Checkpoint 3");
 }
 
 
@@ -48,7 +50,7 @@ sub EVENT_KILLED_MERIT {
     #Potions
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
         my $dbh = plugin::LoadMysql();
-        
+
         my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
