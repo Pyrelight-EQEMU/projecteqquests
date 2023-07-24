@@ -43,7 +43,7 @@ sub EVENT_SPAWN {
 
 
 sub EVENT_KILLED_MERIT {
-    ON_KILL_INSTANCE();    
+    #ON_KILL_INSTANCE();    
 
     #Potions
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
