@@ -22,12 +22,16 @@ sub EVENT_SPAWN {
         $npc->Heal();
     }
 
+    quest::debug("Checkpoint 1");
+
     #Probably not a named.
     if ($npc->GetName() =~ /^[^#A-Z]/) {
         $npc->SetSpecialAbility(14, 0); #Remove uncharmable
         $npc->SetSpecialAbility(15, 0); #Unstunnable
         $npc->SetSpecialAbility(16, 0); #Unsnarable
     }
+
+    quest::debug("Checkpoint 2");
 
     # Check for FoS Instance
     elsif ($instanceversion == 10) {
@@ -38,6 +42,8 @@ sub EVENT_SPAWN {
         my $group_mode = $info_bucket{'groupmode'};
         my $client_level = $info_bucket{'min_level'};
         my $reward = $info_bucket{'reward'};
+
+        quest::debug("Checkpoint 3");
 
         # Set Initial Values for scaling
 
@@ -52,6 +58,8 @@ sub EVENT_SPAWN {
                 $npc_stats{$stat} = $npc->GetNPCStat($stat);
             }
         }
+
+        quest::debug("Checkpoint 4");
 
         foreach my $stat (@stat_names) {
             $npc_stats_perlevel{$stat} = round($npc_stats{$stat} / $npc->GetLevel());
