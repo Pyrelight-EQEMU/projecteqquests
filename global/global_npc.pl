@@ -56,11 +56,15 @@ sub EVENT_FOS_SPAWN
     }
 
     # Set minimum level of mobs
-    my $level_diff = $min_level - 6 - $npc->GetLevel();
+    if ($npc->GetLevel() < ($min_level - 6)) {
+        $npc->ScaleNPC($min_level -6);
 
-    $npc->SetLevel($npc->GetLevel() + $level_diff);
-    foreach my $stat (@stat_names) {
-        $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ($npc_stats_perlevel{$stat} * $level_diff));
+        #my $level_diff = $min_level - 6 - $npc->GetLevel();
+
+        #$npc->SetLevel($npc->GetLevel() + $level_diff);
+        #foreach my $stat (@stat_names) {
+            #$npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ($npc_stats_perlevel{$stat} * $level_diff));
+        #}
     }
 }
 
