@@ -38,9 +38,11 @@ sub EVENT_SPAWN {
         # Get the packed data for the instance
         #my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
         #my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
+
+        quest::debug("Checkpoint 3");
     }
 
-    quest::debug("Checkpoint 3");
+    quest::debug("Checkpoint 4");
 }
 
 
