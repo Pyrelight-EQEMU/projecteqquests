@@ -103,6 +103,7 @@ sub ON_KILL_INSTANCE
         my $client_level = $info_bucket{'min_level'};
         my $reward = $info_bucket{'reward'};
 
+        my $npc_name = $npc->GetCleanName();
         my $removed = 0;
         @targetlist = grep { 
             if ($_ == $npc->GetNPCTypeID() && !$removed) { 
@@ -114,19 +115,20 @@ sub ON_KILL_INSTANCE
         } @targetlist;
 
         if ($removed && $reward > 0) {
-
             #repack the info bucket
             $info_bucket{'targets'} = plugin::SerializeList(@targetlist);
             quest::set_data("instance-$zonesn-$instanceid", plugin::SerializeHash(%info_bucket), $client->GetExpedition->GetSecondsRemaining());
             
             my $remaining_targets = scalar @targetlist;
-            if ($remaining_targets) {
-                plugin::YellowText("You've slain " . $npc->GetCleanName() . "! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
+            if ($remaining_targets) {                
+                plugin::YellowText("You've slain $npc_name! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
             } else {
                 my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
                 $client->SetBucket("FoS-points",$FoS_points);
                 $client->SetBucket("FoS-$zonesn", $escalation);
-                plugin::YellowText("You've slain " . $npc->GetCleanName() . "! Your Feat of Strength has been completed! You have earned $info_bucket{'reward'} Condensed Mana Crystals. You may leave the expedition to be ejected from the zone after a short time.");
+                plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $info_bucket{'reward'} [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
+                $client->AddCrystals($reward, 0);
+                my $itm_link = quest::itemlink(40903);
                 plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: $escalation).");
                 if ($client->GetLevel() < $target_level) {
                     my $bonus = ($escalation - ($target_level - $client->GetLevel())) * $reward;
@@ -143,9 +145,7 @@ sub ON_KILL_INSTANCE
 
 sub CHECK_CHARM_STATUS
 {
-    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {        
-        quest::debug("I have been charmed.");
-
+    if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {     
         my @lootlist = $npc->GetLootList();
         my @inventory;
         foreach my $item_id (@lootlist) {
@@ -154,7 +154,6 @@ sub CHECK_CHARM_STATUS
         }
 
         my $data = @inventory ? join(",", @inventory) : "EMPTY";
-        quest::debug("SEV: $data");
         plugin::SEV($npc, "is_charmed", $data);
 
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
@@ -176,7 +175,6 @@ sub CHECK_CHARM_STATUS
             $npc->AddItem($item_id, $quantity);
         }
 
-        quest::debug("I am no longer charmed.");
         plugin::SEV($npc, "is_charmed", "");
     }
 }

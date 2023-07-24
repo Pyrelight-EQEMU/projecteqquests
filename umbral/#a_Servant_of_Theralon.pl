@@ -31,11 +31,6 @@ my $key_required    = 22198;
 
 sub EVENT_SAY {
     if ($text =~ /hail/i ) {
-        if ($client->GetGM()) {
-            $client->AddAlternateCurrencyValue(46779, 1);
-            $client->AddCrystals(1, 2);
-            quest::debug("Attempted to add Bayle Marks...");
-        }
         $dz = $client->GetExpedition();
         if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
             if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
