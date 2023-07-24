@@ -62,7 +62,7 @@ sub EVENT_SPAWN {
             $npc->SetLevel($npc->GetLevel()+1);
             foreach my $stat (@stat_names) {
                 if ($stat eq 'spellscale' or $stat eq 'healscale') {
-                   next;
+                   #no-op
                 } else {
                     $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
                 }
