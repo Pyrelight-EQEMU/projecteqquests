@@ -25,11 +25,11 @@ sub EVENT_SPAWN {
     quest::debug("Checkpoint 1");
 
     #Probably not a named.
-    if ($npc->GetName() =~ /^[^#A-Z]/) {
-        $npc->SetSpecialAbility(14, 0); #Remove uncharmable
-        $npc->SetSpecialAbility(15, 0); #Unstunnable
-        $npc->SetSpecialAbility(16, 0); #Unsnarable
-    }
+    #if ($npc->GetName() =~ /^[^#A-Z]/) {
+     #   $npc->SetSpecialAbility(14, 0); #Remove uncharmable
+     #   $npc->SetSpecialAbility(15, 0); #Unstunnable
+    #    $npc->SetSpecialAbility(16, 0); #Unsnarable
+    #}
 
     quest::debug("Checkpoint 2");
 
