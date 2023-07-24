@@ -50,7 +50,7 @@ sub EVENT_SPAWN {
         }
 
         foreach my $stat (@stat_names) {
-            $npc_stats_perlevel{$stat} = $npc_stats{$stat} / $npc->GetLevel();
+            $npc_stats_perlevel{$stat} = round($npc_stats{$stat} / $npc->GetLevel());
         }
 
         #plugin::SEV($npc, plugin::SerializeHash(%npc_stats));
@@ -61,7 +61,11 @@ sub EVENT_SPAWN {
         while ($npc->GetLevelCon($client_level) == 6) {
             $npc->SetLevel($npc->GetLevel()+1);
             foreach my $stat (@stat_names) {
-                $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
+                if ($stat eq 'spellscale' or $stat eq 'healscale') {
+                   next;
+                } else {
+                    $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
+                }
             }
         }
 
