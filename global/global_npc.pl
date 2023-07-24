@@ -38,11 +38,6 @@ sub EVENT_SPAWN {
         # Get the packed data for the instance
         #my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
         #my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
-
-        # Print some debug output
-        #quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
-
-        $npc->Heal();
     } 
 }
 
