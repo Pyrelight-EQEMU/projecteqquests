@@ -57,7 +57,7 @@ sub EVENT_FOS_SPAWN
 
     # Set minimum level of mobs (This is a horrifying way to do this)
     while ($npc->GetLevelCon($min_level) == 6) {
-        quest::debug("Incementing level of $npc by 1");
+        quest::debug("Incementing level by 1 ($min_level)");
         $npc->SetLevel($npc->GetLevel() + 1);
         foreach my $stat (@stat_names) {
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
