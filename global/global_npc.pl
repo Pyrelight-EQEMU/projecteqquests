@@ -32,7 +32,37 @@ sub EVENT_FOS_SPAWN
 {
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-    my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
+    my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
+    my $difficulty  = $info_bucket{'difficulty'};
+    my $reward      = $info_bucket{'reward'};
+    my $group_mode  = $info_bucket{'group_mode'};
+    my $min_level   = $info_bucket{'min_level'};
+    my $tar_level   = $info_bucket{'target_level'};
+
+    # Get initial mob stat values
+
+    my @stat_names = qw(max_hp max_dmg min_dmg atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
+    my %npc_stats;
+    my $npc_stats_perlevel;
+
+    foreach my $stat (@stat_names) {
+        $npc_stats{$stat} = $npc->GetNPCStat($stat);
+    }
+
+    $npc_stats{'spellscale'} -= 100;
+    $npc_stats{'healscale'} -= 100;
+
+    foreach my $stat (@stat_names) {
+        $npc_stats_perlevel{$stat} = round($npc_stats{$stat} / $npc->GetLevel());
+    }
+
+    # Set minimum level of mobs (This is a horrifying way to do this)
+    while ($npc->GetLevelCon($min_level) == 6) {
+        $npc->SetLevel($npc->GetLevel() + 1);
+        foreach my $stat (@stat_names) {
+            $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
+        }
+    }
 }
 
 
