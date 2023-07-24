@@ -9,8 +9,8 @@ my $dz_duration     = 604800; # 7 Days
 my $dz_lockout      = 3600; # 1 Hour
 my $explain_message = "Ahead lies Vex Thal, the last city of the Akheva. The Master requires the magical essence of Aten Ha Ra, 
                        the last High Priestess of Luclin, in order to complete the ritual to restore his true power. In order to
-                       reach her, however, you will need to first weaken the wards within by defeating each of her lieutenants
-                       in turn.";
+                       reach her, however, you will need to first weaken her absolute power within her demenes by defeating 
+                       each of her lieutenants in turn.";
 
 #Array of npc_type IDs that we need to kill. Add multiple times for quantity.
 my @target_list     = (158016,  #Thall_Va_Xakra
@@ -49,17 +49,18 @@ sub EVENT_SAY {
         if (!(keys %{$client->GetExpeditionLockouts($expedition_name)})) {
             plugin::NPCTell($explain_message);
             if (my $bucket = $client->GetBucket("FoS-$dz_zone")) {
-                plugin::YellowText("You have previously completed this challenge. You may choose to challenge it once again, or remain at your current difficulty level.");
-                my $start = ($bucket > 5) ? $bucket - 4 : 1;  # If there are more than 5 levels, start from the 5th highest level
-                for my $i ($start..$bucket) {
-                    plugin::YellowText("[".quest::saylink("fs_ESCALATE_${i}_0", 1, "SOLO")."]"."[".quest::saylink("fs_ESCALATE_${i}_1", 1, "GROUP")."]" . "Escalation tier $i");
-                }
-                plugin::YellowText("[".quest::saylink("fs_ESCALATE_" . ($bucket + 1) . "_0", 1, "ESCALATE")."]");
+                my $solo_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "current difficulty")."]";
+                my $group_link = "[".quest::saylink("fs_ESCALATE_${bucket}_1", 1, "group")."]";
+                my $challenge_link = "[".quest::saylink("fs_ESCALATE_" . ($bucket + 1) . "_0", 1, "challenge")."]";
+
+                plugin::YellowText("You have previously completed this challenge. You may choose to $challenge_link it once again, 
+                                    remain at your $solo_link level, or attempt it as $group_link.");
             } else {  
                 plugin::YellowText("You have not previously completed this challenge. Are you ready to [".quest::saylink("fs_ESCALATE_1_0", 1, "Attempt it")."]?")
             }
         } else {
-            plugin::NPCTell("Stronger not ready yet! Come back later.");
+            plugin::NPCTell("I must muster my strength in order to open the portal.");
+            #TODO - Print Lockout with plugin::YellowText here.
         }
     }
 
@@ -95,7 +96,7 @@ sub EVENT_SAY {
                                 target_level => $target_level );
 
                 quest::set_data("instance-$dz_zone-" . $dz->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
-                plugin::NPCTell("Now you know what to do! [".quest::saylink("fs_enter", 1, "Ready to go")."]!?");
+                plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
             }
         }
     } 
