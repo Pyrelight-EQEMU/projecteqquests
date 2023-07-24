@@ -22,22 +22,11 @@ sub EVENT_SPAWN {
         $npc->Heal();
     }
 
-    quest::debug("Checkpoint 1");
-
-    #Probably not a named.
-    #if ($npc->GetName() =~ /^[^#A-Z]/) {
-     #   $npc->SetSpecialAbility(14, 0); #Remove uncharmable
-     #   $npc->SetSpecialAbility(15, 0); #Unstunnable
-    #    $npc->SetSpecialAbility(16, 0); #Unsnarable
-    #}
-
-    quest::debug("Checkpoint 2");
-
     # Check for FoS Instance
     if ($instanceversion == 10) {
         # Get the packed data for the instance
-        #my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-        #my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
+        my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
 
         quest::debug("Checkpoint 3");
     }
