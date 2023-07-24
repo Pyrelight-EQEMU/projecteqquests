@@ -14,7 +14,7 @@ my @target_list     = (
                         73057, #Lady Vox
                         73058
                       );                 
-my $target_level    = $npc->GetLevel();
+my $target_level    = 52;
 my $key_required    = 0;
 
 sub EVENT_SAY {
