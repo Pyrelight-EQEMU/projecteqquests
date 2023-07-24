@@ -46,7 +46,11 @@ sub EVENT_SPAWN {
         my %npc_stats_perlevel;
 
         foreach my $stat (@stat_names) {
-            $npc_stats{$stat} = $npc->GetNPCStat($stat);
+            if ($stat eq 'spellscale' || $stat eq 'healscale') {
+                $npc_stats{$stat} = $npc->GetNPCStat($stat) - 100;
+            } else {
+                $npc_stats{$stat} = $npc->GetNPCStat($stat);
+            }
         }
 
         foreach my $stat (@stat_names) {
@@ -61,11 +65,7 @@ sub EVENT_SPAWN {
         while ($npc->GetLevelCon($client_level) == 6) {
             $npc->SetLevel($npc->GetLevel()+1);
             foreach my $stat (@stat_names) {
-                if ($stat eq 'spellscale' or $stat eq 'healscale') {
-                   #no-op
-                } else {
-                    $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
-                }
+                $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
             }
         }
 
