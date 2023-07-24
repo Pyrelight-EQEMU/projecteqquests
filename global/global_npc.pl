@@ -40,7 +40,7 @@ sub EVENT_FOS_SPAWN
     my $tar_level   = $info_bucket{'target_level'};
 
     # Get initial mob stat values
-    my @stat_names = qw(max_hp max_dmg min_dmg atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
+    my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
     my %npc_stats;
     my $npc_stats_perlevel;
 
@@ -58,14 +58,13 @@ sub EVENT_FOS_SPAWN
 
     # Set minimum level of mobs
     if ($npc->GetLevel() < ($min_level - 6)) {
-        $npc->ScaleNPC($min_level -6, true);
 
-        #my $level_diff = $min_level - 6 - $npc->GetLevel();
+        my $level_diff = $min_level - 6 - $npc->GetLevel();
 
-        #$npc->SetLevel($npc->GetLevel() + $level_diff);
-        #foreach my $stat (@stat_names) {
-            #$npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ($npc_stats_perlevel{$stat} * $level_diff));
-        #}
+        $npc->SetLevel($npc->GetLevel() + $level_diff);
+        foreach my $stat (@stat_names) {
+            $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ($npc_stats_perlevel{$stat} * $level_diff));
+        }
     }
 }
 
