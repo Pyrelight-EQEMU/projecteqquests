@@ -38,11 +38,7 @@ sub EVENT_SPAWN {
         # Get the packed data for the instance
         my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
         my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
-        my $escalation = $info_bucket{'difficulty'};
-        my $group_mode = $info_bucket{'groupmode'};
-        my $client_level = $info_bucket{'min_level'};
-        my $reward = $info_bucket{'reward'};
-
+        
         # Print some debug output
         quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
 
