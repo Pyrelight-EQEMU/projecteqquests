@@ -11,7 +11,8 @@ my $explain_message = "PLACEHOLDER";
 
 #Array of npc_type IDs that we need to kill. Add multiple times for quantity.
 my @target_list     = (
-                        73057 #Lady Vox
+                        73057, #Lady Vox
+                        73058
                       );                 
 my $target_level    = $npc->GetLevel();
 my $key_required    = 0;
