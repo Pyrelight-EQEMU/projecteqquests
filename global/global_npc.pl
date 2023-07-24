@@ -22,68 +22,25 @@ sub EVENT_SPAWN {
         $npc->Heal();
     }
 
+    #Probably not a named.
+    if ($npc->GetName() =~ /^[^#A-Z]/) {
+        $npc->SetSpecialAbility(14, 0); #Remove uncharmable
+        $npc->SetSpecialAbility(15, 0); #Unstunnable
+        $npc->SetSpecialAbility(16, 0); #Unsnarable
+    }
+
     # Check for FoS Instance
     elsif ($instanceversion == 10) {
         # Get the packed data for the instance
         my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
         my $escalation = $info_bucket{'level'};
         my $group_mode = $info_bucket{'groupmode'};
-        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
         my $client_level = $info_bucket{'min_level'};
+        my $reward = $info_bucket{'reward'};
+
+        # Print some debug output
         quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
-
-        my $escalation_scalar = (($escalation - 1) * 0.25) + 1;
-        my $extra_scalar = floor(($escalation - 5) / 5) + 1;
-
-        if ($group_mode) {
-            # group mode specific changes go here
-            $escalation = $escalation * 2;
-        }
-
-        # Set initial level to be at least equal to client's level but not lower than NPC's level
-        my $level = $npc->GetLevel();
-        if (($client_level - 5) > $level) {
-            $level = ($client_level - 5);
-        }
-
-        # Increase NPC's level by 1 for every 5 escalation, capped at 10 above client's level
-        my $escalation_increase = int($escalation / 5);
-        if ($escalation_increase > 10) {
-            $escalation_increase = 10;
-        }
-        $level += $escalation_increase;
-
-        # Ensure the new level is not lower than the NPC's original level
-        if ($level < $npc->GetLevel()) {
-            $level = $npc->GetLevel();
-        }
-
-        # Set the new level
-        $npc->ScaleNPC($level, $group_mode);
-
-        # Set some sane minimums
-        quest::debug("$level");
-        $npc->ModifyNPCStat("max_hp", $level * 100) if ($npc->GetNPCStat("max_hp") < ($level * 100));
-        $npc->ModifyNPCStat("min_hit", $level) if ($npc->GetNPCStat("min_hit") < ($level));
-        $npc->ModifyNPCStat("max_hit", $level * 2.5) if ($npc->GetNPCStat("max_hit") < ($level * 2.5));
-        $npc->ModifyNPCStat("accuracy", $level * 2.5) if ($npc->GetNPCStat("accuracy") < ($level * 2.5));
-        $npc->ModifyNPCStat("atk", $level * 1.5) if ($npc->GetNPCStat("atk") < ($level * 1.5));
-        $npc->ModifyNPCStat("ac", $level * 1.5) if ($npc->GetNPCStat("ac") < ($level * 1.5));
-       
-        # Make sure these stats aren't 0 after rank 5
-        foreach my $stat (qw(heroic_strikethrough, slow_mitigation)) {
-            $npc->ModifyNPCStat($stat, floor($npc->GetNPCStat($stat) + $extra_scalar));
-        }
-        
-        # Apply full scalar to certain stats
-        foreach my $stat (qw(max_hp max_hit spellscale healscale str sta dex agi int wis cha ac accuracy min_hit atk)) {
-            $npc->ModifyNPCStat($stat, floor($npc->GetNPCStat($stat) * $escalation_scalar));
-        }
-
-        # Apply half scalar to certain stats
-        foreach my $stat (qw(fr cr mr pr dr avoidance heroic_strikethrough slow_mitigation)) {
-            $npc->ModifyNPCStat($stat, floor($npc->GetNPCStat($stat) * ($escalation_scalar/2)));
-        }
 
         $npc->Heal();
     } 
@@ -91,57 +48,11 @@ sub EVENT_SPAWN {
 
 
 sub EVENT_KILLED_MERIT {
-    my $dbh = plugin::LoadMysql();
-
-    if ($instanceversion == 10) {
-        #Get the packed data for the instance
-        my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-        my $escalation = $info_bucket{'level'};
-        my $group_mode = $info_bucket{'groupmode'};
-        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
-        quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
-
-        my $client_FoS_max = $client->GetBucket("$zonesn-FoS") || 0;
-
-        my $removed = 0;
-        @targetlist = grep { 
-            if ($_ == $npc->GetNPCTypeID() && !$removed) { 
-                $removed = 1; 
-                0;
-            } else { 
-                1;
-            } 
-        } @targetlist;
-
-        if ($removed && $client_FoS_max < $escalation && !$group_mode) {
-
-            #repack the info bucket
-            $info_bucket{'targets'} = plugin::SerializeList(@targetlist);
-            quest::set_data("instance-$zonesn-$instanceid", plugin::SerializeHash(%info_bucket), $client->GetExpedition->GetSecondsRemaining());
-            
-            my $remaining_targets = scalar @targetlist;
-            if ($remaining_targets) {
-                plugin::YellowText("You've slain " . $npc->GetCleanName() . "! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
-            } else {
-                my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
-                $client->SetBucket("FoS-points",$FoS_points);
-                $client->SetBucket("FoS-$zonesn", $escalation);
-                plugin::YellowText("You've slain " . $npc->GetCleanName() . "! Your Feat of Strength has been completed! You have earned $info_bucket{'reward'} Condensed Mana Crystals. You may leave the expedition to be ejected from the zone.");
-                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Escalation Tier: $escalation).");
-                if ($client->GetLevel() < $target_level) {
-                    my $reward = $escalation - ($target_level - $client->GetLevel());
-                    if ($reward < 0) { $reward = 0; }
-                    $client->AddAAPoints($reward);
-                    plugin::YellowText("As a reward for completing this Feat of Strength at a low level, you have earned a bonus reward.");
-                }
-            }
-
-            quest::debug("Updated Targets: " . join(", ", @targetlist));
-        }
-    }
+    ON_KILL_INSTANCE();    
 
     #Potions
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
+        my $dbh = plugin::LoadMysql();
         my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
@@ -178,7 +89,56 @@ sub EVENT_COMBAT
 sub EVENT_DEATH_COMPLETE
 {
     CHECK_CHARM_STATUS();
-    quest::debug("event_death_complete");
+}
+
+sub ON_KILL_INSTANCE
+{
+    #FoS Instances
+    if ($instanceversion == 10) {
+        #Get the packed data for the instance
+        my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
+        my $escalation = $info_bucket{'level'};
+        my $group_mode = $info_bucket{'groupmode'};
+        my $client_level = $info_bucket{'min_level'};
+        my $reward = $info_bucket{'reward'};
+
+        my $removed = 0;
+        @targetlist = grep { 
+            if ($_ == $npc->GetNPCTypeID() && !$removed) { 
+                $removed = 1; 
+                0;
+            } else { 
+                1;
+            } 
+        } @targetlist;
+
+        if ($removed && $reward > 0) {
+
+            #repack the info bucket
+            $info_bucket{'targets'} = plugin::SerializeList(@targetlist);
+            quest::set_data("instance-$zonesn-$instanceid", plugin::SerializeHash(%info_bucket), $client->GetExpedition->GetSecondsRemaining());
+            
+            my $remaining_targets = scalar @targetlist;
+            if ($remaining_targets) {
+                plugin::YellowText("You've slain " . $npc->GetCleanName() . "! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
+            } else {
+                my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
+                $client->SetBucket("FoS-points",$FoS_points);
+                $client->SetBucket("FoS-$zonesn", $escalation);
+                plugin::YellowText("You've slain " . $npc->GetCleanName() . "! Your Feat of Strength has been completed! You have earned $info_bucket{'reward'} Condensed Mana Crystals. You may leave the expedition to be ejected from the zone after a short time.");
+                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: $escalation).");
+                if ($client->GetLevel() < $target_level) {
+                    my $bonus = ($escalation - ($target_level - $client->GetLevel())) * $reward;
+                    if ($bonus < 0) { $bonus = 0; }
+                    $client->AddAAPoints($bonus);
+                    plugin::YellowText("As a reward for completing this Feat of Strength at a low level, you have earned a bonus reward.");
+                }
+            }
+
+            quest::debug("Updated Targets: " . join(", ", @targetlist));
+        }
+    }
 }
 
 sub CHECK_CHARM_STATUS

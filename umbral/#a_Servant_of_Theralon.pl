@@ -31,6 +31,9 @@ my $key_required    = 22198;
 
 sub EVENT_SAY {
     if ($text =~ /hail/i ) {
+        if ($client->GetGM()) {
+            $client->AddAlternateCurrencyValue(46779, 1);
+        }
         $dz = $client->GetExpedition();
         if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
             if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
@@ -77,21 +80,19 @@ sub EVENT_SAY {
         } else {
             if ($level <= ($bucket + 1)) {
                 $escalation_level = $level || 1;
-                        
-                if ($escalation_level <= $client->GetBucket("FoS-$dz_zone")) {
-                    plugin::YellowText("NOTICE: This escalation tier is below your maximum achievement level, and will not result in Feat of Strength rewards.");
-                }
 
-                if ($group_mode) {
-                    plugin::YellowText("NOTICE: This group instance will not yield Feat of Strength rewards.")
+                my $reward_ineligible = ($escalation_level <= $client->GetBucket("FoS-$dz_zone")) || $group_mode;
+
+                if ($reward_ineligible) {
+                    plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                 }
                                                
                 CREATE_EXPEDITION($exp_name, $exp_min, $exp_max);
 
-                my %payload = ( level => $escalation_level, 
-                                groupmode => $group_mode, 
+                my %payload = ( difficulty => $escalation_level, 
+                                group_mode => $group_mode, 
                                 targets => plugin::SerializeList(@target_list), 
-                                reward => $reward, 
+                                reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
                                 min_level => $client->GetLevel(), 
                                 target_level => $target_level );
 
