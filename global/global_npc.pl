@@ -24,7 +24,7 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        EVENT_FOS_SPAWN()
+        EVENT_FOS_SPAWN();
     }
 
     quest::debug("Checkpoint 4");
