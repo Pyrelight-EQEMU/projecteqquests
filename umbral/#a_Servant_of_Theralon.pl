@@ -33,6 +33,7 @@ sub EVENT_SAY {
     if ($text =~ /hail/i ) {
         if ($client->GetGM()) {
             $client->AddAlternateCurrencyValue(46779, 1);
+            $client->AddCrystals(1, 2);
             quest::debug("Attempted to add Bayle Marks...");
         }
         $dz = $client->GetExpedition();
