@@ -62,12 +62,12 @@ sub EVENT_SPAWN {
         # Ensure each NPC is at least lBlue to the instance-requester
         # this is really stupid and I wish I knew how to do it differently.
 
-        while ($npc->GetLevelCon($client_level) == 6) {
-            $npc->SetLevel($npc->GetLevel()+1);
+        #while ($npc->GetLevelCon($client_level) == 6) {
+            #$npc->SetLevel($npc->GetLevel()+1);
             #foreach my $stat (@stat_names) {
             #    $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
             #}
-        }
+        #}
 
         # Print some debug output
         quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
