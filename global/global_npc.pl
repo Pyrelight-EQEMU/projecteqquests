@@ -41,7 +41,7 @@ sub EVENT_SPAWN {
 
         # Set Initial Values for scaling
 
-        my @stat_names = qw(max_hp max_dmg min_dmg atk accuracy avoidance pr dr mr cr fr spellscale healscale level hp_regen);  # Add more stat names here if needed
+        my @stat_names = qw(max_hp max_dmg min_dmg atk accuracy avoidance pr dr mr cr fr spellscale healscale hp_regen);  # Add more stat names here if needed
         my %npc_stats;
         my %npc_stats_perlevel;
 
