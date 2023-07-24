@@ -53,6 +53,7 @@ sub EVENT_FOS_SPAWN
 
     foreach my $stat (@stat_names) {
         $npc_stats_perlevel{$stat} = ceil($npc_stats{$stat} / $npc->GetLevel());
+        quest::debug("Perlevel: $stat, $npc_stats_perlevel{$stat}");
     }
 
     # Set minimum level of mobs
