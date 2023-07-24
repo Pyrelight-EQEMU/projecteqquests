@@ -48,6 +48,7 @@ sub EVENT_KILLED_MERIT {
     #Potions
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
         my $dbh = plugin::LoadMysql();
+        
         my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
@@ -58,12 +59,12 @@ sub EVENT_KILLED_MERIT {
         } else {
             quest::debug("Invalid Potion Query: $query");
         }
+
+        $dbh->disconnect();
     } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
         $npc->AddItem(40605); # Exp Pot
         $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
     }
-   
-   $dbh->disconnect();
 }
 
 sub EVENT_DAMAGE_GIVEN 
