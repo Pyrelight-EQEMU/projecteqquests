@@ -36,11 +36,11 @@ sub EVENT_SPAWN {
     # Check for FoS Instance
     elsif ($instanceversion == 10) {
         # Get the packed data for the instance
-        my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
-        
+        #my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+        #my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
+
         # Print some debug output
-        quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
+        #quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
 
         $npc->Heal();
     } 
