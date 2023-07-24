@@ -52,7 +52,7 @@ sub EVENT_FOS_SPAWN
     $npc_stats{'healscale'} -= 100;
 
     foreach my $stat (@stat_names) {
-        $npc_stats_perlevel{$stat} = floor($npc_stats{$stat} / $npc->GetLevel());
+        $npc_stats_perlevel{$stat} = ceil($npc_stats{$stat} / $npc->GetLevel());
     }
 
     # Set minimum level of mobs
@@ -62,7 +62,6 @@ sub EVENT_FOS_SPAWN
     foreach my $stat (@stat_names) {
         $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ($npc_stats_perlevel{$stat} * $level_diff));
     }
-
 }
 
 
