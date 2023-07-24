@@ -43,40 +43,6 @@ sub EVENT_SPAWN {
         my $client_level = $info_bucket{'min_level'};
         my $reward = $info_bucket{'reward'};
 
-        quest::debug("Checkpoint 3");
-
-        # Set Initial Values for scaling
-
-        my @stat_names = qw(max_hp max_dmg min_dmg atk accuracy avoidance pr dr mr cr fr spellscale healscale hp_regen);  # Add more stat names here if needed
-        my %npc_stats;
-        my %npc_stats_perlevel;
-
-        foreach my $stat (@stat_names) {
-            if ($stat eq 'spellscale' || $stat eq 'healscale') {
-                $npc_stats{$stat} = $npc->GetNPCStat($stat) - 100;
-            } else {
-                $npc_stats{$stat} = $npc->GetNPCStat($stat);
-            }
-        }
-
-        quest::debug("Checkpoint 4");
-
-        foreach my $stat (@stat_names) {
-            $npc_stats_perlevel{$stat} = round($npc_stats{$stat} / $npc->GetLevel());
-        }
-
-        #plugin::SEV($npc, plugin::SerializeHash(%npc_stats));
-
-        # Ensure each NPC is at least lBlue to the instance-requester
-        # this is really stupid and I wish I knew how to do it differently.
-
-        #while ($npc->GetLevelCon($client_level) == 6) {
-            #$npc->SetLevel($npc->GetLevel()+1);
-            #foreach my $stat (@stat_names) {
-            #    $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
-            #}
-        #}
-
         # Print some debug output
         quest::debug("Level: $escalation, Group: $group_mode, Targets: " . join(", ", @targetlist));
 
