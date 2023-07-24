@@ -34,10 +34,10 @@ sub EVENT_SPAWN {
     quest::debug("Checkpoint 2");
 
     # Check for FoS Instance
-    elsif ($instanceversion == 10) {
+    if ($instanceversion == 10) {
         # Get the packed data for the instance
-        #my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-        #my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
+        my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
     } 
 }
 
