@@ -30,6 +30,54 @@ sub EVENT_SPAWN {
     }
 }
 
+sub EVENT_KILLED_MERIT {
+    # Check for FoS Instance
+    if ($instanceversion == 10) {
+        EVENT_FOS_KILL();
+    }  
+
+    #Potions
+    if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
+        my $dbh = plugin::LoadMysql();
+
+        my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
+        my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
+        $query->execute();
+        my ($potion_id) = $query->fetchrow_array();
+
+        if ($potion_id) {
+            $npc->AddItem($potion_id);
+        } else {
+            quest::debug("Invalid Potion Query: $query");
+        }
+
+        $dbh->disconnect();
+    } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
+        $npc->AddItem(40605); # Exp Pot
+        $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
+    }
+}
+
+sub EVENT_DAMAGE_GIVEN 
+{
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->IsTaunting()) {
+        $entity_list->GetMobByID($entity_id)->AddToHateList($npc->GetOwner());
+    }        
+}
+
+sub EVENT_COMBAT 
+{
+    CHECK_CHARM_STATUS();
+    if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
+        quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
+    }
+}
+
+sub EVENT_DEATH_COMPLETE
+{
+    CHECK_CHARM_STATUS();
+}
+
 sub EVENT_FOS_SPAWN
 {
     # Get the packed data for the instance
@@ -76,64 +124,17 @@ sub EVENT_FOS_SPAWN
     $npc->Heal();
 }
 
-
-sub EVENT_KILLED_MERIT {
-    #ON_KILL_INSTANCE();    
-
-    #Potions
-    if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
-        my $dbh = plugin::LoadMysql();
-
-        my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
-        my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
-        $query->execute();
-        my ($potion_id) = $query->fetchrow_array();
-
-        if ($potion_id) {
-            $npc->AddItem($potion_id);
-        } else {
-            quest::debug("Invalid Potion Query: $query");
-        }
-
-        $dbh->disconnect();
-    } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
-        $npc->AddItem(40605); # Exp Pot
-        $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
-    }
-}
-
-sub EVENT_DAMAGE_GIVEN 
+sub EVENT_FOS_KILL
 {
-    if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->IsTaunting()) {
-        $entity_list->GetMobByID($entity_id)->AddToHateList($npc->GetOwner());
-    }        
-}
+    # Get the packed data for the instance
+    my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
+    my $group_mode   = $info_bucket{'group_mode'};
+    my $difficulty   = $info_bucket{'difficulty'};
+    my $reward       = $info_bucket{'reward'};    
+    my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
-sub EVENT_COMBAT 
-{
-    CHECK_CHARM_STATUS();
-    if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
-        quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
-    }
-}
-
-sub EVENT_DEATH_COMPLETE
-{
-    CHECK_CHARM_STATUS();
-}
-
-sub ON_KILL_INSTANCE
-{
-    #FoS Instances
-    if ($instanceversion == 10) {
-        #Get the packed data for the instance
-        my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-        my @targetlist = plugin::DeserializeList($info_bucket{'targets'});
-        my $escalation = $info_bucket{'level'};
-        my $group_mode = $info_bucket{'groupmode'};
-        my $client_level = $info_bucket{'min_level'};
-        my $reward = $info_bucket{'reward'};
-
+    if ($reward > 0) {
         my $npc_name = $npc->GetCleanName();
         my $removed = 0;
         @targetlist = grep { 
@@ -145,7 +146,7 @@ sub ON_KILL_INSTANCE
             } 
         } @targetlist;
 
-        if ($removed && $reward > 0) {
+        if ($removed) {
             #repack the info bucket
             $info_bucket{'targets'} = plugin::SerializeList(@targetlist);
             quest::set_data("instance-$zonesn-$instanceid", plugin::SerializeHash(%info_bucket), $client->GetExpedition->GetSecondsRemaining());
@@ -156,19 +157,12 @@ sub ON_KILL_INSTANCE
             } else {
                 my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
                 $client->SetBucket("FoS-points",$FoS_points);
-                $client->SetBucket("FoS-$zonesn", $escalation);
-                plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $info_bucket{'reward'} [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
+                $client->SetBucket("FoS-$zonesn", $difficulty);
+                plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $reward [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
                 $client->AddCrystals($reward, 0);
                 my $itm_link = quest::itemlink(40903);
-                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: $escalation).");
-                if ($client->GetLevel() < $target_level) {
-                    my $bonus = ($escalation - ($target_level - $client->GetLevel())) * $reward;
-                    if ($bonus < 0) { $bonus = 0; }
-                    $client->AddAAPoints($bonus);
-                    plugin::YellowText("As a reward for completing this Feat of Strength at a low level, you have earned a bonus reward.");
-                }
+                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: $difficulty).");
             }
-
             quest::debug("Updated Targets: " . join(", ", @targetlist));
         }
     }
