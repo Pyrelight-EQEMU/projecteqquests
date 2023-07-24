@@ -5,6 +5,7 @@ use DBD::mysql;
 use JSON;
 
 my $dz_duration     = 604800; # 7 Days
+my $modifier        = 1.25;
 
 sub EVENT_TICK 
 {
@@ -33,11 +34,10 @@ sub EVENT_FOS_SPAWN
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
     my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
-    my $difficulty  = $info_bucket{'difficulty'};
-    my $reward      = $info_bucket{'reward'};
     my $group_mode  = $info_bucket{'group_mode'};
-    my $min_level   = $info_bucket{'min_level'};
-    my $tar_level   = $info_bucket{'target_level'};
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0);
+    my $reward      = $info_bucket{'reward'};    
+    my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
@@ -48,24 +48,29 @@ sub EVENT_FOS_SPAWN
         $npc_stats{$stat} = $npc->GetNPCStat($stat);
     }
 
-    $npc_stats{'spellscale'} -= 100;
-    $npc_stats{'healscale'} -= 100;
+    $npc_stats{'spellscale'} = 100 * ($difficulty * $modifier);
+    $npc_stats{'healscale'}  = 100 + ($difficulty * $modifier);
 
     foreach my $stat (@stat_names) {
-        $npc_stats_perlevel{$stat} = $npc_stats{$stat} / $npc->GetLevel();
-        quest::debug("Perlevel: $stat, $npc_stats_perlevel{$stat}");
+        $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
     }
 
-    # Set minimum level of mobs
+    #Rescale Levels
     if ($npc->GetLevel() < ($min_level - 6)) {
-
         my $level_diff = $min_level - 6 - $npc->GetLevel();
 
         $npc->SetLevel($npc->GetLevel() + $level_diff);
         foreach my $stat (@stat_names) {
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
-        }
+        }        
     }
+
+    #Recale stats
+    foreach my $stat (@stat_names) {
+        $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
+    }
+
+    $npc->Heal();
 }
 
 
