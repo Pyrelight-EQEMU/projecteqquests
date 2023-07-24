@@ -67,8 +67,10 @@ sub EVENT_FOS_SPAWN
     }
 
     #Recale stats
-    foreach my $stat (@stat_names) {
-        $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
+    if ($difficulty > 0) {
+        foreach my $stat (@stat_names) {
+            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
+        }
     }
 
     $npc->Heal();
