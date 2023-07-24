@@ -64,9 +64,9 @@ sub EVENT_SPAWN {
 
         while ($npc->GetLevelCon($client_level) == 6) {
             $npc->SetLevel($npc->GetLevel()+1);
-            foreach my $stat (@stat_names) {
-                $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
-            }
+            #foreach my $stat (@stat_names) {
+            #    $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + $npc_stats_perlevel{$stat});
+            #}
         }
 
         # Print some debug output
