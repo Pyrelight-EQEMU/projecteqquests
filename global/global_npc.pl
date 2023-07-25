@@ -394,7 +394,7 @@ sub UPDATE_PET_STATS
             if ($stat eq 'atk') { 
                 quest::debug("scaling by $pet_scalar - Result: $bucket_value");
             }
-            $pet->ModifyNPCStat($stat, $bucket_value);
+            $pet->ModifyNPCStat($stat, ceil($bucket_value));
         }
     }
 }
