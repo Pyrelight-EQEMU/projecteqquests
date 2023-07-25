@@ -8,6 +8,8 @@
     my $query = $dbh->prepare('SELECT * FROM items WHERE items.id < 999999;');
     $query->execute();
 
+    quest::debug("Executed Query...");
+
     my $column_names = $query->{NAME};
     my @rows;
 
@@ -19,6 +21,8 @@
 
         $new_row{'id'} = $new_row{'id'} + 1000000;
         $new_row{'Name'} = $new_row{'Name'} . ' +1';
+
+        quest::debug("Trying to generate new ID: [{}]", $new_row{'id'});
 
         push @rows, \%new_row;
     }
