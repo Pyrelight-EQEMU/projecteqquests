@@ -386,7 +386,7 @@ sub UPDATE_PET_STATS
         foreach my $stat (@stat_list) {
             my $bucket_value = $owner->GetBucket("pet_$stat");
             quest::debug("Scaling $stat from $bucket_value..");
-            my $bucket_value *= $pet_scalar;
+            $bucket_value *= $pet_scalar;
             quest::debug("Got $pet_scalar .. $bucket_value");
             $pet->ModifyNPCStat($stat, $bucket_value . "");
         }
