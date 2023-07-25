@@ -30,7 +30,7 @@
         my @values = values %$row;
         my $placeholders = join ", ", map { $dbh->quote($_) } @values;
         my $column_list = join ", ", @columns;
-        my $sql = "INSERT INTO items ($column_list) VALUES ($placeholders)";
+        my $sql = "REPLACE INTO items ($column_list) VALUES ($placeholders)";
         $dbh->do($sql);
     }
 
