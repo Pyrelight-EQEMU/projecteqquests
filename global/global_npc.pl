@@ -387,8 +387,10 @@ sub UPDATE_PET_STATS
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {   
             my $bucket_value = $owner->GetBucket("pet_$stat");
+            quest::debug("Adjusting $stat - base: $bucket_value");
             $bucket_value *= $pet_scalar;
-            $pet->ModifyNPCStat($stat, $bucket_value . "");
+            quest::debug("scaling by $pet_scalar - Result: $bucket_value");
+            $pet->ModifyNPCStat($stat, $bucket_value);
         }
     }
 }
