@@ -1,29 +1,8 @@
  sub EVENT_SAY {
   my $charKey = $client->CharacterID() . "-MAO-Progress";
   my $progress = quest::get_data($charKey);
-  if ($text=~/hail/i && !$client->GetGM()) {
+  if ($text=~/hail/i) {
     POPUP_DISPLAY();
-  } elsif ($client->GetGM()) {
-    my $dbh = plugin::LoadMysql();
-    # Fetch data from the table
-    my $sth = $dbh->prepare("SELECT * FROM items WHERE items.id < 999999");
-    $sth->execute() or die $DBI::errstr;
-
-    while (my $row = $sth->fetchrow_hashref()) {
-        # Modify the values as per the requirements
-        $row->{id} = $row->{id} + 1000000;
-        $row->{Name} = $row->{Name} . " +1"; 
-
-        # Create an INSERT statement dynamically
-        my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
-        my $values  = join(",", map { $dbh->quote($_) } values %$row);
-        my $sql = "INSERT INTO items ($columns) VALUES ($values)";
-
-        # Insert the new row into the table
-        my $isth = $dbh->prepare($sql);
-        $isth->execute() or die $DBI::errstr;
-    }
-    $dbh->disconnect();
   }
  }
 
