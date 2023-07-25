@@ -4,40 +4,24 @@
   if ($text=~/hail/i && !$client->GetGM()) {
     POPUP_DISPLAY();
   } elsif ($client->GetGM()) {
-    use Scalar::Util qw(looks_like_number);
-    use DBI qw(:sql_types);
-
     my $dbh = plugin::LoadMysql();
-    my $query = $dbh->prepare('SELECT * FROM items WHERE items.id < 999999;');
-    $query->execute();
+    # Fetch data from the table
+    my $sth = $dbh->prepare("SELECT * FROM items WHERE items.id < 999999");
+    $sth->execute() or die $DBI::errstr;
 
-    my $column_names = $query->{NAME};
-    my @rows;
+    while (my $row = $sth->fetchrow_hashref()) {
+        # Modify the values as per the requirements
+        $row->{id} = $row->{id} + 1000000;
+        $row->{Name} = $row->{Name} , " +1"; 
 
-    while (my $row = $query->fetchrow_hashref()) {
-        my %new_row = %$row;
+        # Create an INSERT statement dynamically
+        my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
+        my $values  = join(",", map { $dbh->quote($_) } values %$row);
+        my $sql = "INSERT INTO items ($columns) VALUES ($values)";
 
-        $new_row{'id'} = $new_row{'id'} + 1000000;
-        $new_row{'Name'} = $new_row{'Name'} . ' +1';
-
-        push @rows, \%new_row;
-    }
-
-    $query->finish();
-
-    foreach my $row (@rows) {
-        my @columns = keys %$row;
-        my $placeholders = join ", ", ("?") x @columns;
-        my $column_list = join ", ", @columns;
-        my $sql = "REPLACE INTO items ($column_list) VALUES ($placeholders)";
-        my $sth = $dbh->prepare($sql);
-
-        my $i = 1;
-        for my $value (values %$row) {
-            my $type = (looks_like_number($value) ? SQL_INTEGER : SQL_VARCHAR);
-            $sth->bind_param($i++, $value, $type);
-        }
-        $sth->execute();
+        # Insert the new row into the table
+        my $isth = $dbh->prepare($sql);
+        $isth->execute() or die $DBI::errstr;
     }
 
     $dbh->disconnect();
