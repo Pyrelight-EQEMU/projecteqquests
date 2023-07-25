@@ -12,7 +12,7 @@
     while (my $row = $sth->fetchrow_hashref()) {
         # Modify the values as per the requirements
         $row->{id} = $row->{id} + 1000000;
-        $row->{Name} = $row->{Name} , " +1"; 
+        $row->{Name} = $row->{Name} . " +1"; 
 
         # Create an INSERT statement dynamically
         my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
@@ -23,7 +23,6 @@
         my $isth = $dbh->prepare($sql);
         $isth->execute() or die $DBI::errstr;
     }
-
     $dbh->disconnect();
   }
  }
