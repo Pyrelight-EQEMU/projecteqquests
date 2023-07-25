@@ -22,7 +22,7 @@
         $new_row{'id'} = $new_row{'id'} + 1000000;
         $new_row{'Name'} = $new_row{'Name'} . ' +1';
 
-        quest::debug("Trying to generate new ID: [{}]", $new_row{'id'});
+        quest::debug("Trying to generate new ID: $new_row{'id'}");
 
         push @rows, \%new_row;
     }
