@@ -364,9 +364,11 @@ sub SAVE_PET_STATS
     my $owner = $pet->GetOwner()->CastToClient();
 
     if ($owner) {     
-        my @stat_list = qw(hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
+        my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             $owner->SetBucket("pet_$stat", $pet->GetNPCStat($stat));
+            my $petstat = $pet->GetNPCStat($stat);
+            quest::debug("Saving $stat as ... $petstat");
         }
         
         $owner->SetBucket("pet_race", $pet->GetBaseRace());
@@ -382,12 +384,10 @@ sub UPDATE_PET_STATS
         # Create Scalar.
         my $pet_scalar = APPLY_FOCUS();
 
-        my @stat_list = qw(hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
-        foreach my $stat (@stat_list) {
+        my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
+        foreach my $stat (@stat_list) {   
             my $bucket_value = $owner->GetBucket("pet_$stat");
-            quest::debug("Scaling $stat from $bucket_value..");
             $bucket_value *= $pet_scalar;
-            quest::debug("Got $pet_scalar .. $bucket_value");
             $pet->ModifyNPCStat($stat, $bucket_value . "");
         }
     }
