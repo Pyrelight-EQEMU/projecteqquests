@@ -385,8 +385,9 @@ sub UPDATE_PET_STATS
         my @stat_list = qw(hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             my $bucket_value = $owner->GetBucket("pet_$stat");
-            $npc->Say("My base damage was: $bucket_value");
+            quest::debug("Scaling $stat from $bucket_value..");
             my $bucket_value *= $pet_scalar;
+            quest::debug("Got $bucket_value");
             $pet->ModifyNPCStat($stat, $bucket_value . "");
         }
     }
