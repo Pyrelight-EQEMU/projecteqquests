@@ -5,7 +5,7 @@
     POPUP_DISPLAY();
   } elsif ($client->GetGM()) {
     use Scalar::Util qw(looks_like_number);
-    use JSON::MaybeXS qw(is_bool);
+    use DBI qw(:sql_types);
 
     my $dbh = plugin::LoadMysql();
     my $query = $dbh->prepare('SELECT * FROM items WHERE items.id < 999999;');
@@ -34,20 +34,13 @@
 
         my $i = 1;
         for my $value (values %$row) {
-            my $type = DBI::SQL_VARCHAR;
-            if (looks_like_number($value)) {
-                $type = DBI::SQL_INTEGER;
-            }
-            elsif (is_bool($value)) {
-                $type = DBI::SQL_BOOLEAN;
-            }
+            my $type = (looks_like_number($value) ? SQL_INTEGER : SQL_VARCHAR);
             $sth->bind_param($i++, $value, $type);
         }
         $sth->execute();
     }
 
     $dbh->disconnect();
-
   }
  }
 
