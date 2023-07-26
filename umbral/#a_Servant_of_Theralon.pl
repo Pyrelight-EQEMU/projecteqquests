@@ -23,7 +23,7 @@ my @target_list     = (158016,  #Thall_Va_Xakra
                        158010,  #Diabo_Xi_Va_Temariel
                        158011,  #Thall_Xundraux_Diabo
                        158009,  #Va_Xi_Aten_Ha_Ra
-                       158013,  #Kaas_Thox_Xi_Ans_Dyek
+                       158007,  #Kaas_Thox_Xi_Aten_Ha_Ra
                        158007,  #Kaas_Thox_Xi_Aten_Ha_Ra
                        158006); #Aten_Ha_Ra                    
 my $target_level    = 60;
