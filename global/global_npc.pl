@@ -130,7 +130,7 @@ sub EVENT_FOS_KILL
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
     my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
     my $group_mode   = $info_bucket{'group_mode'};
-    my $difficulty   = $info_bucket{'difficulty'};
+    my $difficulty   = $info_bucket{'difficulty'} - 1;
     my $reward       = $info_bucket{'reward'};    
     my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
