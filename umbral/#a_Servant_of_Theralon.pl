@@ -14,7 +14,7 @@ my $explain_message = "Ahead lies Vex Thal, the last city of the Akheva. The Mas
 
 #Array of npc_type IDs that we need to kill. Add multiple times for quantity.
 my @target_list     = (158016,  #Thall_Va_Xakra
-                       158016,  #Thall_Va_Xakra
+                       158125,  #Thall_Va_Xakra
                        158013,  #Kaas_Thox_Xi_Ans_Dyek
                        158014,  #Diabo_Xi_Va
                        158015,  #Diabo_Xi_Xin
