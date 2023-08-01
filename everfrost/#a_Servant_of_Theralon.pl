@@ -15,17 +15,6 @@ my $target_level    = 52;
 
 sub EVENT_SAY {
     quest::debug("wtf?");
-    plugin::ProcessInstanceDialog(
-        expedition_name => $expedition_name,
-        dz_zone => $dz_zone,
-        explain_message => $explain_message,
-        target_list => \@target_list,
-        reward => $reward,
-        key_required => $key_required,
-        target_level => $target_level, 
-        client => $client,
-        npc => $npc,
-        text => $text,
-    );
+    plugin::ProcessInstanceDialog();
     quest::debug("wtf?2");
 }
