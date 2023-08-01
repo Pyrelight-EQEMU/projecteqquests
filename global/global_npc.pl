@@ -26,7 +26,6 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        quest::debug("I spawned in an FOS instance");
         EVENT_FOS_SPAWN();        
     }
 }
@@ -34,7 +33,6 @@ sub EVENT_SPAWN {
 sub EVENT_KILLED_MERIT {
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        quest::debug("I died in an FOS instance");
         EVENT_FOS_KILL();
     }  
 
@@ -88,7 +86,7 @@ sub EVENT_FOS_SPAWN
     my $group_mode  = $info_bucket{'group_mode'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
     my $reward      = $info_bucket{'reward'};    
-    my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
+    my $target_level   = $info_bucket{'target_level'} + min(floor($difficulty / 5), 10);
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
@@ -106,7 +104,7 @@ sub EVENT_FOS_SPAWN
         $npc_stats{$stat} = $npc->GetNPCStat($stat);
     }
 
-    $npc_stats{'spellscale'} = 100 * ($difficulty * $modifier);
+    $npc_stats{'spellscale'} = 100 + ($difficulty * $modifier);
     $npc_stats{'healscale'}  = 100 + ($difficulty * $modifier);
 
     foreach my $stat (@stat_names) {
@@ -114,8 +112,8 @@ sub EVENT_FOS_SPAWN
     }
 
     #Rescale Levels
-    if ($npc->GetLevel() < ($min_level - 6)) {
-        my $level_diff = $min_level - 6 - $npc->GetLevel();
+    if ($npc->GetLevel() < ($target_level - 6)) {
+        my $level_diff = $target_level - 6 - $npc->GetLevel();
 
         $npc->SetLevel($npc->GetLevel() + $level_diff);
         foreach my $stat (@stat_names) {
@@ -141,7 +139,7 @@ sub EVENT_FOS_KILL
     my $group_mode   = $info_bucket{'group_mode'};
     my $difficulty   = $info_bucket{'difficulty'} - 1;
     my $reward       = $info_bucket{'reward'};    
-    my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
+    my $target_level    = $info_bucket{'target_level'} + min(floor($difficulty / 5), 10);
 
     quest::debug(quest::get_data("instance-$zonesn-$instanceid"));
 
@@ -169,10 +167,9 @@ sub EVENT_FOS_KILL
                 my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
                 my $itm_link = quest::itemlink(40903);
                 $client->SetBucket("FoS-points",$FoS_points);
-                $client->SetBucket("FoS-$zonesn", $difficulty);
+                $client->SetBucket("FoS-$zonesn", $difficulty + 1);
                 plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $reward [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
                 $client->AddCrystals($reward, 0);
-                my $itm_link = quest::itemlink(40903);
                 plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: $difficulty).");
             }
             quest::debug("Updated Targets: " . join(", ", @targetlist));
