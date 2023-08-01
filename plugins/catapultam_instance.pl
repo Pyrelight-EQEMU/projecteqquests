@@ -90,6 +90,10 @@ sub ProcessInstanceDialog {
 
                 quest::debug("Check1");
 
+                my $key = "instance-$dz_zone-" . $dz->GetInstanceID();
+
+                quest::debug("key:$key");
+
                 quest::set_data("instance-$dz_zone-" . $dz->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
 
                 quest::debug("Check2");
