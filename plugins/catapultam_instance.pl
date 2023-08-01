@@ -79,7 +79,7 @@ sub ProcessInstanceDialog {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                 }
                                                
-                CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
+                my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
 
                 my %payload = ( difficulty => $escalation_level, 
                                 group_mode => $group_mode, 
@@ -88,7 +88,7 @@ sub ProcessInstanceDialog {
                                 min_level => $client->GetLevel(), 
                                 target_level => $target_level );
 
-                quest::set_data("instance-$dz_zone-" . $client->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
+                quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);
                 plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
             }
         }
@@ -115,6 +115,8 @@ sub CREATE_EXPEDITION {
     $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading());
+
+    return $dz->GetInstanceID();
 }
 
 
