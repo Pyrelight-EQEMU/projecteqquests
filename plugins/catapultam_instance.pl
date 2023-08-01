@@ -5,7 +5,7 @@ sub ProcessInstanceDialog {
     my $client = plugin::val('client');
     my $npc    = plugin::val('npc');
 
-        if ($text =~ /hail/i ) {
+    if ($text =~ /hail/i ) {
         $dz = $client->GetExpedition();
         if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
             if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
