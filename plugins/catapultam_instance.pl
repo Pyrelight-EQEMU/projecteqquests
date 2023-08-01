@@ -91,6 +91,7 @@ sub ProcessInstanceDialog {
                 quest::debug("Check1");
 
                 my $dz = $client->GetExpedition();
+                quest::debug("dz:$dz");
 
                 quest::set_data("instance-$dz_zone-" . $dz->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
 
