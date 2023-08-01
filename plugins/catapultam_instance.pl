@@ -1,4 +1,5 @@
 sub ProcessInstanceDialog {
+    quest::debug("Version 0.1");
     if ($text =~ /hail/i ) {
         $dz = $client->GetExpedition();
         if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
