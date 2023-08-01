@@ -86,7 +86,7 @@ sub EVENT_FOS_SPAWN
     my $group_mode  = $info_bucket{'group_mode'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
     my $reward      = $info_bucket{'reward'};    
-    my $target_level   = $info_bucket{'target_level'} + min(floor($difficulty / 5), 10);
+    my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
@@ -112,8 +112,9 @@ sub EVENT_FOS_SPAWN
     }
 
     #Rescale Levels
-    if ($npc->GetLevel() < ($target_level - 6)) {
-        my $level_diff = $target_level - 6 - $npc->GetLevel();
+    quest::debug("min_level:$min_level");
+    if ($npc->GetLevel() < ($min_level - 6)) {
+        my $level_diff = $min_level - 6 - $npc->GetLevel();
 
         $npc->SetLevel($npc->GetLevel() + $level_diff);
         foreach my $stat (@stat_names) {
@@ -139,7 +140,7 @@ sub EVENT_FOS_KILL
     my $group_mode   = $info_bucket{'group_mode'};
     my $difficulty   = $info_bucket{'difficulty'} - 1;
     my $reward       = $info_bucket{'reward'};    
-    my $target_level    = $info_bucket{'target_level'} + min(floor($difficulty / 5), 10);
+    my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
     quest::debug(quest::get_data("instance-$zonesn-$instanceid"));
 
