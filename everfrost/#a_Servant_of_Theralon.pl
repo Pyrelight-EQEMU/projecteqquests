@@ -14,6 +14,7 @@ my $key_required    = 0; #ID of key item
 my $target_level    = 52;
 
 sub EVENT_SAY {
+    quest::debug("wtf?");
     plugin::ProcessInstanceDialog(
         expedition_name => $expedition_name,
         dz_zone => $dz_zone,
