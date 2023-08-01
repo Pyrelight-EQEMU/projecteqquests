@@ -1,18 +1,22 @@
+my %args = (
+    expedition_name => "Feat of Strength: Permafrost Keep",
+    dz_zone         => "permafrost",
+    explain_message => "This is the lair of the White Dragon, Vox. The Master requires three of her scales for his purposes. Proceed, slay the dragon and her minions, and be rewarded.",
+    target_list     => [73057, 73058], 
 
-#These Must Be Defined
-my $expedition_name = "Feat of Strength: Permafrost Keep";
-my $dz_zone         = "permafrost";
-my $explain_message = "This is the lair of the White Dragon, Vox. The Master requires three of her scales for his purposes. Proceed, slay the dragon and her minions, and be rewarded.";
-my @target_list     = ( #Array of npc_type IDs that we need to kill. Add multiple times for quantity.
-                        73057, #Lady Vox
-                        73058
-                      );
+    # These are Optional, but you probably want to define them.
+    reward          => 3,
+    key_required    => 0, # ID of key item                
+    target_level    => 52,
 
-#These are Optional
-my $reward          = 3;
-my $key_required    = 0; #ID of key item                
-my $target_level    = 52;
+    # These are VERY optional (they have reasonable default values)
+    min_players     => 1,
+    max_players     => 1,
+    dz_version      => 10,
+    dz_duration     => 604800, # 7 Days
+    dz_lockout      => 3600, # 1 Hour
+);
 
 sub EVENT_SAY {
-    plugin::ProcessInstanceDialog();
+    plugin::ProcessInstanceDialog(%args);
 }

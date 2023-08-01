@@ -4,6 +4,26 @@ sub ProcessInstanceDialog {
     my $text   = plugin::val('text');
     my $client = plugin::val('client');
     my $npc    = plugin::val('npc');
+    my $dz = undef;
+
+    my (%args) = @_;
+
+    # Required arguments
+    my $expedition_name = $args{expedition_name};
+    my $dz_zone         = $args{dz_zone};
+    my $explain_message = $args{explain_message};
+    my $target_list     = $args{target_list};
+
+    # Optional arguments with default values
+    my $reward          = $args{reward} // 1;
+    my $key_required    = $args{key_required} // 0;
+    my $target_level    = $args{target_level} // 1;
+    
+    my $min_players     = $args{min_players} // 1;
+    my $max_players     = $args{max_players} // 1;
+    my $dz_version      = $args{dz_version} // 1;
+    my $dz_duration     = $args{dz_duration} // 604800;
+    my $dz_lockout      = $args{dz_lockout} // 3600;
 
     if ($text =~ /hail/i ) {
         $dz = $client->GetExpedition();
@@ -83,8 +103,8 @@ sub ProcessInstanceDialog {
     }
 }
 
-sub CREATE_EXPEDITION {    
-    my $client = $entity_list->GetClientByID($userid);
+sub CREATE_EXPEDITION {
+    my $client = plugin::val('client');
     $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, shift,shift,shift);
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()); 
