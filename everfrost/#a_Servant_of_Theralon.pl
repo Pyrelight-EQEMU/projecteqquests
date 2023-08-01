@@ -14,7 +14,5 @@ my $key_required    = 0; #ID of key item
 my $target_level    = 52;
 
 sub EVENT_SAY {
-    quest::debug("wtf?");
     plugin::ProcessInstanceDialog();
-    quest::debug("wtf?2");
 }

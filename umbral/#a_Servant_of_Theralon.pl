@@ -13,7 +13,8 @@ my $explain_message = "Ahead lies Vex Thal, the last city of the Akheva. The Mas
                        each of her lieutenants in turn.";
 
 #Array of npc_type IDs that we need to kill. Add multiple times for quantity.
-my @target_list     = (158016,  #Thall_Va_Xakra
+my @target_list     = (
+                       158016,  #Thall_Va_Xakra
                        158125,  #Thall_Va_Xakra
                        158013,  #Kaas_Thox_Xi_Ans_Dyek
                        158014,  #Diabo_Xi_Va
@@ -25,7 +26,8 @@ my @target_list     = (158016,  #Thall_Va_Xakra
                        158009,  #Va_Xi_Aten_Ha_Ra
                        158007,  #Kaas_Thox_Xi_Aten_Ha_Ra
                        158007,  #Kaas_Thox_Xi_Aten_Ha_Ra
-                       158006); #Aten_Ha_Ra                    
+                       158006
+                    ); #Aten_Ha_Ra                    
 my $target_level    = 60;
 my $key_required    = 22198;
 
