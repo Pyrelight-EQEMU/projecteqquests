@@ -111,3 +111,5 @@ sub CREATE_EXPEDITION {
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()); 
 }
+
+return 1;
