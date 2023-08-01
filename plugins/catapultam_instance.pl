@@ -46,9 +46,9 @@ sub ProcessInstanceDialog {
             if (my $bucket = $client->GetBucket("FoS-$dz_zone")) {
                 my $solo_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "current difficulty")."]";
                 my $group_link = "[".quest::saylink("fs_ESCALATE_${bucket}_1", 1, "group")."]";
-                my $challenge_link = "[".quest::saylink("fs_ESCALATE_" . ($bucket + 1) . "_0", 1, "challenge")."]";
+                my $challenge_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "challenge")."]";
 
-                plugin::YellowText("You have previously completed this challenge. You may choose to $challenge_link (Difficulty: $bucket + 1) it once again, 
+                plugin::YellowText("You have previously completed this challenge. You may choose to $challenge_link (Difficulty: $bucket) it once again, 
                                     remain at your $solo_link level, or attempt it as $group_link.");
             } else {  
                 plugin::YellowText("You have not previously completed this challenge. Are you ready to [".quest::saylink("fs_ESCALATE_1_0", 1, "Attempt it")."]?")
