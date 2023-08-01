@@ -165,7 +165,7 @@ sub EVENT_FOS_KILL
                 plugin::YellowText("You've slain $npc_name! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
             } else {
                 my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
-                my $itm_link = quest::itemlink(40903);
+                my $itm_link = quest::varlink(40903);
                 $client->SetBucket("FoS-points",$FoS_points);
                 $client->SetBucket("FoS-$zonesn", $difficulty + 1);
                 plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $reward [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
