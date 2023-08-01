@@ -88,13 +88,7 @@ sub ProcessInstanceDialog {
                                 min_level => $client->GetLevel(), 
                                 target_level => $target_level );
 
-                quest::debug("Check1");
-                quest::debug("dz:$dz");
-
                 quest::set_data("instance-$dz_zone-" . $client->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
-
-                quest::debug("Check2");
-
                 plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
             }
         }
@@ -119,13 +113,8 @@ sub CREATE_EXPEDITION {
     my $zoneid = plugin::val('zoneid');
     
     $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
-    quest::debug("Check1.1");
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
-    quest::debug("Check1.2");
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading());
-    quest::debug("Check1.3");
-    my $iid = $dz->GetInstanceID();
-    quest::debug("iid:$iid");
 }
 
 
