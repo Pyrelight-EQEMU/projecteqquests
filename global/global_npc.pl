@@ -41,6 +41,8 @@ sub EVENT_KILLED_MERIT {
         my $dbh = plugin::LoadMysql();
 
         my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
+
+        quest::debug("Looking for potion: $potion");
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
         my ($potion_id) = $query->fetchrow_array();
@@ -92,7 +94,7 @@ sub EVENT_FOS_SPAWN
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
     my %npc_stats;
     my $npc_stats_perlevel;
-    
+
     foreach my $stat (@stat_names) {
         $npc_stats{$stat} = $npc->GetNPCStat($stat);
     }
