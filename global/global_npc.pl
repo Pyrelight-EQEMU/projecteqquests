@@ -40,7 +40,11 @@ sub EVENT_KILLED_MERIT {
     if ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.20) {
         my $dbh = plugin::LoadMysql();
 
-        my $potion = "Distillate of " . plugin::GetPotName() . " " . plugin::GetRoman($client->GetLevel());
+        my $pot_name = plugin::GetPotName();
+        my $potion = "Distillate of " . $pot_name;
+        if ($pot_name ne 'Antidote' and $pot_name ne 'Immunization' and $pot_name ne 'Skinspikes') {
+            $potion .= plugin::GetRoman($client->GetLevel());
+        }
 
         quest::debug("Looking for potion: $potion");
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");

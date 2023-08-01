@@ -53,16 +53,16 @@ sub GetRoman {
     my ($level) = @_;
 
     my %level_to_roman = (
-        0 => "I",
-        10 => "II",
-        20 => "III",
-        30 => "IV",
-        40 => "V",
-        50 => "VI",
-        60 => "VII",
-        70 => "VIII",
-        80 => "IX",
-        90 => "X",
+        0  => " I",
+        10 => " II",
+        20 => " III",
+        30 => " IV",
+        40 => " V",
+        50 => " VI",
+        60 => " VII",
+        70 => " VIII",
+        80 => " IX",
+        90 => " X",
     );
 
     my ($roman) = map { $level_to_roman{$_} } reverse sort grep { $level >= $_ } keys %level_to_roman;
