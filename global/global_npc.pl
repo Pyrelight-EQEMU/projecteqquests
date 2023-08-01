@@ -92,14 +92,7 @@ sub EVENT_FOS_SPAWN
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
     my %npc_stats;
     my $npc_stats_perlevel;
-
-    # Cull over-populated instances
-    if ($zonesn = 'vexthal' and not any { $_ == $npc->GetID() } @targetlist) {
-         if (rand() < 0.33) {
-            $npc->Kill();
-         }
-    }
-
+    
     foreach my $stat (@stat_names) {
         $npc_stats{$stat} = $npc->GetNPCStat($stat);
     }
