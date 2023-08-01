@@ -89,11 +89,9 @@ sub ProcessInstanceDialog {
                                 target_level => $target_level );
 
                 quest::debug("Check1");
-
-                my $dz = $client->GetExpedition();
                 quest::debug("dz:$dz");
 
-                quest::set_data("instance-$dz_zone-" . $dz->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
+                quest::set_data("instance-$dz_zone-" . $client->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
 
                 quest::debug("Check2");
 
