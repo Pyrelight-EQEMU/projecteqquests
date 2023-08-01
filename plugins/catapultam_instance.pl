@@ -1,5 +1,5 @@
 sub ProcessInstanceDialog {
-
+    quest::debug("Version 0.2");
     my (%args) = @_;
 
     # These must be defined manually
