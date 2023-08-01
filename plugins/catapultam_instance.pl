@@ -126,6 +126,8 @@ sub CREATE_EXPEDITION {
     quest::debug("Check1.2");
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading());
     quest::debug("Check1.3");
+    my $iid = $dz->GetInstanceID();
+    quest::debug("iid:$iid");
 }
 
 
