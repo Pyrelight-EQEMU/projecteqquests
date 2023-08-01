@@ -79,7 +79,7 @@ sub ProcessInstanceDialog {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                 }
                                                
-                CREATE_EXPEDITION($exp_name, $exp_min, $exp_max);
+                CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
 
                 my %payload = ( difficulty => $escalation_level, 
                                 group_mode => $group_mode, 
@@ -104,17 +104,18 @@ sub ProcessInstanceDialog {
 }
 
 sub CREATE_EXPEDITION {
+    my ($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max) = @_;
+    
     my $client = plugin::val('client');
     my $x      = plugin::val('x');
     my $y      = plugin::val('y');
     my $z      = plugin::val('z');
     my $zoneid = plugin::val('zoneid');
-
-    quest::debug("debug:$x, $y, $z, $zoneid");
     
-    $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, shift,shift,shift);
+    $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()); 
 }
+
 
 return 1;
