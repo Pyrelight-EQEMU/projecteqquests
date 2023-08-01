@@ -105,7 +105,13 @@ sub ProcessInstanceDialog {
 
 sub CREATE_EXPEDITION {
     my $client = plugin::val('client');
-    quest::debug("debug: $dz_zone, $dz_version, $dz_duration");
+    my $x      = plugin::val('x');
+    my $y      = plugin::val('y');
+    my $z      = plugin::val('z');
+    my $zoneid = plugin::val('zoneid');
+
+    quest::debug("debug:$x, $y, $z, $zoneid");
+    
     $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, shift,shift,shift);
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()); 
