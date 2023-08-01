@@ -26,9 +26,6 @@ sub ProcessInstanceDialog {
     my $dz_lockout      = $args{dz_lockout} // 3600;
 
     if ($text =~ /hail/i ) {
-
-        quest::set_data("FLAG", "WAT?");
-
         $dz = $client->GetExpedition();
         if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
             if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
@@ -121,8 +118,11 @@ sub CREATE_EXPEDITION {
     my $zoneid = plugin::val('zoneid');
     
     $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
+    quest::debug("Check1.1");
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
-    $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()); 
+    quest::debug("Check1.2");
+    $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading());
+    quest::debug("Check1.3");
 }
 
 
