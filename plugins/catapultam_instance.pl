@@ -26,6 +26,9 @@ sub ProcessInstanceDialog {
     my $dz_lockout      = $args{dz_lockout} // 3600;
 
     if ($text =~ /hail/i ) {
+
+        quest::set_data("FLAG", "WAT?");
+
         $dz = $client->GetExpedition();
         if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
             if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
@@ -92,7 +95,7 @@ sub ProcessInstanceDialog {
 
                 quest::set_data("instance-$dz_zone-" . $dz->GetInstanceID(), plugin::SerializeHash(%payload), $dz_duration);
 
-quest::debug("Check2");
+                quest::debug("Check2");
 
                 plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
             }
