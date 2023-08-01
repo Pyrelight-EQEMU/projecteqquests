@@ -14,7 +14,7 @@ my $key_required    = 0; #ID of key item
 my $target_level    = 52;
 
 sub EVENT_SAY {
-    InstanceDialog::ProcessInstanceDialog(
+    plugin::ProcessInstanceDialog(
         expedition_name => $expedition_name,
         dz_zone => $dz_zone,
         explain_message => $explain_message,
@@ -25,5 +25,5 @@ sub EVENT_SAY {
         client => $client,
         npc => $npc,
         text => $text,
-    );
+    ); 
 }
