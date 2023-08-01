@@ -90,7 +90,7 @@ sub ProcessInstanceDialog {
 
                 quest::debug("Check1");
 
-                my $key = "instance-$dz_zone-";
+                my $key = $dz->GetInstanceID();
 
                 quest::debug("key:$key");
 
