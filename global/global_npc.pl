@@ -143,7 +143,7 @@ sub EVENT_FOS_KILL
     my $reward       = $info_bucket{'reward'};    
     my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
-    quest::debug(quest::get_data("FOS_KILL: instance-$zonesn-$instanceid"));
+    quest::debug(quest::get_data("instance-$zonesn-$instanceid"));
 
     if ($reward > 0) {
         my $npc_name = $npc->GetCleanName();
