@@ -12,7 +12,7 @@ sub ProcessInstanceDialog {
     my $expedition_name = $args{expedition_name};
     my $dz_zone         = $args{dz_zone};
     my $explain_message = $args{explain_message};
-    my $target_list     = $args{target_list};
+    my @target_list     = @{ $args{target_list} };
 
     # Optional arguments with default values
     my $reward          = $args{reward} // 1;
