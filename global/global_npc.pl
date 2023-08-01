@@ -26,6 +26,7 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
+        quest::debug("I spawned in an FOS instance");
         EVENT_FOS_SPAWN();        
     }
 }
@@ -33,6 +34,7 @@ sub EVENT_SPAWN {
 sub EVENT_KILLED_MERIT {
     # Check for FoS Instance
     if ($instanceversion == 10) {
+        quest::debug("I died in an FOS instance");
         EVENT_FOS_KILL();
     }  
 

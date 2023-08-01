@@ -21,7 +21,7 @@ sub ProcessInstanceDialog {
     
     my $min_players     = $args{min_players} // 1;
     my $max_players     = $args{max_players} // 1;
-    my $dz_version      = $args{dz_version} // 1;
+    my $dz_version      = $args{dz_version} // 10;
     my $dz_duration     = $args{dz_duration} // 604800;
     my $dz_lockout      = $args{dz_lockout} // 3600;
 
