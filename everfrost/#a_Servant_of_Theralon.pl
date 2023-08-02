@@ -18,5 +18,12 @@ my %args = (
 );
 
 sub EVENT_SAY {
+    if ($client->GetGM()) {
+
+
+
+
+        $client->AssignTask(40);
+    }
     plugin::ProcessInstanceDialog(%args);
 }
