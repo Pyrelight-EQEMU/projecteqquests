@@ -170,12 +170,8 @@ sub ModifyInstanceNPC
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
 
-    my ($zonesn, $instanceid) = @_;
-    quest::debug("instance-$zonesn-$instanceid");
-    quest::debug("attempting to scale $npc :".. quest::get_data("instance-$zonesn-$instanceid"));
-
     # Get the packed data for the instance
-    my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my %info_bucket = plugin::DeserializeHash(shift);
     my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
     my $group_mode  = $info_bucket{'group_mode'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
