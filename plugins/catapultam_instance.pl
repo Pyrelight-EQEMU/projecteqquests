@@ -168,8 +168,6 @@ sub GetScaledLoot {
         return $item_id;
     }
 
-    quest::debug($new_item_name);
-
     return $new_item_id;
 }
 
@@ -194,8 +192,6 @@ sub ModifyInstanceLoot {
             if ($scaled_item != $item_id) {
                 $npc->RemoveItem($item_id, 1);
                 $npc->AddItem($scaled_item);
-
-                quest::debug("Replaced $item_id with $scaled_item");
             }
         }
     }
