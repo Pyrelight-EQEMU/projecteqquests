@@ -140,7 +140,7 @@ sub GetInstanceLoot {
     my $rank = int(log($points) / log(2));
 
     # 50% chance to downgrade by 1 rank, but not lower than 0
-    if (rand() < 0.5 && $rank > 0) {
+    if (rand() < 0.25 && $rank > 1) {
         $rank--;
     }
     
