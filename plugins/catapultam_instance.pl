@@ -19,7 +19,7 @@ sub ProcessInstanceDialog {
     # Optional arguments with default values
     my $reward          = $args{reward} // 1;
     my $key_required    = $args{key_required} // 0;
-    my $target_level    = $args{target_level} // 1;
+    my $target_level    = $args{target_level} // $npc->GetLevel();
     
     my $min_players     = $args{min_players} // 1;
     my $max_players     = $args{max_players} // 1;
@@ -87,7 +87,7 @@ sub ProcessInstanceDialog {
                                 group_mode => $group_mode, 
                                 targets => plugin::SerializeList(@target_list), 
                                 reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
-                                min_level => $client->GetLevel(), 
+                                min_level => $target_level, 
                                 target_level => $target_level );
 
                 quest::debug(plugin::SerializeHash(%payload));                

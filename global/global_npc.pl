@@ -170,7 +170,7 @@ sub EVENT_FOS_KILL
                 $client->SetBucket("FoS-$zonesn", $difficulty + 2);
                 plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $reward [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
                 $client->AddCrystals($reward, 0);
-                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: $difficulty).");
+                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: " . ($difficulty + 1) . ").");
             }
             quest::debug("Updated Targets: " . join(", ", @targetlist));
         }
