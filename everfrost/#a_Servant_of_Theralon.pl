@@ -5,7 +5,7 @@ my %args = (
     target_list     => [73057, 73058], 
 
     # These are Optional, but you probably want to define them.
-    reward          => 3,
+    reward          => 1,
     key_required    => 0, # ID of key item                
     target_level    => 52,
 
