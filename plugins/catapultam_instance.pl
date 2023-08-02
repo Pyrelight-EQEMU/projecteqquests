@@ -156,7 +156,7 @@ sub GetScaledLoot {
     my $dbh = plugin::LoadMysql();
 
     # Prepare a SELECT statement to check if the item exists
-    my $sth = $dbh->prepare("SELECT id FROM items WHERE item_id = ?");
+    my $sth = $dbh->prepare("SELECT COUNT(*) FROM items WHERE item_id = ?");
     
     # Execute the statement, passing the new item id as the parameter
     $sth->execute($new_item_id);
