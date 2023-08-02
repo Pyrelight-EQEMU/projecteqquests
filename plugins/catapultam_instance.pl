@@ -1,3 +1,5 @@
+my $modifier        = 1.25;
+
 sub ProcessInstanceDialog {
     quest::debug("ProcessInstanceDialog Start");
 
@@ -161,6 +163,109 @@ sub GetScaledLoot {
     }
 
     return $new_item_id;
+}
+
+sub ModifyInstanceNPC
+{
+    my $client     = plugin::val('client');
+    my $npc        = plugin::val('npc');
+    my $zonesn     = plugin::val('zonesn');
+    my $instanceid = plugin::val('instanceid');
+
+    # Get the packed data for the instance
+    my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
+    my $group_mode  = $info_bucket{'group_mode'};
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
+    my $reward      = $info_bucket{'reward'};    
+    my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
+
+    # Get initial mob stat values
+    my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
+    my %npc_stats;
+    my $npc_stats_perlevel;
+
+    foreach my $stat (@stat_names) {
+        $npc_stats{$stat} = $npc->GetNPCStat($stat);
+    }
+
+    $npc_stats{'spellscale'} = 100 + ($difficulty * $modifier);
+    $npc_stats{'healscale'}  = 100 + ($difficulty * $modifier);
+
+    foreach my $stat (@stat_names) {
+        $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
+    }
+
+    #Rescale Levels
+    quest::debug("min_level:$min_level");
+    if ($npc->GetLevel() < ($min_level - 6)) {
+        my $level_diff = $min_level - 6 - $npc->GetLevel();
+
+        $npc->SetLevel($npc->GetLevel() + $level_diff);
+        foreach my $stat (@stat_names) {
+            $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
+        }        
+    }
+
+    #Recale stats
+    if ($difficulty > 0) {
+        foreach my $stat (@stat_names) {
+            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
+        }
+    }
+
+    $npc->Heal();
+}
+
+sub CheckInstanceMerit
+{
+    my $client     = plugin::val('client');
+    my $npc        = plugin::val('npc');
+    my $zonesn     = plugin::val('zonesn');
+    my $instanceid = plugin::val('instanceid');
+
+    # Get the packed data for the instance
+    my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
+    my $group_mode   = $info_bucket{'group_mode'};
+    my $difficulty   = $info_bucket{'difficulty'} - 1;
+    my $reward       = $info_bucket{'reward'};    
+    my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
+
+    quest::debug(quest::get_data("instance-$zonesn-$instanceid"));
+
+    if ($reward > 0) {
+        my $npc_name = $npc->GetCleanName();
+        my $removed = 0;
+        @targetlist = grep { 
+            if ($_ == $npc->GetNPCTypeID() && !$removed) { 
+                $removed = 1; 
+                0;
+            } else { 
+                1;
+            } 
+        } @targetlist;
+
+        if ($removed) {
+            #repack the info bucket
+            $info_bucket{'targets'} = plugin::SerializeList(@targetlist);
+            quest::set_data("instance-$zonesn-$instanceid", plugin::SerializeHash(%info_bucket), $client->GetExpedition->GetSecondsRemaining());
+            
+            my $remaining_targets = scalar @targetlist;
+            if ($remaining_targets) {                
+                plugin::YellowText("You've slain $npc_name! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
+            } else {
+                my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
+                my $itm_link = quest::varlink(40903);
+                $client->SetBucket("FoS-points",$FoS_points);
+                $client->SetBucket("FoS-$zonesn", $difficulty + 2);
+                plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $reward [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
+                $client->AddCrystals($reward, 0);
+                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: " . ($difficulty + 1) . ").");
+            }
+            quest::debug("Updated Targets: " . join(", ", @targetlist));
+        }
+    }
 }
 
 return 1;
