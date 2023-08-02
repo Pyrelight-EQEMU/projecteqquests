@@ -137,6 +137,8 @@ sub GetInstanceLoot {
     my $max_points = ceil(3 * ($difficulty - 1)) + 1;
     my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
 
+    quest::debug("$points:$max_points");
+
     # If points less than 2, return the base item id
     if ($points < 2) {
         return $item_id;
