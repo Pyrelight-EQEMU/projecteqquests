@@ -153,22 +153,9 @@ sub GetScaledLoot {
     my $new_item_id = $item_id + (1000000 * $rank);
 
     my $new_item_name = quest::getitemname($new_item_id);
-    quest::debug($new_item_name);    
 
-    # Get a database handle
-    my $dbh = plugin::LoadMysql();
-
-    # Prepare a SELECT statement to check if the item exists
-    my $sth = $dbh->prepare("SELECT COUNT(*) FROM items WHERE item_id = ?");
-    
-    # Execute the statement, passing the new item id as the parameter
-    $sth->execute($new_item_id);
-    
-    # Fetch the result of the query (this will be the count of rows with the given item id)
-    my ($count) = $sth->fetchrow_array();
-
-    # If the count is 0, the item does not exist, so return the base item id
-    if ($count == 0) {
+    # Check if $new_item_name is 'INVALID ITEM ID IN GETITEMNAME'
+    if ($new_item_name eq 'INVALID ITEM ID IN GETITEMNAME') {
         return $item_id;
     }
 
