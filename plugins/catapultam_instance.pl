@@ -150,7 +150,10 @@ sub GetInstanceLoot {
 sub GetScaledLoot {
     my ($item_id, $rank) = @_;
     
-    my $new_item_id = $item_id + (1000000 * $rank);    
+    my $new_item_id = $item_id + (1000000 * $rank);
+
+    my $new_item_name = quest::getitemname($new_item_id);
+    quest::debug($new_item_name);    
 
     # Get a database handle
     my $dbh = plugin::LoadMysql();
@@ -168,8 +171,6 @@ sub GetScaledLoot {
     if ($count == 0) {
         return $item_id;
     }
-
-    quest::debug("$item_id:$new_item_id");
 
     return $new_item_id;
 }
