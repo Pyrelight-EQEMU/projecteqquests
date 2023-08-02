@@ -204,7 +204,6 @@ sub ModifyInstanceNPC
     }
 
     #Rescale Levels
-    quest::debug("min_level:$min_level");
     if ($npc->GetLevel() < ($min_level - 6)) {
         my $level_diff = $min_level - 6 - $npc->GetLevel();
 
