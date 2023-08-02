@@ -265,8 +265,6 @@ sub CheckInstanceMerit
     my $reward       = $info_bucket{'reward'};    
     my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
-    quest::debug(quest::get_data("instance-$zonesn-$instanceid"));
-
     if ($reward > 0) {
         my $npc_name = $npc->GetCleanName();
         my $removed = 0;
@@ -296,7 +294,7 @@ sub CheckInstanceMerit
                 $client->AddCrystals($reward, 0);
                 plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: " . ($difficulty + 1) . ").");
             }
-            quest::debug("Updated Targets: " . join(", ", @targetlist));
+            #quest::debug("Updated Targets: " . join(", ", @targetlist));
         }
     }
 }
