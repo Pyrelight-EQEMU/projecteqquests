@@ -123,5 +123,44 @@ sub CREATE_EXPEDITION {
     return $dz->GetInstanceID();
 }
 
+sub GetInstanceLoot {
+    my ($item_id, $difficulty) = @_;
+    my $max_points = ceil(3 * ($difficulty - 1)) + 1;
+    my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
+
+    # If points less than 2, return the base item id
+    if ($points < 2) {
+        return $item_id;
+    }
+    
+    my $rank = int(log($points) / log(2));
+
+    return GetScaledLoot($item_id, $rank);
+}
+
+sub GetScaledLoot {
+    my ($item_id, $rank) = @_;
+    
+    my $new_item_id = $item_id + (1000000 * $rank);
+
+    # Get a database handle
+    my $dbh = plugin::LoadMysql();
+
+    # Prepare a SELECT statement to check if the item exists
+    my $sth = $dbh->prepare("SELECT COUNT(*) FROM items WHERE item_id = ?");
+    
+    # Execute the statement, passing the new item id as the parameter
+    $sth->execute($new_item_id);
+    
+    # Fetch the result of the query (this will be the count of rows with the given item id)
+    my ($count) = $sth->fetchrow_array();
+
+    # If the count is 0, the item does not exist, so return the base item id
+    if ($count == 0) {
+        return $item_id;
+    }
+
+    return $new_item_id;
+}
 
 return 1;
