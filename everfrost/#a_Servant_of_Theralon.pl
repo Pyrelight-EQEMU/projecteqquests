@@ -20,10 +20,16 @@ my %args = (
 sub EVENT_SAY {
     if ($client->GetGM()) {
 
-
+        my %zone_hash = (
+            'instance' => {
+                'zone' => 'permafrost',
+                'version' => 10,
+            }
+        );
 
 
         $client->AssignTask(40);
+        $client->CreateTaskDynamicZone(40, \%zone_hash);
     }
     plugin::ProcessInstanceDialog(%args);
 }
