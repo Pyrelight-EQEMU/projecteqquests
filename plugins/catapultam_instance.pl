@@ -185,7 +185,7 @@ sub ModifyInstanceNPC
     my $group_mode  = $info_bucket{'group_mode'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
     my $reward      = $info_bucket{'reward'};    
-    my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
+    my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 4), 10);
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
