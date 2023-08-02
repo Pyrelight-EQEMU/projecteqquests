@@ -172,16 +172,22 @@ sub ModifyInstanceNPC
 
     my $instance_config = shift;
 
-    quest::debug("ModifyInstanceNPC v1");
+    quest::debug("ModifyInstanceNPC v2");
     quest::debug($instance_config);
 
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash($instance_config);
+    quest::debug("Check");
     my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
+    quest::debug("Check");
     my $group_mode  = $info_bucket{'group_mode'};
+    quest::debug("Check");
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
+    quest::debug("Check");
     my $reward      = $info_bucket{'reward'};    
+    quest::debug("Check");
     my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
+    quest::debug("Check");
 
     quest::debug("$group_mode, $difficulty, $reward, $min_level");
 
