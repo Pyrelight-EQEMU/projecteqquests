@@ -28,7 +28,7 @@ sub EVENT_SAY {
         );
 
         $client->AssignTask(40);
-        $client->CreateTaskDynamicZone(40, \%zone_hash);
+        $client->CreateTaskDynamicZone(40, %zone_hash);
     }
     plugin::ProcessInstanceDialog(%args);
 }
