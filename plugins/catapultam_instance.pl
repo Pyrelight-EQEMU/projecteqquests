@@ -172,6 +172,33 @@ sub GetScaledLoot {
     return $new_item_id;
 }
 
+sub ModifyInstanceLoot {
+    my $npc          = plugin::val('npc');
+    my $zonesn       = plugin::val('zonesn');
+    my $instanceid   = plugin::val('instanceid');
+    my $group_mode   = plugin::val('group_mode');
+
+    # Get the packed data for the instance
+    my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
+    my $reward       = $info_bucket{'reward'};
+
+    my @lootlist = $npc->GetLootList();
+    my @inventory;
+    foreach my $item_id (@lootlist) {
+        my $quantity = $npc->CountItem($item_id);
+
+        # do this once per $quantity
+        for (my $i = 0; $i < $quantity; $i++) {
+            my $scaled_item = GetInstanceLoot($item_id, $difficulty);
+            if ($scaled_item != $item_id) {
+                $npc->RemoveItem($item_id, 1);
+                $npc->AddItem($scaled_item);
+            }
+        }
+    }
+}
+
 sub ModifyInstanceNPC
 {
     my $client     = plugin::val('client');
