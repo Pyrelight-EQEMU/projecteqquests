@@ -34,6 +34,7 @@ sub EVENT_KILLED_MERIT {
     # Check for FoS Instance
     if ($instanceversion == 10) {
         plugin::CheckInstanceMerit();
+        plugin::ModifyInstanceLoot();
     }  
 
     #Potions
