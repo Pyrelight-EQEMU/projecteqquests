@@ -75,7 +75,7 @@ sub ProcessInstanceDialog {
             if ($level <= ($bucket + 1)) {
                 $escalation_level = $level || 1;
 
-                my $reward_ineligible = ($escalation_level <= $client->GetBucket("FoS-$dz_zone")) || $group_mode;
+                my $reward_ineligible = ($escalation_level < $client->GetBucket("FoS-$dz_zone")) || $group_mode;
 
                 if ($reward_ineligible) {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
