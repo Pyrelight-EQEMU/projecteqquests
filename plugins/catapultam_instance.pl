@@ -172,6 +172,7 @@ sub ModifyInstanceNPC
 
     my $instance_config = shift;
 
+    quest::debug("ModifyInstanceNPC v1");
     quest::debug($instance_config);
 
     # Get the packed data for the instance
