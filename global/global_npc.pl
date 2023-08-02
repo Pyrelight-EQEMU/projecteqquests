@@ -26,7 +26,8 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        plugin::ModifyInstanceNPC();     
+        plugin::ModifyInstanceNPC();        
+        plugin::ModifyInstanceLoot();     
     }
 }
 
@@ -34,7 +35,6 @@ sub EVENT_KILLED_MERIT {
     # Check for FoS Instance
     if ($instanceversion == 10) {
         plugin::CheckInstanceMerit();
-        plugin::ModifyInstanceLoot();
     }  
 
     #Potions
