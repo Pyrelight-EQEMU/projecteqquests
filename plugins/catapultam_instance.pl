@@ -188,6 +188,7 @@ sub ModifyInstanceLoot {
     foreach my $item_id (@lootlist) {
         my $quantity = $npc->CountItem($item_id);
 
+        quest::debug("Evaluating $item_id: " . quest::getitemname($item_id));
         # do this once per $quantity
         for (my $i = 0; $i < $quantity; $i++) {
             my $scaled_item = GetInstanceLoot($item_id, $difficulty);
