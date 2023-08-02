@@ -173,10 +173,10 @@ sub GetScaledLoot {
 }
 
 sub ModifyInstanceLoot {
-    my $npc          = plugin::val('npc');
-    my $zonesn       = plugin::val('zonesn');
-    my $instanceid   = plugin::val('instanceid');
-    my $group_mode   = plugin::val('group_mode');
+    my $client     = plugin::val('client');
+    my $npc        = plugin::val('npc');
+    my $zonesn     = plugin::val('zonesn');
+    my $instanceid = plugin::val('instanceid');
 
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
