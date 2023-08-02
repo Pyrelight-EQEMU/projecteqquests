@@ -90,6 +90,8 @@ sub ProcessInstanceDialog {
                                 min_level => $client->GetLevel(), 
                                 target_level => $target_level );
 
+                quest::debug(plugin::SerializeHash(%payload));                
+
                 quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);
                 plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
             }
