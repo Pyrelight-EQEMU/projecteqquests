@@ -175,7 +175,7 @@ sub ModifyInstanceNPC
     quest::debug($instance_config);
 
     # Get the packed data for the instance
-    my %info_bucket = plugin::DeserializeHash();
+    my %info_bucket = plugin::DeserializeHash(($instance_config);
     my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
     my $group_mode  = $info_bucket{'group_mode'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
