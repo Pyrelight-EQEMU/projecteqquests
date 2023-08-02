@@ -182,6 +182,8 @@ sub ModifyInstanceNPC
     my $reward      = $info_bucket{'reward'};    
     my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
 
+    quest::debug("$group_mode, $difficulty, $reward, $min_level");
+
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
     my %npc_stats;
