@@ -169,8 +169,7 @@ sub ModifyInstanceNPC
 {
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
-    my $zonesn     = plugin::val('zonesn');
-    my $instanceid = plugin::val('instanceid');
+    my ($zonesn, $instanceid) = @_;
 
     quest::debug("attempting to scale $npc :".. quest::get_data("instance-$zonesn-$instanceid"));
 

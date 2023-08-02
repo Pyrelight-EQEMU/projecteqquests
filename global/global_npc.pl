@@ -26,7 +26,7 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        plugin::ModifyInstanceNPC();     
+        plugin::ModifyInstanceNPC($zonesn, $instanceid);     
     }
 }
 
