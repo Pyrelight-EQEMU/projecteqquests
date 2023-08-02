@@ -173,6 +173,7 @@ sub GetScaledLoot {
 }
 
 sub ModifyInstanceLoot {
+    quest::debug("ModifyInstanceLoot Start");
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
     my $zonesn     = plugin::val('zonesn');
