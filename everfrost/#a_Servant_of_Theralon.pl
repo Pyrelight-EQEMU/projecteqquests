@@ -29,6 +29,8 @@ sub EVENT_SAY {
 
         $client->AssignTask(40);
         $client->CreateTaskDynamicZone(40, %zone_hash);
+        $dz = $client->GetExpedition();
+        $client->MovePCDynamicZone($dz_zone);
     }
     plugin::ProcessInstanceDialog(%args);
 }
