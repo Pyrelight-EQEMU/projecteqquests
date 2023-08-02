@@ -176,27 +176,16 @@ sub ModifyInstanceNPC
 {
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
-
-    my $instance_config = shift;
-
-    quest::debug("ModifyInstanceNPC v2");
-    quest::debug($instance_config);
+    my $zonesn     = plugin::val('zonesn');
+    my $instanceid = plugin::val('instanceid');
 
     # Get the packed data for the instance
-    my %info_bucket = plugin::DeserializeHash($instance_config);
-    quest::debug("Check");
-    my @targetlist  = plugin::DeserializeList($info_bucket{'targets'});
-    quest::debug("Check");
+    my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
     my $group_mode  = $info_bucket{'group_mode'};
-    quest::debug("Check");
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
-    quest::debug("Check");
     my $reward      = $info_bucket{'reward'};    
-    quest::debug("Check");
     my $min_level   = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
-    quest::debug("Check");
-
-    quest::debug("$group_mode, $difficulty, $reward, $min_level");
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
