@@ -14,6 +14,8 @@ sub ProcessInstanceDialog {
     my $explain_message = $args{explain_message};
     my @target_list     = @{ $args{target_list} };
 
+    quest::debug(join(", ", @target_list));
+
     # Optional arguments with default values
     my $reward          = $args{reward} // 1;
     my $key_required    = $args{key_required} // 0;
