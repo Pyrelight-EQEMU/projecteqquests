@@ -154,6 +154,8 @@ sub GetScaledLoot {
     
     my $new_item_id = $item_id + (1000000 * $rank);
 
+    quest::debug("$item_id:$new_item_id");
+
     # Get a database handle
     my $dbh = plugin::LoadMysql();
 
