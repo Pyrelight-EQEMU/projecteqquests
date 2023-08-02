@@ -159,6 +159,8 @@ sub GetScaledLoot {
         return $item_id;
     }
 
+    quest::debug($new_item_name);
+
     return $new_item_id;
 }
 
