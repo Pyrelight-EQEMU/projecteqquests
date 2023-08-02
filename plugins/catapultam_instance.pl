@@ -137,8 +137,6 @@ sub GetInstanceLoot {
     my $max_points = ceil(3 * ($difficulty - 1)) + 1;
     my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
 
-    quest::debug("$points:$max_points");
-
     # If points less than 2, return the base item id
     if ($points < 2) {
         return $item_id;
@@ -152,9 +150,7 @@ sub GetInstanceLoot {
 sub GetScaledLoot {
     my ($item_id, $rank) = @_;
     
-    my $new_item_id = $item_id + (1000000 * $rank);
-
-    quest::debug("$item_id:$new_item_id");
+    my $new_item_id = $item_id + (1000000 * $rank);    
 
     # Get a database handle
     my $dbh = plugin::LoadMysql();
@@ -172,6 +168,8 @@ sub GetScaledLoot {
     if ($count == 0) {
         return $item_id;
     }
+
+    quest::debug("$item_id:$new_item_id");
 
     return $new_item_id;
 }
