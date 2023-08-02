@@ -173,7 +173,6 @@ sub GetScaledLoot {
 }
 
 sub ModifyInstanceLoot {
-    quest::debug("ModifyInstanceLoot Start");
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
     my $zonesn     = plugin::val('zonesn');
@@ -188,14 +187,14 @@ sub ModifyInstanceLoot {
     my @inventory;
     foreach my $item_id (@lootlist) {
         my $quantity = $npc->CountItem($item_id);
-
-        quest::debug("Evaluating $item_id: " . quest::getitemname($item_id));
         # do this once per $quantity
         for (my $i = 0; $i < $quantity; $i++) {
             my $scaled_item = GetInstanceLoot($item_id, $difficulty);
             if ($scaled_item != $item_id) {
                 $npc->RemoveItem($item_id, 1);
                 $npc->AddItem($scaled_item);
+
+                quest::debug("Replaced $item_id with $scaled_item");
             }
         }
     }
