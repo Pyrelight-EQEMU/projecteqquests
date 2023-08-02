@@ -172,7 +172,7 @@ sub ModifyInstanceNPC
     my $zonesn     = plugin::val('zonesn');
     my $instanceid = plugin::val('instanceid');
 
-    quest::debug("attempting to scale $npc");
+    quest::debug("attempting to scale $npc :".. quest::get_data("instance-$zonesn-$instanceid"));
 
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
