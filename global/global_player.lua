@@ -54,15 +54,14 @@ function refresh_instance_task(e)
     local dz = client:GetExpedition();
     local dz_id;
 
-    -- Check if a dynamic zone exists and if so, get its id
-    if dz.Valid then
-		eq.debug("We have a DZ");
-        dz_id = dz:GetZoneID();
+ 
+	dz_id = dz:GetZoneID();
+	if dz_id then
 		if not client:IsTaskActive(1000 + dz_id) then
 			eq.debug("Adding task");
 			client:AssignTask(1000 + dz_id);
-		end
-    end
+		end   
+	end
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
