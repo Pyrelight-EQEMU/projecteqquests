@@ -58,7 +58,7 @@ sub ProcessInstanceDialog {
                 my $challenge_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "challenge")."]";
 
                 plugin::YellowText("You have previously completed this challenge. You may choose to $challenge_link (Difficulty: $bucket) it once again, 
-                                    remain at your $solo_link level, or attempt it as $group_link.");
+                                    remain at your $solo_link difficulty level, or attempt it as $group_link.");
             } else {  
                 plugin::YellowText("You have not previously completed this challenge. Are you ready to [".quest::saylink("fs_ESCALATE_1_0", 1, "Attempt it")."]?")
             }
@@ -76,7 +76,7 @@ sub ProcessInstanceDialog {
         my $exp_name = $group_mode ? "$expedition_name (Heroic)" : $expedition_name;
         my $exp_min = $group_mode ? 2 : 1;
         my $exp_max = $group_mode ? 6 : 1;
-        if ($group_mode && !$client->IsGrouped()) {
+        if ($group_mode == 1 && !$client->IsGrouped()) {
             plugin::YellowText("ERROR: You are not in a group.");
         } else {
             if ($level <= ($bucket + 1)) {
@@ -85,6 +85,7 @@ sub ProcessInstanceDialog {
                 my $reward_ineligible = $group_mode;
                 if ($group_mode == 2) {
                     $group_mode == 0;
+                    $level--;
                 }
                 
                 if ($reward_ineligible) {
