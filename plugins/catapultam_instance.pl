@@ -84,7 +84,7 @@ sub ProcessInstanceDialog {
 
                 my $reward_ineligible = ($escalation_level < $client->GetBucket("FoS-$dz_zone")) || $group_mode;
 
-                if ($client->GetExpedition()->GetZoneID()) {
+                if (not $client->GetExpedition()->GetZoneID()) {
                     if ($reward_ineligible) {
                         plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                     } else {
