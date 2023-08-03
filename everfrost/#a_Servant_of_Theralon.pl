@@ -21,7 +21,9 @@ sub EVENT_SAY {
     if ($client->GetGM()) {
         $client->AssignTask(40);
         quest::debug("check");
-        $client->MovePCDynamicZone($dz_zone);
+        $client->CreateTaskDynamicZone(40, \%zone_hash);
+        quest::debug("check");
+        quest::debug($client->MovePCDynamicZone($dz_zone));
         quest::debug("check");
     } else {
         plugin::ProcessInstanceDialog(%args);
