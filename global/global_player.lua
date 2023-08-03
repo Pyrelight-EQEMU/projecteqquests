@@ -10,6 +10,7 @@ function event_connect(e)
 
 	check_class_switch_aa(e)
 	check_starting_attunement(e)
+	refresh_instance_task(e);
 
 	local bucket = e.self:GetBucket("FirstLoginAnnounce")
 	if (not bucket or bucket == "") and e.self:GetLevel() == 1 then
@@ -42,6 +43,32 @@ function check_level_flag(e)
 		e.self:Message(15, "Your Level Cap has been set to 60.")
 	end
 end
+
+function event_enter_zone(e)
+	refresh_instance_task(e);
+end
+
+function refresh_instance_task(e)
+    -- Get client and dynamic zone info
+    local client = e.self;
+    local dz = client:GetExpedition();
+    local dz_id;
+
+    -- Check if a dynamic zone exists and if so, get its id
+    if dz.Valid then
+        dz_id = dz:GetDynamicZoneID();
+    end
+
+    -- Loop over the tasks from 1 to 999
+    for i = 1, 999 do
+        -- Check if the task with id 1000 + i is active and its id doesn't match the dynamic zone's id
+        if client:IsTaskActive(1000 + i) and dz_id ~= i then
+            -- If so, fail the task
+            client:FailTask(1000 + i);
+        end
+    end
+end
+
 
 function event_loot(e)
 	eq.debug("event_loot:" .. eq.get_item_name(e.item:GetID()))
