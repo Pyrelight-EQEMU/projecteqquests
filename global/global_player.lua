@@ -45,8 +45,8 @@ function check_level_flag(e)
 end
 
 function event_tick(e)
-	refresh_instance_task(e);
 	eq.debug("Tick..");
+	refresh_instance_task(e);
 end
 
 function event_enter_zone(e)
