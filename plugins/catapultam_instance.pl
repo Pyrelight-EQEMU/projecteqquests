@@ -73,7 +73,7 @@ sub ProcessInstanceDialog {
         my $group_mode = $2;
 
         my $bucket = $client->GetBucket("FoS-$dz_zone");
-        my $exp_name = $group_mode ? "$expedition_name (Heroic)" : $expedition_name;
+        my $exp_name = $group_mode == 1 ? "$expedition_name (Heroic)" : $expedition_name;
         my $exp_min = $group_mode == 1 ? 2 : 1;
         my $exp_max = $group_mode == 1 ? 6 : 1;
         if ($group_mode == 1 && !$client->IsGrouped()) {
