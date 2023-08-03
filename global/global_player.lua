@@ -68,6 +68,7 @@ function refresh_instance_task(e)
 	if reward > 0 then
 		eq.debug("zone_id:" .. dz:GetZoneID())
 		if eq.get_zone_id() ==  dz:GetZoneID() and eq.get_zone_instance_id() == dz:GetInstanceID() then
+			eq.debug("check")
 			if not client:IsTaskActive(1000 + dz_id) then
 				client:AssignTask(1000 + dz_id)
 			end
