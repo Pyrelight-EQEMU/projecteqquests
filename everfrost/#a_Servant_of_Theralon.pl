@@ -19,7 +19,8 @@ my %args = (
 
 sub EVENT_SAY {
     if ($client->GetGM()) {
-        $client->AssignTask(quest::GetZoneID($dz_zone) + 1000);
+        $dz_id = quest::GetZoneID($dz_zone);
+        $client->AssignTask($dz_id + 1000);
     } else {
         plugin::ProcessInstanceDialog(%args);
     }
