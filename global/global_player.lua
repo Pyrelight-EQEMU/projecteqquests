@@ -66,6 +66,7 @@ function refresh_instance_task(e)
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
         if client:IsTaskActive(1000 + i) then
+			eq.debug("Found a task");
             client:FailTask(1000 + i)
         end
     end
