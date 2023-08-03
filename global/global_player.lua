@@ -46,6 +46,7 @@ end
 
 function event_tick(e)
 	refresh_instance_task(e);
+	eq.debug("Tick..");
 end
 
 function event_enter_zone(e)
