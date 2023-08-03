@@ -35,6 +35,16 @@ function event_level_up(e)
   end
 end
 
+function event_task_fail(e)
+	eq.debug("task_id " .. e.task_id);
+end
+
+function event_task_update(e)
+	eq.debug("count " .. e.count);
+	eq.debug("activity_id " .. e.activity_id);
+	eq.debug("task_id " .. e.task_id);
+end
+
 function check_level_flag(e)
 	local key = e.self:CharacterID() .. "-CharMaxLevel"
 	
