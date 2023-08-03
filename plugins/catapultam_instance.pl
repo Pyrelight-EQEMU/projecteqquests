@@ -98,7 +98,7 @@ sub ProcessInstanceDialog {
                                 target_level => $target_level );
 
                 if ($payload{reward} != 0) {
-                    $client->AssignTask(1000 + $dz_zone);
+                    $client->AssignTask((1000 + $dz_zone));
                 }                               
 
                 quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);
