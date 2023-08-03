@@ -53,7 +53,7 @@ sub ProcessInstanceDialog {
         if (!(keys %{$client->GetExpeditionLockouts($expedition_name)})) {
             plugin::NPCTell($explain_message);
             if (my $bucket = $client->GetBucket("FoS-$dz_zone")) {
-                my $solo_link = "[".quest::saylink("fs_ESCALATE_($bucket - 1)_0", 1, "current difficulty")."]";
+                my $solo_link = "[".quest::saylink("fs_ESCALATE_" . ($bucket - 1) . "_0", 1, "current difficulty")."]";
                 my $group_link = "[".quest::saylink("fs_ESCALATE_${bucket}_1", 1, "group")."]";
                 my $challenge_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "challenge")."]";
 
