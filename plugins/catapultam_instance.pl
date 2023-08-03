@@ -249,6 +249,7 @@ sub ModifyInstanceNPC
     $npc->Heal();
 }
 
+# No Longer Used
 sub CheckInstanceMerit
 {
     my $client     = plugin::val('client');
