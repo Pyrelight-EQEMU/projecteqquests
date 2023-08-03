@@ -74,8 +74,8 @@ sub ProcessInstanceDialog {
 
         my $bucket = $client->GetBucket("FoS-$dz_zone");
         my $exp_name = $group_mode ? "$expedition_name (Heroic)" : $expedition_name;
-        my $exp_min = $group_mode ? 2 : 1;
-        my $exp_max = $group_mode ? 6 : 1;
+        my $exp_min = $group_mode == 1 ? 2 : 1;
+        my $exp_max = $group_mode == 1 ? 6 : 1;
         if ($group_mode == 1 && !$client->IsGrouped()) {
             plugin::YellowText("ERROR: You are not in a group.");
         } else {
