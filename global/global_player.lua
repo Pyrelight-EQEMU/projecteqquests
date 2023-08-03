@@ -57,6 +57,10 @@ function event_discover_item(e)
 		eq.world_emote(15,e.self:GetCleanName() .. " is the first to discover " .. eq.item_link(e.item:ID()) .. "!")
 		eq.discord_send("ooc", e.self:GetCleanName() .. " is the first to discover [[" .. e.item:Name() .. "](https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:ID() ..")]!")
 	end
+
+	if eq.get_zone_short_name() == "lavastorm" and e.self:GetGMStatus() >= 80 then 
+		e.self:Message(MT.DimGray, "There are GM commands available for Dragons of Norrath, use " .. eq.say_link("#don") .. " to get started")
+	end
 end
 
 function event_combine_validate(e)
