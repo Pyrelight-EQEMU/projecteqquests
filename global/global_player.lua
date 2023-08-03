@@ -54,14 +54,7 @@ function refresh_instance_task(e)
     local dz     = client:GetExpedition()
     local dz_id  = dz:GetZoneID()
     local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
-    local config_hash = deserialize_hash(config)
-
-    -- Check if reward is non-zero
-    if config_hash['reward'] ~= nil and config_hash['reward'] ~= '0' then
-       eq.debug("Check");
-    end
-
-	eq.debug("test" .. config_hash['reward']);
+	local reward = tonumber(string.match(config, 'reward=(%d+)'))
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
