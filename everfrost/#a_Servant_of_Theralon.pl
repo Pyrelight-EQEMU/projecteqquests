@@ -21,6 +21,7 @@ sub EVENT_SAY {
     if ($client->GetGM()) {
         $client->AssignTask(1073);
         quest::debug("check");
+        $client->CreateTaskDynamicZone(1073, \%args);
         $client->MovePCDynamicZone('permafrost');
         quest::debug("check");
     } else {
