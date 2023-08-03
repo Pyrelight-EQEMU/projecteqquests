@@ -86,6 +86,8 @@ sub ProcessInstanceDialog {
 
                 if ($reward_ineligible) {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
+                } else {
+                    quest::debug($dz_zone + 1000);
                 }
                                                
                 my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);                
@@ -96,10 +98,6 @@ sub ProcessInstanceDialog {
                                 reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
                                 min_level => $target_level, 
                                 target_level => $target_level );
-
-                if ($payload{reward} != 0) {
-                    $client->AssignTask((1000 + $dz_zone));
-                }                               
 
                 quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);
                 plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
