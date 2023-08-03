@@ -51,12 +51,15 @@ end
 function refresh_instance_task(e)
     -- Get client and dynamic zone info
     local client = e.self
-    local dz     = client:GetExpedition()
-    local dz_id  = dz:GetZoneID()
 
-	local message = "instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" dz:GetInstanceID();
+	local dz = e.self:GetExpedition()
+	if dz.valid then -- In a valid expedition
+		local instance_id = dz:GetInstanceID();
 
-	eq.debug(message)
+		local message = "instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. instance_id;
+
+		eq.debug(message)
+	end
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
