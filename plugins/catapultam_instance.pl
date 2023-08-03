@@ -68,7 +68,7 @@ sub ProcessInstanceDialog {
         }
     }
 
-    elsif ($text =~ /^fs_ESCALATE_(\d+)_(0|1)$/i) {
+    elsif ($text =~ /^fs_ESCALATE_(\d+)_(0|1|2)$/i) {
         my $level = $1;
         my $group_mode = $2;
 
