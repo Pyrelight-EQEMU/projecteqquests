@@ -1,5 +1,5 @@
 my %args = (
-    expedition_name => "Feat of Strength: The Permafrost Caverns",
+    expedition_name => "FoS: Permafrost Caverns",
     dz_zone         => "permafrost",
     explain_message => "This is the lair of the White Dragon, Vox. The Master requires three of her scales for his purposes. Proceed, slay the dragon and her minions, and be rewarded.",
     target_list     => [73057, 73058], 
