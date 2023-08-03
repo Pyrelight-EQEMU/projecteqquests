@@ -83,16 +83,12 @@ sub ProcessInstanceDialog {
                 $escalation_level = $level || 1;
 
                 my $reward_ineligible = ($escalation_level < $client->GetBucket("FoS-$dz_zone")) || $group_mode;
-
-                if (not $client->GetExpedition()->GetZoneID()) {
-                    if ($reward_ineligible) {
-                        plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
-                    } else {
-                        $client->AssignTask(1000 + quest::GetZoneID($dz_zone));
-                    }
+                
+                if ($reward_ineligible) {
+                    plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                 } else {
-                    plugin::YellowText("NOTICE: You are currently assigned to an instance. Please leave that expedition in order to continue.");
-                }                                            
+                    $client->AssignTask(1000 + quest::GetZoneID($dz_zone));
+                }                                     
                                 
                 if ($reward_ineligible or $client->IsTaskActive(1000 + quest::GetZoneID($dz_zone))) {
                     my %payload = ( difficulty => $escalation_level, 
