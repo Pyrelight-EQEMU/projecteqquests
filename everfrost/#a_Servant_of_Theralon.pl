@@ -1,5 +1,5 @@
 my %args = (
-    expedition_name => "Feat of Strength: Permafrost Keep",
+    expedition_name => "Feat of Strength: The Permafrost Caverns",
     dz_zone         => "permafrost",
     explain_message => "This is the lair of the White Dragon, Vox. The Master requires three of her scales for his purposes. Proceed, slay the dragon and her minions, and be rewarded.",
     target_list     => [73057, 73058], 
@@ -19,12 +19,7 @@ my %args = (
 
 sub EVENT_SAY {
     if ($client->GetGM()) {
-        $client->AssignTask(40);
-        quest::debug("check");
-        $client->CreateTaskDynamicZone(40, \%zone_hash);
-        quest::debug("check");
-        quest::debug($client->MovePCDynamicZone($dz_zone));
-        quest::debug("check");
+        $client->AssignTask(quest::GetZoneID($dz_zone) + 1000);
     } else {
         plugin::ProcessInstanceDialog(%args);
     }

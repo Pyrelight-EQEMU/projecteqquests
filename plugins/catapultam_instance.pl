@@ -296,4 +296,22 @@ sub CheckInstanceMerit
     }
 }
 
+sub RefreshTaskStatus
+{
+    my $client = plugin::val('client');
+
+    my $dz     = $client->GetExpedition();
+    my $dz_id  = undef;
+
+    if ($dz) {
+        $dz_id = $dz->GetDynamicZoneID();
+    }
+
+    for my $i (1..999) {
+        if ($client->IsTaskActive(1000 + $i) and not $dz_id == $i) {
+            $client->FailTask(1000 + $i);
+        }        
+    }
+}
+
 return 1;
