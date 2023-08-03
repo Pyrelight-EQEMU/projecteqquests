@@ -86,25 +86,19 @@ sub ProcessInstanceDialog {
                 
                 if ($reward_ineligible) {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
-                } else {
-                    $client->AssignTask(1000 + quest::GetZoneID($dz_zone));
-                }                                     
-                                
-                if ($reward_ineligible or $client->IsTaskActive(1000 + quest::GetZoneID($dz_zone))) {
-                    my %payload = ( difficulty => $escalation_level, 
-                                    group_mode => $group_mode, 
-                                    targets => plugin::SerializeList(@target_list), 
-                                    reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
-                                    min_level => $target_level, 
-                                    target_level => $target_level );
-
-                    my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
-                    quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);                
-
-                    plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
-                } else {
-                    plugin::YellowText("NOTICE: Unable to add task. End your current task before attempting this activity.");
                 }
+                
+                my %payload = ( difficulty => $escalation_level, 
+                                group_mode => $group_mode, 
+                                targets => plugin::SerializeList(@target_list), 
+                                reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
+                                min_level => $target_level, 
+                                target_level => $target_level );
+
+                my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
+                quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);                
+
+                plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");                
             }
         }
     } 
