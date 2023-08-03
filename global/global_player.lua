@@ -57,6 +57,9 @@ function refresh_instance_task(e)
     -- Check if a dynamic zone exists and if so, get its id
     if dz.Valid then
         dz_id = dz:GetDynamicZoneID();
+		if not client:IsTaskActive(1000 + dz_id) then
+			client:AssignTask(1000 + dz_id);
+		end
     end
 
     -- Loop over the tasks from 1 to 999
@@ -65,7 +68,7 @@ function refresh_instance_task(e)
         if client:IsTaskActive(1000 + i) and dz_id ~= i then
             -- If so, fail the task
             client:FailTask(1000 + i);
-        end
+		end
     end
 end
 
