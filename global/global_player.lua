@@ -53,24 +53,19 @@ function refresh_instance_task(e)
     local client = e.self
     local dz     = client:GetExpedition()
     local dz_id  = dz:GetZoneID()
-	local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
-
-	if not (config == nil or config == '') then
-		if not client:IsTaskActive(1000 + dz_id) then
-			client:AssignTask(1000 + dz_id)
-		end
-	end
+    local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
+    local config_hash = deserialize_hash(config)
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
         -- Check if the task with id 1000 + i is active and its id doesn't match the dynamic zone's id
-        if client:IsTaskActive(1000 + i) and dz_id ~= i then
+        -- and if reward is zero then fail the task
+        if client:IsTaskActive(1000 + i) and dz_id ~= i and (config_hash['reward'] == nil or config_hash['reward'] == '0') then
             -- If so, fail the task
             client:FailTask(1000 + i)
-		end
+        end
     end
 end
-
 
 function event_loot(e)
 	eq.debug("event_loot:" .. eq.get_item_name(e.item:GetID()))
