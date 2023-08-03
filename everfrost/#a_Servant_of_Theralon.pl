@@ -17,9 +17,6 @@ my %args = (
     dz_lockout      => 3600, # 1 Hour
 );
 
-sub EVENT_SAY {
-    if ($client->GetGM()) {
-        $client->AssignTask(1073);
-    }       
+sub EVENT_SAY {          
     plugin::ProcessInstanceDialog(%args);
 }
