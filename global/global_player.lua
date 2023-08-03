@@ -44,7 +44,7 @@ function check_level_flag(e)
 	end
 end
 
-function event_item_click_client(e)
+function event_tick(e)
 	refresh_instance_task(e);
 end
 
