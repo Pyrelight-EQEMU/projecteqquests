@@ -53,13 +53,13 @@ function refresh_instance_task(e)
     local client = e.self
 
 	local dz = e.self:GetExpedition()
-	if dz.valid then -- In a valid expedition
+	
 		local instance_id = dz:GetInstanceID();
 
 		local message = "instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. instance_id;
 
 		eq.debug(message)
-	end
+	
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
