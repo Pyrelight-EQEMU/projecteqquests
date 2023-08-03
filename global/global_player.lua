@@ -61,7 +61,7 @@ function refresh_instance_task(e)
        eq.debug("Check");
     end
 
-	eq.debug(config_hash['reward']);
+	eq.debug("test" .. config_hash['reward']);
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
