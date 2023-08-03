@@ -61,6 +61,10 @@ function event_discover_item(e)
 	if eq.get_zone_short_name() == "lavastorm" and e.self:GetGMStatus() >= 80 then 
 		e.self:Message(MT.DimGray, "There are GM commands available for Dragons of Norrath, use " .. eq.say_link("#don") .. " to get started")
 	end
+
+	if eq.get_zone_short_name() == "lavastorm" and e.self:GetGMStatus() >= 80 then 
+		e.self:Message(MT.DimGray, "There are GM commands available for Dragons of Norrath, use " .. eq.say_link("#don") .. " to get started")
+	end
 end
 
 function event_combine_validate(e)
