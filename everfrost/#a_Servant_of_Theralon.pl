@@ -19,8 +19,12 @@ my %args = (
 
 sub EVENT_SAY {
     if ($client->GetGM()) {
-        $dz_id = quest::GetZoneID($dz_zone);
-        $client->AssignTask($dz_id + 1000);
+        $client->AssignTask(1073);
+        quest::debug("check");
+        $client->CreateTaskDynamicZone(1073, \%zone_hash);
+        quest::debug("check");
+        quest::debug($client->MovePCDynamicZone('permafrost'));
+        quest::debug("check");
     } else {
         plugin::ProcessInstanceDialog(%args);
     }
