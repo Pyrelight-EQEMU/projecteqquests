@@ -55,7 +55,7 @@ function refresh_instance_task(e)
     local dz_id;
 
     -- Check if a dynamic zone exists and if so, get its id
-    if dz then
+    if dz.Valid then
 		eq.debug("We have a DZ");
         dz_id = dz:GetZoneID();
 		if not client:IsTaskActive(1000 + dz_id) then
