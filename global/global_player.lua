@@ -56,7 +56,7 @@ function refresh_instance_task(e)
 
  
 	dz_id = dz:GetZoneID();
-	if dz_id then
+	if dz_id != 0 then
 		if not client:IsTaskActive(1000 + dz_id) then
 			eq.debug("Adding task");
 			client:AssignTask(1000 + dz_id);
