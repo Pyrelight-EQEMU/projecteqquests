@@ -19,17 +19,7 @@ my %args = (
 
 sub EVENT_SAY {
     if ($client->GetGM()) {
-
-        my %zone_hash = (
-            'instance' => {
-                'zone' => 'permafrost',
-                'version' => 10,
-            }
-        );
-
         $client->AssignTask(40);
-        quest::debug("check");
-        $client->CreateTaskDynamicZone(40, \%zone_hash);
         quest::debug("check");
         $client->MovePCDynamicZone($dz_zone);
         quest::debug("check");
