@@ -54,7 +54,7 @@ function event_task_complete(e)
 	eq.debug("task_id " .. e.task_id);
 
 	if eq.get_zone_instance_version() == 10 and e.task_id > 1000 and e.task_id < 2000 then
-
+		
 	end
 end
 
@@ -65,12 +65,11 @@ function refresh_instance_task(e)
     local dz_id  = dz:GetZoneID()
     local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
 	local reward = tonumber(string.match(config, 'reward=(%d+)')) or 0
-	local task_id = tonumber(string.match(config, 'task_id=(%d+)')) or 0
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
         if client:IsTaskActive(1000 + i) then
-			if i ~= dz_id or reward == 0 or task_id == 0 then
+			if i ~= dz_id or reward == 0 then
             	client:FailTask(1000 + i)				
 			end
         end
@@ -80,8 +79,8 @@ function refresh_instance_task(e)
 		eq.debug("zone_id:" .. dz:GetZoneID() .. " reward:" .. reward)
 		if eq.get_zone_id() ==  dz:GetZoneID() and eq.get_zone_instance_id() == dz:GetInstanceID() then
 			eq.debug("check")
-			if not client:IsTaskActive(task_id) then
-				client:AssignTask(task_id)
+			if not client:IsTaskActive(1000 + dz_id) then
+				client:AssignTask(1000 + dz_id)
 			end
 		end
 	end
