@@ -33,6 +33,7 @@ sub ProcessInstanceDialog {
     my $dz_version      = $args{dz_version} // 10;
     my $dz_duration     = $args{dz_duration} // 604800;
     my $dz_lockout      = $args{dz_lockout} // 3600;
+    my $task_id         = $args{task_id};
 
     if ($text =~ /hail/i ) {
         $dz = $client->GetExpedition();
@@ -97,7 +98,8 @@ sub ProcessInstanceDialog {
                                 targets => plugin::SerializeList(@target_list), 
                                 reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
                                 min_level => $target_level, 
-                                target_level => $target_level );
+                                target_level => $target_level,
+                                task_id => $task_id );
 
                 my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
                 quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);                
