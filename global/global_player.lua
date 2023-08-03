@@ -35,16 +35,6 @@ function event_level_up(e)
   end
 end
 
-function event_task_fail(e)
-	eq.debug("task_id " .. e.task_id);
-end
-
-function event_task_update(e)
-	eq.debug("count " .. e.count);
-	eq.debug("activity_id " .. e.activity_id);
-	eq.debug("task_id " .. e.task_id);
-end
-
 function check_level_flag(e)
 	local key = e.self:CharacterID() .. "-CharMaxLevel"
 	
@@ -64,7 +54,7 @@ function refresh_instance_task(e)
     local dz     = client:GetExpedition()
     local dz_id  = dz:GetZoneID()
     local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
-	local reward = tonumber(string.match(config, 'reward=(%d+)'))
+	local reward = tonumber(string.match(config, 'reward=(%d+)')) or 0
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
@@ -76,7 +66,7 @@ function refresh_instance_task(e)
     end
 
 	if reward > 0 then
-		eq.debug("zone_id:" .. dz:GetZoneID())
+		eq.debug("zone_id:" .. dz:GetZoneID() .. " reward:" .. reward)
 		if eq.get_zone_id() ==  dz:GetZoneID() and eq.get_zone_instance_id() == dz:GetInstanceID() then
 			eq.debug("check")
 			if not client:IsTaskActive(1000 + dz_id) then
