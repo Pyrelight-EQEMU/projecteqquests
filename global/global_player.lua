@@ -56,7 +56,7 @@ function refresh_instance_task(e)
 
 	local message = "instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID();
 
-	eq.debug(message)
+	eq.debug(eq.get_data(message));
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
