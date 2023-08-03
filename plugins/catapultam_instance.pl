@@ -87,10 +87,10 @@ sub ProcessInstanceDialog {
                 if ($reward_ineligible) {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                 } else {
-                    $client->AssignTask(1000 + quest::GetZoneID($dz_zone));
-                }
-                                               
-                my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);                
+                    my $task = $client->AssignTask(1000 + quest::GetZoneID($dz_zone));
+                    quest::debug("status: $task");
+                }                                             
+                                
 
                 my %payload = ( difficulty => $escalation_level, 
                                 group_mode => $group_mode, 
@@ -99,7 +99,9 @@ sub ProcessInstanceDialog {
                                 min_level => $target_level, 
                                 target_level => $target_level );
 
-                quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);
+                my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
+                quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);                
+
                 plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
             }
         }
