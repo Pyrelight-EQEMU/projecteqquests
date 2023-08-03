@@ -44,6 +44,10 @@ function check_level_flag(e)
 	end
 end
 
+function event_item_click_client(e)
+	refresh_instance_task(e);
+end
+
 function event_enter_zone(e)
 	refresh_instance_task(e);
 end
