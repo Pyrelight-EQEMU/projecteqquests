@@ -22,7 +22,8 @@ sub EVENT_SAY {
         $client->AssignTask(1073);
         quest::debug("check");
         $client->CreateTaskDynamicZone(1073, \%args);
-        $client->MovePCDynamicZone('permafrost');
+        quest::debug("check");
+        $client->MovePCDynamicZone("permafrost");
         quest::debug("check");
     } else {
         plugin::ProcessInstanceDialog(%args);
