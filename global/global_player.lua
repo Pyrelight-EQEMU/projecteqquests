@@ -52,10 +52,6 @@ function event_task_complete(e)
 	eq.debug("count " .. e.count);
 	eq.debug("activity_id " .. e.activity_id);
 	eq.debug("task_id " .. e.task_id);
-
-	if eq.get_zone_instance_version() == 10 and e.task_id > 1000 and e.task_id < 2000 then
-		
-	end
 end
 
 function refresh_instance_task(e)
