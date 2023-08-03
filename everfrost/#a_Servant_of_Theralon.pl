@@ -29,7 +29,7 @@ sub EVENT_SAY {
 
         $client->AssignTask(40);
         quest::debug("check");
-        $client->CreateTaskDynamicZone(40, %zone_hash);
+        $client->CreateTaskDynamicZone(40, \%zone_hash);
         quest::debug("check");
         $client->MovePCDynamicZone($dz_zone);
         quest::debug("check");
