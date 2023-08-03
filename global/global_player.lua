@@ -56,12 +56,16 @@ function refresh_instance_task(e)
     local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
     local config_hash = deserialize_hash(config)
 
+    -- Check if reward is non-zero
+    if config_hash['reward'] ~= nil and config_hash['reward'] ~= '0' then
+       eq.debug("Check");
+    end
+
+	eq.debug(config_hash['reward']);
+
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
-        -- Check if the task with id 1000 + i is active and its id doesn't match the dynamic zone's id
-        -- and if reward is zero then fail the task
-        if client:IsTaskActive(1000 + i) and dz_id ~= i and (config_hash['reward'] == nil or config_hash['reward'] == '0') then
-            -- If so, fail the task
+        if client:IsTaskActive(1000 + i) then
             client:FailTask(1000 + i)
         end
     end
