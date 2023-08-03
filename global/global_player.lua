@@ -59,8 +59,10 @@ function refresh_instance_task(e)
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
         if client:IsTaskActive(1000 + i) then
-			eq.debug("Found a task" .. dz_id .. ", " .. reward);
-            --client:FailTask(1000 + i)
+			eq.debug("Found a task " .. dz_id .. ", " .. reward);
+			if i ~= dz_id or reward == 0 then
+            	client:FailTask(1000 + i)
+			end
         end
     end
 end
