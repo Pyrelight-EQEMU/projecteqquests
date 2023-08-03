@@ -50,25 +50,20 @@ end
 
 function refresh_instance_task(e)
     -- Get client and dynamic zone info
-    local client = e.self;
-    local dz = client:GetExpedition();
-    local dz_id;
+    local client = e.self
+    local dz     = client:GetExpedition()
+    local dz_id  = dz:GetZoneID()
 
- 
-	dz_id = dz:GetZoneID();
-	if dz_id != 0 then
-		if not client:IsTaskActive(1000 + dz_id) then
-			eq.debug("Adding task");
-			client:AssignTask(1000 + dz_id);
-		end   
-	end
+	local message = eq.get_zone_short_name_by_id(dz_id)
+
+	eq.debug(message)
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
         -- Check if the task with id 1000 + i is active and its id doesn't match the dynamic zone's id
         if client:IsTaskActive(1000 + i) and dz_id ~= i then
             -- If so, fail the task
-            client:FailTask(1000 + i);
+            client:FailTask(1000 + i)
 		end
     end
 end
