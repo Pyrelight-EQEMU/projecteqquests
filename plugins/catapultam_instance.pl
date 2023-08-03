@@ -53,7 +53,7 @@ sub ProcessInstanceDialog {
         if (!(keys %{$client->GetExpeditionLockouts($expedition_name)})) {
             plugin::NPCTell($explain_message);
             if (my $bucket = $client->GetBucket("FoS-$dz_zone")) {
-                my $solo_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "current difficulty")."]";
+                my $solo_link = "[".quest::saylink("fs_ESCALATE_${bucket -1}_0", 1, "current difficulty")."]";
                 my $group_link = "[".quest::saylink("fs_ESCALATE_${bucket}_1", 1, "group")."]";
                 my $challenge_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "challenge")."]";
 
@@ -87,7 +87,7 @@ sub ProcessInstanceDialog {
                 if ($reward_ineligible) {
                     plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
                 }
-                
+
                 my %payload = ( difficulty => $escalation_level, 
                                 group_mode => $group_mode, 
                                 targets => plugin::SerializeList(@target_list), 
