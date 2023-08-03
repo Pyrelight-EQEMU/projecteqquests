@@ -23,6 +23,7 @@ sub EVENT_SAY {
         quest::debug("check");
         $client->MovePCDynamicZone($dz_zone);
         quest::debug("check");
+    } else {
+        plugin::ProcessInstanceDialog(%args);
     }
-    plugin::ProcessInstanceDialog(%args);
 }
