@@ -44,13 +44,17 @@ function check_level_flag(e)
 	end
 end
 
-function event_tick(e)
-	eq.debug("Tick..");
-	refresh_instance_task(e);
+function event_timer(e)
+	if e.timer == "instance_check" then
+		eq.debug("Tick..");
+		refresh_instance_task(e);
+		eq.set_timer("intance_check", 6000, e.self)
+	end
 end
 
 function event_enter_zone(e)
 	refresh_instance_task(e);
+	eq.set_timer("intance_check", 6000, e.self)
 end
 
 function refresh_instance_task(e)
