@@ -8,8 +8,6 @@ use JSON;
 my $modifier        = 1.25;
 
 sub ProcessInstanceDialog {
-    quest::debug("ProcessInstanceDialog Start");
-
     my $text   = plugin::val('text');
     my $client = plugin::val('client');
     my $npc    = plugin::val('npc');
