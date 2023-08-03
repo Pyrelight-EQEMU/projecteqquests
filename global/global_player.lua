@@ -54,7 +54,7 @@ function refresh_instance_task(e)
     local dz     = client:GetExpedition()
     local dz_id  = dz:GetZoneID()
 
-	local message = eq.get_zone_short_name_by_id(dz_id)
+	local message = "instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" dz:GetInstanceID();
 
 	eq.debug(message)
 
