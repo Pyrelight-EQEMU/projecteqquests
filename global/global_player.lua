@@ -53,10 +53,13 @@ function refresh_instance_task(e)
     local client = e.self
     local dz     = client:GetExpedition()
     local dz_id  = dz:GetZoneID()
+	local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
 
-	local message = "instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID();
-
-	eq.debug(eq.get_data(message));
+	if not (config == nil or config == '') then
+		if not client:IsTaskActive(1000 + dz_id) then
+			client:AssignTask(1000 + dz_id)
+		end
+	end
 
     -- Loop over the tasks from 1 to 999
     for i = 1, 999 do
@@ -318,4 +321,37 @@ function convert_spellunlocks(e)
 		end
 		e.self:SetBucket("unlocked-spells", table.concat(UNLOCKED_SPELLS, " "))
 	end
+end
+
+-- Serializer for List
+function SerializeList(list)
+    return table.concat(list, ',')
+end
+
+-- Deserializer for List
+function DeserializeList(str)
+    local list = {}
+    for match in (str..','):gmatch("(.-)"..',') do
+        table.insert(list, match)
+    end
+    return list
+end
+
+-- Serializer for Hash (Table in Lua context)
+function SerializeHash(tbl)
+    local str = ""
+    for k, v in pairs(tbl) do
+        str = str..k.."="..v..";"
+    end
+    return str
+end
+
+-- Deserializer for Hash (Table in Lua context)
+function DeserializeHash(str)
+    local hash = {}
+    for match in (str..';'):gmatch("(.-)"..';') do
+        local k, v = match:match("(%w+)=(%w+)")
+        hash[k] = v
+    end
+    return hash
 end
