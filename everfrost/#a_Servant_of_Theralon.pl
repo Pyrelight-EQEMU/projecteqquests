@@ -18,4 +18,28 @@ my %args = (
 
 sub EVENT_SAY {          
     plugin::ProcessInstanceDialog(%args);
+
+    if ($client->GetGM()) {        
+        if($text=~/hail/i) {    
+            $client->AssignTask(39);
+        } else {
+                        my %dz = (
+                "instance"    => {
+                    "zone" => 58,
+                    "version" => 1,
+                    "duration" => 1337
+                },
+                "compass"    => {
+                    "zone" => "gfaydark",
+                    "x"    => 28,
+                    "y" => 2553,
+                    "z" => 20,
+                    "h"    => 252
+                }
+            );
+
+            $client->CreateTaskDynamicZone(16, \%dz);
+            $client->MovePCDynamicZone("crushbone");
+        }    
+    }
 }
