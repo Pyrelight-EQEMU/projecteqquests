@@ -21,7 +21,7 @@ sub EVENT_SAY {
 
     if ($client->Admin() > 100) {        
         if($text=~/hail/i) {    
-            $client->AssignTask(39);
+            quest::taskselector(39);
         } elsif($text=~/create/i) {
             quest::debug("Ok then");
             my %dz = (
@@ -45,4 +45,5 @@ sub EVENT_SAY {
             $client->MovePCDynamicZone("crushbone");
         }
     }
+}
 }
