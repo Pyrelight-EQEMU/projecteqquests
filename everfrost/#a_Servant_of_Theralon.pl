@@ -30,7 +30,7 @@ sub EVENT_SAY {
                     "version" => 1,
                 },
                 "compass"    => {
-                    "zone" => "gfaydark",
+                    "zone" => 58,
                     "x"    => 28,
                     "y" => 2553,
                     "z" => 20,
