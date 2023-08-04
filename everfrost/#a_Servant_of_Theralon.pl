@@ -23,7 +23,8 @@ sub EVENT_SAY {
         if($text=~/hail/i) {    
             $client->AssignTask(39);
         } else {
-                        my %dz = (
+            quest::debug("Ok then");
+            my %dz = (
                 "instance"    => {
                     "zone" => 58,
                     "version" => 1,
