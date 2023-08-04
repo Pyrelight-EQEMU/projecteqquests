@@ -126,7 +126,6 @@ sub CREATE_EXPEDITION {
     my $zoneid = plugin::val('zoneid');
     
     $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
-    #$client->CreateTaskDynamicZone(int task_id, reference table_ref);
     $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
     $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading());
 

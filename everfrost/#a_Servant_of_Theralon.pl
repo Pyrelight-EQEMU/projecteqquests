@@ -28,7 +28,6 @@ sub EVENT_SAY {
                 "instance"    => {
                     "zone" => 58,
                     "version" => 1,
-                    "duration" => 1337
                 },
                 "compass"    => {
                     "zone" => "gfaydark",
@@ -40,7 +39,7 @@ sub EVENT_SAY {
             );
 
             $client->CreateTaskDynamicZone(39, \%dz);
-            $client->MovePCDynamicZone("crushbone");
+            $client->MovePCDynamicZone(58);
         }    
     }
 }
