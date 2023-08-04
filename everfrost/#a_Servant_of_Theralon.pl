@@ -39,7 +39,7 @@ sub EVENT_SAY {
                 }
             );
 
-            $client->CreateTaskDynamicZone(16, \%dz);
+            $client->CreateTaskDynamicZone(39, \%dz);
             $client->MovePCDynamicZone("crushbone");
         }    
     }
