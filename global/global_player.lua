@@ -45,7 +45,7 @@ function check_level_flag(e)
 end
 
 function event_enter_zone(e)
-	refresh_instance_task(e);
+	eq.debug("Hello from Lua");
 end
 
 function event_task_complete(e)
