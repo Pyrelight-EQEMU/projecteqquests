@@ -17,7 +17,7 @@ my %args = (
 );
 
 sub EVENT_SAY {          
-   # plugin::ProcessInstanceDialog(%args);
+    plugin::ProcessInstanceDialog(%args);
 
     if ($client->Admin() > 100) {        
         if($text=~/hail/i) {    
