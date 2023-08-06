@@ -18,7 +18,7 @@ sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, true);    
 
-    plugin::CheckLevelFlags();
+    #plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
     my $bucket_value = $client->GetBucket("FirstLoginAnnounce");
