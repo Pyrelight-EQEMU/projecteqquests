@@ -21,6 +21,8 @@ sub EVENT_CONNECT {
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
+    quest::debug($client->GetBucket("FirstLoginAnnounce"))
+
     if (not $client->GetBucket("FirstLoginAnnounce")) {
         my $name  = $client->GetCleanName();
         my $level = $client->GetLevel();
@@ -28,6 +30,6 @@ sub EVENT_CONNECT {
 
         plugin::WorldAnnounce("$name (Level $level $class) has logged in for the first time!");
         
-        $client->SetBucket("FirstLoginAnnounce");
+        $client->SetBucket("FirstLoginAnnounce", "Yup");
     }
 }
