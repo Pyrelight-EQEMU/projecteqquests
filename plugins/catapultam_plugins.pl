@@ -221,7 +221,7 @@ sub CheckClassAA {
         }
     }
 
-    if $accum == 0 {
+    if ($accum == 0) {
         $accum++;
     }
 
