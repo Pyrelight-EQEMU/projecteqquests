@@ -18,7 +18,7 @@ sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, true);    
 
-    #plugin::CheckLevelFlags();
+    plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
     my $bucket_value = $client->GetBucket("FirstLoginAnnounce");
@@ -28,7 +28,7 @@ sub EVENT_CONNECT {
         my $name  = $client->GetCleanName();
         my $level = $client->GetLevel();
         my $class = quest::getclassname($client->GetClass(), $level);
-                
+
         plugin::WorldAnnounce("$name (Level $level $class) has logged in for the first time!");
         
         $client->SetBucket("FirstLoginAnnounce", "Yup");
