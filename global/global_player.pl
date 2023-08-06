@@ -17,14 +17,11 @@
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, true);
-    quest::debug("test");
+
     plugin::CheckLevelFlags();
-    quest::debug("test");
     plugin::CheckClassAA($client);
-    quest::debug("test");
 
     my $bucket_value = $client->GetBucket("FirstLoginAnnounce");
-    quest::debug("BucketVal:$bucket_value");
 
     if (not $client->GetBucket("FirstLoginAnnounce")) {
         my $name  = $client->GetCleanName();
