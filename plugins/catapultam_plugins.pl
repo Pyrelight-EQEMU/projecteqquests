@@ -168,16 +168,21 @@ sub GetClassListString {
     return $info_string;
 }
 
-sub GetInactiveClasses {
+sub plugin::GetInactiveClasses {
     my $client = shift;
     my %unlocked_classes = GetUnlockedClasses($client);
 
     # Remove the active class from the list
     delete $unlocked_classes{$client->GetClass()};
 
-    # Convert to a formatted string
+    # Convert to a formatted string, sorted by level (descending), then by class ID (ascending)
     my @inactive_classes;
-    foreach my $class_id (keys %unlocked_classes) {
+    foreach my $class_id (
+        sort {
+            $unlocked_classes{$b} <=> $unlocked_classes{$a}
+                or $a <=> $b
+        } keys %unlocked_classes
+    ) {
         my $class_name = quest::getclassname($class_id, $unlocked_classes{$class_id});
         push @inactive_classes, "$unlocked_classes{$class_id} $class_name";
     }
