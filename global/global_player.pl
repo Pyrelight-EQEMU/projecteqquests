@@ -16,10 +16,12 @@
 
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
-    $client->GrantAlternateAdvancementAbility(938, 8, true);    
-
+    $client->GrantAlternateAdvancementAbility(938, 8, true);
+    quest::debug("test");
     plugin::CheckLevelFlags();
+    quest::debug("test");
     plugin::CheckClassAA($client);
+    quest::debug("test");
 
     my $bucket_value = $client->GetBucket("FirstLoginAnnounce");
     quest::debug("BucketVal:$bucket_value");
@@ -34,7 +36,7 @@ sub EVENT_CONNECT {
         $client->SetBucket("FirstLoginAnnounce", "Yup");
     }
 
-    quest::debug("test");
+    
 }
 
 #function event_level_up(e)
