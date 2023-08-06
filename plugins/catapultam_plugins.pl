@@ -133,8 +133,11 @@ sub GetLockoutTime {
 #end
 
 sub CheckLevelFlags {
+    quest::debug("Check");
     my $client = plugin::val('client');
+    quest::debug("Check");
     my $key    = $client->CharacterID() . "-CharMaxLevel";
+    quest::debug("Check");
 
     if (not quest::get_data($key)) {
         quest::set_data($key);

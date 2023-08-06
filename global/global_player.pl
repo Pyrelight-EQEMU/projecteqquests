@@ -27,8 +27,8 @@ sub EVENT_CONNECT {
     if (not $client->GetBucket("FirstLoginAnnounce")) {
         my $name  = $client->GetCleanName();
         my $level = $client->GetLevel();
-        my $class = $client->GetClass();
-
+        my $class = quest::getclassname($client->GetClass(), $level);
+                
         plugin::WorldAnnounce("$name (Level $level $class) has logged in for the first time!");
         
         $client->SetBucket("FirstLoginAnnounce", "Yup");
