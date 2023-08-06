@@ -134,9 +134,10 @@ sub GetLockoutTime {
 
 sub CheckLevelFlags {
     my $client = plugin::val('client');
+    my $key    = $client->CharacterID() . "-CharMaxLevel";
 
-    if (not $client->GetBucket("CharMaxLevel")) {
-        quest::set_data("CharMaxLevel", 60);
+    if (not $client->GetBucket(CharMaxLevel)) {
+        quest::set_data($key, 60);
         YellowText("Your Level Cap has been set to 60");
     }
 }
