@@ -20,9 +20,7 @@ sub EVENT_CONNECT {
 
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
-
-    quest::debug($client->GetBucket("FirstLoginAnnounce"))
-
+    
     if (not $client->GetBucket("FirstLoginAnnounce")) {
         my $name  = $client->GetCleanName();
         my $level = $client->GetLevel();
