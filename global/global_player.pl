@@ -61,10 +61,12 @@ sub EVENT_LEVEL_UP {
     }
 
     if ($client->GetLevel() % 5 == 0) {
-        my $name  = $client->GetCleanName();
-        my $level = $client->GetLevel();
+        my $name             = $client->GetCleanName();
+        my $level            = $client->GetLevel();
+        my $inactive_classes = plugin::GetInactiveClasses($client);
 
-        my $announceString = "$name has reached level $level!";
+        my $announceString = "$name has reached level $level!"
+                           . ($inactive_classes ? " ($inactive_classes)" : "");
 
         plugin::WorldAnnounce($announceString);
     }
