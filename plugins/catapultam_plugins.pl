@@ -20,8 +20,45 @@ sub YellowText {
 
 sub WorldAnnounce {
 	my $message = shift;
-	#quest::discordsend("ooc", $message);
+	quest::discordsend("ooc", $message);
 	quest::we(15, $message);
+}
+
+# Usage: WorldAnnounceItem($message, $item_id)
+# Sends a world announcement and a Discord message for a given item.
+# 
+# Parameters:
+#   $message  - The text that will be included in the announcement.
+#               It can contain a placeholder "{item}" that will be replaced
+#               with an in-game link in the world announcement, and with
+#               a Discord link in the Discord announcement.
+#   $item_id  - The ID of the item.
+#
+# The function constructs in-game and Discord links using quest::varlink and quest::getitemname.
+# It then sends the world announcement using quest::we, and the Discord announcement using quest::discordsend.
+#
+# Example:
+#   WorldAnnounceItem("{item} has been claimed!", 12345);
+#   # World announcement: "[ItemLink] has been claimed!"
+#   # Discord announcement: "[[ItemName](https://www.pyrelight.net/allaclone/?a=item&id=12345)] has been claimed!"
+sub WorldAnnounceItem {
+    my ($message, $item_id) = @_;
+    my $itemname = quest::getitemname($item_id);
+
+    my $eqgitem_link = quest::varlink($item_id);
+    my $discord_link = "[[$itemname](https://www.pyrelight.net/allaclone/?a=item&id=$item_id)]";
+
+    # Replace a placeholder in the message with the EQ game link
+    $message =~ s/\{item\}/$eqgitem_link/g;
+
+    # Send the message with the game link to the EQ world
+    quest::we(15, $message);
+
+    # Replace the game link with the Discord link
+    $message =~ s/\Q$eqgitem_link\E/$discord_link/g;
+
+    # Send the message with the Discord link to Discord
+    quest::discordsend("ooc", $message);
 }
 
 # Serializer
