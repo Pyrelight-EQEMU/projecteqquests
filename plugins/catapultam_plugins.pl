@@ -21,7 +21,7 @@ sub YellowText {
 sub WorldAnnounce {
 	my $message = shift;
 	quest::discordsend("ooc", $message);
-	quest::we(335, $message);
+	quest::we(15, $message);
 }
 
 # Serializer
