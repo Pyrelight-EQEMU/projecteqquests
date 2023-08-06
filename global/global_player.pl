@@ -18,9 +18,11 @@ sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, true);
 
+    plugin::WorldAnnounce("Hello there");
+
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
-    
+
     if (not $client->GetBucket("FirstLoginAnnounce")) {
         my $name  = $client->GetCleanName();
         my $level = $client->GetLevel();
