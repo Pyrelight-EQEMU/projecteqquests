@@ -66,7 +66,7 @@ sub EVENT_LEVEL_UP {
         my $active_class     = quest::getclassname($client->GetClass(), $level);
         my $inactive_classes = plugin::GetInactiveClasses($client);
 
-        my $announceString = "$name has reached level $level $active_class!"
+        my $announceString = "$name has achived level $level $active_class!"
                            . ($inactive_classes ? " ($inactive_classes)" : "");
 
         plugin::WorldAnnounce($announceString);
