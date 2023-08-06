@@ -34,7 +34,6 @@ sub EVENT_CONNECT {
     }
 
     quest::debug(plugin::GetClassListString($client));
-    quest::debug($client->GetID());
 }
 
 #function event_level_up(e)
