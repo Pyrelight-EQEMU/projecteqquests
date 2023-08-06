@@ -124,7 +124,7 @@ sub GetUnlockedClasses {
     my $dbh    = plugin::LoadMysql();
     my $sth    = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ?");
 
-    $sth->execute($client->GetCharacterID());
+    $sth->execute($client->CharacterID());
 
     my %unlocked_classes;
     while (my $row = $sth->fetchrow_hashref()) {

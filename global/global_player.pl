@@ -32,7 +32,7 @@ sub EVENT_CONNECT {
         
         $client->SetBucket("FirstLoginAnnounce", "Yup");
     }
-
+    quest::debug($client->CharacterID());
     quest::debug(plugin::GetClassListString($client));
 }
 
