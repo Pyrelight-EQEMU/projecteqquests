@@ -13,7 +13,7 @@ sub YellowText {
 	my $npc = plugin::val('npc');
     my $client = plugin::val('client');
 	my $message = shift;
-    my $tellColor = 335;
+    my $tellColor = 15;
 	
     $client->Message($tellColor, $message);
 }
@@ -123,5 +123,79 @@ sub GetLockoutTime {
     return 3600;
 }
 
+#function check_level_flag(e)
+#	local key = e.self:CharacterID() .. "-CharMaxLevel"
+#	
+#	if eq.get_data(key) == "" then
+#		eq.set_data(key, "60")
+#		e.self:Message(15, "Your Level Cap has been set to 60.")
+#	end
+#end
+
+sub CheckLevelFlags {
+    my $client = plugin::val('client');
+    my $key    = $client->CharacterID() . "-CharMaxLevel";
+
+    if (not quest::get_data($key)) {
+        quest::set_data($key);
+        YellowText("Your Level Cap has been set to 60");
+    }
+
+}
+
+#function check_class_switch_aa(e)
+#	accum = 0
+#	for i=16,1,-1
+#	do
+#		eq.debug("Checking class: " .. i);
+#		if (e.self:GetBucket("class-"..i.."-unlocked") == '1') then
+#			eq.debug("Unlocked Class: " .. i);
+#			e.self:GrantAlternateAdvancementAbility(20000 + i, 1, true)			
+#			accum = accum + 1			
+#		end		 
+#	end
+#	eq.debug("Unlocked Classes: " .. accum);
+#	expPenalty = calculate_modifier(accum)
+#	e.self:SetEXPModifier(0, expPenalty)
+#	eq.debug("Setting your Exp Modifier to: " .. expPenalty)
+#end
+
+sub CheckClassAA {
+    my $client = shift;
+    my $accum  = 0;
+
+    foreach my $i (reverse 1..16) {
+        quest::debug("Checking Class ID: $i");
+        if ($client->GetBucket("class-$i-unlocked")) {
+            quest::debug("ClassID $i is unlocked");
+            $client->GrantAlternateAdvancementAbility(20000+$i, 1, true);
+            $accum++;
+        }
+    }
+
+    my $expPenalty = CalculateExpPenalty($accum);
+    $client->SetEXPModifier(0, $expPenalty);
+    
+    quest::debug("Unlocked Class Count: $accum");
+    quest::debug("Set Exp Penalty to: $expPenalty");
+}
+
+#function calculate_modifier(count)
+#    if count == 1 then
+#        return 1
+#    end
+#
+#    modifier = 1
+#    for i=count,2,-1 do
+#        modifier = modifier * .90
+#    end
+#	modifier = 1
+#    return modifier
+#end
+
+sub CalculateExpPenalty {
+    #This is currently no-oped
+    return 1;
+}
 
 return 1;
