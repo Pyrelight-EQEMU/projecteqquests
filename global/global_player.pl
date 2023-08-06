@@ -36,7 +36,7 @@ sub EVENT_CONNECT {
         $client->SetBucket("FirstLoginAnnounce", "Yup");
     }
 
-    
+    quest::debug(plugin::GetClassListString($client));
 }
 
 #function event_level_up(e)
