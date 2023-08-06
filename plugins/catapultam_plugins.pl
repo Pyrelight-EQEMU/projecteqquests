@@ -119,6 +119,55 @@ sub FabledName {
     return $new_name;
 }
 
+sub GetUnlockedClasses {
+    my $client = shift;
+    my $dbh    = plugin::LoadMysql();
+    my $sth    = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ?");
+
+    $sth->execute($client->GetID());
+
+    my %unlocked_classes;
+    while (my $row = $sth->fetchrow_hashref()) {
+        my $class_id = $row->{'class'};
+        my $class_level = $row->{'level'};
+        $unlocked_classes{$class_id} = $class_level;
+    }
+
+    my $current_class = $client->GetClass();
+    my $current_level = $client->GetLevel();
+
+    $unlocked_classes{$current_class} = $current_level;
+
+    return %unlocked_classes;
+}
+
+sub GetClassListString {
+    my $client = shift;
+
+    # Get active class and level
+    my $active_class_id = $client->GetClass();
+    my $active_level    = $client->GetLevel();
+    my $active_class    = quest::getclassname($active_class_id, $active_level);
+
+    # Get other unlocked classes
+    my %unlocked_classes = GetUnlockedClasses($client);
+    my @class_strings;
+    while (my ($class_id, $level) = each %unlocked_classes) {
+        # Skip the active class since it's already included
+        next if $class_id == $active_class_id;
+
+        my $class_name = quest::getclassname($class_id, $level);
+        push @class_strings, "$level $class_name";
+    }
+
+    # Construct the final string
+    my $name        = $client->GetCleanName();
+    my $class_list  = join(', ', @class_strings);
+    my $info_string = "$name (Level $active_level $active_class [$class_list])";
+
+    return $info_string;
+}
+
 sub GetLockoutTime {
     return 3600;
 }
@@ -170,6 +219,10 @@ sub CheckClassAA {
             $client->GrantAlternateAdvancementAbility(20000+$i, 1, true);
             $accum++;
         }
+    }
+
+    if $accum == 0 {
+        $accum++;
     }
 
     my $expPenalty = CalculateExpPenalty($accum);
