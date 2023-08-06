@@ -32,9 +32,9 @@ sub EVENT_CONNECT {
         plugin::WorldAnnounce("$name (Level $level $class) has logged in for the first time!");
         
         $client->SetBucket("FirstLoginAnnounce", "Yup");
-    } else {
-        plugin::WorldAnnounce(plugin::GetClassListString($client));
     }
+
+    quest::debug(plugin::GetClassListString($client));
 }
 
 #function event_level_up(e)
