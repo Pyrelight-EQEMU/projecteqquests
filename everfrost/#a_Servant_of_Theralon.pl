@@ -21,7 +21,7 @@ sub EVENT_SAY {
 
     if ($client->Admin() > 100) {        
         if($text=~/hail/i) {    
-            quest::taskselector(39);
+            quest::taskselector(41);
         } elsif($text=~/create/i) {
             quest::debug("Ok then");
             my %dz = (
