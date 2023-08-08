@@ -26,16 +26,9 @@ sub EVENT_SAY {
             quest::debug("Ok then");
             my %dz = (
                 "instance"     => {
-                    "zone"     => 58,
-                    "version"  => 1,
-                    "duration" => 1337
-                },
-                "compass"    => {
-                    "zone"   => "everfrost",
-                    "x"      => 28,
-                    "y"      => 2553,
-                    "z"      => 20,
-                    "h"      => 252
+                    "zone"     => 73,
+                    "version"  => 10,
+                    "duration" => 604800
                 }
             );
 
