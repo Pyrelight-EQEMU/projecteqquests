@@ -15,8 +15,8 @@ sub Instance_Hail {
     my $mana_crystals = quest::saylink("mana_crystals", 1, "Mana Crystals");
     my $decrease      = quest::saylink("decrease_info", 1, "decrease");
 
-    my $mana_cystals_item       = varlink(40903);
-    my $dark_mana_cystals_item  = varlink(40902);
+    my $mana_cystals_item       = quest::varlink(40903);
+    my $dark_mana_cystals_item  = quest::varlink(40902);
 
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
