@@ -11,8 +11,8 @@ sub Instance_Hail {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
 
-    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation") | 1;
-    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") | 1;
+    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 1;
+    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 1;
 
     quest::debug("$solo_escalation_level : $group_escalation_level");
 
