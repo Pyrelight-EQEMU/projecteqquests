@@ -16,8 +16,8 @@ my %args = (
     dz_lockout      => 3600, # 1 Hour
 );
 
-sub EVENT_SAY {          
-    plugin::ProcessInstanceDialog(%args);
+sub EVENT_SAY {         
+
 
     if ($client->Admin() > 100) {        
         if($text=~/hail/i) {    
@@ -25,25 +25,24 @@ sub EVENT_SAY {
         } elsif($text=~/create/i) {
             quest::debug("Ok then");
             my %dz = (
-                "instance"    => {
-                    "zone" => 58,
-                    "version" => 1,
+                "instance"     => {
+                    "zone"     => 58,
+                    "version"  => 1,
                     "duration" => 1337
                 },
                 "compass"    => {
-                    "zone" => "gfaydark",
-                    "x"    => 28,
-                    "y" => 2553,
-                    "z" => 20,
-                    "h"    => 252
+                    "zone"   => "everfrost",
+                    "x"      => 28,
+                    "y"      => 2553,
+                    "z"      => 20,
+                    "h"      => 252
                 }
             );
 
-            $client->CreateTaskDynamicZone(39, \%dz);
+            $client->CreateTaskDynamicZone(41, \%dz);
             
         } elsif($text=~/enter/i) {
-            $client->MovePCDynamicZone("crushbone");
+            $client->MovePCDynamicZone("permafrost");
         }
     }
-}
 }
