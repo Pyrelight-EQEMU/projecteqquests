@@ -7,5 +7,6 @@ my $reward          = 1;
 my @task_id = (41, 42, 43);
 
 sub EVENT_SAY {
+    quest::debug("Starting Test");
     plugin::Instance_Hail($client, $npc, $zone_name, $explain_details, $reward, @task_id);
 }
