@@ -11,13 +11,16 @@ sub Instance_Hail {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
 
+    my $details       = quest::saylink("instance_details", 1, "details");
+    my $mana_crystals = quest::saylink("mana_crystals", 1, "Mana Crystals");
+    my $decrease     = quest::saylink("decrease_info", 1, "decrease");
+
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
-        $npc->Emote("The golem grinds as it's head orients on you.");
-        my $details = quest::saylink("instance_details", 1, "details");
+        $npc->Emote("The golem grinds as it's head orients on you.");       
         plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
         return;
     }
@@ -27,7 +30,10 @@ sub Instance_Hail {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
 
-        plugin::YellowText("Difficulty (Normal\\Escalation\\Heroic): [$solo_escalation_level\\@{[$solo_escalation_level + 1]}\\@{[$group_escalation_level + 1]}]");
+        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
+        plugin::YellowText("Your Escalation Difficulty Rank is $solo_escalation_level.");
+        plugin::YellowText("Your Escalation Difficulty Rank is $group_escalation_level.");
+
 
         return;
     }
