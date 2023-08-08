@@ -14,15 +14,10 @@ sub Instance_Hail {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 1;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 1;
 
-    quest::debug("$solo_escalation_level : $group_escalation_level");
-
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         $npc->Emote("The golem grinds as it's head orients on you.");
-
-        my $details = quest::saylink("details", 1, "instance_details");
-
-
+        my $details = quest::saylink("instance_details", 1, "details");
         plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
         return;
     }
