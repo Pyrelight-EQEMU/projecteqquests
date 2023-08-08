@@ -10,7 +10,3 @@ sub EVENT_SAY {
     quest::debug("Starting Test");
     plugin::Instance_Hail($client, $npc, $zone_name, $explain_details, $reward, @task_id);
 }
-
-sub EVENT_TASKACCEPTED {
-    quest::debug("task_id " . $task_id);
-}
