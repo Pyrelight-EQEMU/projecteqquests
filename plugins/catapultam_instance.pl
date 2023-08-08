@@ -33,6 +33,10 @@ sub Instance_Hail {
     return; # Return value if needed
 }
 
+sub Instance_Accept {
+    quest::debug("Accepted a Feat of Strength task");
+}
+
 sub ProcessInstanceDialog {
     my $text   = plugin::val('text');
     my $client = plugin::val('client');
