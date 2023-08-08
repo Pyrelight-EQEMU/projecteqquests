@@ -31,9 +31,7 @@ sub Instance_Hail {
         $client->TaskSelector(@task_id);
 
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
-        plugin::YellowText("Your Base Difficulty Rank is $solo_escalation_level");
-        plugin::YellowText("Your Escalation Difficulty Rank is ". ($solo_escalation_level + 1) .".");
-        plugin::YellowText("Your Heroic Difficulty Rank is ". ($group_escalation_level + 1) ."."); 
+        plugin::YellowText("Your Basic Difficulty is $solo_escalation_level. Your Escalation Difficulty is @[{$solo_escalation_level + 1}]. Your Heroic Difficulty is @[{$group_escalation_level + 1}].");
 
 
         return;
