@@ -25,7 +25,7 @@ sub EVENT_TASKACCEPTED {
     quest::debug("task_id " . $task_id);
     my $task_name = quest::gettaskname($task_id);
     if ($task_name && $task_name =~ /^Feat of Strength:/) {
-        plugin::Instance_Accept();
+        plugin::Instance_Accept($client, $task_id, $task_name);
     }
 }
 

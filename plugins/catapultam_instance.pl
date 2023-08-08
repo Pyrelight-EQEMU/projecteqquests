@@ -34,7 +34,17 @@ sub Instance_Hail {
 }
 
 sub Instance_Accept {
-    quest::debug("Accepted a Feat of Strength task");
+    my ($client, $task_id, $task_name) = @_;
+
+    if ($task_name =~ /\(Escalation\)$/ ) {
+       quest::debug("this is an escalation task");
+    }
+
+    if ($task_name =~ /\(Heroic\)$/ ) {
+        quest::debug("This is a heroic task");
+    }
+
+    # otherwise ...
 }
 
 sub ProcessInstanceDialog {
