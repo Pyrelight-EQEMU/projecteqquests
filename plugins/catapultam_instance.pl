@@ -7,6 +7,37 @@ use JSON;
 
 my $modifier        = 1.25;
 
+sub Instance_Hail {
+    my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
+    my $text   = plugin::val('text');
+
+    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation") | 1;
+    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") | 1;
+
+    quest::debug("$solo_escalation_level : $group_escalation_level");
+
+    # TO-DO Handle this differently based on introductory flag from Theralon.
+    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
+        $npc->Emote("The golem grinds as it's head orients on you.");
+
+        my $details = quest::saylink("details", 1, "instance_details");
+
+
+        plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
+        return;
+    }
+
+    # From [details]
+    if ($text eq 'instance_details') {
+        plugin::NPCTell($explain_details);
+        plugin::YellowText("");
+        $client->TaskSelector(@task_id);
+        return;
+    }
+
+    return; # Return value if needed
+}
+
 sub ProcessInstanceDialog {
     my $text   = plugin::val('text');
     my $client = plugin::val('client');
