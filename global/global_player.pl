@@ -21,7 +21,12 @@ sub EVENT_CONNECT {
     quest::debug(plugin::GetClassListString($client));
 }
 
-
+sub EVENT_TASKACCEPTED {
+    my $task_name = quest::gettaskname($task_id);
+    if ($task_name && $task_name =~ /^Feat of Strength:/) {
+        plugin::Instance_Accept($client, $task_id, $task_name);
+    }
+}
 
 # This event fires when the player levels up.
 sub EVENT_LEVEL_UP {
