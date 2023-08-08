@@ -15,6 +15,9 @@ sub Instance_Hail {
     my $mana_crystals = quest::saylink("mana_crystals", 1, "Mana Crystals");
     my $decrease      = quest::saylink("decrease_info", 1, "decrease");
 
+    my $mana_cystals_item       = varlink(40903);
+    my $dark_mana_cystals_item  = varlink(40902);
+
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
@@ -31,9 +34,6 @@ sub Instance_Hail {
         $client->TaskSelector(@task_id);
 
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
-        plugin::YellowText("Your Basic Difficulty is $solo_escalation_level. Your Escalation Difficulty is ". ($solo_escalation_level + 1) .". Your Heroic Difficulty is ". ($group_escalation_level + 1) .".");
-
-
         return;
     }
 
@@ -46,15 +46,19 @@ sub Instance_Accept {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
+    my $difficulty_rank = $solo_escalation_level;
+
     if ($task_name =~ /\(Escalation\)$/ ) {
-       quest::debug("this is an escalation task");
+        $difficulty_rank++;
+        plugin::YellowText("You have started an Escalation task. You will recieve $reward\x [$mana_crystals_item] and permanently increase your Difficulty Rank for this zone upon completion.");
+    } elsif ($task_name =~ /\(Heroic\)$/ ) {
+        $difficulty_rank = $group_escalation_level + 1;
+        plugin::YellowText("You have started a Heroic task. You will recieve $reward\x [$dark_mana_crystals_item] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+    } else {
+        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
     }
 
-    if ($task_name =~ /\(Heroic\)$/ ) {
-        quest::debug("This is a heroic task");
-    }
-
-    # otherwise ...
+    plugin::YellowText("The Difficulty Rank of this task is $difficult_rank");
 }
 
 sub ProcessInstanceDialog {
