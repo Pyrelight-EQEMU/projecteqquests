@@ -21,6 +21,13 @@ sub Instance_Hail {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
+    foreach my $task (@task_id) {
+        if ($client->IsTaskActive($task)) {
+            plugin::NPCTell("You already have an active task with ID $task.");
+            return;
+        }
+    }
+
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         $npc->Emote("The golem grinds as it's head orients on you.");       
@@ -50,15 +57,13 @@ sub Instance_Accept {
 
     if ($task_name =~ /\(Escalation\)$/ ) {
         $difficulty_rank++;
-        plugin::YellowText("You have started an Escalation task. You will recieve $reward\x [$mana_crystals_item] and permanently increase your Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started an Escalation task. You will permanently increase your Difficulty Rank for this zone upon completion.");
     } elsif ($task_name =~ /\(Heroic\)$/ ) {
         $difficulty_rank = $group_escalation_level + 1;
-        plugin::YellowText("You have started a Heroic task. You will recieve $reward\x [$dark_mana_crystals_item] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started a Heroic task. You will permanently increase your Heroic Difficulty Rank for this zone upon completion.");
     } else {
         plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
     }
-
-    plugin::YellowText("The Difficulty Rank of this task is $difficult_rank");
 }
 
 sub ProcessInstanceDialog {
