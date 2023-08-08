@@ -1,6 +1,6 @@
 # This script should be copy-pasted and reconfigured for each instance master
 
-my $explain_details = "WIthin the caverns ahead is the lair of the legendary White Dragon of Antonica - Lady Vox. Prove your strength to Master Theralon by slaying her and her minions."
+my $explain_details = "WIthin the caverns ahead is the lair of the legendary White Dragon of Antonica - Lady Vox. Prove your strength to Master Theralon by slaying her and her minions.";
 
 my $zone_name       = 'permafrost';
 my $reward          = 1;
