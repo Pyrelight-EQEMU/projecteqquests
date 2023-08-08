@@ -11,8 +11,8 @@ sub Instance_Hail {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
 
-    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 1;
-    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 1;
+    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
+    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
@@ -25,8 +25,10 @@ sub Instance_Hail {
     # From [details]
     if ($text eq 'instance_details') {
         plugin::NPCTell($explain_details);
-        plugin::YellowText("");
         $client->TaskSelector(@task_id);
+
+        plugin::YellowText("Difficulty (Normal\\Escalation\\Heroic): [$solo_escalation_level\\@{[$solo_escalation_level + 1]}\\@{[$group_escalation_level + 1]}]");
+
         return;
     }
 
@@ -35,6 +37,9 @@ sub Instance_Hail {
 
 sub Instance_Accept {
     my ($client, $task_id, $task_name) = @_;
+
+    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
+    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
     if ($task_name =~ /\(Escalation\)$/ ) {
        quest::debug("this is an escalation task");
