@@ -1,6 +1,6 @@
 sub GetInstanceOwner2 {
     my $instance_id = shift;
-    my $dbh         = plugin::LoadMySQL();
+    my $dbh         = plugin::LoadMysql();
     my $query       = $dbh->prepare("SELECT charid FROM instance_list_player WHERE id = ? LIMIT 1;");
 
     $query->execute($instance_id);
