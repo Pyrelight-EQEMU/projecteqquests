@@ -26,9 +26,8 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        quest::debug("This instance is owned by: " . plugin::GetInstanceOwner($instanceid));
-        #plugin::ModifyInstanceNPC();        
-        #plugin::ModifyInstanceLoot();     
+        plugin::ModifyInstanceNPC();        
+        plugin::ModifyInstanceLoot();     
     }
 }
 
