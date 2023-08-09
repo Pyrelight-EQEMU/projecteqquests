@@ -1,3 +1,15 @@
+sub GetInstanceOwner {
+    my $instance_id = shift;
+    my $dbh         = plugin::LoadMySQL();
+    my $query       = $dbh->prepare("SELECT charid FROM instance_list_player WHERE id = ? LIMIT 1;");
+
+    $query->execute($instance_id);
+
+    my ($charid)    = $query->fetchrow_array();
+
+    return $charid;
+}
+
 sub NPCTell {	
 	my $npc = plugin::val('npc');
     my $client = plugin::val('client');
@@ -120,42 +132,6 @@ sub GetPotName {
     return $strings[int(rand(@strings))];
 }
 
-sub FabledName {
-    my $mob_name = shift;
-    
-    my $leading_character = "";
-
-    if ($mob_name =~ s/^#//) {
-        $leading_character = "#";
-    }
-
-    my @words = split('_', $mob_name);
-    my @new_words;
-
-    foreach my $index (0 .. $#words) {
-        my $word = $words[$index];
-        
-        # Skip leading article
-        if ($index == 0 && $word =~ /^(a|an|the)$/i) {
-            next;
-        }
-        
-        # Leave articles in the middle of the name uncapitalized
-        if ($word =~ /^(a|an|the)$/i) {
-            push @new_words, $word;
-        } else {
-            $word =~ s/(\w+)/\u\L$1/g;  # Capitalize first letter, lowercase the rest
-            push @new_words, $word;
-        }
-    }
-
-    my $new_name = join('_', @new_words);
-    $new_name = $leading_character . $new_name;
-    $new_name = ("The_Fabled_$new_name");
-
-    return $new_name;
-}
-
 sub GetUnlockedClasses {
     my $client = shift;
     my $dbh    = plugin::LoadMysql();
@@ -205,7 +181,7 @@ sub GetClassListString {
     return $info_string;
 }
 
-sub plugin::GetInactiveClasses {
+sub GetInactiveClasses {
     my $client = shift;
     my %unlocked_classes = GetUnlockedClasses($client);
 
@@ -308,5 +284,3 @@ sub CalculateExpPenalty {
     #This is currently no-oped
     return 1;
 }
-
-return 1;

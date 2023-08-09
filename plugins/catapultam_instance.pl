@@ -6,6 +6,8 @@ use DBD::mysql;
 use JSON;
 
 my $modifier        = 1.25;
+my $zone_duration   = 604800;
+my $zone_version    = 10;
 
 sub Instance_Hail {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
@@ -23,14 +25,37 @@ sub Instance_Hail {
 
     foreach my $task (@task_id) {
         if ($client->IsTaskActive($task)) {
-            plugin::NPCTell("You already have an active task with ID $task.");
+            my $task_name       = quest::gettaskname($task);
+            my $heroic          = 0;
+            my $difficulty_rank = 0;
+
+            if ($task_name =~ /\(Escalation\)$/ ) {
+                $difficulty_rank++;
+                plugin::YellowText("You have started an Escalation task. You will recieve $reward [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
+            } elsif ($task_name =~ /\(Heroic\)$/ ) {
+                $difficulty_rank    = $group_escalation_level + 1;
+                $heroic             = 1;
+                plugin::YellowText("You have started a Heroic task. You will recieve $reward [$mana_cystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+            } else {
+                plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
+            }
+
+            my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+            
+            my %dz = (
+                "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
+                "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
+                "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
+            );
+
+            $client->CreateTaskDynamicZone($task, \%dz);
+            $client->MovePCDynamicZone($zone_name);
             return;
         }
     }
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
-    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
-        $npc->Emote("The golem grinds as it's head orients on you.");       
+    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {   
         plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
         return;
     }
@@ -45,150 +70,6 @@ sub Instance_Hail {
     }
 
     return; # Return value if needed
-}
-
-sub Instance_Accept {
-    my ($client, $task_id, $task_name) = @_;
-
-    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
-    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
-
-    my $difficulty_rank = $solo_escalation_level;
-
-    if ($task_name =~ /\(Escalation\)$/ ) {
-        $difficulty_rank++;
-        plugin::YellowText("You have started an Escalation task. You will permanently increase your Difficulty Rank for this zone upon completion.");
-    } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        $difficulty_rank = $group_escalation_level + 1;
-        plugin::YellowText("You have started a Heroic task. You will permanently increase your Heroic Difficulty Rank for this zone upon completion.");
-    } else {
-        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
-    }
-}
-
-sub ProcessInstanceDialog {
-    my $text   = plugin::val('text');
-    my $client = plugin::val('client');
-    my $npc    = plugin::val('npc');
-    my $dz = undef;
-
-    my (%args) = @_;
-
-    # Required arguments
-    my $expedition_name = $args{expedition_name};
-    my $dz_zone         = $args{dz_zone};
-    my $explain_message = $args{explain_message};
-    my @target_list     = @{ $args{target_list} };
-
-    quest::debug(join(", ", @target_list));
-
-    # Optional arguments with default values
-    my $reward          = $args{reward} // 1;
-    my $key_required    = $args{key_required} // 0;
-    my $target_level    = $args{target_level} // $npc->GetLevel();
-    
-    my $min_players     = $args{min_players} // 1;
-    my $max_players     = $args{max_players} // 1;
-    my $dz_version      = $args{dz_version} // 10;
-    my $dz_duration     = $args{dz_duration} // 604800;
-    my $dz_lockout      = $args{dz_lockout} // 3600;
-
-    if ($text =~ /hail/i ) {
-        $dz = $client->GetExpedition();
-        if ($key_required == 0 or $client->KeyRingCheck($key_required) or plugin::check_hasitem($client, $key_required)) {
-            if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
-                plugin::NPCTell("Adventurer, your [".quest::saylink("fs_2", 1, "task")."] remains unfulfilled. Do you wish to [".quest::saylink("fs_enter", 1, "continue")."] it?");
-            } else {
-                plugin::NPCTell("Greetings, adventurer! I am a servant of Master Theralon, sent here to set you upon your [".quest::saylink("fs_explain", 1, "task")."].");
-            }
-        }      
-    }
-
-    elsif ($text =~ /fs_2/i) {
-        plugin::NPCTell($explain_message . " Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");
-    }
-
-    elsif (($text =~ /\bfs_explain\b/i)) {        
-        if (!(keys %{$client->GetExpeditionLockouts($expedition_name)})) {
-            plugin::NPCTell($explain_message);
-            if (my $bucket = $client->GetBucket("FoS-$dz_zone")) {
-                my $solo_link = "[".quest::saylink("fs_ESCALATE_${bucket}_2", 1, "current")."]";
-                my $group_link = "[".quest::saylink("fs_ESCALATE_${bucket}_1", 1, "group")."]";
-                my $challenge_link = "[".quest::saylink("fs_ESCALATE_${bucket}_0", 1, "challenge")."]";
-
-                plugin::YellowText("You have previously completed this challenge. You may choose to $challenge_link (Difficulty: $bucket) it once again, 
-                                    remain at your $solo_link difficulty level, or attempt it as $group_link.");
-            } else {  
-                plugin::YellowText("You have not previously completed this challenge. Are you ready to [".quest::saylink("fs_ESCALATE_1_0", 1, "Attempt it")."]?")
-            }
-        } else {
-            plugin::NPCTell("I must muster my strength in order to open the portal.");
-            #TODO - Print Lockout with plugin::YellowText here.
-        }
-    }
-
-    elsif ($text =~ /^fs_ESCALATE_(\d+)_(0|1|2)$/i) {
-        my $level = $1;
-        my $group_mode = $2;
-
-        my $bucket = $client->GetBucket("FoS-$dz_zone");
-        my $exp_name = $group_mode == 1 ? "$expedition_name (Heroic)" : $expedition_name;
-        my $exp_min = $group_mode == 1 ? 2 : 1;
-        my $exp_max = $group_mode == 1 ? 6 : 1;
-        if ($group_mode == 1 && !$client->IsGrouped()) {
-            plugin::YellowText("ERROR: You are not in a group.");
-        } else {
-            if ($level <= ($bucket + 1)) {
-                $escalation_level = $level || 1;
-
-                my $reward_ineligible = $group_mode;
-                if ($group_mode == 2) {
-                    $group_mode == 0;
-                    $level--;
-                }
-                
-                if ($reward_ineligible) {
-                    plugin::YellowText("NOTICE: You are not challenging this zone, and will not recieve Feat of Strength rewards.");
-                }
-
-                my %payload = ( difficulty => $escalation_level, 
-                                group_mode => $group_mode, 
-                                targets => plugin::SerializeList(@target_list), 
-                                reward => $reward_ineligible ? 0 : $reward * scalar @target_list,
-                                min_level => $target_level, 
-                                target_level => $target_level );
-
-                my $instance_id = CREATE_EXPEDITION($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
-                quest::set_data("instance-$dz_zone-$instance_id", plugin::SerializeHash(%payload), $dz_duration);                
-
-                plugin::NPCTell("Are you [".quest::saylink("fs_enter", 1, "ready to begin")."]?");                
-            }
-        }
-    } 
-    
-    elsif (($text =~ /\bfs_enter\b/i)) {
-        $dz = $client->GetExpedition();
-        if ($dz && ($dz->GetName() eq $expedition_name || $dz->GetName() eq $expedition_name . ' (Heroic)')) {
-            $dz->AddReplayLockout(plugin::GetLockoutTime());
-            $client->MovePCDynamicZone($dz_zone);
-        }
-    }
-}
-
-sub CREATE_EXPEDITION {
-    my ($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max) = @_;
-    
-    my $client = plugin::val('client');
-    my $x      = plugin::val('x');
-    my $y      = plugin::val('y');
-    my $z      = plugin::val('z');
-    my $zoneid = plugin::val('zoneid');
-    
-    $dz = $client->CreateExpedition($dz_zone, $dz_version, $dz_duration, $exp_name, $exp_min, $exp_max);
-    $dz->SetCompass(quest::GetZoneShortName($zoneid), $x, $y, $z);
-    $dz->SetSafeReturn(quest::GetZoneShortName($zoneid), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading());
-
-    return $dz->GetInstanceID();
 }
 
 sub GetInstanceLoot {
@@ -230,7 +111,8 @@ sub GetScaledLoot {
     return $new_item_id;
 }
 
-sub ModifyInstanceLoot {
+sub ModifyInstanceLoot 
+{
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
     my $zonesn     = plugin::val('zonesn');
@@ -306,73 +188,3 @@ sub ModifyInstanceNPC
 
     $npc->Heal();
 }
-
-# No Longer Used
-sub CheckInstanceMerit
-{
-    my $client     = plugin::val('client');
-    my $npc        = plugin::val('npc');
-    my $zonesn     = plugin::val('zonesn');
-    my $instanceid = plugin::val('instanceid');
-
-    # Get the packed data for the instance
-    my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
-    my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
-    my $group_mode   = $info_bucket{'group_mode'};
-    my $difficulty   = $info_bucket{'difficulty'} - 1;
-    my $reward       = $info_bucket{'reward'};    
-    my $min_level    = $info_bucket{'min_level'} + min(floor($difficulty / 5), 10);
-
-    if ($reward > 0) {
-        my $npc_name = $npc->GetCleanName();
-        my $removed = 0;
-        @targetlist = grep { 
-            if ($_ == $npc->GetNPCTypeID() && !$removed) { 
-                $removed = 1; 
-                0;
-            } else { 
-                1;
-            } 
-        } @targetlist;
-
-        if ($removed) {
-            #repack the info bucket
-            $info_bucket{'targets'} = plugin::SerializeList(@targetlist);
-            quest::set_data("instance-$zonesn-$instanceid", plugin::SerializeHash(%info_bucket), $client->GetExpedition->GetSecondsRemaining());
-            
-            my $remaining_targets = scalar @targetlist;
-            if ($remaining_targets) {                
-                plugin::YellowText("You've slain $npc_name! Your Feat of Strength is closer to completion. There are $remaining_targets targets left.");
-            } else {
-                my $FoS_points = $client->GetBucket("FoS-points") + $info_bucket{'reward'};
-                my $itm_link = quest::varlink(40903);
-                $client->SetBucket("FoS-points",$FoS_points);
-                $client->SetBucket("FoS-$zonesn", $difficulty + 2);
-                plugin::YellowText("You've slain $npc_name! Your Feat of Strength has been completed! You have earned $reward [$itm_link]. You may leave the expedition to be ejected from the zone after a short time.");
-                $client->AddCrystals($reward, 0);
-                plugin::WorldAnnounce($client->GetCleanName() . " (Level ". $client->GetLevel() . " ". $client->GetClassName() . ") has completed the Feat of Strength: $zoneln (Difficulty: " . ($difficulty + 1) . ").");
-            }
-            #quest::debug("Updated Targets: " . join(", ", @targetlist));
-        }
-    }
-}
-
-sub RefreshTaskStatus
-{
-    my $client = plugin::val('client');
-
-    my $dz     = $client->GetExpedition();
-    my $dz_id  = undef;
-
-    if ($dz) {
-        $dz_id = $dz->GetDynamicZoneID();
-    }
-
-    for my $i (1..999) {
-        if ($client->IsTaskActive(1000 + $i) and not $dz_id == $i) {
-            $client->FailTask(1000 + $i);
-        }        
-    }
-}
-
-return 1;
