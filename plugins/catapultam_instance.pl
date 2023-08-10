@@ -32,6 +32,8 @@ sub Instance_Hail {
                 my $heroic          = 0;
                 my $difficulty_rank = 0;
 
+                my ($instance_id, $leader) = plugin::GetDZLeaderAndID($client);
+
                 plugin::YellowText("The way before you is clear. [$Proceed] when you are ready.");
 
                 if ($task_name =~ /\(Escalation\)$/ ) {
@@ -45,7 +47,7 @@ sub Instance_Hail {
                     plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
                 }
 
-                if (not GetDZLeaderAndID()) {
+                if (not $instance_id) {
                     my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
                     
                     my %dz = (
