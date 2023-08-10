@@ -35,7 +35,7 @@ sub Instance_Hail {
                 my ($instance_id, $leader) = plugin::GetDZLeaderAndID($client);
                 quest::debug("$instance_id:$leader");
 
-                plugin::YellowText("The way before you is clear. [$Proceed] when you are ready.");
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
                 if ($task_name =~ /\(Escalation\)$/ ) {
                     $difficulty_rank++;
