@@ -177,8 +177,8 @@ sub ModifyInstanceNPC
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $group_mode  = $info_bucket{'heroic'};
-    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;    
-    my $min_level   = $info_bucket{'minimum_level'} + min(floor($difficulty / 4), 10);
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0) - 1;    
+    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 4);
     my $reward      = $info_bucket{'reward'};    
 
     # Get initial mob stat values
