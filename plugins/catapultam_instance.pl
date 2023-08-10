@@ -33,7 +33,7 @@ sub Instance_Hail {
                 my $difficulty_rank = 0;
 
                 my ($instance_id, $leader) = plugin::GetDZLeaderAndID($client);
-                quest::debug("$instance_id:$leader");
+                
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
@@ -58,6 +58,7 @@ sub Instance_Hail {
                     );
 
                     $client->CreateTaskDynamicZone($task, \%dz);
+                    quest::debug("$instance_id:$leader");
                 }
 
                 return;
