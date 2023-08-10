@@ -235,7 +235,7 @@ sub GetSharedTaskLeader
     my $sth = $dbh->prepare($query);
     $sth->execute($character_id);
 
-    my $leader_id = $sth->fetchrow_array();
+    my $leader_id = $sth->fetchrow();
     $sth->finish();
     $dbh->disconnect();
 
