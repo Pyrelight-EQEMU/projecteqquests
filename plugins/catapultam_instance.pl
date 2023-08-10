@@ -87,7 +87,7 @@ sub HandleSay {
 sub HandleTaskAccept
 {
     my $task_id            = shift || plugin::val('task_id');
-    my $task_name          = quest::gettaskname($task);
+    my $task_name          = quest::gettaskname($task_id);
     my $mana_cystals       = quest::varlink(40903);
     my $dark_mana_cystals  = quest::varlink(40902);
 
