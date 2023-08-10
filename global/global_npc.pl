@@ -26,6 +26,7 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
+        quest::we(15, "OMFG!");
         plugin::ModifyInstanceNPC();        
         plugin::ModifyInstanceLoot();     
     }
