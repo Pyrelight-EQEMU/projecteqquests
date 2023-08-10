@@ -16,6 +16,7 @@ sub Instance_Hail {
     my $details       = quest::saylink("instance_details", 1, "details");
     my $mana_crystals = quest::saylink("mana_crystals", 1, "Mana Crystals");
     my $decrease      = quest::saylink("decrease_info", 1, "decrease");
+    my $Proceed       = quest::saylink("instance_proceed", 1, "Proceed");
 
     my $mana_cystals_item       = quest::varlink(40903);
     my $dark_mana_cystals_item  = quest::varlink(40902);
@@ -29,6 +30,8 @@ sub Instance_Hail {
             my $heroic          = 0;
             my $difficulty_rank = 0;
 
+            plugin::YellowText("The way before you is clear. [$Proceed] when you are ready.");
+
             if ($task_name =~ /\(Escalation\)$/ ) {
                 $difficulty_rank++;
                 plugin::YellowText("You have started an Escalation task. You will recieve $reward [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
@@ -40,16 +43,18 @@ sub Instance_Hail {
                 plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
             }
 
-            my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
-            
-            my %dz = (
-                "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
-                "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
-                "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
-            );
+            if (not GetDZLeaderAndID()) {
+                my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+                
+                my %dz = (
+                    "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
+                    "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
+                    "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
+                );
 
-            $client->CreateTaskDynamicZone($task, \%dz);
-            $client->MovePCDynamicZone($zone_name);
+                $client->CreateTaskDynamicZone($task, \%dz);
+            }
+
             return;
         }
     }
@@ -69,10 +74,12 @@ sub Instance_Hail {
         return;
     }
 
-    return; # Return value if needed
-}
+    # From [Proceed]
+    if ($text eq 'instance_proceed') {
+        $client->MovePCDynamicZone($zone_name);
+    }
 
-sub Instance_Accept {
+    return; # Return value if needed
 }
 
 sub GetInstanceLoot {
@@ -192,7 +199,7 @@ sub ModifyInstanceNPC
     $npc->Heal();
 }
 
-sub GetInstanceOwner {
+sub GetDZOwner {
     my $instance_id = shift;
     my $dbh         = plugin::LoadMysql();
     my $query       = $dbh->prepare("SELECT charid FROM instance_list_player WHERE id = ? LIMIT 1;");
@@ -203,5 +210,21 @@ sub GetInstanceOwner {
 
     return $charid;
 }
+
+sub GetDZLeaderAndID {
+    my $client = shift;
+
+    my $dbh    = plugin::LoadMysql();
+    my $query  = $dbh->prepare("SELECT dynamic_zones.instance_id, dynamic_zones.leader_id 
+                                 FROM dynamic_zones, dynamic_zone_members 
+                                WHERE dynamic_zone_members.dynamic_zone_id = dynamic_zones.id
+                                  AND dynamic_zone_members.character_id = ?
+                                LIMIT 1;");
+    
+    $query->execute($client->CharacterID());
+
+    return $query->fetchrow_array();
+}
+
 
 return 1;
