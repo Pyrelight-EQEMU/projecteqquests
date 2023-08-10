@@ -24,6 +24,10 @@ sub Instance_Hail {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
+    if ($text eq 'info') {
+        quest::debug("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
+    }
+
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         foreach my $task (@task_id) {
@@ -31,10 +35,7 @@ sub Instance_Hail {
                 my $task_name       = quest::gettaskname($task);
                 my $heroic          = 0;
                 my $difficulty_rank = 0;
-
                 
-                
-
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
                 if ($task_name =~ /\(Escalation\)$/ ) {
@@ -58,9 +59,6 @@ sub Instance_Hail {
                     );
 
                     $client->CreateTaskDynamicZone($task, \%dz);
-                    sleep(10);
-                    my ($instance_id, $leader) = plugin::GetDZLeaderAndID($client);
-                    quest::debug("$instance_id:$leader");
                 }
 
                 return;
@@ -206,36 +204,28 @@ sub ModifyInstanceNPC
     $npc->Heal();
 }
 
-sub GetDZOwner {
-    my $instance_id = shift;
-    my $dbh         = plugin::LoadMysql();
-    my $query       = $dbh->prepare("SELECT charid FROM instance_list_player WHERE id = ? LIMIT 1;");
+sub GetSharedTaskLeader {
+    my $client  = shift || plugin::val('client');
+    my $dbh     = plugin::LoadMysql();
 
-    $query->execute($instance_id);
+    my $character_id = $client->CharacterID(); # Assuming this is how you get the character_id
 
-    my ($charid)    = $query->fetchrow_array();
+    my $query = "SELECT t2.character_id
+                 FROM shared_task_members t1
+                 JOIN shared_task_members t2 ON t1.shared_task_id = t2.shared_task_id
+                 WHERE t1.character_id = ?
+                 AND t2.is_leader = 1
+                 LIMIT 1";
 
-    return $charid;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($character_id);
+
+    my $leader_id = $sth->fetchrow_array();
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $leader_id;
 }
-
-sub GetDZLeaderAndID {
-    my $client = shift;
-
-    my $dbh    = plugin::LoadMysql();
-    my $query  = $dbh->prepare("SELECT dynamic_zones.instance_id, dynamic_zones.leader_id 
-                                 FROM dynamic_zones, dynamic_zone_members 
-                                WHERE dynamic_zone_members.dynamic_zone_id = dynamic_zones.id
-                                  AND dynamic_zone_members.character_id = ?
-                                LIMIT 1;");
-    
-    $query->execute($client->CharacterID());
-
-    my ($instance_id, $leader_id) = $query->fetchrow_array();
-    quest::debug("instance_id:$instance_id, leader_id:$leader_id");
-
-    return ($instance_id, $leader_id);
-}
-
 
 
 return 1;
