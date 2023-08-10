@@ -24,7 +24,7 @@ sub EVENT_SPAWN {
         $npc->Heal();
     }
 
-    quest::we(15, "mob spawn event");
+    quest::we(15, "mob spawn event - $zonesn -$instanceversion - $instanceid");
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
