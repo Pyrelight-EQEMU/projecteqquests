@@ -26,7 +26,6 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        quest::debug("Instance owner of this zone is player: " . plugin::GetInstanceOwner2($instanceid));
         plugin::ModifyInstanceNPC();        
         plugin::ModifyInstanceLoot();     
     }

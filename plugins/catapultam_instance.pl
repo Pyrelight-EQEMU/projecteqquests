@@ -6,6 +6,8 @@ use DBD::mysql;
 use JSON;
 
 my $modifier        = 1.25;
+my $zone_duration   = 604800;
+my $zone_version    = 10;
 
 sub Instance_Hail {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
@@ -23,14 +25,37 @@ sub Instance_Hail {
 
     foreach my $task (@task_id) {
         if ($client->IsTaskActive($task)) {
-            plugin::NPCTell("You already have an active task with ID $task.");
+            my $task_name       = quest::gettaskname($task);
+            my $heroic          = 0;
+            my $difficulty_rank = 0;
+
+            if ($task_name =~ /\(Escalation\)$/ ) {
+                $difficulty_rank++;
+                plugin::YellowText("You have started an Escalation task. You will recieve $reward [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
+            } elsif ($task_name =~ /\(Heroic\)$/ ) {
+                $difficulty_rank    = $group_escalation_level + 1;
+                $heroic             = 1;
+                plugin::YellowText("You have started a Heroic task. You will recieve $reward [$mana_cystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+            } else {
+                plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
+            }
+
+            my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+            
+            my %dz = (
+                "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
+                "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
+                "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
+            );
+
+            $client->CreateTaskDynamicZone($task, \%dz);
+            $client->MovePCDynamicZone($zone_name);
             return;
         }
     }
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
-    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
-        $npc->Emote("The golem grinds as it's head orients on you.");       
+    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {   
         plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
         return;
     }
@@ -105,7 +130,8 @@ sub GetScaledLoot {
     return $new_item_id;
 }
 
-sub ModifyInstanceLoot {
+sub ModifyInstanceLoot 
+{
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
     my $zonesn     = plugin::val('zonesn');
