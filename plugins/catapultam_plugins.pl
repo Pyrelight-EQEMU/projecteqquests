@@ -1,15 +1,3 @@
-sub GetInstanceOwner2 {
-    my $instance_id = shift;
-    my $dbh         = plugin::LoadMysql();
-    my $query       = $dbh->prepare("SELECT charid FROM instance_list_player WHERE id = ? LIMIT 1;");
-
-    $query->execute($instance_id);
-
-    my ($charid)    = $query->fetchrow_array();
-
-    return $charid;
-}
-
 sub NPCTell {	
 	my $npc = plugin::val('npc');
     my $client = plugin::val('client');
