@@ -255,7 +255,9 @@ sub GetSharedTaskLeaderByInstance
     my $sth = $dbh->prepare($query);
     $sth->execute($instance_id);
 
-    my $leader_id = $sth->fetchrow_array();
+    my $leader_id = $sth->fetchrow();
+    $sth->finish();
+    $dbh->disconnect();
 
     return $leader_id;
 }
@@ -272,7 +274,7 @@ sub GetMinimumLevelForTask {
     my $sth = $dbh->prepare($query);
     $sth->execute($task_id);
 
-    my $min_level = $sth->fetchrow_array();
+    my $min_level = $sth->fetchrow();
     $sth->finish();
     $dbh->disconnect();
 
@@ -289,7 +291,7 @@ sub HasDynamicZoneAssigned {
     my $sth = $dbh->prepare($query);
     $sth->execute($character_id);
 
-    my $count = $sth->fetchrow_array();
+    my $count = $sth->fetchrowy();
     $sth->finish();
     $dbh->disconnect();
 
