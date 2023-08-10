@@ -33,7 +33,7 @@ sub EVENT_SPAWN {
         # Get the packed data for the instance
         quest::debug("Looking up character-$owner_id-$zonesn");
 
-        quest::we(15, "version: $instanceversion id: $instanceid owner: $owner_id bucket: " . quest::get_data("character-$owner_id-$zonesn"));
+        quest::we(15, "level: ". $npc->GetLevel() . " version: $instanceversion id: $instanceid owner: $owner_id bucket: " . quest::get_data("character-$owner_id-$zonesn"));
         plugin::ModifyInstanceNPC();        
         plugin::ModifyInstanceLoot();     
     }

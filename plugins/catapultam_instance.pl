@@ -175,8 +175,7 @@ sub ModifyInstanceNPC
     my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
 
     # Get the packed data for the instance
-    quest::debug("Looking up character-$owner_id-$zonesn");
-    my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
+    my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $group_mode  = $info_bucket{'heroic'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;    
     my $min_level   = $info_bucket{'minimum_level'} + min(floor($difficulty / 4), 10);
