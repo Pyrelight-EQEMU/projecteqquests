@@ -40,7 +40,7 @@ sub HandleSay {
                         $heroic++;
                     }
                     
-                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => 100);
                     quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info));
 
                     my %dz = (
