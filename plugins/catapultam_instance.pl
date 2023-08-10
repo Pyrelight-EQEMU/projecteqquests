@@ -146,6 +146,8 @@ sub ModifyInstanceLoot
     my $zonesn     = plugin::val('zonesn');
     my $instanceid = plugin::val('instanceid');
 
+    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
