@@ -291,7 +291,7 @@ sub HasDynamicZoneAssigned {
     my $sth = $dbh->prepare($query);
     $sth->execute($character_id);
 
-    my $count = $sth->fetchrowy();
+    my $count = $sth->fetchrow();
     $sth->finish();
     $dbh->disconnect();
 
