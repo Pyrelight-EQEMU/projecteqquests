@@ -229,8 +229,12 @@ sub GetDZLeaderAndID {
     
     $query->execute($client->CharacterID());
 
-    return $query->fetchrow_array();
+    my ($instance_id, $leader_id) = $query->fetchrow_array();
+    quest::debug("instance_id:$instance_id, leader_id:$leader_id");
+
+    return ($instance_id, $leader_id);
 }
+
 
 
 return 1;
