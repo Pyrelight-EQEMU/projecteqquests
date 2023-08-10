@@ -256,8 +256,6 @@ sub GetSharedTaskLeaderByInstance
     $sth->execute($instance_id);
 
     my $leader_id = $sth->fetchrow_array();
-    $sth->finish();
-    $dbh->disconnect();
 
     return $leader_id;
 }
