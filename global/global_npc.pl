@@ -26,7 +26,7 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+        my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
 
         # Get the packed data for the instance
         quest::debug("Looking up character-$owner_id-$zonesn");
