@@ -147,7 +147,7 @@ sub ModifyInstanceLoot
     my $instanceid = plugin::val('instanceid');
 
     # Get the packed data for the instance
-    my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
+    my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
 
     my @lootlist = $npc->GetLootList();
