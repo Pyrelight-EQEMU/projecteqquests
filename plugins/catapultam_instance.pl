@@ -149,7 +149,6 @@ sub ModifyInstanceLoot
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("instance-$zonesn-$instanceid"));
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
-    my $reward       = $info_bucket{'reward'};
 
     my @lootlist = $npc->GetLootList();
     my @inventory;
@@ -178,7 +177,6 @@ sub ModifyInstanceNPC
     # Get the packed data for the instance
     quest::debug("Looking up character-$owner_id-$zonesn");
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
-    my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
     my $group_mode  = $info_bucket{'heroic'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;    
     my $min_level   = $info_bucket{'minimum_level'} + min(floor($difficulty / 4), 10);
