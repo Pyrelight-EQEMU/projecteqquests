@@ -176,6 +176,7 @@ sub ModifyInstanceNPC
     my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
 
     # Get the packed data for the instance
+    quest::debug("Looking up character-$owner_id-$zonesn");
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my @targetlist   = plugin::DeserializeList($info_bucket{'targets'});
     my $group_mode  = $info_bucket{'group_mode'};
