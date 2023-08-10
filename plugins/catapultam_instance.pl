@@ -24,6 +24,26 @@ sub Instance_Hail {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
+    # TO-DO Handle this differently based on introductory flag from Theralon.
+    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {   
+        plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
+        return;
+    }
+
+    # From [details]
+    if ($text eq 'instance_details') {
+        plugin::NPCTell($explain_details);
+        $client->TaskSelector(@task_id);
+
+        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
+        return;
+    }
+
+    # From [Proceed]
+    if ($text eq 'instance_proceed') {
+        $client->MovePCDynamicZone($zone_name);
+    }    
+
     foreach my $task (@task_id) {
         if ($client->IsTaskActive($task)) {
             my $task_name       = quest::gettaskname($task);
@@ -57,26 +77,6 @@ sub Instance_Hail {
 
             return;
         }
-    }
-
-    # TO-DO Handle this differently based on introductory flag from Theralon.
-    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {   
-        plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
-        return;
-    }
-
-    # From [details]
-    if ($text eq 'instance_details') {
-        plugin::NPCTell($explain_details);
-        $client->TaskSelector(@task_id);
-
-        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
-        return;
-    }
-
-    # From [Proceed]
-    if ($text eq 'instance_proceed') {
-        $client->MovePCDynamicZone($zone_name);
     }
 
     return; # Return value if needed
