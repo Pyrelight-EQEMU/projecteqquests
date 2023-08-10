@@ -33,6 +33,7 @@ sub Instance_Hail {
                 my $difficulty_rank = 0;
 
                 my ($instance_id, $leader) = plugin::GetDZLeaderAndID($client);
+                quest::debug("$instance_id:$leader");
 
                 plugin::YellowText("The way before you is clear. [$Proceed] when you are ready.");
 
