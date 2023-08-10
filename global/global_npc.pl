@@ -26,7 +26,12 @@ sub EVENT_SPAWN {
 
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        quest::we(15, "OMFG! $instanceversion : $instanceid");
+        my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+
+        # Get the packed data for the instance
+        quest::debug("Looking up character-$owner_id-$zonesn");
+
+        quest::we(15, "OMFG! $instanceversion : $instanceid : " . quest::get_data("character-$owner_id-$zonesn"));
         plugin::ModifyInstanceNPC();        
         plugin::ModifyInstanceLoot();     
     }
