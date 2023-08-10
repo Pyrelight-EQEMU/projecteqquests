@@ -9,7 +9,7 @@ my $modifier        = 1.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
 
-sub Instance_Hail {
+sub HandleSay {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
 
@@ -24,34 +24,25 @@ sub Instance_Hail {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
-    if ($text eq 'info') {
-       $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
-    }
-
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
                 my $task_name       = quest::gettaskname($task);
+                my $task_leader_id  = plugin::GetSharedTaskLeader($client);
                 my $heroic          = 0;
-                my $difficulty_rank = 0;
-                
-                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
+                my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation");
 
-                if ($task_name =~ /\(Escalation\)$/ ) {
-                    $difficulty_rank++;
-                    plugin::YellowText("You have started an Escalation task. You will recieve $reward [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
-                } elsif ($task_name =~ /\(Heroic\)$/ ) {
-                    $difficulty_rank    = $group_escalation_level + 1;
-                    $heroic             = 1;
-                    plugin::YellowText("You have started a Heroic task. You will recieve $reward [$mana_cystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
-                } else {
-                    plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
-                }
-
-                if (not $instance_id) {
-                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+                if (not plugin::HasDynamicZoneAssigned($client)) {
+                    if ($task_name =~ /\(Escalation\)$/ ) {
+                        $difficulty_rank++;
+                    } elsif ($task_name =~ /\(Heroic\)$/ ) {
+                        $heroic++;
+                    }
                     
+                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+                    quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info));
+
                     my %dz = (
                         "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
                         "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
@@ -61,6 +52,7 @@ sub Instance_Hail {
                     $client->CreateTaskDynamicZone($task, \%dz);
                 }
 
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready."); 
                 return;
             }
         }
@@ -68,6 +60,11 @@ sub Instance_Hail {
         plugin::NPCTell("Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?");
 
         return;
+    }
+
+    if ($text eq 'debug') {
+       $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
+       $npc->Say("HasDynamicZoneAssigned: " . plugin::HasDynamicZoneAssigned($client));
     }
 
     # From [details]
@@ -85,6 +82,22 @@ sub Instance_Hail {
     }  
 
     return; # Return value if needed
+}
+
+sub HandleTaskAccept
+{
+    my $task_id            = shift || plugin::val('task_id');
+    my $task_name          = quest::gettaskname($task);
+    my $mana_cystals       = quest::varlink(40903);
+    my $dark_mana_cystals  = quest::varlink(40902);
+
+    if ($task_name =~ /\(Escalation\)$/ ) {
+        plugin::YellowText("You have started an Escalation task. You will recieve [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
+    } elsif ($task_name =~ /\(Heroic\)$/ ) {
+        plugin::YellowText("You have started a Heroic task. You will recieve [$dark_mana_cystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+    } else {
+        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
+    }
 }
 
 sub GetInstanceLoot {
@@ -204,11 +217,12 @@ sub ModifyInstanceNPC
     $npc->Heal();
 }
 
-sub GetSharedTaskLeader {
+sub GetSharedTaskLeader 
+{
     my $client  = shift || plugin::val('client');
     my $dbh     = plugin::LoadMysql();
 
-    my $character_id = $client->CharacterID(); # Assuming this is how you get the character_id
+    my $character_id = $client->CharacterID();
 
     my $query = "SELECT t2.character_id
                  FROM shared_task_members t1
@@ -227,5 +241,60 @@ sub GetSharedTaskLeader {
     return $leader_id;
 }
 
+sub GetSharedTaskLeaderByInstance 
+{
+    my $instance_id = shift || plugin::val('instanceid');
+    my $dbh = plugin::LoadMysql();
+
+    my $query = "SELECT leader_id
+                 FROM dynamic_zones
+                 WHERE instance_id = ?
+                 LIMIT 1";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute($instance_id);
+
+    my $leader_id = $sth->fetchrow_array();
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $leader_id;
+}
+
+sub GetMinimumLevelForTask {
+    my $task_id = shift || die "Task ID is required";
+    my $dbh = plugin::LoadMysql();
+
+    my $query = "SELECT min_level
+                 FROM tasks
+                 WHERE id = ?
+                 LIMIT 1";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute($task_id);
+
+    my $min_level = $sth->fetchrow_array();
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $min_level;
+}
+
+sub HasDynamicZoneAssigned {
+    my $client  = shift || plugin::val('client');
+    my $dbh     = plugin::LoadMysql();
+
+    my $character_id = $client->CharacterID();
+
+    my $query = "SELECT COUNT(*) FROM dynamic_zone_members WHERE character_id = ?";
+    my $sth = $dbh->prepare($query);
+    $sth->execute($character_id);
+
+    my $count = $sth->fetchrow_array();
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $count > 0 ? 1 : 0;
+}
 
 return 1;

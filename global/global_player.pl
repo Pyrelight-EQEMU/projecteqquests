@@ -21,6 +21,10 @@ sub EVENT_CONNECT {
     quest::debug(plugin::GetClassListString($client));
 }
 
+sub EVENT_TASKACCEPTED {
+    plugin::HandleTaskAccept($task_id);
+}
+
 # This event fires when the player levels up.
 sub EVENT_LEVEL_UP {
     my $free_skills = [0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76];
