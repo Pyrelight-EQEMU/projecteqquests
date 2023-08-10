@@ -58,6 +58,7 @@ sub Instance_Hail {
                     );
 
                     $client->CreateTaskDynamicZone($task, \%dz);
+                    sleep(10);
                     my ($instance_id, $leader) = plugin::GetDZLeaderAndID($client);
                     quest::debug("$instance_id:$leader");
                 }
