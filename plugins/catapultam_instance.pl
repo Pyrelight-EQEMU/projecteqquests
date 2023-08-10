@@ -25,7 +25,7 @@ sub Instance_Hail {
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
     if ($text eq 'info') {
-        quest::debug("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
+       $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
     }
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
