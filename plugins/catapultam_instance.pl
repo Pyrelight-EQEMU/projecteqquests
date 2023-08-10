@@ -73,22 +73,6 @@ sub Instance_Hail {
 }
 
 sub Instance_Accept {
-    my ($client, $task_id, $task_name) = @_;
-
-    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
-    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
-
-    my $difficulty_rank = $solo_escalation_level;
-
-    if ($task_name =~ /\(Escalation\)$/ ) {
-        $difficulty_rank++;
-        plugin::YellowText("You have started an Escalation task. You will permanently increase your Difficulty Rank for this zone upon completion.");
-    } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        $difficulty_rank = $group_escalation_level + 1;
-        plugin::YellowText("You have started a Heroic task. You will permanently increase your Heroic Difficulty Rank for this zone upon completion.");
-    } else {
-        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
-    }
 }
 
 sub GetInstanceLoot {
