@@ -64,7 +64,7 @@ sub EVENT_KILLED_MERIT {
         } else {
             quest::debug("Invalid Potion Query: $query");
         }
-
+        $dbh->finish();
         $dbh->disconnect();
     } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
         $npc->AddItem(40605); # Exp Pot
