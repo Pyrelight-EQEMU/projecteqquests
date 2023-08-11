@@ -62,7 +62,7 @@ sub HandleSay {
                                      "zone_name" => $zone_name, 
                                      "difficulty_rank" => $difficulty_rank, 
                                      "task_id" => $task, 
-                                     "leader_id" => $task_leader_id 
+                                     "leader_id" => $task_leader_id,
                                      "challenge" => $challenge);
 
                 $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
