@@ -71,7 +71,6 @@ sub HandleSay {
     if ($text eq 'debug') {
        $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
-       HandleTaskComplete;
     }
 
     # From [details]
@@ -104,7 +103,7 @@ sub HandleTaskComplete
     my $zone_name       = $instance_data{'zone_name'};
     my $task_id_stored  = $instance_data{'task_id'};
     my $leader_id       = $instance_data{'leader_id'};
-    my $task_name = quest::gettaskname($task_id);  
+    my $task_name       = quest::gettaskname($task_id);  
     my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
 
     if ($task_id == $task_id_stored) {
@@ -116,11 +115,9 @@ sub HandleTaskComplete
             }
         }
 
-        if ($heroic) {
-            plugin::YellowText("You have recieved [$dark_mana_crystals] x$reward.");
+        if ($heroic) {                        
             $client->AddCrystals(0, $reward);
-        } else {
-            plugin::YellowText("You have recieved [$mana_crystals] x$reward.");
+        } else {            
             $client->AddCrystals($reward, 0);
         }
         

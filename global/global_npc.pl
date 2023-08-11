@@ -29,11 +29,6 @@ sub EVENT_SPAWN {
     # Check for FoS Instance
     if ($instanceversion == 10) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
-
-        # Get the packed data for the instance
-        quest::debug("Looking up character-$owner_id-$zonesn");
-
-        quest::we(15, "level: ". $npc->GetLevel() . " version: $instanceversion id: $instanceid owner: $owner_id bucket: " . quest::get_data("character-$owner_id-$zonesn"));
         plugin::ModifyInstanceNPC();        
         plugin::ModifyInstanceLoot();     
     }
@@ -54,7 +49,7 @@ sub EVENT_KILLED_MERIT {
             $potion .= plugin::GetRoman($client->GetLevel());
         }
 
-        quest::debug("Looking for potion: $potion");
+        #quest::debug("Looking for potion: $potion");
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
         my ($potion_id) = $query->fetchrow_array();
@@ -62,8 +57,9 @@ sub EVENT_KILLED_MERIT {
         if ($potion_id) {
             $npc->AddItem($potion_id);
         } else {
-            quest::debug("Invalid Potion Query: $query");
+            #quest::debug("Invalid Potion Query: $query");
         }
+
         $query->finish();
         $dbh->disconnect();
     } elsif ($client && $client->GetLevelCon($npc->GetLevel()) != 6 && rand() <= 0.01 && !($client->GetBucket("ExpPotionDrop"))) {
@@ -120,7 +116,7 @@ sub CHECK_CHARM_STATUS
 
         foreach my $item (@inventory) {
             my ($item_id, $quantity) = split(":", $item);
-            quest::debug("Adding: $item_id x $quantity");
+            #quest::debug("Adding: $item_id x $quantity");
             $npc->AddItem($item_id, $quantity);
         }
 

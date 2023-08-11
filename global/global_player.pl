@@ -17,8 +17,8 @@ sub EVENT_CONNECT {
         
         $client->SetBucket("FirstLoginAnnounce", "Yup");
     }
-    quest::debug($client->CharacterID());
-    quest::debug(plugin::GetClassListString($client));
+    #quest::debug($client->CharacterID());
+    #quest::debug(plugin::GetClassListString($client));
 }
 
 sub EVENT_TASKACCEPTED {
@@ -54,8 +54,8 @@ sub EVENT_LEVEL_UP {
 }
 
 sub EVENT_DISCOVER_ITEM {
-    quest::debug("itemid " . $itemid);
-    quest::debug("item " . $item);
+    #quest::debug("itemid " . $itemid);
+    #quest::debug("item " . $item);
 
     my $name = $client->GetCleanName();
 
