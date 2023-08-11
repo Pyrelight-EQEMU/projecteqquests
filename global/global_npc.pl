@@ -23,9 +23,7 @@ sub EVENT_SPAWN {
         UPDATE_PET();
         $npc->Heal();
     }
-
-    quest::we(15, "mob spawn event - $zonesn -$instanceversion - $instanceid");
-
+    
     # Check for FoS Instance
     if ($instanceversion == 10) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
