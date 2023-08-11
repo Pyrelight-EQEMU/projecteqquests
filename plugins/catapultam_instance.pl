@@ -125,22 +125,23 @@ sub HandleTaskComplete
             if ($heroic or $escalation) {
                 my $charname = $client->GetCleanName();
                 plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
-            }
-
-            if ($heroic) {                
-                $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);                
-            } else {
-                $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
-            }
+                if ($heroic) {                
+                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
+                    plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.");                
+                } else {
+                    $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
+                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
+                }
+            }            
         }
 
         if ($heroic) {                        
             $client->AddCrystals(0, $reward);
-            plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.");
+            
         } 
         if ($escalation) {            
             $client->AddCrystals($reward, 0);
-            plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
+            
         }
         
         $client->DeleteBucket("instance-data");
