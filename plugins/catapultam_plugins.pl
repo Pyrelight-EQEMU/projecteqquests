@@ -9,11 +9,10 @@ sub NPCTell {
     $client->Message($tellColor, "$NPCName tells you, '" . $message . "'");
 }
 
-sub YellowText {	
-	my $npc = plugin::val('npc');
-    my $client = plugin::val('client');
-	my $message = shift;
-    my $tellColor = 15;
+sub YellowText {
+	my $message     = shift;
+    my $client      = shift || plugin::val('client');
+    my $tellColor   = 15;
 	
     $client->Message($tellColor, $message);
 }
