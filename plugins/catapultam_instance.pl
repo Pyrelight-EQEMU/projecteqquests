@@ -101,7 +101,7 @@ sub HandleTaskComplete
     my $zone_name       = $instance_data{'zone_name'};
     my $task_id_stored  = $instance_data{'task_id'};
     my $leader_id       = $instance_data{'leader_id'};
-    my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 ? 0;
+    my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
 
     if ($task_id == $task_id_stored) {
         if ($client->CharacterID() == $leader_id) {
