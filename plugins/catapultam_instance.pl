@@ -61,9 +61,17 @@ sub HandleSay {
                                      "zone_name" => $zone_name, 
                                      "difficulty_rank" => $difficulty_rank, 
                                      "task_id" => $task, 
-                                     "leader_id" => $task_leader_id);
+                                     "leader_id" => $task_leader_id);                
 
-                $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
+                my $group = $client->GetGroup();
+                if($group) {
+                    for ($count = 0; $count < $group->GroupCount(); $count++) {
+                        $player = $group->GetMember($count);
+                        if($player) {
+                            $player->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
+                        }
+                    }
+                }
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
