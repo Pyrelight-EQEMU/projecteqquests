@@ -146,7 +146,7 @@ sub HandleTaskComplete
         }
 
         if ($heroic) {                        
-            $client->AddCrystals(0, $reward);
+            $client->AddCrystals(0, ceil($reward * ($difficulty_rank + 1) * 0.5));
             
         } 
         if ($escalation) {            
