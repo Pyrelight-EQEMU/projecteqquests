@@ -58,7 +58,11 @@ sub HandleSay {
                 my %instance_data = ("reward" => $reward, "zone_name" => $zone_name, "difficulty_rank" => $difficulty_rank, "task_id" => $task, "leader_id" => $task_leader_id );
                 $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
 
-                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready."); 
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
+
+                if ($client->GetGM()) {
+                    plugin::HandleTaskComplete($client, $task);
+                }
                 return;
             }
         }
@@ -121,7 +125,8 @@ sub HandleTaskComplete
             $client->AddCrystals($reward, 0);
         }
         
-        $client->DeleteBucket("instance-data");    
+        $client->DeleteBucket("instance-data");
+        $client->EndSharedTask();
     }
 }
 
