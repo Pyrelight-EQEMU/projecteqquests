@@ -36,11 +36,12 @@ sub HandleSay {
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
                         $difficulty_rank++;
-                    } elsif ($task_name =~ /\(Heroic\)$/ ) {
+                    } if ($task_name =~ /\(Heroic\)$/ ) {                        
+                        $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0
                         $heroic++;
                     }
                     
-                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel(), "reward" => $reward);
+                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
                     quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info), $zone_duration);
 
                     my %dz = (
@@ -48,9 +49,12 @@ sub HandleSay {
                         "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
                         "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
                     );
-
+                    
                     $client->CreateTaskDynamicZone($task, \%dz);
                 }
+
+                my %instance_data = ("reward" => $reward, "zone_name" => $zone_name, "difficulty_rank" => $difficulty_rank, "task_id" => $task, "leader_id" => $task_leader_id );
+                $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready."); 
                 return;
@@ -64,7 +68,7 @@ sub HandleSay {
 
     if ($text eq 'debug') {
        $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
-       $npc->Say("HasDynamicZoneAssigned: " . plugin::HasDynamicZoneAssigned($client));
+       $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
     }
 
     # From [details]
@@ -82,6 +86,44 @@ sub HandleSay {
     }  
 
     return; # Return value if needed
+}
+
+sub HandleTaskComplete
+{
+    my ($client, $task_id)        = @_;
+
+    my $mana_cystals      = quest::varlink(40903);
+    my $dark_mana_cystals = quest::varlink(40902);
+
+    my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
+    my $difficulty_rank = $instance_data{'difficulty'};
+    my $reward          = $instance_data{'reward'};
+    my $zone_name       = $instance_data{'zone_name'};
+    my $task_id_stored  = $instance_data{'task_id'};
+    my $leader_id       = $instance_data{'leader_id'};
+    my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 ? 0;
+
+    if ($task_id == $task_id_stored) {
+        if ($client->CharacterID() == $leader_id) {
+            my $task_name = quest::gettaskname($task_id);            
+
+            if ($heroic) {
+                $client->SetBucket("$zone_name-group-escalation", $difficulty_rank)
+            } else {
+                $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank)
+            }
+        }
+
+        if ($heroic) {
+            plugin::YellowText("You have recieved [$dark_mana_cystals] x$reward.");
+            $client->AddCrystals(0, $reward);
+        } else {
+            plugin::YellowText("You have recieved [$mana_cystals] x$reward.");
+            $client->AddCrystals($reward, 0)
+        }
+        
+        $client->DeleteBucket("instance-data");    
+    }
 }
 
 sub HandleTaskAccept
