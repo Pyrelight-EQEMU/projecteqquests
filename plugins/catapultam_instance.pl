@@ -145,26 +145,30 @@ sub HandleTaskAccept
 
 sub GetInstanceLoot {
     my ($item_id, $difficulty) = @_;
-    my $max_points = ceil(3 * ($difficulty - 1)) + 1;
-    my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
-    
-    my $rank = int(log($points) / log(2));
+    if ($difficulty > 0) {
+        my $max_points = ceil(3 * ($difficulty - 1)) + 1;
+        my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
+        
+        my $rank = int(log($points) / log(2));
 
-    # 50% chance to downgrade by 1 rank, but not lower than 0
-    if (rand() < 0.25 && $rank > 1) {
-        $rank--;
-    }
-    
-    # 5% chance to upgrade by 1 rank, but not higher than 50
-    elsif (rand() < 0.05 && $rank < 50) {
-        $rank++;
-    }
+        # 50% chance to downgrade by 1 rank, but not lower than 0
+        if (rand() < 0.25 && $rank > 1) {
+            $rank--;
+        }
+        
+        # 5% chance to upgrade by 1 rank, but not higher than 50
+        elsif (rand() < 0.05 && $rank < 50) {
+            $rank++;
+        }
 
-    if ($rank <= 0) {
+        if ($rank <= 0) {
+            return $item_id;
+        }
+
+        return GetScaledLoot($item_id, $rank);
+    } else {
         return $item_id;
     }
-
-    return GetScaledLoot($item_id, $rank);
 }
 
 sub GetScaledLoot {
