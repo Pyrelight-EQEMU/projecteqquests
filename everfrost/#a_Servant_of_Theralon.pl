@@ -4,7 +4,7 @@ my $explain_details = "Within the caverns ahead is the lair of the legendary Whi
 
 my $zone_name       = 'permafrost';
 my $reward          = 1;
-my @task_id = (41, 42, 43);
+my @task_id         = (41, 42, 43);
 
 sub EVENT_SAY {
     plugin::HandleSay($client, $npc, $zone_name, $explain_details, $reward, @task_id);
