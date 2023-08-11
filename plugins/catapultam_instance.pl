@@ -111,19 +111,23 @@ sub HandleTaskComplete
     my $dark_mana_crystals = quest::varlink(40902);
 
     my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
-    my $difficulty_rank = $instance_data{'difficulty_rank'};
-    my $challenge       = $instance_data{'challenge'};
+    my $difficulty_rank = $instance_data{'difficulty_rank'};   
     my $reward          = $instance_data{'reward'};
     my $zone_name       = $instance_data{'zone_name'};
     my $task_id_stored  = $instance_data{'task_id'};
     my $leader_id       = $instance_data{'leader_id'};
     my $task_name       = quest::gettaskname($task_id);  
     my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
+    my $escalation      = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
     if ($task_id == $task_id_stored) {
         if ($client->CharacterID() == $leader_id) {
-            my $charname = $client->GetCleanName();       
-            plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");  
+            
+            if ($heroic or $escalation) {
+                my $charname = $client->GetCleanName();
+                plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
+            }
+            
             if ($heroic) {                
                 $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);                
             } else {
