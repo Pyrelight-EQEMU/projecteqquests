@@ -18,8 +18,8 @@ sub HandleSay {
     my $decrease      = quest::saylink("decrease_info", 1, "decrease");
     my $Proceed       = quest::saylink("instance_proceed", 1, "Proceed");
 
-    my $mana_cystals_item       = quest::varlink(40903);
-    my $dark_mana_cystals_item  = quest::varlink(40902);
+    my $mana_crystals_item       = quest::varlink(40903);
+    my $dark_mana_crystals_item  = quest::varlink(40902);
 
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
@@ -94,8 +94,8 @@ sub HandleTaskComplete
 {
     my ($client, $task_id)        = @_;
 
-    my $mana_cystals      = quest::varlink(40903);
-    my $dark_mana_cystals = quest::varlink(40902);
+    my $mana_crystals      = quest::varlink(40903);
+    my $dark_mana_crystals = quest::varlink(40902);
 
     my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
     my $difficulty_rank = $instance_data{'difficulty'};
@@ -103,12 +103,11 @@ sub HandleTaskComplete
     my $zone_name       = $instance_data{'zone_name'};
     my $task_id_stored  = $instance_data{'task_id'};
     my $leader_id       = $instance_data{'leader_id'};
+    my $task_name = quest::gettaskname($task_id);  
     my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
 
     if ($task_id == $task_id_stored) {
-        if ($client->CharacterID() == $leader_id) {
-            my $task_name = quest::gettaskname($task_id);            
-
+        if ($client->CharacterID() == $leader_id) {               
             if ($heroic) {
                 $client->SetBucket("$zone_name-group-escalation", $difficulty_rank)
             } else {
@@ -117,10 +116,10 @@ sub HandleTaskComplete
         }
 
         if ($heroic) {
-            plugin::YellowText("You have recieved [$dark_mana_cystals] x$reward.");
+            plugin::YellowText("You have recieved [$dark_mana_crystals] x$reward.");
             $client->AddCrystals(0, $reward);
         } else {
-            plugin::YellowText("You have recieved [$mana_cystals] x$reward.");
+            plugin::YellowText("You have recieved [$mana_crystals] x$reward.");
             $client->AddCrystals($reward, 0);
         }
         
