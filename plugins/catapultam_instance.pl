@@ -139,7 +139,7 @@ sub HandleTaskComplete
             plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.");
         } 
         if ($escalation) {            
-            $client->AddCrystals($reward, 0);t
+            $client->AddCrystals($reward, 0);
             plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
         }
         
