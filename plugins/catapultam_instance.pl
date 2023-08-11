@@ -32,15 +32,18 @@ sub HandleSay {
                 my $task_leader_id  = plugin::GetSharedTaskLeader($client);
                 my $heroic          = 0;
                 my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
+                my $challenge       = 0;
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
                         $difficulty_rank++;
+                        $challenge++;
                     } 
                     
                     if ($task_name =~ /\(Heroic\)$/ ) {                        
                         $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
                         $heroic++;
+                        $challenge++;
                     }
                     
                     my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
@@ -55,7 +58,13 @@ sub HandleSay {
                     $client->CreateTaskDynamicZone($task, \%dz);
                 }
 
-                my %instance_data = ("reward" => $reward, "zone_name" => $zone_name, "difficulty_rank" => $difficulty_rank, "task_id" => $task, "leader_id" => $task_leader_id );
+                my %instance_data = ("reward" => $reward, 
+                                     "zone_name" => $zone_name, 
+                                     "difficulty_rank" => $difficulty_rank, 
+                                     "task_id" => $task, 
+                                     "leader_id" => $task_leader_id 
+                                     "challenge" => $challenge);
+
                 $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
@@ -103,6 +112,7 @@ sub HandleTaskComplete
 
     my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
     my $difficulty_rank = $instance_data{'difficulty_rank'};
+    my $challenge       = $instance_data{'challenge'};
     my $reward          = $instance_data{'reward'};
     my $zone_name       = $instance_data{'zone_name'};
     my $task_id_stored  = $instance_data{'task_id'};
@@ -111,18 +121,20 @@ sub HandleTaskComplete
     my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
 
     if ($task_id == $task_id_stored) {
-        if ($client->CharacterID() == $leader_id) {               
-            if ($heroic) {
-                $client->SetBucket("$zone_name-group-escalation", $difficulty_rank)
+        if ($client->CharacterID() == $leader_id) {
+            my $charname = $client->GetCleanName();       
+            plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");  
+            if ($heroic) {                
+                $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);                
             } else {
-                $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank)
+                $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
             }
         }
 
         if ($heroic) {                        
             $client->AddCrystals(0, $reward);
         } else {            
-            $client->AddCrystals($reward, 0);
+            $client->AddCrystals($reward, 0);t
         }
         
         $client->DeleteBucket("instance-data");
