@@ -127,7 +127,7 @@ sub HandleTaskComplete
                 my $charname = $client->GetCleanName();
                 plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
             }
-            
+
             if ($heroic) {                
                 $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);                
             } else {
@@ -137,7 +137,8 @@ sub HandleTaskComplete
 
         if ($heroic) {                        
             $client->AddCrystals(0, $reward);
-        } else {            
+        } 
+        if ($escalation) {            
             $client->AddCrystals($reward, 0);t
         }
         
