@@ -37,13 +37,12 @@ sub HandleSay {
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
                         $difficulty_rank++;
-                        $challenge++;
                     } 
                     
                     if ($task_name =~ /\(Heroic\)$/ ) {                        
                         $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
+                        $difficulty_rank++;
                         $heroic++;
-                        $challenge++;
                     }
                     
                     my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
@@ -62,8 +61,7 @@ sub HandleSay {
                                      "zone_name" => $zone_name, 
                                      "difficulty_rank" => $difficulty_rank, 
                                      "task_id" => $task, 
-                                     "leader_id" => $task_leader_id,
-                                     "challenge" => $challenge);
+                                     "leader_id" => $task_leader_id);
 
                 $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
 
@@ -142,7 +140,7 @@ sub HandleTaskComplete
         } 
         if ($escalation) {            
             $client->AddCrystals($reward, 0);t
-            #plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
+            plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
         }
         
         $client->DeleteBucket("instance-data");
