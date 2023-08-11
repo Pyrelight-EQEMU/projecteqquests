@@ -92,6 +92,7 @@ sub HandleSay {
         $client->TaskSelector(@task_id);
 
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
+        plugin::YellowText("Solo Difficulty: $solo_escalation_level, Heroic Difficulty: $group_escalation_level");
         return;
     }
 
