@@ -146,8 +146,8 @@ sub HandleTaskAccept
 {
     my $task_id            = shift || plugin::val('task_id');
     my $task_name          = quest::gettaskname($task_id);
-    my $mana_cystals       = quest::varlink(40903);
-    my $dark_mana_cystals  = quest::varlink(40902);
+    my $mana_crystals       = quest::varlink(40903);
+    my $dark_mana_crystals  = quest::varlink(40902);
 
     if ($task_name =~ /\(Escalation\)$/ ) {
         plugin::YellowText("You have started an Escalation task. You will recieve [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
