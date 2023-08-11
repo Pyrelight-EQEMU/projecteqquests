@@ -71,7 +71,7 @@ sub HandleSay {
     if ($text eq 'debug') {
        $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
-       HandleTaskAccept;
+       HandleTaskComplete;
     }
 
     # From [details]
