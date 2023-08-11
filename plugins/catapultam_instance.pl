@@ -92,7 +92,7 @@ sub HandleSay {
         $client->TaskSelector(@task_id);
 
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
-        plugin::YellowText("Solo Difficulty: $solo_escalation_level, Heroic Difficulty: $group_escalation_level");
+        plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
         return;
     }
 
@@ -138,9 +138,11 @@ sub HandleTaskComplete
 
         if ($heroic) {                        
             $client->AddCrystals(0, $reward);
+            plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.");
         } 
         if ($escalation) {            
             $client->AddCrystals($reward, 0);t
+            plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
         }
         
         $client->DeleteBucket("instance-data");
@@ -158,7 +160,7 @@ sub HandleTaskAccept
     if ($task_name =~ /\(Escalation\)$/ ) {
         plugin::YellowText("You have started an Escalation task. You will recieve [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
     } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        plugin::YellowText("You have started a Heroic task. You will recieve [$dark_mana_cystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started a Heroic task. You will recieve [$dark_mana_crystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
     } else {
         plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
     }
