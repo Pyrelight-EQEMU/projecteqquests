@@ -68,7 +68,16 @@ sub HandleSay {
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
                 if ($client->GetGM()) {
-                    plugin::HandleTaskComplete($client, $task);
+                    
+                    my $group = $client->GetGroup();
+                    if($group) {
+                        for ($count = 0; $count < $group->GroupCount(); $count++) {
+                            $player = $group->GetMember($count);
+                            if($player) {
+                                plugin::HandleTaskComplete($player, $task);
+                            }
+                        }
+                    }                    
                 }
                 return;
             }
