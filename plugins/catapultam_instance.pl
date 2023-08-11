@@ -36,7 +36,9 @@ sub HandleSay {
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
                         $difficulty_rank++;
-                    } if ($task_name =~ /\(Heroic\)$/ ) {                        
+                    } 
+                    
+                    if ($task_name =~ /\(Heroic\)$/ ) {                        
                         $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
                         $heroic++;
                     }
