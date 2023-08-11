@@ -138,7 +138,6 @@ sub HandleTaskComplete
 
     if ($task_id == $task_id_stored) {
         if ($client->CharacterID() == $leader_id) {
-            $client->Say("I am the leader.");
             if ($heroic or $escalation) {
                 my $charname = $client->GetCleanName();
                 plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
@@ -154,8 +153,7 @@ sub HandleTaskComplete
         }
 
         if ($heroic) {                        
-            $client->AddCrystals(0, ceil(($reward * ($difficulty_rank + 1)) / plugin::GetSharedTaskMemberCount($client)));
-            
+            $client->AddCrystals(0, ceil(($reward * ($difficulty_rank + 1)) / plugin::GetSharedTaskMemberCount($client)));            
         } 
         if ($escalation) {            
             $client->AddCrystals($reward, 0);
