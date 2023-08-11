@@ -239,7 +239,7 @@ sub CheckClassAA {
         quest::debug("Checking Class ID: $i");
         if ($client->GetBucket("class-$i-unlocked")) {
             quest::debug("ClassID $i is unlocked");
-            $client->GrantAlternateAdvancementAbility(20000+$i, 1, true);
+            $client->GrantAlternateAdvancementAbility(20000+$i, 1, 1);
             $accum++;
         }
     }
