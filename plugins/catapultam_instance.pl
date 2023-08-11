@@ -119,7 +119,7 @@ sub HandleTaskComplete
             $client->AddCrystals(0, $reward);
         } else {
             plugin::YellowText("You have recieved [$mana_cystals] x$reward.");
-            $client->AddCrystals($reward, 0)
+            $client->AddCrystals($reward, 0);
         }
         
         $client->DeleteBucket("instance-data");    
