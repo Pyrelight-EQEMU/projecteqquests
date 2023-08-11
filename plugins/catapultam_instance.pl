@@ -154,7 +154,7 @@ sub HandleTaskComplete
         }
 
         if ($heroic) {                        
-            $client->AddCrystals(0, ceil($reward * ($difficulty_rank + 1) * 0.5));
+            $client->AddCrystals(0, ceil(($reward * ($difficulty_rank + 1)) / plugin::GetSharedTaskMemberCount($client)));
             
         } 
         if ($escalation) {            
@@ -384,6 +384,26 @@ sub HasDynamicZoneAssigned {
     $dbh->disconnect();
 
     return $count > 0 ? 1 : 0;
+}
+
+sub GetSharedTaskMemberCount {
+    my ($client)        = @_;
+    my $character_id    = $client->CharacterID();
+    my $dbh             = plugin::LoadMysql();
+
+    my $query = "SELECT COUNT(DISTINCT t2.character_id) AS member_count
+                 FROM shared_task_members t1
+                 JOIN shared_task_members t2 ON t1.shared_task_id = t2.shared_task_id
+                 WHERE t1.character_id = ?";
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute($character_id);
+
+    my $member_count = $sth->fetchrow_hashref()->{'member_count'};
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $member_count;
 }
 
 return 1;
