@@ -102,7 +102,7 @@ sub HandleTaskComplete
     my $dark_mana_crystals = quest::varlink(40902);
 
     my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
-    my $difficulty_rank = $instance_data{'difficulty'};
+    my $difficulty_rank = $instance_data{'difficulty_rank'};
     my $reward          = $instance_data{'reward'};
     my $zone_name       = $instance_data{'zone_name'};
     my $task_id_stored  = $instance_data{'task_id'};
