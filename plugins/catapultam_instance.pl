@@ -130,14 +130,15 @@ sub HandleTaskComplete
 
     if ($task_id == $task_id_stored) {
         if ($client->CharacterID() == $leader_id) {
-            
+            $client->Say("I am the leader.");
             if ($heroic or $escalation) {
                 my $charname = $client->GetCleanName();
                 plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
                 if ($heroic) {                
                     $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
                     plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.");                
-                } else {
+                } 
+                if ($escalation) {
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.");
                 }
