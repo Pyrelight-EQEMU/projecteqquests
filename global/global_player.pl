@@ -26,6 +26,7 @@ sub EVENT_TASKACCEPTED {
 }
 
 sub EVENT_TASK_COMPLETE {
+    quest::debug("Completed task_id : $task_id");
     plugin::HandleTaskComplete($client, $task_id);
 }
 
