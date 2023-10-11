@@ -206,17 +206,6 @@ sub UPDATE_PET {
             }
         }
 
-        # if $updated is still false, it could be because new_bag_inventory has more items, check for that
-        if (!$updated) {
-            foreach my $item_id (keys %new_bag_inventory) {
-                # if the key doesn't exist in new_pet_inventory
-                if (!exists $new_pet_inventory{$item_id}) {                    
-                    $updated = 1; # set updated to true
-                    last; # exit the loop as we have found a difference
-                }
-            }
-        }
-
         if ($updated) {
             quest::debug("--Pet Inventory Reset Triggered--");
             my @lootlist = $npc->GetLootList();
