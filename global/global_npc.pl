@@ -137,6 +137,10 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
+    #temp debug
+    my $hstr = $npc->CastToMob()->GetHeroicSTR() || -1;
+    quest::debug("Heroic_STR: $hstr");
+
     if (not $npc->Charmed()) {
         UPDATE_PET_STATS();
     }
