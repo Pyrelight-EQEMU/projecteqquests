@@ -218,8 +218,6 @@ sub GET_BAG_CONTENTS {
     my $bag_start = $ref_bags + ($rel_bag_slot * $bag_size);
     my $bag_end = $bag_start + $bag_size;
 
-    my @items_in_bag;  # Store items in an array
-
     for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
         my $item_slot = $iter - $bag_start;
         my $item_id   = $owner->GetItemIDAt($iter);
@@ -233,36 +231,12 @@ sub GET_BAG_CONTENTS {
                     push @augments, 0;
                 }
             }
-            # Instead of populating the hash directly, store the items in an array for sorting
-            push @items_in_bag, {
-                id => $item_id,
-                damage => $owner->GetItemStat($item_id, "damage"),
-                hp => $owner->GetItemStat($item_id, "hp"),
-                ac => $owner->GetItemStat($item_id, "ac"),
-                quantity => 1,
-                augments => \@augments
-            };
+            quest::debug("Item ID: $item_id found at Slot ID: $iter");
+            $new_bag_inventory{$item_id} = { quantity => 1, augments => \@augments };
         }
     }
-
-    # Sort items based on the provided criteria
-    @items_in_bag = sort { 
-        $b->{damage} <=> $a->{damage} ||  # Sort by 'damage' first, in descending order
-        $b->{hp} <=> $a->{hp} ||          # Then by 'hp', in descending order
-        $b->{ac} <=> $a->{ac}             # Finally by 'ac', in descending order
-    } @items_in_bag;
-
-    # Convert the sorted array to the desired hash format
-    foreach my $item (@items_in_bag) {
-        $new_bag_inventory{$item->{id}} = {
-            quantity => $item->{quantity},
-            augments => $item->{augments}
-        };
-    }
-
     return %new_bag_inventory;
 }
-
 
 
 sub APPLY_FOCUS {
