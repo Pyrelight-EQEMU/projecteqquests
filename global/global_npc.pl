@@ -137,10 +137,6 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
-    #temp debug
-    my $hstr = $npc->GetHeroicSTR();
-    quest::debug("Heroic_STR: $hstr");
-
     if (not $npc->Charmed()) {
         UPDATE_PET_STATS();
     }
@@ -207,6 +203,17 @@ sub UPDATE_PET {
                 $updated = 1; # set updated to true
                 quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
                 last; # exit the loop as we have found a difference
+            }
+        }
+
+        # if $updated is still false, it could be because new_bag_inventory has more items, check for that
+        if (!$updated) {
+            foreach my $item_id (keys %new_bag_inventory) {
+                # if the key doesn't exist in new_pet_inventory
+                if (!exists $new_pet_inventory{$item_id}) {                    
+                    $updated = 1; # set updated to true
+                    last; # exit the loop as we have found a difference
+                }
             }
         }
 
