@@ -279,7 +279,7 @@ sub GET_BAG_CONTENTS {
 
 
     foreach my $item (@items) {
-        for my $slot_bit (0..20) {
+        for my $slot_bit (reverse 0..20) {
             if ($item->{slots} & (1 << $slot_bit) && !$occupied_slots{$slot_bit}) {
                 $occupied_slots{$slot_bit} = 1;
                 $new_bag_inventory{$item->{id}} = { quantity => 1, slot => $item->{slot}, augments => $item->{augments} };
