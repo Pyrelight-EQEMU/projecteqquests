@@ -190,7 +190,7 @@ sub UPDATE_PET {
 
         foreach my $item_id (@lootlist) {
             my $quantity = $npc->CountItem($item_id);
-            if ($quantity > 0) {
+            if ($quantity > 1) {
                 $updated = 1;
                 last;
             }
