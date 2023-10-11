@@ -251,16 +251,27 @@ sub GET_BAG_CONTENTS {
     my $bag_start = $ref_bags + ($rel_bag_slot * $bag_size);
     my $bag_end = $bag_start + $bag_size;
 
-    for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
+    for (my $iter = $bag_start; $iter < $bag_end; $iter++) {
         my $item_id = $owner->GetItemIDAt($iter);
+        
         if ($item_id > 0 && !exists($blacklist{$item_id})) {
+            my @augments;
+            for (my $aug_iter = 0; $aug_iter < 6; $aug_iter++) {
+                if ($owner->GetAugmentAt($iter, $aug_iter)) {
+                    push @augments, $owner->GetAugmentIDAt($iter, $aug_iter);
+                } else {
+                    push @augments, 0;
+                }
+            }
+
             push @items, {
                 slot => $iter,
                 id => $item_id,
                 damage => $owner->GetItemStat($item_id, "damage") || 0,
                 ac => $owner->GetItemStat($item_id, "ac") || 0,
                 hp => $owner->GetItemStat($item_id, "hp") || 0,
-                slots => $owner->GetItemStat($item_id, "slots")
+                slots => $owner->GetItemStat($item_id, "slots"),
+                augments => \@augments  # Augment list for this item
             };
         }
     }
@@ -272,7 +283,11 @@ sub GET_BAG_CONTENTS {
         for my $slot_bit (0..20) {
             if ($item->{slots} & (1 << $slot_bit) && !$occupied_slots{$slot_bit}) {
                 $occupied_slots{$slot_bit} = 1;
-                $new_bag_inventory{$item->{id}} = { quantity => 1, slot => $item->{slot} };
+                $new_bag_inventory{$item->{id}} = {
+                    quantity => 1,
+                    slot => $item->{slot},
+                    augments => $item->{augments}  # Augment list stored for this item
+                };
                 last;
             }
         }
