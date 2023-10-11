@@ -183,6 +183,16 @@ sub UPDATE_PET {
         }
         quest::debug("Pet inventory fetched and sorted.");
 
+        # Debugging the new_pet_inventory
+        foreach my $item_id (keys %new_pet_inventory) {
+            quest::debug("Pet Inventory - Item ID: $item_id, Quantity: $new_pet_inventory{$item_id}");
+        }
+
+        # Debugging the new_bag_inventory
+        foreach my $item_id (keys %new_bag_inventory) {
+            quest::debug("Bag Inventory - Item ID: $item_id, Quantity: $new_bag_inventory{$item_id}->{quantity}, Augments: @{$new_bag_inventory{$item_id}->{augments}}");
+        }
+
         $updated = 0; # initially set it to false
         foreach my $item_id (keys %new_pet_inventory) {
             # if the key doesn't exist in new_bag_inventory or the values don't match
