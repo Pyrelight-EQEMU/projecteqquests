@@ -236,7 +236,7 @@ sub GET_BAG_CONTENTS {
     }
 
     # Sort items by damage, then ac, then hp
-    @items = sort { $b->{damage} <=> $a->{damage} || $b->{ac} <=> $a->{ac} || $b->{hp} <=> $a->{hp} } @items;
+    @items = sort { $b->{damage} <=> $a->{damage} || $b->{ac} <=> $a->{ac} || $b->{hp} <=> $a->{hp} || $b->{id} <=> $a->{id} } @items;
 
     foreach my $item (@items) {
         for my $slot_bit (0..20) {
