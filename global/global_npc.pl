@@ -158,11 +158,30 @@ sub UPDATE_PET {
             return;
         }
 
+        # Fetching pet's inventory
         my @lootlist = $npc->GetLootList();
+
+        # Sort the lootlist based on criteria
+        @lootlist = sort {
+            my $a_damage = $npc->GetItemStat($a, "damage") || 0;
+            my $a_ac = $npc->GetItemStat($a, "ac") || 0;
+            my $a_hp = $npc->GetItemStat($a, "hp") || 0;
+
+            my $b_damage = $npc->GetItemStat($b, "damage") || 0;
+            my $b_ac = $npc->GetItemStat($b, "ac") || 0;
+            my $b_hp = $npc->GetItemStat($b, "hp") || 0;
+
+            $b_damage <=> $a_damage
+            || $b_ac <=> $a_ac
+            || $b_hp <=> $a_hp
+            || $b <=> $a  # using item IDs for final tiebreaker
+        } @lootlist;
+
         foreach my $item_id (@lootlist) {
             my $quantity = $npc->CountItem($item_id);
             $new_pet_inventory{$item_id} += $quantity;
         }
+        quest::debug("Pet inventory fetched and sorted.");
 
         $updated = 0; # initially set it to false
         foreach my $item_id (keys %new_pet_inventory) {
