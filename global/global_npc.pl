@@ -185,7 +185,7 @@ sub UPDATE_PET {
         }
 
         if ($updated) {
-            #quest::debug("--Pet Inventory Reset Triggered--");
+            quest::debug("--Pet Inventory Reset Triggered--");
             my @lootlist = $npc->GetLootList();
             while (@lootlist) { # While lootlist has elements
                 foreach my $item_id (@lootlist) {
