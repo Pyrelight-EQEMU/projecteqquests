@@ -81,6 +81,13 @@ sub EVENT_COMBAT
     }
 }
 
+sub EVENT_ITEM
+{
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
+        plugin::YellowText("You must use a Summoner's Syncrosatchel to equip your pet.");
+    }
+}
+
 sub EVENT_DEATH_COMPLETE
 {
     CHECK_CHARM_STATUS();
@@ -266,6 +273,7 @@ sub GET_BAG_CONTENTS {
                 slot => $iter,
                 id => $item_id,
                 proceffect => $owner->GetItemStat($item_id, "proceffect") || 0,
+                damage => $owner->GetItemStat($item_id, "damage") || 0,
                 ac => $owner->GetItemStat($item_id, "ac") || 0,
                 hp => $owner->GetItemStat($item_id, "hp") || 0,
                 slots => $owner->GetItemStat($item_id, "slots"),
@@ -275,8 +283,10 @@ sub GET_BAG_CONTENTS {
     }
 
     # Sort items by proceffect in descending order
-    @items = sort { ($b->{proceffect} > 0 ? 1 : 0) <=> ($a->{proceffect} > 0 ? 1 : 0) || $b->{ac} <=> $a->{ac} || $b->{hp} <=> $a->{hp} || $b->{id} <=> $a->{id} } @items;
-
+    @items = sort { ($b->{proceffect} > 0 ? 1 : 0) <=> ($a->{proceffect} > 0 ? 1 : 0) ||
+                     $b->{damage} <=> $a->{damage} ||
+                     $b->{ac} <=> $a->{ac} || $b->{hp} <=> $a->{hp} || 
+                     $b->{id} <=> $a->{id} } @items;
 
     foreach my $item (@items) {
         for my $slot_bit (reverse 0..20) {
@@ -290,8 +300,6 @@ sub GET_BAG_CONTENTS {
 
     return %new_bag_inventory;
 }
-
-
 
 sub APPLY_FOCUS {
     my $owner = $npc->GetOwner()->CastToClient();
