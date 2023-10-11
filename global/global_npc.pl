@@ -138,7 +138,7 @@ sub UPDATE_PET {
     my $bag_slot = 0;
 
     #temp debug
-    my $hstr = $npc->CastToMob()->GetHeroicSTR() || -1;
+    my $hstr = $npc->CastToMob()->GetHeroicSTR();
     quest::debug("Heroic_STR: $hstr");
 
     if (not $npc->Charmed()) {
