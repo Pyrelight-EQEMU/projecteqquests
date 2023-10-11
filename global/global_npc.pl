@@ -214,49 +214,56 @@ sub GET_BAG_CONTENTS {
     my ($new_bag_inventory_ref, $owner, $bag_slot, $ref_general, $ref_bags, $bag_size) = @_;
     my %new_bag_inventory = %{$new_bag_inventory_ref};
 
-    my %occupied_slots; # To keep track of slots already taken
-    my @items;
-
     my $rel_bag_slot = $bag_slot - $ref_general;
     my $bag_start = $ref_bags + ($rel_bag_slot * $bag_size);
     my $bag_end = $bag_start + $bag_size;
 
+    my @items_in_bag;  # Store items in an array
+
     for (my $iter = $bag_start; $iter < $bag_end; $iter++) {                
-        my $item_id = $owner->GetItemIDAt($iter);
-        if ($item_id > 0 && !exists($blacklist{$item_id})) {
-            push @items, {
-                id => $item_id,
-                damage => $owner->GetItemStat($item_id, "damage") || 0,
-                ac => $owner->GetItemStat($item_id, "ac") || 0,
-                hp => $owner->GetItemStat($item_id, "hp") || 0,
-                slots => $owner->GetItemStat($item_id, "slots")
-            };
-        }
-    }
+        my $item_slot = $iter - $bag_start;
+        my $item_id   = $owner->GetItemIDAt($iter);
 
-    # Sort items by damage, then ac, then hp
-    @items = sort { $b->{damage} <=> $a->{damage} || $b->{ac} <=> $a->{ac} || $b->{hp} <=> $a->{hp} } @items;
-
-    for my $item (@items) {
-        # Check highest-bit slot available for item
-        for my $slot_bit (20..0) {
-            if ($item->{slots} & (1 << $slot_bit) && !$occupied_slots{$slot_bit}) {
-                # Assign item to slot
-                $occupied_slots{$slot_bit} = $item->{id};
-                last;
+        if ($item_id > 0 && $owner->GetItemStat($item_id, "slots") && $owner->GetItemStat($item_id, "classes") && $owner->GetItemStat($item_id, "itemtype") != 54 && !exists($blacklist{$item_id})) {
+            my @augments;
+            for (my $aug_iter = 0; $aug_iter < 6; $aug_iter++) {
+                if ($owner->GetAugmentAt($iter, $aug_iter)) {
+                    push @augments, $owner->GetAugmentIDAt($iter, $aug_iter);
+                } else {
+                    push @augments, 0;
+                }
             }
+            # Instead of populating the hash directly, store the items in an array for sorting
+            push @items_in_bag, {
+                id => $item_id,
+                damage => $owner->GetItemStat($item_id, "damage"),
+                hp => $owner->GetItemStat($item_id, "hp"),
+                ac => $owner->GetItemStat($item_id, "ac"),
+                quantity => 1,
+                augments => \@augments
+            };
+            my $slots = $owner->GetItemStat($item_id, "slots");
+            quest::debug("Item ID: $item_id found at Slot ID: $iter, $slots");
         }
     }
 
-    # Populate new_bag_inventory using the occupied_slots
-    for my $slot_bit (keys %occupied_slots) {
-        my $item_id = $occupied_slots{$slot_bit};
-        $new_bag_inventory{$item_id} = { quantity => 1 }; # Augments and other details can be added similarly if needed
+    # Sort items based on the provided criteria
+    @items_in_bag = sort { 
+        $b->{damage} <=> $a->{damage} ||  # Sort by 'damage' first, in descending order
+        $b->{hp} <=> $a->{hp} ||          # Then by 'hp', in descending order
+        $b->{ac} <=> $a->{ac}             # Finally by 'ac', in descending order
+    } @items_in_bag;
+
+    # Convert the sorted array to the desired hash format
+    foreach my $item (@items_in_bag) {
+        $new_bag_inventory{$item->{id}} = {
+            quantity => $item->{quantity},
+            augments => $item->{augments}
+        };
     }
 
     return %new_bag_inventory;
 }
-
 
 sub APPLY_FOCUS {
     my $owner = $npc->GetOwner()->CastToClient();
