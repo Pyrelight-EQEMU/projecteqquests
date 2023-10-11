@@ -368,10 +368,6 @@ sub UPDATE_PET_STATS
                 $bucket_value += 10 * $owner->GetItemBonuses()->GetHeroicSTA();            
             }
 
-            if ($stat == 'max_hit' || $stat == 'min_hit') {
-                $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() / 10);            
-            }
-
             $bucket_value *= $pet_scalar;
             $pet->ModifyNPCStat($stat, ceil($bucket_value));
         }
