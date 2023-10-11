@@ -171,15 +171,18 @@ sub UPDATE_PET {
 
         # Sort the lootlist based on criteria
         @lootlist = sort {
+            my $a_proceffect = $npc->GetItemStat($a, "proceffect") || 0;
             my $a_damage = $npc->GetItemStat($a, "damage") || 0;
             my $a_ac = $npc->GetItemStat($a, "ac") || 0;
             my $a_hp = $npc->GetItemStat($a, "hp") || 0;
 
+            my $b_proceffect = $npc->GetItemStat($b, "proceffect") || 0;
             my $b_damage = $npc->GetItemStat($b, "damage") || 0;
             my $b_ac = $npc->GetItemStat($b, "ac") || 0;
             my $b_hp = $npc->GetItemStat($b, "hp") || 0;
 
-            $b_damage <=> $a_damage
+            ($b_proceffect > 0 ? 1 : 0) <=> ($a_proceffect > 0 ? 1 : 0)
+            || $b_damage <=> $a_damage
             || $b_ac <=> $a_ac
             || $b_hp <=> $a_hp
             || $b <=> $a  # using item IDs for final tiebreaker
