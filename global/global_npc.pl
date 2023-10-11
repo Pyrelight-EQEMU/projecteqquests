@@ -188,6 +188,7 @@ sub UPDATE_PET {
             # if the key doesn't exist in new_bag_inventory or the values don't match
             if (!exists $new_bag_inventory{$item_id} || $new_pet_inventory{$item_id} != $new_bag_inventory{$item_id}) {
                 $updated = 1; # set updated to true
+                quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
                 last; # exit the loop as we have found a difference
             }
         }
