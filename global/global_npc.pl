@@ -364,8 +364,12 @@ sub UPDATE_PET_STATS
         foreach my $stat (@stat_list) {
             my $bucket_value = $owner->GetBucket("pet_$stat");
 
-            if ($stat == 'max_hp') {
+            if ($stat eq 'max_hp') {
                 $bucket_value += 10 * $owner->GetItemBonuses()->GetHeroicSTA();            
+            }
+
+            if ($stat eq 'max_hit' || $stat eq 'min_hit') {
+                $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() / 10);            
             }
 
             $bucket_value *= $pet_scalar;
