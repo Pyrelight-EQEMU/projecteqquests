@@ -137,7 +137,7 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
-    $hsta = $owner->GetHeroicSTA();
+    $hsta = $owner->GetSTA();
 
     quest::debug("ownerhsta:$hsta");
 
