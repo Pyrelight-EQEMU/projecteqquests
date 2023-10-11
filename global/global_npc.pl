@@ -137,10 +137,6 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
-    $hsta = $owner->GetItemBonuses()->GetHeroicSTA();
-
-    quest::debug("ownerhsta:$hsta");
-
     if (not $npc->Charmed()) {
         UPDATE_PET_STATS();
     }
@@ -367,8 +363,15 @@ sub UPDATE_PET_STATS
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             my $bucket_value = $owner->GetBucket("pet_$stat");
+
+            if ($stat == 'max_hp') {
+                $bucket_value += 10 * $owner->GetItemBonuses()->GetHeroicSTA();            
+            }
+
             $bucket_value *= $pet_scalar;
             $pet->ModifyNPCStat($stat, ceil($bucket_value));
+
+
         }
     }
 }
