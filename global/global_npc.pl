@@ -142,6 +142,7 @@ sub UPDATE_PET {
     }
 
     my $damage_bonus = 0;
+
     foreach my $item_id (7..8) {
         my $equipment_id = $npc->GetEquipment($item_id);
 
@@ -152,11 +153,11 @@ sub UPDATE_PET {
 
             quest::debug("slot: $item_id, ratio: $ratio");
 
-            $damage_bonus =+ $ratio;
+            $damage_bonus += $ratio;
         }
     }
 
-    my $damage_bonus *= $npc->GetLevel();
+    $damage_bonus = $damage_bonus/2 * $npc->GetLevel();
 
     quest::debug("Final Damage Bonus: $damage_bonus");
 
