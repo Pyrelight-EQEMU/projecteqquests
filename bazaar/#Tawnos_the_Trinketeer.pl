@@ -49,10 +49,8 @@ sub EVENT_ITEM {
 
             # Use a prepared statement to prevent SQL injection
             my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
-            $sth->execute("'" . $item_name . "'" . ' Glamour-Stone');
-            if (my $row = $sth->fetchrow_hashref()) {
-                # Found a matching item in the database
-
+            $sth->execute("'" . $item_name . "' Glamour-Stone");
+            if (my $row = $sth->fetchrow_hashref()) {                
                 if ($total_money >= (5000 * 1000)) {
                     $total_money -= (5000 * 1000);
                     plugin::NPCTell("Perfect! Here, I had a Glamour-Stone almost ready for your $item_name, I just needed to add the attunement. This should be what you want!");
