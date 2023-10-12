@@ -43,5 +43,6 @@ sub EVENT_ITEM {
 
    quest::debug("I was handed money: $copper, $silver, $gold, $platinum");
 
-    plugin::return_items(\%itemcount);
+   plugin::return_items(\%money);
+   plugin::return_mo
 }
