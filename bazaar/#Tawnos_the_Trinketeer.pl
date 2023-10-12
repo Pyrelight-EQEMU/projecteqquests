@@ -46,6 +46,7 @@ sub EVENT_ITEM {
             quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
 
             my $item_name = quest::getitemname($item_id);
+            quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
 
             # Use a prepared statement to prevent SQL injection
             my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
