@@ -173,16 +173,20 @@ sub UPDATE_PET {
         @lootlist = sort {
             my $a_proceffect = $npc->GetItemStat($a, "proceffect") || 0;
             my $a_damage = $npc->GetItemStat($a, "damage") || 0;
+            my $a_delay = $npc->GetItemStat($a, "delay") || 0;
+            my $a_ratio = ($a_delay > 0 ? $a_damage / $a_delay : 0);
             my $a_ac = $npc->GetItemStat($a, "ac") || 0;
             my $a_hp = $npc->GetItemStat($a, "hp") || 0;
 
             my $b_proceffect = $npc->GetItemStat($b, "proceffect") || 0;
             my $b_damage = $npc->GetItemStat($b, "damage") || 0;
+            my $b_delay = $npc->GetItemStat($b, "delay") || 0;
+            my $b_ratio = ($b_delay > 0 ? $b_damage / $b_delay : 0);
             my $b_ac = $npc->GetItemStat($b, "ac") || 0;
             my $b_hp = $npc->GetItemStat($b, "hp") || 0;
 
             ($b_proceffect > 0 ? 1 : 0) <=> ($a_proceffect > 0 ? 1 : 0)
-            || $b_damage <=> $a_damage
+            || $b_ratio <=> $a_ratio
             || $b_ac <=> $a_ac
             || $b_hp <=> $a_hp
             || $b <=> $a  # using item IDs for final tiebreaker
@@ -269,7 +273,7 @@ sub GET_BAG_CONTENTS {
                 slot => $iter,
                 id => $item_id,
                 proceffect => $owner->GetItemStat($item_id, "proceffect") || 0,
-                damage => $owner->GetItemStat($item_id, "damage") || 0,
+                ratio => ($owner->GetItemStat($item_id, "delay") > 0 ? ($owner->GetItemStat($item_id, "damage") / $owner->GetItemStat($item_id, "delay")) : 0),
                 ac => $owner->GetItemStat($item_id, "ac") || 0,
                 hp => $owner->GetItemStat($item_id, "hp") || 0,
                 slots => $owner->GetItemStat($item_id, "slots"),
@@ -280,7 +284,7 @@ sub GET_BAG_CONTENTS {
 
     # Sort items by proceffect in descending order
     @items = sort { ($b->{proceffect} > 0 ? 1 : 0) <=> ($a->{proceffect} > 0 ? 1 : 0) ||
-                     $b->{damage} <=> $a->{damage} ||
+                     $b->{ratio} <=> $a->{ratio} ||
                      $b->{ac} <=> $a->{ac} || $b->{hp} <=> $a->{hp} || 
                      $b->{id} <=> $a->{id} } @items;
 
