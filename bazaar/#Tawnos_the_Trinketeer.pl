@@ -36,5 +36,12 @@ sub EVENT_ITEM {
         quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
     }
 
+   my $copper = plugin::val('copper');
+   my $silver = plugin::val('silver');
+   my $gold = plugin::val('gold');
+   my $platinum = plugin::val('platinum');
+
+   quest::debug("I was handed money: $copper, $silver, $gold, $platinum");
+
     plugin::return_items(\%itemcount);
 }
