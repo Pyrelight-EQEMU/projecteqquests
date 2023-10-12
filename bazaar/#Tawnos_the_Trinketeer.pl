@@ -16,7 +16,7 @@ sub EVENT_SAY {
    }
 
    elsif ($text eq "link_services") {
-      $response = "Primarily, I can enchant a $link_glamour_stone for you. A speciality of my own invention, these augments can change the appearance of your equipment to mimic another item that you posess. I do charge a nominal fee, a mere 5000 platinum coins, for this service. I aim to offer $link_custom_work for my most discerning customers soon, too."
+      $response = "Primarily, I can enchant a $link_glamour_stone for you. A speciality of my own invention, these augments can change the appearance of your equipment to mimic another item that you posess. I do charge a nominal fee, a mere 5000 platinum coins, for this service. I aim to offer $link_custom_work for my most discerning customers soon, too.";
       $client->SetBucket("Tawnos");
    }
 
