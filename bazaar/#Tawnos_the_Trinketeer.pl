@@ -2,10 +2,10 @@ sub EVENT_SAY {
    my $response = "";
    my $clientName = $client->GetCleanName();
 
-   my $link_services = "[".quest::saylink("link_services", true, "services")."]";
-   my $link_services_2 = "[".quest::saylink("link_services", true, "do for you")."]";
-   my $link_glamour_stone = "[".quest::saylink("link_glamour_stone", true, "Glamour-Stone")."]";
-   my $link_custom_work = "[".quest::saylink("link_custom_work", true, "custom enchantments")."]";
+   my $link_services = "[".quest::saylink("link_services", 1, "services")."]";
+   my $link_services_2 = "[".quest::saylink("link_services", 1, "do for you")."]";
+   my $link_glamour_stone = "[".quest::saylink("link_glamour_stone", 1, "Glamour-Stone")."]";
+   my $link_custom_work = "[".quest::saylink("link_custom_work", 1, "custom enchantments")."]";
 
    if($text=~/hail/i) {
       if (!$client->GetBucket("Tawnos")) {
@@ -49,7 +49,7 @@ sub EVENT_ITEM {
 
             # Use a prepared statement to prevent SQL injection
             my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
-            $sth->execute($item_name . ' Glamour-Stone');
+            $sth->execute("'" . $item_name . "'" . ' Glamour-Stone');
             if (my $row = $sth->fetchrow_hashref()) {
                 # Found a matching item in the database
 
