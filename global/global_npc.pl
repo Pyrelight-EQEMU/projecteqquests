@@ -141,10 +141,11 @@ sub UPDATE_PET {
         UPDATE_PET_STATS();
     }
 
-    foreach (0..7) {
-        my $item_id = $npc->GetEquipment($item_id);
-        quest::debug("Item:$item_id");
+    foreach my $item_id (0..7) {
+        my $equipment_id = $npc->GetEquipment($item_id);
+        quest::debug("Item:$equipment_id");
     }
+
 
     if ($owner) {       
         my %new_pet_inventory;
@@ -210,7 +211,7 @@ sub UPDATE_PET {
             # if the key doesn't exist in new_bag_inventory or the values don't match
             if (!exists $new_bag_inventory{$item_id}) {
                 $updated = 1; # set updated to true
-                quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
+                #quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
                 last; # exit the loop as we have found a difference
             }
         }
@@ -227,7 +228,7 @@ sub UPDATE_PET {
         }
 
         if ($updated) {
-            quest::debug("--Pet Inventory Reset Triggered--");
+            #quest::debug("--Pet Inventory Reset Triggered--");
             my @lootlist = $npc->GetLootList();
             while (@lootlist) { # While lootlist has elements
                 foreach my $item_id (@lootlist) {
