@@ -143,7 +143,7 @@ sub UPDATE_PET {
 
     foreach (0..7) {
         my $item_id = $npc->GetEquipment($item_id);
-        quest("Item:$item_id");
+        quest::debug("Item:$item_id");
     }
 
     if ($owner) {       
