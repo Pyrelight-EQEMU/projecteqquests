@@ -137,10 +137,6 @@ sub UPDATE_PET {
     my $bag_id = 199999; # Custom Item
     my $bag_slot = 0;
 
-    if (not $npc->Charmed()) {
-        UPDATE_PET_STATS();
-    }
-
     if ($owner) {       
         my %new_pet_inventory;
         my %new_bag_inventory;
@@ -240,6 +236,10 @@ sub UPDATE_PET {
                 }
             }
         }
+
+        if (not $npc->Charmed()) {
+            UPDATE_PET_STATS();
+        }  
     } else {
         quest::debug("The owner is not defined");
         return;
@@ -369,7 +369,15 @@ sub UPDATE_PET_STATS
             my $bucket_value = $owner->GetBucket("pet_$stat");
 
             if ($stat eq 'max_hp') {
-                $bucket_value += 10 * $owner->GetItemBonuses()->GetHeroicSTA();            
+
+                # Fetching pet's inventory
+                my @lootlist = $npc->GetLootList();
+                my $hsta_total = 0;
+                foreach my $item_id (@lootlist) {
+                    my $hsta_total += $pet->GetItemStat("heroicsta");
+                }
+
+                $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $hsta_total);                            
             }
 
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
