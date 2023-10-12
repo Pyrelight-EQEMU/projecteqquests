@@ -50,7 +50,7 @@ sub EVENT_KILLED_MERIT {
         #quest::debug("Looking for potion: $potion");
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
-        my ($potion_id) = $query->fetchrow_array();
+        my ($potion_id) = $query->fetchrow_array();s
 
         if ($potion_id) {
             $npc->AddItem($potion_id);
@@ -381,8 +381,6 @@ sub UPDATE_PET_STATS
                         my $damage = $npc->GetItemStat($equipment_id, "damage");
                         my $delay = $npc->GetItemStat($equipment_id, "delay");
                         my $ratio = $damage / $delay;
-
-                        quest::debug("slot: $item_id, ratio: $ratio");
 
                         $damage_bonus += $ratio;
                     }
