@@ -141,7 +141,7 @@ sub UPDATE_PET {
         UPDATE_PET_STATS();
     }
 
-    foreach my $item_id (0..7) {
+    foreach my $item_id (0..10) {
         my $equipment_id = $npc->GetEquipment($item_id);
         quest::debug("Item:$equipment_id");
     }
