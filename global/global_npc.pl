@@ -141,27 +141,6 @@ sub UPDATE_PET {
         UPDATE_PET_STATS();
     }
 
-    my $damage_bonus = 0;
-
-    foreach my $item_id (7..8) {
-        my $equipment_id = $npc->GetEquipment($item_id);
-
-        if ($equipment_id > 0) {        
-            my $damage = $npc->GetItemStat($equipment_id, "damage");
-            my $delay = $npc->GetItemStat($equipment_id, "delay");
-            my $ratio = $damage / $delay;
-
-            quest::debug("slot: $item_id, ratio: $ratio");
-
-            $damage_bonus += $ratio;
-        }
-    }
-
-    $damage_bonus = $damage_bonus/2 * $npc->GetLevel();
-
-    quest::debug("Final Damage Bonus: $damage_bonus");
-
-
     if ($owner) {       
         my %new_pet_inventory;
         my %new_bag_inventory;
@@ -393,7 +372,29 @@ sub UPDATE_PET_STATS
                 $bucket_value += 10 * $owner->GetItemBonuses()->GetHeroicSTA();            
             }
 
-            if ($stat eq 'max_hit' || $stat eq 'min_hit') {
+            if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
+                my $damage_bonus = 0;
+                foreach my $item_id (7..8) {
+                    my $equipment_id = $npc->GetEquipment($item_id);
+
+                    if ($equipment_id > 0) {        
+                        my $damage = $npc->GetItemStat($equipment_id, "damage");
+                        my $delay = $npc->GetItemStat($equipment_id, "delay");
+                        my $ratio = $damage / $delay;
+
+                        quest::debug("slot: $item_id, ratio: $ratio");
+
+                        $damage_bonus += $ratio;
+                    }
+                }
+                $damage_bonus = $damage_bonus/2 * $npc->GetLevel();
+
+                if ($stat eq 'min_hit') {
+                    $bucket_value = max($damage_bonus, $bucket_value);
+                } else {
+                    $bucket_value = max($damage_bonus*2, $bucket_value);
+                }
+
                 $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() / 10);            
             }
 
