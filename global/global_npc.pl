@@ -50,7 +50,7 @@ sub EVENT_KILLED_MERIT {
         #quest::debug("Looking for potion: $potion");
         my $query = $dbh->prepare("SELECT id FROM items WHERE name LIKE '$potion';");
         $query->execute();
-        my ($potion_id) = $query->fetchrow_array();s
+        my ($potion_id) = $query->fetchrow_array();
 
         if ($potion_id) {
             $npc->AddItem($potion_id);
