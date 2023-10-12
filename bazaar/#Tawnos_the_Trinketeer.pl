@@ -20,7 +20,7 @@ sub EVENT_SAY {
       $client->SetBucket("Tawnos", 1);
    }
 
-   elsif ($text eq "link_services") {
+   elsif ($text eq "link_glamour_stone") {
       $response = "If you are interested in a $link_glamour_stone, simply hand me the item which you'd like me to duplicate. Do not bother me with coins, I will handle the money seperately.";
    }
 
