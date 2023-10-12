@@ -141,6 +141,11 @@ sub UPDATE_PET {
         UPDATE_PET_STATS();
     }
 
+    foreach (0..7) {
+        my $item_id = $npc->GetEquipment($item_id);
+        quest("Item:$item_id");
+    }
+
     if ($owner) {       
         my %new_pet_inventory;
         my %new_bag_inventory;
