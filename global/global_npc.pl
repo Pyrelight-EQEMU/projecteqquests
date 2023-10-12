@@ -370,12 +370,13 @@ sub UPDATE_PET_STATS
 
             if ($stat eq 'max_hp') {
 
-                # Fetching pet's inventory
-                my @lootlist = $npc->GetLootList();
                 my $hsta_total = 0;
-                foreach my $item_id (@lootlist) {
-                    my $hsta_total += $pet->GetItemStat($item_id, "heroicsta");
-                }
+
+                # Fetching pet's inventory
+                #my @lootlist = $npc->GetLootList();                
+                #foreach my $item_id (@lootlist) {
+                #    my $hsta_total += $pet->GetItemStat($item_id, "heroicsta");
+                #}
 
                 $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $hsta_total);                            
             }
