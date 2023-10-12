@@ -143,7 +143,14 @@ sub UPDATE_PET {
 
     foreach my $item_id (0..10) {
         my $equipment_id = $npc->GetEquipment($item_id);
-        quest::debug("Item:$equipment_id");
+
+        if ($equipment_id > 0) {        
+            my $damage = $npc->GetItemStat($equipment_id, "damage");
+            my $delay = $npc->GetItemStat($equipment_id, "delay");
+            my $ratio = $damage / $delay;
+
+            quest::debug("slot: $item_id, ratio: $ratio");
+        }
     }
 
 
