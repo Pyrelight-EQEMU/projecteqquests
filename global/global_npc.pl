@@ -374,7 +374,7 @@ sub UPDATE_PET_STATS
                 my @lootlist = $npc->GetLootList();
                 my $hsta_total = 0;
                 foreach my $item_id (@lootlist) {
-                    my $hsta_total += $pet->GetItemStat("heroicsta");
+                    my $hsta_total += $pet->GetItemStat($item_id, "heroicsta");
                 }
 
                 $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $hsta_total);                            
