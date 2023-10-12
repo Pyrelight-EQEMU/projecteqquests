@@ -32,15 +32,12 @@ sub EVENT_SAY {
 }
 
 sub EVENT_ITEM {
+    foreach my $item_id (keys %itemcount) {
+        quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
+    }
 
-   if (scalar(keys %itemcount) == 1) {
-      my ($item_id) = keys %itemcount;
-      quest::debug("I was handed: $item_id");
-   } else {
-      # The hash does not contain exactly one item.
-   }
-
-  plugin::return_items(\%itemcount);
+    plugin::return_items(\%itemcount);
 }
+
 
 
