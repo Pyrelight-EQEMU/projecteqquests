@@ -141,7 +141,8 @@ sub UPDATE_PET {
         UPDATE_PET_STATS();
     }
 
-    foreach my $item_id (0..10) {
+    my $damage_bonus = 0;
+    foreach my $item_id (7..8) {
         my $equipment_id = $npc->GetEquipment($item_id);
 
         if ($equipment_id > 0) {        
@@ -150,8 +151,14 @@ sub UPDATE_PET {
             my $ratio = $damage / $delay;
 
             quest::debug("slot: $item_id, ratio: $ratio");
+
+            $damage_bonus =+ $ratio;
         }
     }
+
+    my $damage_bonus *= $npc->GetLevel();
+
+    quest::debug("Final Damage Bonus: $damage_bonus");
 
 
     if ($owner) {       
