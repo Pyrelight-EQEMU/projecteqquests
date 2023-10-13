@@ -32,7 +32,7 @@ sub EVENT_ITEM {
                             my $targeted_item_id = $base_id + ($available_tier*1000000);
 
                             # Encode data, assuming a simple "targeted_item_id:available_tier" format
-                            my $hidden_data = "$targeted_item_id:$available_tier";
+                            my $hidden_data = "$base_id:$available_tier";
 
                             # Calculate CMC cost for the targeted tier
                             my $cmc_cost = calculate_upgrade_cmc($targeted_item_id);
@@ -315,10 +315,12 @@ sub calculate_heroic_stat_sum {
 }
 
 sub calculate_upgrade_cmc {
-    my $item_id = shift;
+    my $item_id = shift;    
     my ($base_id, $tier) = get_base_id_and_tier($item_id);
 
     my $base_cost = calculate_heroic_stat_sum($item_id);
+
+    quest::debug("$item_id, $base_id, $tier, $base_cost");
 
     return $base_cost * $tier;
 }
