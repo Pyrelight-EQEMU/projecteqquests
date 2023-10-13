@@ -28,7 +28,7 @@ sub EVENT_SAY {
       $response = "I do not have all of my equipment prepared yet, so we will discuss that at a later time";
    }
 
-   if ($response neq "") {
+   if ($response not eq "") {
       plugin::NPCTell($response);
    }
 }
