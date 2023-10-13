@@ -21,13 +21,38 @@ sub EVENT_SAY {
       plugin::NPCTell($response);
    }
 
-   my %inventory_list = %{ get_all_items_in_inventory($client) };
+    my %inventory_list = %{ get_all_items_in_inventory($client) };
+    my $dbh = plugin::LoadMysql();
 
-   # Iterating over the inventory_list hash and send each element with plugin::NPCTell
-   while (my ($key, $value) = each %inventory_list) {
-    my $name = quest::getitemname($key);
-      plugin::NPCTell("$name: $value");
-   }
+    my @eligible_items;
+
+    # Iterating over the inventory_list hash and send each element with plugin::NPCTell
+    while (my ($key, $value) = each %inventory_list) {
+        my $name = quest::getitemname($key);
+        plugin::NPCTell("$name: $value");
+
+        if ($client->GetItemStat($key, "slots")) {
+            # Modify the key to find eligible items for upgrades
+            my $eligible_item_id = ($key % 1000000) + 1000000;
+
+            # Push to eligible_items list
+            push @eligible_items, $eligible_item_id;
+
+            # Optionally, query the 'items' table to retrieve the eligible item
+            my $sth = $dbh->prepare("SELECT * FROM items WHERE id = ?");
+            $sth->execute($eligible_item_id);
+            while (my $ref = $sth->fetchrow_hashref()) {
+                # Process the item data if needed, e.g., 
+                plugin::NPCTell("Eligible upgrade item for $name: $ref->{name}");
+            }
+        }
+    }
+
+    # Close the database handle
+    $dbh->disconnect();
+
+    # If you need the list of eligible items outside the loop, you can use the @eligible_items array.
+
 }
 
 
