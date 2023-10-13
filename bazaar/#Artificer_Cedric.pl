@@ -316,5 +316,5 @@ sub calculate_upgrade_cmc {
 
     my $base_cost = calculate_heroic_stat_sum($item_id);
 
-    return $base_cost * $tier + $tier;
+    return $base_cost * $tier;
 }
