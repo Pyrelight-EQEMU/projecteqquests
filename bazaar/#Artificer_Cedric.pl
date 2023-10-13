@@ -1,6 +1,6 @@
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
-    my $CMC_Available = sprintf("%04d", $client->GetBucket("Artificer_CMC"));
+    my $CMC_Available = $client->GetBucket("Artificer_CMC");
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
 
     if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
@@ -42,7 +42,15 @@ sub EVENT_ITEM {
                             my $link_text = "+$available_tier ($cmc_cost CMC)";
                             my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
-                            push @tier_links, "---- [$upgrade_link] ---- [" . quest::varlink($targeted_item_id) . "] ---- (COST: $cmc_cost / $CMC_Available $link_concentrated_mana_crystals)";
+                            # Determine the number of digits required for padding
+                            my $max_digits = length($cmc_cost) > length($CMC_Available) ? length($cmc_cost) : length($CMC_Available);
+
+                            # Format the numbers with leading zeroes
+                            my $formatted_cmc_cost = sprintf("%0${max_digits}d", $cmc_cost);
+                            my $formatted_CMC_Available = sprintf("%0${max_digits}d", $CMC_Available);
+
+                            push @tier_links, "---- [$upgrade_link] ---- [" . quest::varlink($targeted_item_id) . "] ---- (COST: $formatted_cmc_cost / $formatted_CMC_Available $link_concentrated_mana_crystals)";
+
                         }
 
                         my $tier_list = join(", ", @tier_links);
