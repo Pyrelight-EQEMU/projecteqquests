@@ -43,7 +43,8 @@ sub EVENT_ITEM {
                         }
 
                         my $tier_list = join(", ", @tier_links);
-                        my $response_string = "I believe that I can upgrade this equipment to: $tier_list";
+                        my $current_item = "[" . quest::varlink($item_id) . "]";
+                        my $response_string = "I believe that I can upgrade your $current_item to: $tier_list";
                         
                         plugin::NPCTell($response_string);
 
