@@ -222,31 +222,19 @@ sub get_total_points_for_base_item {
 }
 
 sub max_eligible_upgrade {
-    my ($base_item_id, $points_available) = @_;
+    my ($base_item_id, $points) = @_;
     
-    # Initial item_id is the base item
-    my $current_item_id = $base_item_id;
-    
-    # Loop to check for eligible upgrades
-    while (1) {
-        # Calculate next upgrade item ID
-        my $next_upgrade_item_id = $current_item_id + 1000000;
-        
-        # Check if the next upgrade item exists in DB
-        if (!item_exists_in_db($next_upgrade_item_id)) {
-            last;
-        }
-        
-        # Check if we have enough points for the next upgrade
-        my $points_required = get_point_value($next_upgrade_item_id);
-        if ($points_available < $points_required) {
-            last;
-        }
-        
-        # Update current item to next upgrade and deduct points
-        $current_item_id = $next_upgrade_item_id;
-        $points_available -= $points_required;
+    # If the base item ID is less than 1000000, it is Tier 0, which already has a value of 1 point.
+    if ($base_item_id < 1000000) {
+        return $base_item_id if $points < 2; # Cannot upgrade, remain at Tier 0
+        $points--; # Deduct the 1 point for the base item
     }
     
-    return $current_item_id;
+    my $tier = 0; # Start from Tier 0
+    while ($points >= (2 ** $tier)) {
+        $tier++;
+    }
+    $tier--; # because the while loop will exceed by one
+    return $base_item_id + (1000000 * $tier);
 }
+
