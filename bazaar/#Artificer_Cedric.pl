@@ -42,9 +42,7 @@ sub EVENT_SAY {
             my $sth = $dbh->prepare("SELECT * FROM items WHERE id = ?");
             $sth->execute($eligible_item_id);
             while (my $ref = $sth->fetchrow_hashref()) {
-                # Process the item data if needed, e.g., 
-                my $name = $ref->{name};
-                plugin::NPCTell("Eligible upgrade item for $name: $name");
+                plugin::NPCTell("Eligible upgrade item for $name:");
             }
         }
     }
