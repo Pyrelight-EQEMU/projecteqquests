@@ -224,17 +224,13 @@ sub get_total_points_for_base_item {
 sub max_eligible_upgrade {
     my ($base_item_id, $points) = @_;
     
-    # If the base item ID is less than 1000000, it is Tier 0, which already has a value of 1 point.
-    if ($base_item_id < 1000000) {
-        return $base_item_id if $points < 2; # Cannot upgrade, remain at Tier 0
-        $points--; # Deduct the 1 point for the base item
-    }
-    
-    my $tier = 0; # Start from Tier 0
+    my $tier = 0;
     while ($points >= (2 ** $tier)) {
         $tier++;
     }
-    $tier--; # because the while loop will exceed by one
+    $tier--; # Subtract one because we've overshot by one tier in the loop
+    
     return $base_item_id + (1000000 * $tier);
 }
+
 
