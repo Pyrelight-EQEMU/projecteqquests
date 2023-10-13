@@ -1,6 +1,6 @@
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
-    my $CMC_Available = $client->GetBucket("Artificer_CMC");
+    my $CMC_Available = sprintf("%04d", $client->GetBucket("Artificer_CMC"));
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
 
     if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
