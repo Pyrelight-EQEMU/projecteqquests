@@ -230,7 +230,9 @@ sub UPDATE_PET {
             while (grep { $_->{quantity} > 0 } values %new_bag_inventory) {
                 # Preprocess and sort item_ids by GetItemStat in ascending order
                 my @sorted_item_ids = sort {
-                    $owner->GetItemStat($a, "slots") <=> $owner->GetItemStat($b, "slots")
+                    my $count_a = () = unpack('B*', $owner->GetItemStat($a, "slots")) =~ /1/g;
+                    my $count_b = () = unpack('B*', $owner->GetItemStat($b, "slots")) =~ /1/g;
+                    $count_a <=> $count_b
                 } keys %new_bag_inventory;
                 
                 foreach my $item_id (@sorted_item_ids) {
