@@ -86,7 +86,13 @@ sub EVENT_ITEM {
     }
 
     if ($earned_points > 0) {
-        plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+        if ($total_money > 0) {
+            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
+        } else {
+            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+        }
+    } else {
+        plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
     }
 
     # After processing all items, return any remaining money
