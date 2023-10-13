@@ -27,7 +27,7 @@ sub EVENT_ITEM {
                     if (@affordable_tiers) {
                         my @tier_links;
 
-                        my $real_max_digits = length($CMC_Available)
+                        my $real_max_digits = length($CMC_Available);
                         # Construct saylinks for each affordable tier
                         foreach my $available_tier (reverse @affordable_tiers) {
                             # Calculate the new item_id using the base_id and the targeted tier
