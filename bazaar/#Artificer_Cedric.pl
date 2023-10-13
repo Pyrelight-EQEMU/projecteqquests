@@ -268,21 +268,15 @@ sub get_point_value_for_item {
 sub calculate_heroic_stat_sum {
     my ($item_id, $client) = @_;
 
-    
-
-    my $heroic_test = $client->GetItemStat($item_id, 'heroic_str');
-
-    quest::debug("calculating heroics for $item_id, test:$heroic_test");
-
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
-        heroic_str heroic_sta heroic_dex heroic_agi 
-        heroic_int heroic_wis heroic_cha
+        heroicstr heroicsta heroicdex heroicagi 
+        heroicint heroicwis heroiccha
     );
 
     # Define the resistance stats we want to sum up and then halve
     my @resistance_stats = qw(
-        heroic_fr heroic_mr heroic_cr heroic_pr heroic_dr
+        heroicfr heroicmr heroic_r heroicpr heroicdr
     );
 
     # Fetch and sum the primary stats
