@@ -78,9 +78,15 @@ sub EVENT_ITEM {
     plugin::return_items(\%itemcount);
 
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
-
+    my $earned_points = 0;
+    
     while ($total_money > (500 * 1000)) {
         $total_money = $total_money - (500 * 1000);
+        $earned_points++;
+    }
+
+    if ($earned_points > 0) {
+        plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
     }
 
     # After processing all items, return any remaining money
