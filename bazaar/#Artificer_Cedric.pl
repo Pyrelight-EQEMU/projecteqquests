@@ -182,8 +182,18 @@ sub EVENT_SAY {
         }
     }
 
-    elsif ($text eq "link_show_me_your_equipment") {
+    
+    elsif ($text =~ /(\d+):(\d+)/) { # This regex pattern will match any string that has the format "number:number"
+        my $intercepted_base_id = $1; # The first matched number
+        my $intercepted_available_tier = $2; # The second matched number
+
+        if (is_item_upgradable($intercepted_base_id)) {
+            my $available = get_total_points_for_item($intercepted_base_id);
+            my $target    = get_point_value_for_item($intercepted_base_id + ($intercepted_tier * 1000000));
+            quest::debug("$available, $target");
+        }
     }
+
 }
 
 # Returns the base ID of an item
