@@ -278,16 +278,18 @@ sub GET_BAG_CONTENTS {
                     push @augments, 0;
                 }
             }
-            push @items, {
-                slot => $iter,
-                id => $item_id,
-                proceffect => $owner->GetItemStat($item_id, "proceffect") || 0,
-                ratio => ($owner->GetItemStat($item_id, "delay") > 0 ? ($owner->GetItemStat($item_id, "damage") / $owner->GetItemStat($item_id, "delay")) : 0),
-                ac => $owner->GetItemStat($item_id, "ac") || 0,
-                hp => $owner->GetItemStat($item_id, "hp") || 0,
-                slots => $owner->GetItemStat($item_id, "slots"),
-                augments => \@augments
-            };
+            if ($owner->GetItemStat($item_id, "itemtype") != 54) {
+                push @items, {
+                    slot => $iter,
+                    id => $item_id,
+                    proceffect => $owner->GetItemStat($item_id, "proceffect") || 0,
+                    ratio => ($owner->GetItemStat($item_id, "delay") > 0 ? ($owner->GetItemStat($item_id, "damage") / $owner->GetItemStat($item_id, "delay")) : 0),
+                    ac => $owner->GetItemStat($item_id, "ac") || 0,
+                    hp => $owner->GetItemStat($item_id, "hp") || 0,
+                    slots => $owner->GetItemStat($item_id, "slots"),
+                    augments => \@augments
+                };
+            }
         }
     }
 
