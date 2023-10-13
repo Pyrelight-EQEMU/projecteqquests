@@ -10,7 +10,22 @@ sub EVENT_ITEM {
                 my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
                     my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
-                    plugin::NPCTell("That item can be upgraded, points: $points");
+
+                    # List the upgrade tiers the player can afford
+                    my $tier = 0;
+                    my @affordable_tiers;
+                    while ($points >= 2**$tier) {
+                        push @affordable_tiers, $tier;
+                        $tier++;
+                    }
+
+                    if (@affordable_tiers) {
+                        my $tier_list = join(", ", @affordable_tiers);
+                        plugin::NPCTell("$clientName, with your available points, you can afford the following upgrade tiers for your [$item_name]: $tier_list.");
+                    } else {
+                        plugin::NPCTell("$clientName, unfortunately, you do not have enough points to upgrade your [$item_name].");
+                    }
+
                 } else {
                     plugin::NPCTell("I'm sorry, $clientName, I do not have the skills to improve your [$item_name].");
                 }
