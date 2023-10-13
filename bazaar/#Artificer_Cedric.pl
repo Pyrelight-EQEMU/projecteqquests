@@ -1,6 +1,12 @@
-sub EVENT_ITEM { 
-    plugin::return_items(\%itemcount);
+sub EVENT_ITEM {
 
+    if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
+        quest::debug("You handed in an item.");
+    } else {
+        quest::debug("that was just money");
+    }
+
+    plugin::return_items(\%itemcount);
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $earned_points = 0;
     
@@ -110,127 +116,5 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_show_me_your_equipment") {
-        my %upgradable_items = get_upgradable();
-        
-        # Debug or further processing here, for example:
-        while (my ($item, $value) = each %upgradable_items) {
-            my $max_upgrade = quest::itemlink(max_eligible_upgrade($item, $value));
-            quest::debug("Upgradable base item ID in inventory: $item with value $value; max_upgrade = $max_upgrade");
-        }
     }
 }
-
-sub get_all_items_in_inventory {
-    my $client = shift;
-    
-    my @augment_slots = (
-        quest::getinventoryslotid("augsocket.begin")..quest::getinventoryslotid("augsocket.end")
-    );
-
-    my @inventory_slots = (
-        quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
-        quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
-        quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
-        quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
-        quest::getinventoryslotid("sharedbank.begin")..quest::getinventoryslotid("sharedbank.end"),
-        quest::getinventoryslotid("sharedbankbags.begin")..quest::getinventoryslotid("sharedbankbags.end"),
-    );
-    
-    my %items_in_inventory;
-
-    foreach my $slot_id (@inventory_slots) {
-        if ($client->GetItemAt($slot_id)) {
-            my $item_id_at_slot = $client->GetItemIDAt($slot_id);
-            $items_in_inventory{$item_id_at_slot}++ if defined $item_id_at_slot;
-
-            foreach my $augment_slot (@augment_slots) {
-                if ($client->GetAugmentAt($slot_id, $augment_slot)) {
-                    my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
-                    $items_in_inventory{$augment_id_at_slot}++ if defined $augment_id_at_slot;
-                }
-            }
-        }
-    }
-    
-    return \%items_in_inventory;
-}
-
-# Return the point value of a specified raw item ID
-sub get_point_value {
-    my $item_id = shift;
-    if ($item_id < 1000000) {
-        return 1;
-    }
-    my $tier = int($item_id / 1000000);
-    return 2 ** $tier;
-}
-
-# Check if the specified item ID exists
-sub item_exists_in_db {
-    my $item_id = shift;
-    my $dbh = plugin::LoadMysql();
-    my $sth = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
-    $sth->execute($item_id);
-
-    my $result = $sth->fetchrow_array();
-
-    quest::debug("Item with ID $item_id exists in DB: $result");
-
-    return $result;
-}
-
-# Return a list of upgradable base items in the player's inventory
-sub get_upgradable {
-    my %inventory_list = %{ get_all_items_in_inventory($client) };
-    my %upgradable_base_items;
-
-    foreach my $item_id (keys %inventory_list) {
-        # Calculate base item ID
-        my $base_item_id = $item_id % 1000000;
-
-        # Check if the base item can be upgraded
-        if (item_exists_in_db($base_item_id + 1000000)) {
-            if (exists $upgradable_base_items{$base_item_id}) {
-                $upgradable_base_items{$base_item_id} += get_point_value($item_id) * $inventory_list{$item_id};
-            } else {
-                $upgradable_base_items{$base_item_id} = get_point_value($item_id) * $inventory_list{$item_id};
-            }
-        }
-    }
-
-    return %upgradable_base_items;
-}
-
-# Return the total points for a specified base item ID
-sub get_total_points_for_base_item {
-    my ($base_item_id, %inventory_list) = @_;
-    my $total_points = 0;
-
-    # Start with the base item itself
-    if (exists $inventory_list{$base_item_id}) {
-        $total_points += get_point_value($base_item_id) * $inventory_list{$base_item_id};
-    }
-
-    # Now check for its upgrades
-    my $next_tier_item_id = $base_item_id + 1000000;
-    while (exists $inventory_list{$next_tier_item_id}) {
-        $total_points += get_point_value($next_tier_item_id) * $inventory_list{$next_tier_item_id};
-        $next_tier_item_id += 1000000;
-    }
-
-    return $total_points;
-}
-
-sub max_eligible_upgrade {
-    my ($base_item_id, $points) = @_;
-    
-    my $tier = 0;
-    while ($points >= (2 ** $tier)) {
-        $tier++;
-    }
-    $tier--; # Subtract one because we've overshot by one tier in the loop
-    
-    return $base_item_id + (1000000 * $tier);
-}
-
-
