@@ -17,7 +17,7 @@ sub EVENT_SAY {
       $client->SetBucket("CedricVisit", 1);
    }
 
-   if ($response neq "") {
+   if ($response ne "") {
       plugin::NPCTell($response);
    }
 }

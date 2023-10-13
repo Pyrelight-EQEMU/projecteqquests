@@ -16,16 +16,12 @@ sub EVENT_SAY {
    }
 
    elsif ($text eq "link_services") {
-      $response = "Primarily, I can enchant a $link_glamour_stone for you. A speciality of my own invention, these augments can change the appearance of your equipment to mimic another item that you posess. I do charge a nominal fee, a mere 5000 platinum coins, for this service. I aim to offer $link_custom_work for my most discerning customers soon, too.";
+      $response = "Primarily, I can enchant a $link_glamour_stone for you. A speciality of my own invention, these augments can change the appearance of your equipment to mimic another item that you posess. I do charge a nominal fee, a mere 5000 platinum coins, for this service.";
       $client->SetBucket("Tawnos", 1);
    }
 
    elsif ($text eq "link_glamour_stone") {
-      $response = "If you are interested in a $link_glamour_stone, simply hand me the item which you'd like me to duplicate, along with my fee.";
-   }
-
-   elsif ($text eq "link_custom_work") {
-      $response = "I do not have all of my equipment prepared yet, so we will discuss that at a later time";
+      $response = "If you are interested in a $link_glamour_stone, simply hand me the item or items which you'd like me to duplicate, along with my fee. Be warned, this process will irrevocably consume the item that you are asking me to duplicate.";
    }
 
    if ($response ne "") {
@@ -43,36 +39,39 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $dbh = plugin::LoadMysql();
 
-    foreach my $item_id (keys %itemcount) {
-        if ($item_id != 0) {
-            quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
+   foreach my $item_id (keys %itemcount) {
+      if ($item_id != 0) {
+         quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
 
-            my $item_name = quest::getitemname($item_id);
+         my $item_name = quest::getitemname($item_id);
 
-            # Strip prefix with possible whitespace
-            $item_name =~ s/^\s*(Rose Colored|Apocryphal|Fabled)\s*//;
+         # Strip prefix with possible whitespace
+         $item_name =~ s/^\s*(Rose Colored|Apocryphal|Fabled)\s*//;
 
-            # Strip suffix with possible whitespace
-            $item_name =~ s/\s*\+\d{1,2}\s*$//;
+         # Strip suffix with possible whitespace
+         $item_name =~ s/\s*\+\d{1,2}\s*$//;
 
-            quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
+         quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
 
-            # Use a prepared statement to prevent SQL injection
-            my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
-            $sth->execute("'" . $item_name . "' Glamour-Stone");
-            if (my $row = $sth->fetchrow_hashref()) {                
-                if ($total_money >= (5000 * 1000)) {
-                    $total_money -= (5000 * 1000);
-                    plugin::NPCTell("Perfect! Here, I had a Glamour-Stone almost ready for your $item_name, I just needed to add the attunement. This should be what you want!");
-                    $client->SummonItem($row->{id});
-                } else {
-                    plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
-                }
-            } else {
+         # Use a prepared statement to prevent SQL injection
+         my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
+         $sth->execute("'" . $item_name . "' Glamour-Stone");
+         if (my $row = $sth->fetchrow_hashref()) {                
+               if ($total_money >= (5000 * 1000)) {
+                  $total_money -= (5000 * 1000);
+                  plugin::NPCTell("Perfect! Here, I had a Glamour-Stone almost ready. I'll just need to attune it to your $item_name! Enjoy!");
+                  $client->SummonItem($row->{id});
+                  
+                  # Remove the $item_id from the hash %itemcount
+                  delete $itemcount{$item_id};                  
+               } else {
+                  plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
+               }
+         } else {
                plugin::NPCTell("I don't think that I can create a Glamour-Stone for that item, $clientName. It must be something that you hold in your hand, such as a weapon or shield.");
-            }
-        }
-    }
+         }
+      }
+   }
 
     # After processing all items, return any remaining money
     my $platinum_remainder = int($total_money / 1000);
