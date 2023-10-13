@@ -26,7 +26,9 @@ sub EVENT_ITEM {
                         my $tier_list = join(", ", @affordable_tiers);
                         plugin::NPCTell("$clientName, with your available points, you can afford the following upgrade tiers for your [$item_name]: $tier_list.");
 
-                        calculate_heroic_stat_sum($item_id, $client);
+                        my $testval = calculate_heroic_stat_sum($item_id, $client);
+
+                        plugin::NPCTell("$testval");
                     } else {
                         plugin::NPCTell("$clientName, unfortunately, you do not have enough points to upgrade your [$item_name] to a higher tier.");
                     }
