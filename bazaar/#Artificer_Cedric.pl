@@ -1,57 +1,20 @@
 sub EVENT_SAY {
-   my $response = "";
    my $clientName = $client->GetCleanName();
 
    my $link_enhance = "[".quest::saylink("link_enhance", 1, "enhancement of items")."]";
 
    if($text=~/hail/i) {
       if (!$client->GetBucket("CedricVisit")) {
-         $response = "Greetings, $clientName, I Cedric Sparkswall. I specialize in the $link_enhance, and have come to this grand center of commerce in order to ply my trade.";
+         plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall. I specialize in the $link_enhance, and have come to this grand center of commerce in order to ply my trade.");
       } else {
-         $response = "Ah, it's you again, $clientName. How may I assist you with my $link_enhance today?";
+         plugin::NPCTell("Ah, it's you again, $clientName. How may I assist you with my $link_enhance today?");
       }    
    }
 
    elsif ($text eq "link_enhance") {
-      $response = "I specialize in enhancing items, granting them newfound powers and capabilities. The enhancement process requires a special component, which I can procure for a fee of 5000 platinum coins. Soon, I'll be expanding my services to include custom enhancements for those seeking unique powers.";
+      plugin::NPCTell("I can intensify the magic of certain equipment and weapons through the use of $link_concentrated_mana_crystals as well as an identical item to donate its aura. If you'd like to $link_show_me_your_equipment, can I tell you if you have equipment that is eligible for my services.");
       $client->SetBucket("CedricVisit", 1);
    }
-
-   if ($response ne "") {
-      plugin::NPCTell($response);
-   }
-
-    my %inventory_list = %{ get_all_items_in_inventory($client) };
-    my $dbh = plugin::LoadMysql();
-
-    my @eligible_items;
-
-    # Iterating over the inventory_list hash and send each element with plugin::NPCTell
-    while (my ($key, $value) = each %inventory_list) {
-        my $name = quest::getitemname($key);
-        #plugin::NPCTell("$name: $value");
-
-        if ($client->GetItemStat($key, "slots")) {
-            # Modify the key to find eligible items for upgrades
-            my $eligible_item_id = ($key % 1000000) + 1000000;
-
-            # Push to eligible_items list
-            push @eligible_items, $eligible_item_id;
-
-            # Optionally, query the 'items' table to retrieve the eligible item
-            my $sth = $dbh->prepare("SELECT * FROM items WHERE id = ?");
-            $sth->execute($eligible_item_id);
-            while (my $ref = $sth->fetchrow_hashref()) {
-                plugin::NPCTell("Eligible upgrade item for $name:");
-            }
-        }
-    }
-
-    # Close the database handle
-    $dbh->disconnect();
-
-    # If you need the list of eligible items outside the loop, you can use the @eligible_items array.
-
 }
 
 
