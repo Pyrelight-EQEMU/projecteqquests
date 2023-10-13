@@ -30,16 +30,16 @@ sub EVENT_ITEM {
                             # Encode data, assuming a simple "item_id:tier" format, you might have a more complex one
                             my $hidden_data = "$item_id:$available_tier";
                             
-                            my $link_text = "Tier $available_tier";
+                            my $link_text = "[$available_tier]";
                             
-                            push @tier_links, quest::saylink($hidden_data, 1, $link_text);
+                            push @tier_links, quest::saylink($hidden_data, 1, '+'.$link_text);
                         }
 
                         my $tier_list = join(", ", @tier_links);
                         my $response_string = "I believe that I can upgrade this equipment to: $tier_list";
                         
                         plugin::NPCTell($response_string);
-                        
+
                     } else {
                         plugin::NPCTell("$clientName, unfortunately, you do not have enough duplicate items available to upgrade your [$item_name] to a higher tier.");
                     }
