@@ -71,8 +71,18 @@ sub EVENT_SAY {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
         }
     }
-}
 
+    elsif ($text eq "link_show_me_your_equipment") {
+        my %raw_inventory_list = %{ get_all_items_in_inventory($client) };
+        my %upgradeable_inventory = %{ transform_inventory_list(\%raw_inventory_list) };
+
+        while (my ($base_id, $points) = each %upgradeable_inventory) {
+            my $item_name = quest::getitemname($base_id);
+            plugin::NPCTell("$item_name: $points points");
+        }
+    }    
+
+}
 
 sub EVENT_ITEM { 
     plugin::return_items(\%itemcount);
@@ -145,4 +155,43 @@ sub get_all_items_in_inventory {
     
     return \%items_in_inventory;
 }
+
+sub get_point_value {
+    my $tier = shift;
+    return 2**($tier - 1);
+}
+
+sub decompose_item {
+    my $item_id = shift;
+
+    my $base_item_id = $item_id % 1000000;
+    my $tier = int($item_id / 1000000);
+    my $points = get_point_value($tier);
+
+    return ($base_item_id, $points);
+}
+
+sub transform_inventory_list {
+    my %raw_inventory_list = %{ $_[0] };
+    my %transformed_inventory;
+
+    while (my ($key, $value) = each %raw_inventory_list) {
+        my ($base_id, $points) = decompose_item($key);
+
+        # Account for multiple items of the same ID in the inventory
+        $points *= $value;
+
+        if (exists $transformed_inventory{$base_id}) {
+            $transformed_inventory{$base_id} += $points;
+        } else {
+            $transformed_inventory{$base_id} = $points;
+        }
+    }
+
+    return \%transformed_inventory;
+}
+
+# Usage:
+# my %raw_inventory_list = %{ get_all_items_in_inventory($client) };
+# my %upgradeable_inventory = %{ transform_inventory_list(\%raw_inventory_list) };
 
