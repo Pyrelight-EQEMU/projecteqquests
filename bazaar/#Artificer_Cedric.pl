@@ -90,12 +90,12 @@ sub EVENT_SAY {
 
         # Determine the highest-tier version achievable for the total points available
         while (my ($base_id, $points) = each %base_items_and_points) {
-            my $upgrade_potential = int($points / 2); # because 2 of the previous tier required for the next tier
-            my $highest_possible_upgrade_id = $base_id + ($upgrade_potential * 1000000);
+            my $tier = int(log($points)/log(2)); # This will calculate the tier based on points. E.g., log2(16) = 4, so Tier 4.
+            my $highest_possible_upgrade_id = $base_id + ($tier * 1000000);
             
-            if (!$inventory_list{$highest_possible_upgrade_id} && $upgrade_potential > 0) { 
+            if (!$inventory_list{$highest_possible_upgrade_id} && $tier > 0) { 
                 my $name = quest::getitemname($base_id);
-                plugin::NPCTell("You can upgrade $name to tier $upgrade_potential.");
+                plugin::NPCTell("You can upgrade $name to tier $tier.");
             }
         }
     }
