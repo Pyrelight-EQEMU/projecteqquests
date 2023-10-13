@@ -15,15 +15,15 @@ sub EVENT_ITEM {
                     # Get current item's tier and base_id
                     my $current_tier = get_upgrade_tier($item_id);
                     my $base_id = get_base_id($item_id);
-                    my $base_stat_value = calculate_heroic_stat_sum($client, $base_id);
+                    #my $base_stat_value = calculate_heroic_stat_sum($client, $base_id);
 
                     # List the upgrade tiers the player can afford which are higher than the current item's tier
                     my $tier = $current_tier + 1;
                     my @affordable_tiers;
-                    while ($points >= ($base_stat_value * $tier)) {
-                        push @affordable_tiers, $tier;
-                        $tier++;
-                    }
+                    #while ($points >= ($base_stat_value * $tier)) {
+                    #    push @affordable_tiers, $tier;
+                    #    $tier++;
+                    #}
 
                     if (@affordable_tiers) {
                         my $tier_list = join(", ", @affordable_tiers);
