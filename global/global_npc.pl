@@ -229,6 +229,7 @@ sub UPDATE_PET {
 
             while (grep { $_->{quantity} > 0 } values %new_bag_inventory) { # While new_bag_inventory still has non-zero elements
                 foreach my $item_id (keys %new_bag_inventory) {
+                    quest::debug("Processing item to add: $item_id");
                     if ($new_bag_inventory{$item_id}->{quantity} > 0) {
                         $npc->AddItem($item_id, 1, 1, @{$new_bag_inventory{$item_id}->{augments}});
                         $new_bag_inventory{$item_id}->{quantity}--;
