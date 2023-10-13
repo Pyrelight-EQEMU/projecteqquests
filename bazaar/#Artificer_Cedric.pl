@@ -26,7 +26,7 @@ sub EVENT_ITEM {
                         my $tier_list = join(", ", @affordable_tiers);
                         plugin::NPCTell("$clientName, with your available points, you can afford the following upgrade tiers for your [$item_name]: $tier_list.");
 
-                        my $testval = calculate_heroic_stat_sum(get_base_id($item_id), $client);
+                        my $testval = calculate_heroic_stat_sum(get_base_id($item_id));
 
                         plugin::NPCTell("$testval");
                     } else {
@@ -266,7 +266,7 @@ sub get_point_value_for_item {
 }
 
 sub calculate_heroic_stat_sum {
-    my ($item_id, $client) = @_;
+    my ($item_id) = @_;
 
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
@@ -294,4 +294,8 @@ sub calculate_heroic_stat_sum {
 
     # Return the total sum of primary and halved resistance stats
     return $primary_stat_total + $resistance_stat_total;
+}
+
+sub calculate_upgrade_cmc {
+
 }
