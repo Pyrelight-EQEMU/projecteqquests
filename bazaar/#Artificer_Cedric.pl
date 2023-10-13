@@ -7,11 +7,11 @@ sub EVENT_ITEM {
             plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
         } else {             
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
-                my $item_name = quest::getitemname($item_id);
+                my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
                     plugin::NPCTell("That item can be upgraded.");
                 } else {
-                    plugin::NPCTell("I'm sorry, $clientName, but I do not have the skills to improve your $item_name.");
+                    plugin::NPCTell("I'm sorry, $clientName, but I do not have the skills to improve your [$item_name].");
                 }
              }
              plugin::return_items(\%itemcount);
