@@ -33,7 +33,7 @@ sub EVENT_SAY {
         plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with platinum, simply hand the coins to me. I will credit you with one crystal for each 500 coins.");
     }
 
-    elsif ($text eq "link_platinum") {
+    elsif ($text eq "link_aa_points") {
         plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with temporal energy, simply say the word. I can $link_siphon_10, $link_siphon_100, or $link_siphon_all and credit you with one crystal for each point removed.");
     }
 
