@@ -27,11 +27,15 @@ sub EVENT_ITEM {
 
                         # Construct saylinks for each affordable tier
                         foreach my $available_tier (@affordable_tiers) {
-                            # Encode data, assuming a simple "item_id:tier" format
-                            my $hidden_data = "$item_id:$available_tier";
+                            # Calculate the new item_id using the base_id and the targeted tier
+                            my ($base_id, $current_tier) = get_base_id_and_tier($item_id);
+                            my $targeted_item_id = $base_id * $available_tier * 1000000;
 
-                            # Calculate CMC cost for this tier
-                            my $cmc_cost = calculate_upgrade_cmc($item_id);
+                            # Encode data, assuming a simple "targeted_item_id:available_tier" format
+                            my $hidden_data = "$targeted_item_id:$available_tier";
+
+                            # Calculate CMC cost for the targeted tier
+                            my $cmc_cost = calculate_upgrade_cmc($targeted_item_id);
                             
                             my $link_text = "+$available_tier ($cmc_cost CMC)";
                             
