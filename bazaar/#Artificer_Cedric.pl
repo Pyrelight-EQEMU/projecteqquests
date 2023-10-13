@@ -29,7 +29,7 @@ sub EVENT_SAY {
     # Iterating over the inventory_list hash and send each element with plugin::NPCTell
     while (my ($key, $value) = each %inventory_list) {
         my $name = quest::getitemname($key);
-        plugin::NPCTell("$name: $value");
+        #plugin::NPCTell("$name: $value");
 
         if ($client->GetItemStat($key, "slots")) {
             # Modify the key to find eligible items for upgrades
