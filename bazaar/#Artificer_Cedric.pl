@@ -23,14 +23,25 @@ sub EVENT_ITEM {
                     }
 
                     if (@affordable_tiers) {
-                        my $tier_list = join(", ", @affordable_tiers);
-                        plugin::NPCTell("$clientName, with your available points, you can afford the following upgrade tiers for your [$item_name]: $tier_list.");
+                        my @tier_links;
 
-                        my $testval = calculate_heroic_stat_sum(get_base_id($item_id));
+                        # Construct saylinks for each affordable tier
+                        foreach my $available_tier (@affordable_tiers) {
+                            # Encode data, assuming a simple "item_id:tier" format, you might have a more complex one
+                            my $hidden_data = "$item_id:$available_tier";
+                            
+                            my $link_text = "Tier $available_tier";
+                            
+                            push @tier_links, quest::saylink($hidden_data, 1, $link_text);
+                        }
 
-                        plugin::NPCTell("$testval");
+                        my $tier_list = join(", ", @tier_links);
+                        my $response_string = "I believe that I can upgrade this equipment to: $tier_list";
+                        
+                        plugin::NPCTell($response_string);
+                        
                     } else {
-                        plugin::NPCTell("$clientName, unfortunately, you do not have enough points to upgrade your [$item_name] to a higher tier.");
+                        plugin::NPCTell("$clientName, unfortunately, you do not have enough duplicate items available to upgrade your [$item_name] to a higher tier.");
                     }
 
                 } else {
@@ -266,7 +277,7 @@ sub get_point_value_for_item {
 }
 
 sub calculate_heroic_stat_sum {
-    my ($item_id) = @_;
+    my $item_id = get_base_id(shift);
 
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
@@ -297,5 +308,10 @@ sub calculate_heroic_stat_sum {
 }
 
 sub calculate_upgrade_cmc {
+    my $item_id = shift;
+    my ($base_id, $tier) = get_base_id_and_tier($item_id);
 
+    my $base_cost = calculate_heroic_stat_sum($item_id);
+
+    return $base_cost * $tier + $tier;
 }
