@@ -9,25 +9,24 @@ sub EVENT_ITEM {
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
-
                     my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
 
-                    # Get current item's tier and base_id
+                    # Get current item's tier
                     my $current_tier = get_upgrade_tier($item_id);
-                    my $base_id = get_base_id($item_id);
-                    #my $base_stat_value = calculate_heroic_stat_sum($client, $base_id);
-
+                    
                     # List the upgrade tiers the player can afford which are higher than the current item's tier
                     my $tier = $current_tier + 1;
                     my @affordable_tiers;
-                    #while ($points >= ($base_stat_value * $tier)) {
-                    #    push @affordable_tiers, $tier;
-                    #    $tier++;
-                    #}
+                    while ($points >= 2**$tier) {
+                        push @affordable_tiers, $tier;
+                        $tier++;
+                    }
 
                     if (@affordable_tiers) {
                         my $tier_list = join(", ", @affordable_tiers);
                         plugin::NPCTell("$clientName, with your available points, you can afford the following upgrade tiers for your [$item_name]: $tier_list.");
+
+                        calculate_heroic_stat_sum($item_id, $client);
                     } else {
                         plugin::NPCTell("$clientName, unfortunately, you do not have enough points to upgrade your [$item_name] to a higher tier.");
                     }
@@ -265,9 +264,7 @@ sub get_point_value_for_item {
 }
 
 sub calculate_heroic_stat_sum {
-    my ($client, $item_id) = @_;
-
-    quest::debug("Trying to calculate the sum for $item_id");
+    my ($item_id, $client) = @_;
 
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
