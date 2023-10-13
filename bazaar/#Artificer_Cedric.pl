@@ -11,8 +11,11 @@ sub EVENT_ITEM {
                 if (is_item_upgradable($item_id)) {
                     my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
 
-                    # List the upgrade tiers the player can afford
-                    my $tier = 0;
+                    # Get current item's tier
+                    my $current_tier = get_upgrade_tier($item_id);
+                    
+                    # List the upgrade tiers the player can afford which are higher than the current item's tier
+                    my $tier = $current_tier + 1;
                     my @affordable_tiers;
                     while ($points >= 2**$tier) {
                         push @affordable_tiers, $tier;
@@ -23,7 +26,7 @@ sub EVENT_ITEM {
                         my $tier_list = join(", ", @affordable_tiers);
                         plugin::NPCTell("$clientName, with your available points, you can afford the following upgrade tiers for your [$item_name]: $tier_list.");
                     } else {
-                        plugin::NPCTell("$clientName, unfortunately, you do not have enough points to upgrade your [$item_name].");
+                        plugin::NPCTell("$clientName, unfortunately, you do not have enough points to upgrade your [$item_name] to a higher tier.");
                     }
 
                 } else {
