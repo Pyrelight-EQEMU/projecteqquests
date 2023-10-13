@@ -61,9 +61,11 @@ sub get_all_items_in_inventory {
                 if ($client->GetAugmentAt($slot_id, $augment_slot)) {
                     my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
                     $items_in_inventory{$augment_id_at_slot}++ if defined $augment_id_at_slot;
-            }
+                }
+            }  # <-- Closing brace for inner foreach
         }
-    }
+    }  # <-- Closing brace for outer foreach
     
     return \%items_in_inventory;
 }
+
