@@ -28,7 +28,7 @@ sub EVENT_ITEM {
                         my @tier_links;
 
                         # Construct saylinks for each affordable tier
-                        foreach my $available_tier (@affordable_tiers) {
+                        foreach my $available_tier (reverse @affordable_tiers) {
                             # Calculate the new item_id using the base_id and the targeted tier
                             my $base_id = get_base_id($item_id);
                             my $targeted_item_id = $base_id + ($available_tier*1000000);
