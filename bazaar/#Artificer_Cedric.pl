@@ -114,7 +114,7 @@ sub EVENT_SAY {
         
         # Debug or further processing here, for example:
         while (my ($item, $value) = each %upgradable_items) {
-            my $max_upgrade = max_eligible_upgrade($item, $value);
+            my $max_upgrade = quest::itemlink(max_eligible_upgrade($item, $value));
             quest::debug("Upgradable base item ID in inventory: $item with value $value; max_upgrade = $max_upgrade");
         }
     }
