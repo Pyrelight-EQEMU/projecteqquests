@@ -320,5 +320,5 @@ sub calculate_upgrade_cmc {
 
     quest::debug("$item_id, $base_id, $tier, $base_cost");
 
-    return $base_cost * $tier;
+    return $base_cost * $tier + $tier;
 }
