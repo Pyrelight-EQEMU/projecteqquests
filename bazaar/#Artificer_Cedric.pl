@@ -74,12 +74,11 @@ sub EVENT_SAY {
 
     elsif ($text eq "link_show_me_your_equipment") {
         my %inventory_list = %{ get_all_items_in_inventory($client) };
-
-        # Transform the raw inventory list into a list of upgradeable items, represented by their base versions and point values
         my %upgradeable_items;
+
         while (my ($key, $value) = each %inventory_list) {
             my $base_id = $key % 1000000;
-            my $points = int($key / 1000000) + 0.5 * $value;
+            my $points = 2 ** int($key / 1000000) * $value;
 
             if (item_exists_in_db($base_id + 1000000) || $key > 1000000) {
                 $upgradeable_items{$base_id} += $points;
