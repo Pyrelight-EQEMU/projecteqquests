@@ -38,8 +38,9 @@ sub EVENT_ITEM {
                             my $cmc_cost = calculate_upgrade_cmc($item_id, $available_tier);
                             
                             my $link_text = "+$available_tier ($cmc_cost CMC)";
+                            my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
-                            push @tier_links, "[UPGRADE][" . quest::varlink($targeted_item_id) . "][COST: XX Converted Mana Crystals]";
+                            push @tier_links, "[$upgrade_link][" . quest::varlink($targeted_item_id) . "](COST: XX Converted Mana Crystals)";
                         }
 
                         my $tier_list = join(", ", @tier_links);
@@ -49,7 +50,7 @@ sub EVENT_ITEM {
                         plugin::NPCTell($response_string);
 
                         foreach my $link (@tier_links) {
-                            plugin::YellowText("$link");
+                            plugin::PurpleText("$link");
                         }
 
                     } else {
