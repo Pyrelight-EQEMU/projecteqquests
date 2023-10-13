@@ -73,15 +73,32 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_show_me_your_equipment") {
-        my %raw_inventory_list = %{ get_all_items_in_inventory($client) };
-        my %upgradeable_inventory = %{ transform_inventory_list(\%raw_inventory_list) };
+        my %inventory_list = %{ get_all_items_in_inventory($client) };
 
-        while (my ($base_id, $points) = each %upgradeable_inventory) {
-            my $item_name = quest::getitemname($base_id);
-            plugin::NPCTell("$item_name: $points points");
+        my %base_items_and_points; # This will store base item as the key and total points as the value
+
+        # Transform the raw inventory list into a list of upgradeable items 
+        # represented by their base versions and point values
+        while (my ($key, $value) = each %inventory_list) {
+            my $base_id = $key % 1000000;
+            
+            if (is_upgradeable($base_id)) {
+                my $points = int($key / 1000000) + 1;  # +1 to make base versions 1 point
+                $base_items_and_points{$base_id} += $points * $value;
+            }
         }
-    }    
 
+        # Determine the highest-tier version achievable for the total points available
+        while (my ($base_id, $points) = each %base_items_and_points) {
+            my $upgrade_potential = int($points / 2); # because 2 of the previous tier required for the next tier
+            my $highest_possible_upgrade_id = $base_id + ($upgrade_potential * 1000000);
+            
+            if (!$inventory_list{$highest_possible_upgrade_id} && $upgrade_potential > 0) { 
+                my $name = quest::getitemname($base_id);
+                plugin::NPCTell("You can upgrade $name to tier $upgrade_potential.");
+            }
+        }
+    }
 }
 
 sub EVENT_ITEM { 
