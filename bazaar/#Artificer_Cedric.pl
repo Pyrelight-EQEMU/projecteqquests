@@ -27,6 +27,7 @@ sub EVENT_ITEM {
                     if (@affordable_tiers) {
                         my @tier_links;
 
+                        my $real_max_digits = length($CMC_Available)
                         # Construct saylinks for each affordable tier
                         foreach my $available_tier (reverse @affordable_tiers) {
                             # Calculate the new item_id using the base_id and the targeted tier
@@ -43,7 +44,10 @@ sub EVENT_ITEM {
                             my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
                             # Determine the number of digits required for padding
-                            my $max_digits = length($cmc_cost) > length($CMC_Available) ? length($cmc_cost) : length($CMC_Available);
+                            my $max_digits = length($cmc_cost) > length($CMC_Available) ? length($cmc_cost) : $real_max_digits;
+                            if ($max_digits > $real_max_digits) {
+                                $real_max_digits = $max_digits;
+                            }
 
                             # Format the numbers with leading zeroes
                             my $formatted_cmc_cost = sprintf("%0${max_digits}d", $cmc_cost);
