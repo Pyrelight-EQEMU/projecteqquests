@@ -49,11 +49,11 @@ sub EVENT_ITEM {
 
             my $item_name = quest::getitemname($item_id);
 
-            # Strip prefix
-            $item_name =~ s/^(Rose Colored|Apocryphal|Fabled)\s*//;
+            # Strip prefix with possible whitespace
+            $item_name =~ s/^\s*(Rose Colored|Apocryphal|Fabled)\s*//;
 
-            # Strip suffix
-            $item_name =~ s/\+\d{1,2}$//;
+            # Strip suffix with possible whitespace
+            $item_name =~ s/\s*\+\d{1,2}\s*$//;
 
             quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
 
