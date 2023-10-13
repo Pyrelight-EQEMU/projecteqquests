@@ -225,10 +225,15 @@ sub UPDATE_PET {
                     $npc->RemoveItem($item_id);
                 }
                 @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
-            }   
+            }            
 
-            while (grep { $_->{quantity} > 0 } values %new_bag_inventory) { # While new_bag_inventory still has non-zero elements
-                foreach my $item_id (keys %new_bag_inventory) {
+            while (grep { $_->{quantity} > 0 } values %new_bag_inventory) {
+                # Preprocess and sort item_ids by GetItemStat in ascending order
+                my @sorted_item_ids = sort {
+                    $owner->GetItemStat($a, "slots") <=> $owner->GetItemStat($b, "slots")
+                } keys %new_bag_inventory;
+                
+                foreach my $item_id (@sorted_item_ids) {
                     quest::debug("Processing item to add: $item_id");
                     if ($new_bag_inventory{$item_id}->{quantity} > 0) {
                         $npc->AddItem($item_id, 1, 1, @{$new_bag_inventory{$item_id}->{augments}});
@@ -236,6 +241,7 @@ sub UPDATE_PET {
                     }
                 }
             }
+
         }
 
         if (not $npc->Charmed()) {
