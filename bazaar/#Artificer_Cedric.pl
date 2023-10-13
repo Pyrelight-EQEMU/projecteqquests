@@ -1,3 +1,40 @@
+sub EVENT_ITEM { 
+    plugin::return_items(\%itemcount);
+
+    my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
+    my $earned_points = 0;
+    
+    while ($total_money >= (500 * 1000)) {
+        $total_money = $total_money - (500 * 1000);
+        $earned_points++;
+    }
+
+    if ($earned_points > 0) {
+        if ($total_money > 0) {
+            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
+        } else {
+            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+        }
+        $client->SetBucket("Artificer_CMC", ($client->GetBucket("Artificer_CMC") || 0) + $earned_points);
+    } else {
+        plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
+    }
+
+    # After processing all items, return any remaining money
+    my $platinum_remainder = int($total_money / 1000);
+    $total_money %= 1000;
+
+    my $gold_remainder = int($total_money / 100);
+    $total_money %= 100;
+
+    my $silver_remainder = int($total_money / 10);
+    $total_money %= 10;
+
+    my $copper_remainder = $total_money;
+
+    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1); 
+}
+
 sub EVENT_SAY {
     my $clientName = $client->GetCleanName();
 
@@ -73,53 +110,13 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_show_me_your_equipment") {
-        my %inventory_list = %{ get_all_items_in_inventory($client) };
-        my $dbh = plugin::LoadMysql();
-        my %base_items_and_points = get_base_items_and_points(\%inventory_list);
-
-        # Informing the player about possible upgrades
-        while (my ($base_id, $points) = each %base_items_and_points) {
-            my $highest_possible_upgrade = get_highest_tier_upgrade($base_id, $points, $dbh);
-            plugin::NPCTell("For base item ID $base_id, you can upgrade to tier: $highest_possible_upgrade");
+        my @upgradable_items = get_upgradable($client);
+        
+        # Debug or further processing here, for example:
+        foreach my $item (@upgradable_items) {
+            quest::debug("Upgradable item in inventory: $item");
         }
     }
-}
-
-sub EVENT_ITEM { 
-    plugin::return_items(\%itemcount);
-
-    my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
-    my $earned_points = 0;
-    
-    while ($total_money >= (500 * 1000)) {
-        $total_money = $total_money - (500 * 1000);
-        $earned_points++;
-    }
-
-    if ($earned_points > 0) {
-        if ($total_money > 0) {
-            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
-        } else {
-            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
-        }
-        $client->SetBucket("Artificer_CMC", ($client->GetBucket("Artificer_CMC") || 0) + $earned_points);
-    } else {
-        plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
-    }
-
-    # After processing all items, return any remaining money
-    my $platinum_remainder = int($total_money / 1000);
-    $total_money %= 1000;
-
-    my $gold_remainder = int($total_money / 100);
-    $total_money %= 100;
-
-    my $silver_remainder = int($total_money / 10);
-    $total_money %= 10;
-
-    my $copper_remainder = $total_money;
-
-    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1); 
 }
 
 sub get_all_items_in_inventory {
@@ -150,85 +147,24 @@ sub get_all_items_in_inventory {
                     my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
                     $items_in_inventory{$augment_id_at_slot}++ if defined $augment_id_at_slot;
                 }
-            }  # <-- Closing brace for inner foreach
+            }
         }
-    }  # <-- Closing brace for outer foreach
+    }
     
     return \%items_in_inventory;
 }
 
+# Return the point value of a specified raw item ID
 sub get_point_value {
-    my $tier = shift;
-    return 2**($tier - 1);
-}
-
-sub decompose_item {
     my $item_id = shift;
-
-    my $base_item_id = $item_id % 1000000;
+    if ($item_id < 1000000) {
+        return 1;
+    }
     my $tier = int($item_id / 1000000);
-    my $points = get_point_value($tier);
-
-    return ($base_item_id, $points);
+    return 2 ** $tier;
 }
 
-sub is_upgradeable {
-    my $base_id = shift;
-    my $dbh = plugin::LoadMysql();
-
-    # Shortcut if the base_id is already above 1 million
-    if ($base_id >= 1000000) {
-        return 1;
-    }
-
-    # Check for the existence of an item with base_id + 1 million in the 'items' table
-    my $upgrade_id = $base_id + 1000000;
-    my $query = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
-    $query->execute($upgrade_id);
-    my ($count) = $query->fetchrow_array();
-
-    # If the count is greater than 0, the item is upgradeable
-    if ($count > 0) {
-        return 1;
-    }
-
-    return 0;
-}
-
-sub transform_inventory_list {
-    my $inventory_ref = shift;
-    my %raw_inventory = %{$inventory_ref};
-    my %transformed_inventory;
-
-    foreach my $item_id (keys %raw_inventory) {
-        my $base_id = $item_id % 1000000;
-        next unless is_upgradeable($base_id);
-
-        my $tier = int($item_id / 1000000);
-
-        # Calculate points based on the tier
-        my $points = 2**$tier;
-
-        $transformed_inventory{$base_id} += $points * $raw_inventory{$item_id};
-    }
-
-    return \%transformed_inventory;
-}
-
-sub get_highest_tier_upgrade {
-    my ($base_id, $points, $dbh) = @_;
-
-    # Set the starting tier based on the ID value
-    my $current_tier = int($base_id / 1000000);
-
-    while ($points >= (2**$current_tier) && item_exists_in_db($base_id + ($current_tier * 1000000), $dbh)) {
-        $points -= 2**$current_tier;  # Deduct the points for the current tier
-        $current_tier++;  # Move to the next tier
-    }
-
-    return $current_tier;  # This will be the highest tier the player can upgrade to
-}
-
+# Check if the specified item ID exists
 sub item_exists_in_db {
     my $item_id = shift;
     my $dbh = plugin::LoadMysql();
@@ -240,4 +176,22 @@ sub item_exists_in_db {
     quest::debug("Item with ID $item_id exists in DB: $result");
 
     return $result;
+}
+
+# Return a list of upgradable items from a player's inventory
+sub get_upgradable {
+    my $client = shift;
+    my %inventory_list = %{ get_all_items_in_inventory($client) };
+    my @upgradable_items;
+
+    # Iterate through each item in the inventory
+    foreach my $item_id (keys %inventory_list) {
+        # Check if there's an item in the DB with an ID 1 million greater
+        if (item_exists_in_db($item_id + 1000000)) {
+            push @upgradable_items, $item_id;
+            quest::debug("Item with ID $item_id is upgradable.");
+        }
+    }
+
+    return @upgradable_items;
 }
