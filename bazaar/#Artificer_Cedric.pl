@@ -9,7 +9,7 @@ sub EVENT_ITEM {
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
-                    my $points = get_total_points_for_item($item_id, $client);
+                    my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
                     plugin::NPCTell("That item can be upgraded, points: $points");
                 } else {
                     plugin::NPCTell("I'm sorry, $clientName, I do not have the skills to improve your [$item_name].");
@@ -211,25 +211,35 @@ sub get_all_items_in_inventory {
 
 sub get_total_points_for_item {
     my ($item_id, $client) = @_;
-    
-    # Get the base item ID
-    my $base_id = get_base_id($item_id);
-    
-    # Get all items in inventory
-    my %inventory = %{ get_all_items_in_inventory($client) };
+
+    # Obtain base item ID for comparison
+    my $base_item_id = get_base_id($item_id);
+
+    # Fetch all items in the client's inventory
+    my %items_in_inventory = %{ get_all_items_in_inventory($client) };
+
+    # Calculate the total points
     my $total_points = 0;
-    
-    foreach my $inv_item_id (keys %inventory) {
-        # If the inventory item has the same base ID
-        if (get_base_id($inv_item_id) == $base_id) {
-            # Calculate tier of the inventory item
-            my $tier = get_upgrade_tier($inv_item_id);
-            my $point_value = 2 ** $tier; # Point value for the tier
-            
-            # Add total points for the inventory item to the running total
-            $total_points += $point_value * $inventory{$inv_item_id};
+
+    # Iterate over all items in the inventory
+    foreach my $inv_item_id (keys %items_in_inventory) {
+        if (get_base_id($inv_item_id) == $base_item_id) {
+            $total_points += get_point_value_for_item($inv_item_id) * $items_in_inventory{$inv_item_id};
         }
     }
-    
+
     return $total_points;
 }
+
+sub get_point_value_for_item {
+    my $item_id = shift;
+
+    # Determine the tier of the item
+    my $tier = get_upgrade_tier($item_id);
+
+    # Calculate the point value based on the tier
+    my $point_value = 2 ** $tier;  # Tier 0 = 1 point, Tier 1 = 2 points, Tier 2 = 4 points, ...
+
+    return $point_value;
+}
+
