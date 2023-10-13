@@ -188,7 +188,7 @@ sub EVENT_SAY {
         my $intercepted_available_tier = $2; # The second matched number
 
         if (is_item_upgradable($intercepted_base_id)) {
-            my $available = get_total_points_for_item($intercepted_base_id);
+            my $available = get_total_points_for_item($intercepted_base_id, $client);
             my $target    = get_point_value_for_item($intercepted_base_id + ($intercepted_tier * 1000000));
             quest::debug("$available, $target");
         }
