@@ -43,7 +43,8 @@ sub EVENT_SAY {
             $sth->execute($eligible_item_id);
             while (my $ref = $sth->fetchrow_hashref()) {
                 # Process the item data if needed, e.g., 
-                plugin::NPCTell("Eligible upgrade item for $name: $ref->{name}");
+                my $name = $ref->{name};
+                plugin::NPCTell("Eligible upgrade item for $name: $name");
             }
         }
     }
