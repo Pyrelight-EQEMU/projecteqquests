@@ -2,6 +2,8 @@ sub EVENT_SAY {
    my $clientName = $client->GetCleanName();
 
    my $link_enhance = "[".quest::saylink("link_enhance", 1, "enhancement of items")."]";
+   my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
+   my $link_show_me_your_equipment = "[".quest::saylink("link_show_me_your_equipment", 1, "show me your equipment")."]";
 
    if($text=~/hail/i) {
       if (!$client->GetBucket("CedricVisit")) {
