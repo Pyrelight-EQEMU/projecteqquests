@@ -110,7 +110,7 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_show_me_your_equipment") {
-        my @upgradable_items = get_upgradable($client);
+        my %upgradable_items = get_upgradable();
         
         # Debug or further processing here, for example:
         foreach my $item (@upgradable_items) {
