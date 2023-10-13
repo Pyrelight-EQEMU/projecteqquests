@@ -351,13 +351,15 @@ sub get_total_points_for_item {
 
     # Iterate over all items in the inventory
     foreach my $inv_item_id (keys %items_in_inventory) {
-        if (get_base_id($inv_item_id) == $base_item_id) {
+        if (get_base_id($inv_item_id) == $base_item_id 
+            && $inv_item_id <= $item_id) {   # Check if the inventory item is of the current tier or lower
             $total_points += get_point_value_for_item($inv_item_id) * $items_in_inventory{$inv_item_id};
         }
     }
 
     return $total_points;
 }
+
 
 sub get_point_value_for_item {
     my $item_id = shift;
