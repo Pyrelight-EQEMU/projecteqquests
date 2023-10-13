@@ -172,26 +172,19 @@ sub decompose_item {
 }
 
 sub transform_inventory_list {
-    my %raw_inventory_list = %{ $_[0] };
+    my $inventory_ref = shift;
+    my %raw_inventory = %{$inventory_ref};
     my %transformed_inventory;
 
-    while (my ($key, $value) = each %raw_inventory_list) {
-        my ($base_id, $points) = decompose_item($key);
+    foreach my $item_id (keys %raw_inventory) {
+        my $base_id = $item_id % 1000000;
+        my $tier = int($item_id / 1000000);
 
-        # Account for multiple items of the same ID in the inventory
-        $points *= $value;
+        # Calculate points based on the tier
+        my $points = 2**$tier;
 
-        if (exists $transformed_inventory{$base_id}) {
-            $transformed_inventory{$base_id} += $points;
-        } else {
-            $transformed_inventory{$base_id} = $points;
-        }
+        $transformed_inventory{$base_id} += $points * $raw_inventory{$item_id};
     }
 
     return \%transformed_inventory;
 }
-
-# Usage:
-# my %raw_inventory_list = %{ get_all_items_in_inventory($client) };
-# my %upgradeable_inventory = %{ transform_inventory_list(\%raw_inventory_list) };
-
