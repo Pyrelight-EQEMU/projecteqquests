@@ -75,28 +75,26 @@ sub EVENT_SAY {
     elsif ($text eq "link_show_me_your_equipment") {
         my %inventory_list = %{ get_all_items_in_inventory($client) };
 
-        my %base_items_and_points; # This will store base item as the key and total points as the value
-
-        # Transform the raw inventory list into a list of upgradeable items 
-        # represented by their base versions and point values
+        # Transform the raw inventory list into a list of upgradeable items, represented by their base versions and point values
+        my %upgradeable_items;
         while (my ($key, $value) = each %inventory_list) {
             my $base_id = $key % 1000000;
-            
-            if (is_upgradeable($base_id)) {
-                my $points = int($key / 1000000) + 1;  # +1 to make base versions 1 point
-                $base_items_and_points{$base_id} += $points * $value;
+            my $points = int($key / 1000000) + 0.5 * $value;
+
+            if (item_exists_in_db($base_id + 1000000) || $key > 1000000) {
+                $upgradeable_items{$base_id} += $points;
             }
         }
 
-        # Determine the highest-tier version achievable for the total points available
-        while (my ($base_id, $points) = each %base_items_and_points) {
-            my $tier = int(log($points)/log(2)); # This will calculate the tier based on points. E.g., log2(16) = 4, so Tier 4.
-            my $highest_possible_upgrade_id = $base_id + ($tier * 1000000);
-            
-            if (!$inventory_list{$highest_possible_upgrade_id} && $tier > 0) { 
-                my $name = quest::getitemname($base_id);
-                plugin::NPCTell("You can upgrade $name to tier $tier.");
-            }
+        # Debugging information
+        while (my ($key, $value) = each %upgradeable_items) {
+            quest::debug("Base ID: $key, Points: $value");
+        }
+
+        # For each upgradeable item, determine the highest tier upgrade we can achieve
+        while (my ($key, $value) = each %upgradeable_items) {
+            my $highest_tier = get_highest_tier_upgrade($key, $value, %inventory_list);
+            plugin::NPCTell("For base item ID $key, you can upgrade to tier: $highest_tier");
         }
     }
 }
@@ -229,4 +227,45 @@ sub transform_inventory_list {
     }
 
     return \%transformed_inventory;
+}
+
+sub get_highest_tier_upgrade {
+    my ($base_id, $points, %inventory_list) = @_;
+    my $tier = 1;
+    my $needed_points = 2**$tier; # For the first tier, we need 2 points (2 items of base version).
+
+    quest::debug("Starting get_highest_tier_upgrade for base_id: $base_id with points: $points");
+
+    # Check if an item with base_id + 1 million exists and if we have enough points for that tier
+    while (exists($inventory_list{$base_id + ($tier * 1000000)}) || 
+           (item_exists_in_db($base_id + ($tier * 1000000)) && $points >= $needed_points)) {
+
+        quest::debug("Tier: $tier, Needed Points: $needed_points");
+        
+        # If we find an item in inventory for this tier, deduct the needed points for this tier
+        if (exists($inventory_list{$base_id + ($tier * 1000000)})) {
+            quest::debug("Item for tier $tier found in inventory.");
+            $points -= $needed_points;
+        }
+
+        $tier++;
+        $needed_points = 2**$tier;
+    }
+
+    quest::debug("Ending get_highest_tier_upgrade. Highest possible tier: " . ($tier - 1));
+
+    return $tier - 1;
+}
+
+sub item_exists_in_db {
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
+    my $sth = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
+    $sth->execute($item_id);
+
+    my $result = $sth->fetchrow_array();
+
+    quest::debug("Item with ID $item_id exists in DB: $result");
+
+    return $result;
 }
