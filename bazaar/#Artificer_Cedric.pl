@@ -178,20 +178,44 @@ sub item_exists_in_db {
     return $result;
 }
 
-# Return a list of upgradable items from a player's inventory
+# Return a list of upgradable base items in the player's inventory
 sub get_upgradable {
-    my $client = shift;
     my %inventory_list = %{ get_all_items_in_inventory($client) };
-    my @upgradable_items;
+    my %upgradable_base_items;
 
-    # Iterate through each item in the inventory
     foreach my $item_id (keys %inventory_list) {
-        # Check if there's an item in the DB with an ID 1 million greater
-        if (item_exists_in_db($item_id + 1000000)) {
-            push @upgradable_items, $item_id;
-            quest::debug("Item with ID $item_id is upgradable.");
+        # Calculate base item ID
+        my $base_item_id = $item_id % 1000000;
+
+        # Check if the base item can be upgraded
+        if (item_exists_in_db($base_item_id + 1000000)) {
+            if (exists $upgradable_base_items{$base_item_id}) {
+                $upgradable_base_items{$base_item_id} += get_point_value($item_id) * $inventory_list{$item_id};
+            } else {
+                $upgradable_base_items{$base_item_id} = get_point_value($item_id) * $inventory_list{$item_id};
+            }
         }
     }
 
-    return @upgradable_items;
+    return %upgradable_base_items;
+}
+
+# Return the total points for a specified base item ID
+sub get_total_points_for_base_item {
+    my ($base_item_id, %inventory_list) = @_;
+    my $total_points = 0;
+
+    # Start with the base item itself
+    if (exists $inventory_list{$base_item_id}) {
+        $total_points += get_point_value($base_item_id) * $inventory_list{$base_item_id};
+    }
+
+    # Now check for its upgrades
+    my $next_tier_item_id = $base_item_id + 1000000;
+    while (exists $inventory_list{$next_tier_item_id}) {
+        $total_points += get_point_value($next_tier_item_id) * $inventory_list{$next_tier_item_id};
+        $next_tier_item_id += 1000000;
+    }
+
+    return $total_points;
 }
