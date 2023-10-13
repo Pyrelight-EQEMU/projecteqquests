@@ -28,7 +28,9 @@ sub EVENT_SAY {
       $response = "I do not have all of my equipment prepared yet, so we will discuss that at a later time";
    }
 
-   plugin::NPCTell($response);
+   if ($response neq "") {
+      plugin::NPCTell($response);
+   }
 }
 
 sub EVENT_ITEM { 
@@ -46,6 +48,13 @@ sub EVENT_ITEM {
             quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
 
             my $item_name = quest::getitemname($item_id);
+
+            # Strip prefix
+            $item_name =~ s/^(Rose Colored|Apocryphal|Fabled)\s*//;
+
+            # Strip suffix
+            $item_name =~ s/\+\d{1,2}$//;
+
             quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
 
             # Use a prepared statement to prevent SQL injection
