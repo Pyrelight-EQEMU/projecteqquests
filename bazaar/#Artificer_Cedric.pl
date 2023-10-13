@@ -267,6 +267,8 @@ sub get_point_value_for_item {
 sub calculate_heroic_stat_sum {
     my ($client, $item_id) = @_;
 
+    quest::debug("Trying to calculate the sum for $item_id");
+
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
         heroic_str heroic_sta heroic_dex heroic_agi 
