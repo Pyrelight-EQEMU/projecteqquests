@@ -1,5 +1,6 @@
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
+    my $CMC_Available = $client->GetBucket("Artificer_CMC");
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
 
     if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
@@ -40,14 +41,14 @@ sub EVENT_ITEM {
                             my $link_text = "+$available_tier ($cmc_cost CMC)";
                             my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
-                            push @tier_links, "-----[$upgrade_link]-----[" . quest::varlink($targeted_item_id) . "]-----(COST: $cmc_cost Converted Mana Crystals)";
+                            push @tier_links, "---- [$upgrade_link] ---- [" . quest::varlink($targeted_item_id) . "] ---- (COST: $cmc_cost Converted Mana Crystals)";
                         }
 
                         my $tier_list = join(", ", @tier_links);
                         my $current_item = "[" . quest::varlink($item_id) . "]";
-                        my $response_string = "I believe that I can upgrade your $current_item.";
-                        
+                        my $response_string = "I believe that I can upgrade your $current_item. To what degree, is the question?";                        
                         plugin::NPCTell($response_string);
+                        plugin::PurpleText("You have $CMC_Available [Converted Mana Crystals] available.");
 
                         foreach my $link (@tier_links) {
                             plugin::PurpleText("$link");
