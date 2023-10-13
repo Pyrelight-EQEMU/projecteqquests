@@ -186,11 +186,9 @@ sub get_upgrade_tier {
 # Wrapper function to return both base ID and upgrade tier
 sub get_base_id_and_tier {
     my $item_id = shift;
-    return (
-        base_id => get_base_id($item_id),
-        tier => get_upgrade_tier($item_id)
-    );
+    return (get_base_id($item_id), get_upgrade_tier($item_id));
 }
+
 
 sub is_item_upgradable {
     my $item_id = shift;
