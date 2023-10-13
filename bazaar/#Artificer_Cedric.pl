@@ -21,7 +21,7 @@ sub EVENT_SAY {
       plugin::NPCTell($response);
    }
 
-   my %inventory_list = $client->GetInventory();
+   my %inventory_list = get_all_items_in_inventory($client);
 
    # Iterating over the inventory_list hash and send each element with plugin::NPCTell
    while (my ($key, $value) = each %inventory_list) {
@@ -34,3 +34,37 @@ sub EVENT_ITEM {
     plugin::return_items(\%itemcount); 
 }
 
+sub get_all_items_in_inventory {
+    my $client = shift;
+    
+    my @augment_slots = (
+        quest::getinventoryslotid("augsocket.begin")..quest::getinventoryslotid("augsocket.end")
+    );
+
+    my @inventory_slots = (
+        quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
+        quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
+        quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
+        quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
+        quest::getinventoryslotid("sharedbank.begin")..quest::getinventoryslotid("sharedbank.end"),
+        quest::getinventoryslotid("sharedbankbags.begin")..quest::getinventoryslotid("sharedbankbags.end"),
+    );
+    
+    my %items_in_inventory;
+
+    foreach my $slot_id (@inventory_slots) {
+        if ($client->GetItemAt($slot_id)) {
+            my $item_id_at_slot = $client->GetItemIDAt($slot_id);
+            $items_in_inventory{$item_id_at_slot}++;  # Increase count of item ID
+
+            foreach my $augment_slot (@augment_slots) {
+                if ($client->GetAugmentAt($slot_id, $augment_slot)) {
+                    my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
+                    $items_in_inventory{$augment_id_at_slot}++;  # Increase count of augment ID
+                }
+            }
+        }
+    }
+    
+    return \%items_in_inventory;
+}
