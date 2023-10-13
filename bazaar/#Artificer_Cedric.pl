@@ -21,7 +21,7 @@ sub EVENT_SAY {
       plugin::NPCTell($response);
    }
 
-   my %inventory_list = get_all_items_in_inventory($client);
+   my %inventory_list = %{ get_all_items_in_inventory($client) };
 
    # Iterating over the inventory_list hash and send each element with plugin::NPCTell
    while (my ($key, $value) = each %inventory_list) {
@@ -55,13 +55,12 @@ sub get_all_items_in_inventory {
     foreach my $slot_id (@inventory_slots) {
         if ($client->GetItemAt($slot_id)) {
             my $item_id_at_slot = $client->GetItemIDAt($slot_id);
-            $items_in_inventory{$item_id_at_slot}++;  # Increase count of item ID
+            $items_in_inventory{$item_id_at_slot}++ if defined $item_id_at_slot;
 
             foreach my $augment_slot (@augment_slots) {
                 if ($client->GetAugmentAt($slot_id, $augment_slot)) {
                     my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
-                    $items_in_inventory{$augment_id_at_slot}++;  # Increase count of augment ID
-                }
+                    $items_in_inventory{$augment_id_at_slot}++ if defined $augment_id_at_slot;
             }
         }
     }
