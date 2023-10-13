@@ -196,6 +196,11 @@ sub EVENT_SAY {
             my %relevant_inventory_items = get_relevant_items_in_inventory($intercepted_base_id, $client);
             quest::debug(join(', ', map { "$_ => $relevant_inventory_items{$_}" } keys %relevant_inventory_items));
 
+
+            # Extract the first item id and remove it
+            my ($first_item_id) = each %relevant_inventory_items;
+            remove_item($first_item_id);
+            quest::debug("Removed item with id: $first_item_id");
         }
     }
 
@@ -281,6 +286,51 @@ sub get_relevant_items_in_inventory {
     } keys %all_items;
 
     return %relevant_items;
+}
+
+sub get_slots_for_item {
+    my $base_id = shift;
+
+    my @inventory_slots = (
+        quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
+        quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
+        quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
+        quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
+        quest::getinventoryslotid("sharedbank.begin")..quest::getinventoryslotid("sharedbank.end"),
+        quest::getinventoryslotid("sharedbankbags.begin")..quest::getinventoryslotid("sharedbankbags.end"),
+    );
+
+    my %slots_for_item;
+
+    foreach my $slot_id (@inventory_slots) {
+        if ($client->GetItemAt($slot_id)) {
+            my $item_id_at_slot = $client->GetItemIDAt($slot_id);
+            if (defined $item_id_at_slot && get_base_id($item_id_at_slot) == $base_id) {
+                push @{$slots_for_item{$item_id_at_slot}}, $slot_id;
+            }
+        }
+    }
+    
+    return %slots_for_item;
+}
+
+sub remove_item {
+    my $item_id = shift;
+
+    # Obtain all the slots associated with this item_id
+    my %slots_for_item = get_slots_for_item(get_base_id($item_id));
+
+    # If there are slots that have the given item_id, select the first one
+    if (exists $slots_for_item{$item_id} && @{$slots_for_item{$item_id}}) {
+        my $slot_to_remove = shift @{$slots_for_item{$item_id}};
+        $client->NukeItem($item_id, $slot_to_remove);
+
+        # If you want to do something after removal, you can add additional functionality here
+
+        return 1; # Indicating successful removal
+    } else {
+        return 0; # Indicating the item was not found in any slot
+    }
 }
 
 sub get_total_points_for_item {
