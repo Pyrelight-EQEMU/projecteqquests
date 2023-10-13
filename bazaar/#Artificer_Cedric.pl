@@ -40,7 +40,7 @@ sub EVENT_ITEM {
                             my $link_text = "+$available_tier ($cmc_cost CMC)";
                             my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
-                            push @tier_links, "----------[$upgrade_link]---[" . quest::varlink($targeted_item_id) . "]---(COST: XX Converted Mana Crystals)";
+                            push @tier_links, "-----[$upgrade_link]-----[" . quest::varlink($targeted_item_id) . "]-----(COST: XX Converted Mana Crystals)";
                         }
 
                         my $tier_list = join(", ", @tier_links);
