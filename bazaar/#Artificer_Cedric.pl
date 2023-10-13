@@ -171,6 +171,29 @@ sub decompose_item {
     return ($base_item_id, $points);
 }
 
+sub is_upgradeable {
+    my $base_id = shift;
+    my $dbh = plugin::LoadMysql();
+
+    # Shortcut if the base_id is already above 1 million
+    if ($base_id >= 1000000) {
+        return 1;
+    }
+
+    # Check for the existence of an item with base_id + 1 million in the 'items' table
+    my $upgrade_id = $base_id + 1000000;
+    my $query = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
+    $query->execute($upgrade_id);
+    my ($count) = $query->fetchrow_array();
+
+    # If the count is greater than 0, the item is upgradeable
+    if ($count > 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
 sub transform_inventory_list {
     my $inventory_ref = shift;
     my %raw_inventory = %{$inventory_ref};
@@ -178,6 +201,8 @@ sub transform_inventory_list {
 
     foreach my $item_id (keys %raw_inventory) {
         my $base_id = $item_id % 1000000;
+        next unless is_upgradeable($base_id);
+
         my $tier = int($item_id / 1000000);
 
         # Calculate points based on the tier
