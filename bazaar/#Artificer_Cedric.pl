@@ -44,9 +44,13 @@ sub EVENT_ITEM {
 
                         my $tier_list = join(", ", @tier_links);
                         my $current_item = "[" . quest::varlink($item_id) . "]";
-                        my $response_string = "I believe that I can upgrade your $current_item to: $tier_list";
+                        my $response_string = "I believe that I can upgrade your $current_item.";
                         
                         plugin::NPCTell($response_string);
+
+                        foreach my $link (@tier_links) {
+                            plugin::YellowText("$link");
+                        }
 
                     } else {
                         plugin::NPCTell("$clientName, unfortunately, you do not have enough duplicate items available to upgrade your [$item_name] to a higher tier.");
