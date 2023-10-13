@@ -44,7 +44,7 @@ sub EVENT_ITEM {
                             my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
                             # Determine the number of digits required for padding
-                            my $max_digits = length($cmc_cost) > length($CMC_Available) ? length($cmc_cost) : $real_max_digits;
+                            my $max_digits = length($cmc_cost) > $real_max_digits ? length($cmc_cost) : $real_max_digits;
                             if ($max_digits > $real_max_digits) {
                                 $real_max_digits = $max_digits;
                             }
