@@ -20,7 +20,15 @@ sub EVENT_SAY {
    if ($response ne "") {
       plugin::NPCTell($response);
    }
+
+   my %inventory_list = $client->GetInventory();
+
+   # Iterating over the inventory_list hash and send each element with plugin::NPCTell
+   while (my ($key, $value) = each %inventory_list) {
+      plugin::NPCTell("$key: $value");
+   }
 }
+
 
 sub EVENT_ITEM { 
     plugin::return_items(\%itemcount); 
