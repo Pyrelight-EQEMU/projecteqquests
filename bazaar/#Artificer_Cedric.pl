@@ -113,8 +113,8 @@ sub EVENT_SAY {
         my %upgradable_items = get_upgradable();
         
         # Debug or further processing here, for example:
-        foreach my $item (keys %upgradable_items) {
-            quest::debug("Upgradable base item ID in inventory: $item");
+        while (my ($item, $value) = each %upgradable_items) {
+            quest::debug("Upgradable base item ID in inventory: $item with value $value");
         }
     }
 }
