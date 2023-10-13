@@ -10,7 +10,7 @@ sub EVENT_SAY {
     my $link_platinum = "[".quest::saylink("link_platinum", 1, "platinum")."]";
     my $link_siphon_10 = "[".quest::saylink("link_siphon_10", 1, "siphon 10 points")."]";
     my $link_siphon_100 = "[".quest::saylink("link_siphon_100", 1, "siphon 100 points")."]";
-    my $link_siphon_all = "[".quest::saylink("link_siphon_all", 1, "siphon 100 points")."]";
+    my $link_siphon_all = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
 
     if($text=~/hail/i) {
         if (!$client->GetBucket("CedricVisit")) {
@@ -75,7 +75,27 @@ sub EVENT_SAY {
 
 
 sub EVENT_ITEM { 
-    plugin::return_items(\%itemcount); 
+    plugin::return_items(\%itemcount);
+
+    my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
+
+    while ($total_money > (500 * 1000)) {
+        $total_money = $total_money - (500 * 1000);
+    }
+
+    # After processing all items, return any remaining money
+    my $platinum_remainder = int($total_money / 1000);
+    $total_money %= 1000;
+
+    my $gold_remainder = int($total_money / 100);
+    $total_money %= 100;
+
+    my $silver_remainder = int($total_money / 10);
+    $total_money %= 10;
+
+    my $copper_remainder = $total_money;
+
+    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1); 
 }
 
 sub get_all_items_in_inventory {
