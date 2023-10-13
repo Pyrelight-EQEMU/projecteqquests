@@ -9,15 +9,18 @@ sub EVENT_ITEM {
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
+                    
                     my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
 
-                    # Get current item's tier
+                    # Get current item's tier and base_id
                     my $current_tier = get_upgrade_tier($item_id);
-                    
+                    my $base_id = get_base_id($item_id);
+                    my $base_stat_value = calculate_heroic_stat_sum($client, $base_id);
+
                     # List the upgrade tiers the player can afford which are higher than the current item's tier
                     my $tier = $current_tier + 1;
                     my @affordable_tiers;
-                    while ($points >= 2**$tier) {
+                    while ($points >= ($base_stat_value * $tier)) {
                         push @affordable_tiers, $tier;
                         $tier++;
                     }
@@ -261,3 +264,33 @@ sub get_point_value_for_item {
     return $point_value;
 }
 
+sub calculate_heroic_stat_sum {
+    my ($item_id, $client) = @_;
+
+    # Define the primary stats we want to sum up
+    my @primary_stats = qw(
+        heroic_str heroic_sta heroic_dex heroic_agi 
+        heroic_int heroic_wis heroic_cha
+    );
+
+    # Define the resistance stats we want to sum up and then halve
+    my @resistance_stats = qw(
+        heroic_fr heroic_mr heroic_cr heroic_pr heroic_dr
+    );
+
+    # Fetch and sum the primary stats
+    my $primary_stat_total = 0;
+    foreach my $stat (@primary_stats) {
+        $primary_stat_total += $client->GetItemStat($item_id, $stat);
+    }
+
+    # Fetch the resistance stats, sum them up, and then halve the total
+    my $resistance_stat_total = 0;
+    foreach my $stat (@resistance_stats) {
+        $resistance_stat_total += $client->GetItemStat($item_id, $stat);
+    }
+    $resistance_stat_total /= 2;
+
+    # Return the total sum of primary and halved resistance stats
+    return $primary_stat_total + $resistance_stat_total;
+}
