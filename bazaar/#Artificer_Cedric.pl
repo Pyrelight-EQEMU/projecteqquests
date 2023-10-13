@@ -25,7 +25,8 @@ sub EVENT_SAY {
 
    # Iterating over the inventory_list hash and send each element with plugin::NPCTell
    while (my ($key, $value) = each %inventory_list) {
-      plugin::NPCTell("$key: $value");
+    my $name = quest::getitemname($key);
+      plugin::NPCTell("$name: $value");
    }
 }
 
