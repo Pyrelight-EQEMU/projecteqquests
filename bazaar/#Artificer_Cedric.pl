@@ -10,6 +10,7 @@ sub EVENT_SAY {
     my $link_platinum = "[".quest::saylink("link_platinum", 1, "platinum")."]";
     my $link_siphon_10 = "[".quest::saylink("link_siphon_10", 1, "siphon 10 points")."]";
     my $link_siphon_100 = "[".quest::saylink("link_siphon_100", 1, "siphon 100 points")."]";
+    my $link_siphon_all = "[".quest::saylink("link_siphon_all", 1, "siphon 100 points")."]";
 
     if($text=~/hail/i) {
         if (!$client->GetBucket("CedricVisit")) {
@@ -40,6 +41,8 @@ sub EVENT_SAY {
     elsif ($text eq "link_siphon_10") {
         if ($client->GetAAPoints() >= 10) {
             $client->SetAAPoints($client->GetAAPoints() - 10);
+            $client->SetBucket("Artificer_CMC", $CMC_Points + 10);
+            plugin::YellowText("You have LOST 10 Alternate Advancement points!");
             plugin::NPCTell("Ahh. Excellent. I've added ten crystals under your name to my ledger.");
         } else {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
@@ -49,7 +52,21 @@ sub EVENT_SAY {
     elsif ($text eq "link_siphon_100") {
         if ($client->GetAAPoints() >= 100) {
             $client->SetAAPoints($client->GetAAPoints() - 100);
+            $client->SetBucket("Artificer_CMC", $CMC_Points + 100);
+            plugin::YellowText("You have LOST 100 Alternate Advancement points!");
             plugin::NPCTell("Ahh. Excellent. I've added one hundred crystals under your name to my ledger.");
+        } else {
+            plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
+        }
+    }
+
+    elsif ($text eq "link_siphon_all") {
+        if ($client->GetAAPoints() >= 1) {
+            my $aa_drained = $client->GetAAPoints();
+            $client->SetAAPoints(0);
+            $client->SetBucket("Artificer_CMC", $CMC_Points + $aa_drained);
+            plugin::YellowText("You have LOST $aa_drained Alternate Advancement points!");
+            plugin::NPCTell("Ahh. Excellent. I've added $aa_drained crystals under your name to my ledger.");
         } else {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
         }
