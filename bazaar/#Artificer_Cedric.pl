@@ -191,6 +191,11 @@ sub EVENT_SAY {
             my $available = get_total_points_for_item($intercepted_base_id, $client);
             my $target    = get_point_value_for_item($intercepted_base_id + ($intercepted_available_tier * 1000000));
             quest::debug("$available, $target");
+
+            # Fetch the relevant items from the client's inventory
+            my %relevant_inventory_items = get_relevant_items_in_inventory($intercepted_base_id, $client);
+            quest::debug(join(', ', map { "$_ => $relevant_inventory_items{$_}" } keys %relevant_inventory_items));
+
         }
     }
 
@@ -239,10 +244,6 @@ sub item_exists_in_db {
 
 sub get_all_items_in_inventory {
     my $client = shift;
-    
-    my @augment_slots = (
-        quest::getinventoryslotid("augsocket.begin")..quest::getinventoryslotid("augsocket.end")
-    );
 
     my @inventory_slots = (
         quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
@@ -259,17 +260,26 @@ sub get_all_items_in_inventory {
         if ($client->GetItemAt($slot_id)) {
             my $item_id_at_slot = $client->GetItemIDAt($slot_id);
             $items_in_inventory{$item_id_at_slot}++ if defined $item_id_at_slot;
-
-            foreach my $augment_slot (@augment_slots) {
-                if ($client->GetAugmentAt($slot_id, $augment_slot)) {
-                    my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
-                    $items_in_inventory{$augment_id_at_slot}++ if defined $augment_id_at_slot;
-                }
-            }
         }
     }
     
     return \%items_in_inventory;
+}
+
+sub get_relevant_items_in_inventory {
+    my ($base_id, $client) = @_;
+
+    # Fetch all items from the client's inventory
+    my %all_items = get_all_items_in_inventory($client);
+
+    # Filter the items to keep only those with the relevant base ID
+    my %relevant_items = map { 
+        $_ => $all_items{$_} 
+    } grep { 
+        get_base_id($_) == $base_id 
+    } keys %all_items;
+
+    return %relevant_items;
 }
 
 sub get_total_points_for_item {
