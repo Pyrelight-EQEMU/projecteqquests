@@ -5,13 +5,14 @@ sub EVENT_ITEM {
         if ($total_money > 0) {
             plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
         } else {             
-             foreach my $item_id (keys %itemcount) { 
+             foreach my $item_id (grep { $_ != 0 } keys %itemcount) { 
                 if (is_item_upgradable($item_id)) {
                     plugin::NPCTell("That item can be upgraded");
                 } else {
                     plugin::NPCTell("That item cannot be upgraded");
                 }
              }
+             plugin::return_items(\%itemcount);
         }
     } else {
         plugin::return_items(\%itemcount);        
