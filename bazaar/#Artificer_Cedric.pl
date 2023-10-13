@@ -270,7 +270,8 @@ sub get_relevant_items_in_inventory {
     my ($base_id, $client) = @_;
 
     # Fetch all items from the client's inventory
-    my %all_items = get_all_items_in_inventory($client);
+    my $all_items_ref = get_all_items_in_inventory($client);
+    my %all_items = %$all_items_ref;
 
     # Filter the items to keep only those with the relevant base ID
     my %relevant_items = map { 
