@@ -1,44 +1,52 @@
 sub EVENT_ITEM {
+    my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
 
     if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
-        quest::debug("You handed in an item.");
-    } else {
-        quest::debug("that was just money");
-    }
-
-    plugin::return_items(\%itemcount);
-    my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
-    my $earned_points = 0;
-    
-    while ($total_money >= (500 * 1000)) {
-        $total_money = $total_money - (500 * 1000);
-        $earned_points++;
-    }
-
-    if ($earned_points > 0) {
         if ($total_money > 0) {
-            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
-        } else {
-            plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+            plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
+        } else {             
+             foreach my $item_id (keys %itemcount) { 
+                if (is_item_upgradable($item_id)) {
+                    plugin::NPCTell("That item can be upgraded");
+                } else {
+                    plugin::NPCTell("That item cannot be upgraded");
+                }
+             }
         }
-        $client->SetBucket("Artificer_CMC", ($client->GetBucket("Artificer_CMC") || 0) + $earned_points);
     } else {
-        plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
-    }
+        plugin::return_items(\%itemcount);        
+        my $earned_points = 0;
 
-    # After processing all items, return any remaining money
-    my $platinum_remainder = int($total_money / 1000);
-    $total_money %= 1000;
+        while ($total_money >= (500 * 1000)) {
+            $total_money = $total_money - (500 * 1000);
+            $earned_points++;
+        }
 
-    my $gold_remainder = int($total_money / 100);
-    $total_money %= 100;
+        if ($earned_points > 0) {
+            if ($total_money > 0) {
+                plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
+            } else {
+                plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+            }
+            $client->SetBucket("Artificer_CMC", ($client->GetBucket("Artificer_CMC") || 0) + $earned_points);
+        } else {
+            plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
+        }
 
-    my $silver_remainder = int($total_money / 10);
-    $total_money %= 10;
+        # After processing all items, return any remaining money
+        my $platinum_remainder = int($total_money / 1000);
+        $total_money %= 1000;
 
-    my $copper_remainder = $total_money;
+        my $gold_remainder = int($total_money / 100);
+        $total_money %= 100;
 
-    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1); 
+        my $silver_remainder = int($total_money / 10);
+        $total_money %= 10;
+
+        my $copper_remainder = $total_money;
+
+        $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
+    }     
 }
 
 sub EVENT_SAY {
@@ -117,4 +125,82 @@ sub EVENT_SAY {
 
     elsif ($text eq "link_show_me_your_equipment") {
     }
+}
+
+# Returns the base ID of an item
+sub get_base_id {
+    my $item_id = shift;
+    return $item_id % 1000000; # Assuming item IDs increment by 1000000 per tier
+}
+
+# Returns the upgrade tier of an item
+sub get_upgrade_tier {
+    my $item_id = shift;
+    return int($item_id / 1000000); # Assuming item IDs increment by 1000000 per tier
+}
+
+# Wrapper function to return both base ID and upgrade tier
+sub get_base_id_and_tier {
+    my $item_id = shift;
+    return (
+        base_id => get_base_id($item_id),
+        tier => get_upgrade_tier($item_id)
+    );
+}
+
+sub is_item_upgradable {
+    my $item_id = shift;
+
+    # Calculate the next-tier item ID
+    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+
+    # Check if the next-tier item exists in the database
+    return item_exists_in_db($next_tier_item_id);
+}
+
+# Check if the specified item ID exists
+sub item_exists_in_db {
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
+    my $sth = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
+    $sth->execute($item_id);
+
+    my $result = $sth->fetchrow_array();
+
+    return $result > 0 ? 1 : 0;
+}
+
+sub get_all_items_in_inventory {
+    my $client = shift;
+    
+    my @augment_slots = (
+        quest::getinventoryslotid("augsocket.begin")..quest::getinventoryslotid("augsocket.end")
+    );
+
+    my @inventory_slots = (
+        quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
+        quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
+        quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
+        quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
+        quest::getinventoryslotid("sharedbank.begin")..quest::getinventoryslotid("sharedbank.end"),
+        quest::getinventoryslotid("sharedbankbags.begin")..quest::getinventoryslotid("sharedbankbags.end"),
+    );
+    
+    my %items_in_inventory;
+
+    foreach my $slot_id (@inventory_slots) {
+        if ($client->GetItemAt($slot_id)) {
+            my $item_id_at_slot = $client->GetItemIDAt($slot_id);
+            $items_in_inventory{$item_id_at_slot}++ if defined $item_id_at_slot;
+
+            foreach my $augment_slot (@augment_slots) {
+                if ($client->GetAugmentAt($slot_id, $augment_slot)) {
+                    my $augment_id_at_slot = $client->GetAugmentIDAt($slot_id, $augment_slot);
+                    $items_in_inventory{$augment_id_at_slot}++ if defined $augment_id_at_slot;
+                }
+            }  # <-- Closing brace for inner foreach
+        }
+    }  # <-- Closing brace for outer foreach
+    
+    return \%items_in_inventory;
 }
