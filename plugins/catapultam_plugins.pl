@@ -17,6 +17,14 @@ sub YellowText {
     $client->Message($tellColor, $message);
 }
 
+sub PurpleText {
+	my $message     = shift;
+    my $client      = shift || plugin::val('client');
+    my $tellColor   = 257;
+	
+    $client->Message($tellColor, $message);
+}
+
 sub WorldAnnounce {
 	my $message = shift;
 	quest::discordsend("ooc", $message);
