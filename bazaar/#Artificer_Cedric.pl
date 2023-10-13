@@ -9,7 +9,7 @@ sub EVENT_ITEM {
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
-                    
+
                     my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
 
                     # Get current item's tier and base_id
@@ -265,7 +265,7 @@ sub get_point_value_for_item {
 }
 
 sub calculate_heroic_stat_sum {
-    my ($item_id, $client) = @_;
+    my ($client, $item_id) = @_;
 
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
