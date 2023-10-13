@@ -80,7 +80,7 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $earned_points = 0;
     
-    while ($total_money > (500 * 1000)) {
+    while ($total_money >= (500 * 1000)) {
         $total_money = $total_money - (500 * 1000);
         $earned_points++;
     }
