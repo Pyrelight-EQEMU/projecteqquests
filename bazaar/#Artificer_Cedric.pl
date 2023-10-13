@@ -11,6 +11,7 @@ sub EVENT_ITEM {
                 my $item_name = quest::varlink($item_id);
                 if (is_item_upgradable($item_id)) {
                     my $points = get_total_points_for_item($item_id, $client) + get_point_value_for_item($item_id);
+                    my $link_concentrated_mana_crystals = quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals");
 
                     # Get current item's tier
                     my $current_tier = get_upgrade_tier($item_id);
@@ -41,15 +42,13 @@ sub EVENT_ITEM {
                             my $link_text = "+$available_tier ($cmc_cost CMC)";
                             my $upgrade_link = quest::saylink($hidden_data, 1, "UPGRADE");
                             
-                            push @tier_links, "---- [$upgrade_link] ---- [" . quest::varlink($targeted_item_id) . "] ---- (COST: $cmc_cost Concentrated Mana Crystals)";
+                            push @tier_links, "---- [$upgrade_link] ---- [" . quest::varlink($targeted_item_id) . "] ---- (COST: $cmc_cost / $CMC_Available $link_concentrated_mana_crystals)";
                         }
 
                         my $tier_list = join(", ", @tier_links);
-                        my $current_item = "[" . quest::varlink($item_id) . "]";
-                        my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
+                        my $current_item = "[" . quest::varlink($item_id) . "]";                        
                         my $response_string = "I believe that I can upgrade your $current_item. To what degree, is the question?";                        
                         plugin::NPCTell($response_string);
-                        plugin::PurpleText("You have $CMC_Available [$link_concentrated_mana_crystals] available.");
 
                         foreach my $link (@tier_links) {
                             plugin::PurpleText("$link");
