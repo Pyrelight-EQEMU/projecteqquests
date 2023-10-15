@@ -346,10 +346,11 @@ sub test_upgrade {
 
     # Direct upgrade check
     if ($virtual_inventory->{$current_item_id} && $virtual_inventory->{$current_item_id} >= 2) {
-        quest::debug("Direct upgrade possible for item ID: $current_item_id");
+        quest::debug("Direct upgrade possible for item ID: $current_item_id. Virtually consuming items for upgrade.");
         # Virtually "consume" the items for upgrade in direct path
         $virtual_inventory->{$current_item_id} -= 2;
         $virtual_inventory->{$target_item_id}++;
+        quest::debug("Updated virtual inventory after direct upgrade: Current ID: $current_item_id count: $virtual_inventory->{$current_item_id}. Target ID: $target_item_id count: $virtual_inventory->{$target_item_id}");
         return 1; # Upgrade is possible
     }
 
@@ -357,14 +358,17 @@ sub test_upgrade {
     my $base_id = get_base_id($current_item_id);
     foreach my $item_id (keys %{$virtual_inventory}) {
         next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
-        
-        quest::debug("Checking recursive upgrade for lesser item ID: $item_id related to $current_item_id");
+
+        quest::debug("Checking recursive upgrade for lesser item ID: $item_id related to $current_item_id with count: $virtual_inventory->{$item_id}");
 
         # Recursively check if this lesser item can be upgraded
         if ($virtual_inventory->{$item_id} && $virtual_inventory->{$item_id} >= 2) {
+            quest::debug("Recursive upgrade possible for item ID: $item_id. Virtually consuming items for upgrade.");
             # Virtually "consume" the items for upgrade
             $virtual_inventory->{$item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
+
+            quest::debug("Updated virtual inventory after recursive upgrade: Lesser ID: $item_id count: $virtual_inventory->{$item_id}. Target ID: $target_item_id count: $virtual_inventory->{$target_item_id}");
 
             # Recursive call with updated virtual inventory
             if (test_upgrade($item_id, 1, $virtual_inventory)) {
@@ -373,11 +377,9 @@ sub test_upgrade {
         }
     }
 
+    quest::debug("No upgrade possible for item ID: $current_item_id at this level.");
     return 0; # Upgrade is not possible
 }
-
-
-
 
 sub execute_upgrade {
     my ($current_item_id, $is_recursive) = @_;
