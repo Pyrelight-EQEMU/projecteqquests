@@ -17,7 +17,7 @@ sub EVENT_ITEM {
                 my %simulated_inventory = %{ get_all_items_in_inventory($client) };
                 $simulated_inventory{$item_id}++;  # Add back the item being considered for upgrade
 
-                if (is_item_upgradable($item_id) && simulate_upgrade(\%simulated_inventory, $item_id, $item_id + 1000000)) {
+                if (is_item_upgradable($item_id) && test_upgrade($item_id)) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
                 } else {
@@ -306,106 +306,41 @@ sub get_all_items_in_inventory {
     return \%items_in_inventory;
 }
 
-sub auto_upgrade_item {
-    my ($client, $item_id_to_upgrade, $target_upgrade) = @_;
-
-    # Create a clone of the player's inventory for simulation purposes
-    my %simulated_inventory = %{ get_all_items_in_inventory($client) };
+sub get_filtered_inventory {
+    my ($item_id) = @_;
     
-    # Check if upgrade is possible in simulation
-    if (simulate_upgrade(\%simulated_inventory, $item_id_to_upgrade, $target_upgrade)) {
-        
-        # Perform actual inventory operations since simulation succeeded
-        execute_upgrade($client, $item_id_to_upgrade, $target_upgrade);
-        
-        return 1; # Upgrade successful
-    }
+    # Get the base ID of the given item
+    my $base_id_of_item = get_base_id($item_id);
+
+    # Retrieve all items in inventory
+    my %all_items = %{ get_all_items_in_inventory($client) };
     
-    return 0; # Upgrade failed
-}
-
-sub simulate_upgrade {
-    my ($inventory_ref, $item_id_to_upgrade, $target_item_id) = @_;
-
-    my %simulated_inventory = %$inventory_ref;
-
-    my ($base_id, $current_tier) = get_base_id_and_tier($item_id_to_upgrade);
-    my $desired_tier = get_upgrade_tier($target_item_id);
-
-    # Debug: print current and desired tiers
-    plugin::NPCTell("Debug: Attempting to upgrade from tier $current_tier to tier $desired_tier.");
-
-    # Check if desired tier exceeds the limit
-    if (!is_item_upgradable($base_id + ($desired_tier * 1000000))) {
-        plugin::NPCTell("Debug: Desired tier exceeds limit.");
-        return 0;
-    }
-
-    # If we already have a direct upgrade path, return true
-    if ($simulated_inventory{$base_id + ($desired_tier * 1000000)} &&
-        $simulated_inventory{$base_id + ($desired_tier * 1000000)} >= 2) {
-        plugin::NPCTell("Debug: Direct upgrade path available.");
-        return 1; # Success
-    }
-
-    # Debug: print current inventory state
-    foreach my $item (keys %simulated_inventory) {
-        plugin::NPCTell("Debug: Inventory has $simulated_inventory{$item} of item ID $item.");
-    }
-
-    # If direct path isn't available, attempt cascading upgrades
-    for (my $tier = $desired_tier - 1; $tier > $current_tier; $tier--) {
-        if ($simulated_inventory{$base_id + ($tier * 1000000)} &&
-            $simulated_inventory{$base_id + ($tier * 1000000)} >= 2) {
-            # Debug: print current tier under consideration
-            plugin::NPCTell("Debug: Checking upgrade possibility from tier $tier.");
-
-            # Recursively try to upgrade
-            if (simulate_upgrade(\%simulated_inventory, $base_id + ($tier * 1000000), $target_item_id)) {
-                plugin::NPCTell("Debug: Upgrade possible from tier $tier.");
-                return 1; # Success
-            } else {
-                plugin::NPCTell("Debug: Upgrade not possible from tier $tier.");
-            }
+    # Filter items based on the given item's base ID and their item_id
+    my %filtered_items;
+    foreach my $inventory_item_id (keys %all_items) {
+        if (get_base_id($inventory_item_id) == $base_id_of_item && $inventory_item_id <= $item_id) {
+            $filtered_items{$inventory_item_id} = $all_items{$inventory_item_id};
         }
     }
+    
+    return \%filtered_items;
+}
 
-    plugin::NPCTell("Debug: Overall upgrade failed.");
-    return 0; # Upgrade failed
+sub test_upgrade {
+    my ($current_item_id) = @_;
+
+    # Determine the target upgrade ID
+    my $target_item_id = get_next_upgrade_id($current_item_id);
+
+    # Fetch the filtered inventory based on the current item's base ID
+    my %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
+
+    # Direct upgrade check
+    if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
+        return 1; # Upgrade is possible
+    }
+
+    return 0; # Upgrade is not possible
 }
 
 
-sub execute_upgrade {
-    my ($client, $item_id_to_upgrade, $target_upgrade) = @_;
-
-    # Here, we are sure the upgrade is possible, so we directly modify the player's inventory
-
-    my ($base_id, $current_tier) = get_base_id_and_tier($item_id_to_upgrade);
-    my $desired_tier = $current_tier + $target_upgrade;
-
-    # Direct upgrade
-    if ($desired_tier - $current_tier == 1 && $client->GetItemCount($base_id + ($desired_tier * 1000000)) >= 2) {
-        
-        # Consume items
-        $client->RemoveItem($base_id + ($desired_tier * 1000000));
-        $client->RemoveItem($base_id + ($desired_tier * 1000000));
-
-        # Add upgraded item
-        $client->SummonItem(get_next_upgrade_id($base_id + ($desired_tier * 1000000)));
-        
-        return;
-    }
-
-    # Cascading upgrade
-    for (my $tier = $desired_tier - 1; $tier > $current_tier; $tier--) {
-        if ($client->GetItemCount($base_id + ($tier * 1000000)) >= 2) {
-            
-            # Consume items
-            $client->RemoveItem($base_id + ($tier * 1000000));
-            $client->RemoveItem($base_id + ($tier * 1000000));
-
-            # Add upgraded item
-            $client->SummonItem(get_next_upgrade_id($base_id + ($tier * 1000000)));
-        }
-    }
-}
