@@ -372,32 +372,31 @@ sub execute_upgrade {
     # Include the 'missing' item currently held by the NPC if it's not a recursive call
     $filtered_inventory{$current_item_id}++ unless $is_recursive;
 
-    quest::debug("Checking upgrade for Item ID: $current_item_id. Target Upgrade ID: $target_item_id. Is Recursive: $is_recursive");
-
-    # Direct upgrade check
-    if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
-        quest::debug("Direct upgrade possible for Item ID: $current_item_id");
-        $client->RemoveItem($current_item_id) if $is_recursive; 
-        $client->RemoveItem($current_item_id);
-        $client->SummonItem($target_item_id);
-        return 1; # Upgrade is possible
-    }
-
-    # Recursive upgrade check
-    # Fetch all lesser-tier items related to the current item
+    # Check all lesser-tier items related to the current item for possible upgrades first
     my $base_id = get_base_id($current_item_id);
     foreach my $item_id (keys %filtered_inventory) {
         next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
         
-        quest::debug("Checking recursive upgrade for lesser item ID: $item_id related to $current_item_id");
-        
         # Recursively check if this lesser item can be upgraded
         if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
-            quest::debug("Recursive upgrade possible for lesser item ID: $item_id");
-            return execute_upgrade($item_id, 1); # Recursive call
+            if(execute_upgrade($item_id, 1)) { # Recursive call
+                last; # Exit the loop if a recursive upgrade was executed
+            }
         }
     }
 
-    quest::debug("Upgrade not possible for Item ID: $current_item_id");
-    return 0; # Upgrade is not possible
+    # Re-fetch the filtered inventory after any possible recursive upgrades
+    %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
+
+    # Direct upgrade check (after all possible recursive upgrades)
+    if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
+        quest::debug("[Perl - debug] Directly upgrading item ID: $current_item_id to $target_item_id");
+        $client->RemoveItem($current_item_id) if $is_recursive; 
+        $client->RemoveItem($current_item_id);
+        $client->SummonItem($target_item_id);
+        return 1; # Upgrade executed
+    }
+
+    return 0; # No upgrade executed
 }
+
