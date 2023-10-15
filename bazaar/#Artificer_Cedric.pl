@@ -28,6 +28,7 @@ sub EVENT_ITEM {
                             my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
                             my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
                             plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
+                            plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
                             $client->SetBucket("Artificer-WorkOrder", $item_id);
                             return;
                         } else {
@@ -171,7 +172,7 @@ sub EVENT_SAY {
         quest::debug("item_id: $item_id");
         if (item_exists_in_db($item_id)) {
             execute_upgrade($item_id);
-            #$client->DeleteBucket("Artificer-WorkOrder");
+            $client->DeleteBucket("Artificer-WorkOrder");
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
         }
@@ -431,7 +432,7 @@ sub execute_upgrade {
 
             my $count = $client->CountItem($current_item_id);
 
-            quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+            #quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");        
 
             my $loop_limit = 2; # A limit to prevent infinite loops
@@ -452,7 +453,7 @@ sub execute_upgrade {
 
                 subtract_upgrade_points(get_upgrade_cost($target_item_id));
 
-                quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+                #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             }
         }
     } else {
