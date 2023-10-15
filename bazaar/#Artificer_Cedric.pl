@@ -21,12 +21,12 @@ sub EVENT_ITEM {
                     my $cmc_avail = get_upgrade_points();
 
                     plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
-                    my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost Concentrated Mana Crystals";
+                    my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost ";
 
                     if ( $cmc_avail >= $cmc_cost) {
-                        $response = $response . ". Would you [like to proceed]?";
+                        $response = $response . "of your $cmc_avail Concentrated Mana Crystals. Would you [like to proceed]?";
                     } else {
-                        $response = $response . ", but you only have $cmc_avail. Would you like to [obtain more]?";
+                        $response = $response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to [obtain more]?";
                     }
 
                     plugin::NPCTell($response);
