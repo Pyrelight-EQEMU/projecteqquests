@@ -326,7 +326,7 @@ sub test_upgrade {
 
     my $base_id = get_base_id($current_item_id);
     while ($base_id < 20999999) {
-        $virtual_inventory->{$base_id} == 0;
+        $virtual_inventory->{$base_id} = 0;
         $base_id += 1000000;
     }
 
