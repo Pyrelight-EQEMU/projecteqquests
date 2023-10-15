@@ -403,7 +403,6 @@ sub test_upgrade {
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
         quest::debug("Successfully produced the $target_item_id");
         $result->{success} = 1;
-        quest::debug("Total Cost: $total_cmc_cost") unless $is_recursive;
     } else {
         quest::debug("Unable to upgrade $current_item_id to $target_item_id");
     }
