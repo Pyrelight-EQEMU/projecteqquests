@@ -363,10 +363,13 @@ sub test_upgrade {
 
         # Recursively check if this lesser item can be upgraded
         if ($virtual_inventory->{$item_id} && $virtual_inventory->{$item_id} >= 2) {
-            $virtual_inventory->{$item_id} -= 2;
-            $virtual_inventory->{$target_item_id}++;
-            quest::debug("Current virtual inventory: " . join(", ", map { "$_: $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
-            if (test_upgrade($item_id, 1, $virtual_inventory)) {
+            my $temp_inventory = {%$virtual_inventory}; # Clone the virtual inventory
+            $temp_inventory->{$item_id} -= 2;
+            $temp_inventory->{$target_item_id}++;
+            quest::debug("Temporary virtual inventory: " . join(", ", map { "$_: $temp_inventory->{$_}" } keys %{$temp_inventory}));
+            
+            if (test_upgrade($item_id, 1, $temp_inventory)) {
+                %$virtual_inventory = %$temp_inventory; # Commit the changes to the original virtual inventory
                 return 1; # Upgrade is possible
             }
         }
