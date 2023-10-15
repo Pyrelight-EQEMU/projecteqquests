@@ -363,7 +363,7 @@ sub test_upgrade {
 
         quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
 
-        my $loop_limit = 2; # A limit to prevent infinite loops
+        my $loop_limit = 20; # A limit to prevent infinite loops
         my $loop_count = 0;
 
         while ($virtual_inventory->{$current_item_id} < 2 && get_prev_upgrade_id($current_item_id) && !%rec_changes && $loop_count++ < $loop_limit) {            
