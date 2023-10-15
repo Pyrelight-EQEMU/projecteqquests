@@ -324,6 +324,9 @@ sub test_upgrade {
     my $target_item_id = get_next_upgrade_id($current_item_id);
     my $prev_item_id = get_prev_upgrade_id($current_item_id);
 
+    $virtual_inventory->{$current_item_id} //= 0;
+    $virtual_inventory->{$target_item_id} //= 0;
+
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
             $virtual_inventory = get_upgrade_items($current_item_id, 1);
