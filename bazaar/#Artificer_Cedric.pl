@@ -302,7 +302,7 @@ sub get_upgrade_items {
     my ($item_id, $mod) = @_;
     my %item_counts;
 
-    $item_counts{$item_id} += $mod;
+    $item_counts{$item_id} = $mod;
 
     # Continue until the item_id is reduced to a value less than or equal to 999999
     while ($item_id > 999999) {
@@ -324,8 +324,11 @@ sub test_upgrade {
     my $target_item_id = get_next_upgrade_id($current_item_id);
     my $prev_item_id = get_prev_upgrade_id($current_item_id);
 
-    $virtual_inventory->{$current_item_id} //= 0;
-    $virtual_inventory->{$target_item_id} //= 0;
+    my $base_id = get_base_id($current_item_id);
+    while ($base_id < 20999999) {
+        $virtual_inventory->{$base_id} == 0;
+        $base_id += 1000000;
+    }
 
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
