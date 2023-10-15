@@ -362,11 +362,9 @@ sub test_upgrade {
 
         quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
 
-        while ($virtual_inventory->{$current_item_id} < 2 && get_prev_upgrade_id($current_item_id) && !%{$rec_changes}) {
-            my $virtual_inventory_copy = deep_copy_hash($virtual_inventory);
-            %{$virtual_inventory_copy} = %{ get_filtered_inventory(get_prev_upgrade_id($current_item_id), $virtual_inventory_copy) };
+        while ($virtual_inventory->{$current_item_id} < 2 && get_prev_upgrade_id($current_item_id) && !%{$rec_changes}) {            
 
-            my $rec_changes = test_upgrade($current_item_id, 1, $virtual_inventory_copy);
+            my $rec_changes = test_upgrade($current_item_id, 1, $virtual_inventory);
 
             if (%{$rec_changes}) { # If there are changes
                 # Apply changes to $virtual_inventory
