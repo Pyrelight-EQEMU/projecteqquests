@@ -70,16 +70,20 @@ sub EVENT_SAY {
     my $link_siphon_all = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
 
     if($text=~/hail/i) {
+
+        $client->RemoveItem(1029439);
+
+
         if (!$client->GetBucket("CedricVisit")) {
             plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
         } else {
             plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
-            plugin::NPCTell("Ah, it's you again, $clientName. Do you have $link_equipment that needs to be enhanced, or would you like to obtain more $link_concentrated_mana_crystals?");
+            plugin::NPCTell("Ah, it's you again, $clientName. Do you have $link_equipment that needs to be enhanced? Do you need extra $link_concentrated_mana_crystals?");
         }    
     }
 
     elsif ($text eq "link_equipment") {
-                plugin::NPCTell("I can intensify the magic of certain equipment and weapons through the use of $link_concentrated_mana_crystals as well as an identical item to donate its aura. If you'd like me to appraise an item, simply hand it to me.");
+                plugin::NPCTell("I can intensify the magic of certain equipment and weapons through the use of $link_concentrated_mana_crystals as well as an identical item to donate its aura. If you'd like me to appraise an item, simply hand it to me. Please be careful to remove any augmentations which you have added, though! They can interfere with the appraisal process.");
         $client->SetBucket("CedricVisit", 1);
     }
 
@@ -129,4 +133,71 @@ sub EVENT_SAY {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
         }
     }
+}
+
+# add_limbo($value)
+# Adds a new value to the "Artificer-Limbo" bucket.
+# Parameters:
+#   $value - The value to be added.
+sub add_limbo {
+    my ($value) = @_;
+
+    # Fetch the current data
+    my $data_string = $client->GetBucket("Artificer-Limbo");
+    my $data_array = eval($data_string) || [];
+
+    # Append the new value
+    push @$data_array, $value;
+
+    # Serialize and store the updated data
+    $client->SetBucket("Artificer-Limbo", Dumper($data_array));
+}
+
+# remove_limbo($value)
+# Removes a value from the "Artificer-Limbo" bucket.
+# Parameters:
+#   $value - The value to be removed.
+# Note: Removes all instances of the value.
+sub remove_limbo {
+    my ($value) = @_;
+
+    # Fetch the current data
+    my $data_string = $client->GetBucket("Artificer-Limbo");
+    my $data_array = eval($data_string) || [];
+
+    # Remove the value
+    @$data_array = grep { $_ ne $value } @$data_array;
+
+    # Serialize and store the updated data
+    $client->SetBucket("Artificer-Limbo", Dumper($data_array));
+}
+
+# get_limbo()
+# Retrieves all values stored in the "Artificer-Limbo" bucket.
+# Returns:
+#   An array containing all the stored values.
+sub get_limbo {
+    # Fetch the current data
+    my $data_string = $client->GetBucket("Artificer-Limbo");
+    my $data_array = eval($data_string) || [];
+
+    # Return the entire array
+    return @$data_array;
+}
+
+# exists_limbo($value)
+# Checks if a value exists in the "Artificer-Limbo" bucket.
+# Parameters:
+#   $value - The value to check for.
+# Returns:
+#   1 if the value exists, 0 otherwise.
+sub exists_limbo {
+    my ($value) = @_;
+
+    # Fetch the current data
+    my $data_string = $client->GetBucket("Artificer-Limbo");
+    my $data_array = eval($data_string) || [];
+
+    # Check and return if the value exists
+    return grep { $_ eq $value } @$data_array ? 1 : 0;
 }
