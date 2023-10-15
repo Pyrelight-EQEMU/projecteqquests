@@ -15,7 +15,7 @@ sub EVENT_ITEM {
                 $Data::Dumper::Useqq   = 1;   # use double quotes always
                 $Data::Dumper::Purity  = 1;   # attempts to produce valid perl code
 
-                quest::debug(Dumper(\%item_data));
+                quest::debug(Dumper(\plugin::val('$item4_inst')));
              }
              plugin::return_items(\%itemcount);
         }
