@@ -346,21 +346,30 @@ sub test_upgrade {
     if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
         return 1; # Upgrade is possible
     }
-
+    
     # Recursive upgrade check
-    # Fetch all lesser-tier items related to the current item
     my $base_id = get_base_id($current_item_id);
     foreach my $item_id (keys %filtered_inventory) {
         next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
         
         # Recursively check if this lesser item can be upgraded
         if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
-            return test_upgrade($item_id, 1); # Recursive call
+            if (test_upgrade($item_id, 1)) { # Recursive call
+                
+                # After the successful recursive test, re-fetch the filtered inventory
+                %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
+                
+                # Re-check the direct upgrade possibility
+                if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
+                    return 1; # Upgrade is possible after recursive test
+                }
+            }
         }
     }
 
     return 0; # Upgrade is not possible
 }
+
 
 sub execute_upgrade {
     my ($current_item_id, $is_recursive) = @_;
