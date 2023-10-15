@@ -274,52 +274,6 @@ sub auto_upgrade_item {
     return 0; # Upgrade failed
 }
 
-sub get_all_items_in_inventory {
-    my $client = shift;
-
-    my @inventory_slots = (
-        quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
-        quest::getinventoryslotid("cursorbag.begin")..quest::getinventoryslotid("cursorbag.end"),
-        quest::getinventoryslotid("cursor"),
-        quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
-        quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
-        quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
-        quest::getinventoryslotid("sharedbank.begin")..quest::getinventoryslotid("sharedbank.end"),
-        quest::getinventoryslotid("sharedbankbags.begin")..quest::getinventoryslotid("sharedbankbags.end"),
-    );
-    
-    my %items_in_inventory;
-
-    foreach my $slot_id (@inventory_slots) {
-        if ($client->GetItemAt($slot_id)) {
-            my $item_id_at_slot = $client->GetItemIDAt($slot_id);
-            $items_in_inventory{$item_id_at_slot}++ if defined $item_id_at_slot;
-        }
-    }
-    
-    return \%items_in_inventory;
-}
-
-sub get_filtered_inventory {
-    my ($item_id, $provided_inventory) = @_;
-    
-    # Get the base ID of the given item
-    my $base_id_of_item = get_base_id($item_id);
-    
-    # Retrieve all items in inventory, unless an inventory hash is provided
-    my %all_items = defined $provided_inventory ? %{$provided_inventory} : %{ get_all_items_in_inventory($client) };
-    
-    # Filter items based on the given item's base ID and their item_id
-    my %filtered_items;
-    foreach my $inventory_item_id (keys %all_items) {
-        if (get_base_id($inventory_item_id) == $base_id_of_item && $inventory_item_id <= $item_id) {
-            $filtered_items{$inventory_item_id} = $all_items{$inventory_item_id};
-        }
-    }
-    
-    return \%filtered_items;
-}
-
 sub get_next_upgrade_id {
     my $item_id = shift;
 
@@ -398,6 +352,10 @@ sub test_upgrade {
 
             quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
+    }
+
+    if ($virtual_inventory->{$target_item_id} > 1) {
+        quest::debug("Successfully produced the $target_item_id");
     }
 
     return \%changes; # Return summary of changes
