@@ -347,9 +347,11 @@ sub deep_copy_hash {
     return \%new_hash;
 }
 
-sub get_upgrade_item {
-    my ($item_id) = @_;
+sub get_upgrade_items {
+    my ($item_id, $mod) = @_;
     my %item_counts;
+
+    $item_counts{$item_id} += $mod;
 
     # Continue until the item_id is reduced to a value less than or equal to 999999
     while ($item_id > 999999) {
@@ -373,7 +375,7 @@ sub test_upgrade {
 
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
-            $virtual_inventory = get_upgrade_item($current_item_id);
+            $virtual_inventory = get_upgrade_items($current_item_id, 1);
             $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
         }
 
