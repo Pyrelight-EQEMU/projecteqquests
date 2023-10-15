@@ -411,9 +411,8 @@ sub test_upgrade {
 
 sub execute_upgrade {
     my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
-
-    quest::debug("WTF: $current_item_id");
-    my $test_result = test_upgrade($item_id); 
+    
+    my $test_result = test_upgrade($current_item_id); 
 
     if ($is_recursive && $test_result->{success} && $test_result->{total_cost} <= get_upgrade_points()) {
 
