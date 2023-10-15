@@ -320,7 +320,7 @@ sub get_upgrade_items {
 }
 
 sub test_upgrade {
-    my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
+    my ($current_item_id, $is_recursive, $virtual_inventory, $total_cmc_cost) = @_;
 
     my $target_item_id = get_next_upgrade_id($current_item_id);
     my $prev_item_id = get_prev_upgrade_id($current_item_id);
@@ -344,12 +344,14 @@ sub test_upgrade {
 
         while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
 
-            test_upgrade($prev_item_id, 1, $virtual_inventory);
+            test_upgrade($prev_item_id, 1, $virtual_inventory, $total_cmc_cost);
         }
 
         if ($virtual_inventory->{$current_item_id} >= 2) {
             $virtual_inventory->{$current_item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
+
+            $total_cmc_cost += get_upgrade_cost($item_id);
 
             quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
@@ -357,6 +359,7 @@ sub test_upgrade {
 
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
         quest::debug("Successfully produced the $target_item_id");
+        quest::debug("Total Cost: $total_cmc_cost") unless $is_recursive;
         return 1;
     } else {
         quest::debug("Unable to upgrade $current_item_id to $target_item_id");
@@ -404,4 +407,48 @@ sub execute_upgrade {
     } else {
         quest::debug("Pre-Upgrade Test Failed!");
     }
+}
+
+sub get_upgrade_cost {
+    my $item_id = shift;
+    my $item_tier = get_upgrade_tier($item_id);
+    my $cost = (calculate_heroic_stat_sum($item_id) * $item_tier) + $item_tier;    
+
+    return $cost;
+}
+
+sub get_upgrade_points {
+    my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
+    return $CMC_Available;
+}
+
+sub calculate_heroic_stat_sum {
+    my $item_id = get_base_id(shift);
+
+    # Define the primary stats we want to sum up
+    my @primary_stats = qw(
+        heroicstr heroicsta heroicdex heroicagi 
+        heroicint heroicwis heroiccha
+    );
+
+    # Define the resistance stats we want to sum up and then halve
+    my @resistance_stats = qw(
+        heroicfr heroicmr heroic_r heroicpr heroicdr
+    );
+
+    # Fetch and sum the primary stats
+    my $primary_stat_total = 0;
+    foreach my $stat (@primary_stats) {
+        $primary_stat_total += $client->GetItemStat($item_id, $stat);
+    }
+
+    # Fetch the resistance stats, sum them up, and then halve the total
+    my $resistance_stat_total = 0;
+    foreach my $stat (@resistance_stats) {
+        $resistance_stat_total += $client->GetItemStat($item_id, $stat);
+    }
+    $resistance_stat_total /= 2;
+
+    # Return the total sum of primary and halved resistance stats
+    return $primary_stat_total + $resistance_stat_total;
 }
