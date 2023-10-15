@@ -53,7 +53,7 @@ sub EVENT_ITEM {
             } else {
                 plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
             }
-            $client->SetBucket("Artificer_CMC", ($client->GetBucket("Artificer_CMC") || 0) + $earned_points);
+            $client->SetBucket("Artificer_CMC", ($client->GetBucket("Artificer_CMC")) + $earned_points);
         } else {
             plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
         }
