@@ -360,7 +360,7 @@ sub test_upgrade {
             $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
         }
 
-        quest::debug("Current virtual inventory for item ID: $current_item_id -> $virtual_inventory->{$current_item_id}");
+        quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
 
         while ($virtual_inventory->{$current_item_id} < 2) {
             my $virtual_inventory_copy = deep_copy_hash($virtual_inventory);
