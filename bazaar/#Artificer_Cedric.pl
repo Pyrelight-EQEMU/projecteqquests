@@ -151,7 +151,7 @@ sub EVENT_SAY {
     }
 
     elsif ($test eq "link_cancel") {
-        my $item_id = $client->GetBucket("Artificer-WorkOrder") || 0;
+        my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
             $client->SummonItem($item_id);
             plugin::NPCTell("No problem! Here, have this back.");
@@ -161,7 +161,7 @@ sub EVENT_SAY {
     }
 
     elsif ($test eq "link_proceed") {
-        my $item_id = $client->GetBucket("Artificer-WorkOrder") || 0;
+        my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
             execute_upgrade($item_id);
         } else {
