@@ -14,9 +14,6 @@ sub EVENT_ITEM {
             foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_link = quest::varlink($item_id);
 
-                my %simulated_inventory = %{ get_all_items_in_inventory($client) };
-                $simulated_inventory{$item_id}++;  # Add back the item being considered for upgrade
-
                 if (is_item_upgradable($item_id) && test_upgrade($item_id)) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
