@@ -71,7 +71,7 @@ sub EVENT_SAY {
 
     if($text=~/hail/i) {
 
-        $client->RemoveItem(1029439);
+        $client->RemoveItem(29439);
 
 
         if (!$client->GetBucket("CedricVisit")) {
