@@ -21,6 +21,7 @@ sub EVENT_ITEM {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
                     execute_upgrade($item_id);
+                    return;
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                 }
