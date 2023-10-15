@@ -305,3 +305,86 @@ sub get_all_items_in_inventory {
     
     return \%items_in_inventory;
 }
+
+sub auto_upgrade_item {
+    my ($client, $item_id_to_upgrade, $target_upgrade) = @_;
+
+    # Create a clone of the player's inventory for simulation purposes
+    my %simulated_inventory = %{ get_all_items_in_inventory($client) };
+    
+    # Check if upgrade is possible in simulation
+    if (simulate_upgrade(\%simulated_inventory, $item_id_to_upgrade, $target_upgrade)) {
+        
+        # Perform actual inventory operations since simulation succeeded
+        execute_upgrade($client, $item_id_to_upgrade, $target_upgrade);
+        
+        return 1; # Upgrade successful
+    }
+    
+    return 0; # Upgrade failed
+}
+
+sub simulate_upgrade {
+    my ($inventory_ref, $item_id_to_upgrade, $target_upgrade) = @_;
+
+    my ($base_id, $current_tier) = get_base_id_and_tier($item_id_to_upgrade);
+    my $desired_tier = $current_tier + $target_upgrade;
+
+    # Check if desired tier exceeds the limit
+    return 0 unless is_item_upgradable($base_id + ($desired_tier * 1000000));
+
+    # If we already have a direct upgrade path, do it
+    if ($inventory_ref->{$base_id + ($desired_tier * 1000000)} &&
+        $inventory_ref->{$base_id + ($desired_tier * 1000000)} >= 2) {
+        return 1; # Success
+    }
+
+    # If direct path isn't available, attempt cascading upgrades
+    for (my $tier = $desired_tier - 1; $tier > $current_tier; $tier--) {
+        if ($inventory_ref->{$base_id + ($tier * 1000000)} &&
+            $inventory_ref->{$base_id + ($tier * 1000000)} >= 2) {
+            
+            # Recursively try to upgrade in simulation
+            if (simulate_upgrade($inventory_ref, $base_id + ($tier * 1000000), $target_upgrade)) {
+                return 1; # Success
+            }
+        }
+    }
+    
+    return 0; # Upgrade failed
+}
+
+sub execute_upgrade {
+    my ($client, $item_id_to_upgrade, $target_upgrade) = @_;
+
+    # Here, we are sure the upgrade is possible, so we directly modify the player's inventory
+
+    my ($base_id, $current_tier) = get_base_id_and_tier($item_id_to_upgrade);
+    my $desired_tier = $current_tier + $target_upgrade;
+
+    # Direct upgrade
+    if ($desired_tier - $current_tier == 1 && $client->GetItemCount($base_id + ($desired_tier * 1000000)) >= 2) {
+        
+        # Consume items
+        $client->RemoveItem($base_id + ($desired_tier * 1000000));
+        $client->RemoveItem($base_id + ($desired_tier * 1000000));
+
+        # Add upgraded item
+        $client->SummonItem(get_next_upgrade_id($base_id + ($desired_tier * 1000000)));
+        
+        return;
+    }
+
+    # Cascading upgrade
+    for (my $tier = $desired_tier - 1; $tier > $current_tier; $tier--) {
+        if ($client->GetItemCount($base_id + ($tier * 1000000)) >= 2) {
+            
+            # Consume items
+            $client->RemoveItem($base_id + ($tier * 1000000));
+            $client->RemoveItem($base_id + ($tier * 1000000));
+
+            # Add upgraded item
+            $client->SummonItem(get_next_upgrade_id($base_id + ($tier * 1000000)));
+        }
+    }
+}
