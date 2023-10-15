@@ -345,3 +345,26 @@ sub execute_upgrade {
     }
 }
 
+sub get_all_items_in_inventory {
+    my $client = shift;
+
+    my @inventory_slots = (
+        quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
+        quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
+        quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
+        quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
+        quest::getinventoryslotid("sharedbank.begin")..quest::getinventoryslotid("sharedbank.end"),
+        quest::getinventoryslotid("sharedbankbags.begin")..quest::getinventoryslotid("sharedbankbags.end"),
+    );
+    
+    my %items_in_inventory;
+
+    foreach my $slot_id (@inventory_slots) {
+        if ($client->GetItemAt($slot_id)) {
+            my $item_id_at_slot = $client->GetItemIDAt($slot_id);
+            $items_in_inventory{$item_id_at_slot}++ if defined $item_id_at_slot;
+        }
+    }
+    
+    return \%items_in_inventory;
+}
