@@ -289,6 +289,8 @@ sub get_all_items_in_inventory {
 
     my @inventory_slots = (
         quest::getinventoryslotid("possessions.begin")..quest::getinventoryslotid("possessions.end"),
+        quest::getinventoryslotid("cursorbag.begin")..quest::getinventoryslotid("cursorbag.end"),
+        quest::getinventoryslotid("cursor"),
         quest::getinventoryslotid("generalbags.begin")..quest::getinventoryslotid("generalbags.end"),
         quest::getinventoryslotid("bank.begin")..quest::getinventoryslotid("bank.end"),
         quest::getinventoryslotid("bankbags.begin")..quest::getinventoryslotid("bankbags.end"),
