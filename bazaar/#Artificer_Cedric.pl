@@ -472,6 +472,7 @@ sub get_upgrade_points {
 sub subtract_upgrade_points {
     my $amount = shift;
     my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
+    quest::debug("Subtracting $amount from CMC");
     $client->SetBucket("Artificer_CMC", $CMC_Available - $amount);
 }
 
