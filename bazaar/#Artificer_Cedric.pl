@@ -330,9 +330,9 @@ sub test_upgrade {
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
             $virtual_inventory = get_upgrade_items($current_item_id, 1);
-            $original_target_count = $virtual_inventory->{$target_item_id};
         }
-
+        
+        $original_target_count = $virtual_inventory->{$target_item_id};
         my $count = $client->CountItem($current_item_id);
 
         quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
