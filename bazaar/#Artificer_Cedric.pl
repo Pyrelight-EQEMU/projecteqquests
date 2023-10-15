@@ -54,7 +54,7 @@ sub EVENT_ITEM {
         }
 
         if ($earned_points > 0) {
-            plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
+            plugin::YellowText("You currently have $CMC_Available Concentrated Mana Crystals available.");
             if ($total_money > 0) {
                 plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
             } else {
