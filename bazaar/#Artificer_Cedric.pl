@@ -303,12 +303,7 @@ sub get_upgrade_items {
     my %item_counts;
 
     $item_counts{$item_id} = $mod;
-
-    my $base_id = get_base_id($item_id);
-    while ($base_id <= get_next_upgrade_id($item_id)) {
-        $item_counts->{$base_id} //= 0;
-        $base_id += 1000000;
-    }
+    $item_counts{get_next_upgrade_id($item_id)} = 0;
 
     # Continue until the item_id is reduced to a value less than or equal to 999999
     while ($item_id > 999999) {
