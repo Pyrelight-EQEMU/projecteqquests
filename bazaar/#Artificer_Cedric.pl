@@ -335,6 +335,9 @@ sub test_upgrade {
     # Fetch the filtered inventory based on the current item's base ID
     my %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
 
+    # Include the 'missing' item currently held by the NPC
+    $filtered_inventory{$current_item_id}++;
+
     # Direct upgrade check
     if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
         return 1; # Upgrade is possible
@@ -342,5 +345,6 @@ sub test_upgrade {
 
     return 0; # Upgrade is not possible
 }
+
 
 
