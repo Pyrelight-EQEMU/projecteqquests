@@ -15,23 +15,27 @@ sub EVENT_ITEM {
                 my $item_link = quest::varlink($item_id);
                 my $test_result = test_upgrade($item_id);
 
-                if (is_item_upgradable($item_id) && $test_result->{success}) {
-                    my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
-                    my $cmc_cost = $test_result->{total_cost};
-                    my $cmc_avail = get_upgrade_points();
+                if (is_item_upgradable($item_id)) {
+                    if ($test_result->{success}) {
+                        my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
+                        my $cmc_cost = $test_result->{total_cost};
+                        my $cmc_avail = get_upgrade_points();
 
-                    plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
-                    my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost ";
+                        plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
+                        my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to a [$next_item_link], it will cost you $cmc_cost ";
 
-                    if ( $cmc_avail >= $cmc_cost) {
-                        my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
-                        my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
-                        plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
-                        $client->SetBucket("Artificer-WorkOrder", $item_id);
-                        return;
+                        if ( $cmc_avail >= $cmc_cost) {
+                            my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
+                            my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
+                            plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
+                            $client->SetBucket("Artificer-WorkOrder", $item_id);
+                            return;
+                        } else {
+                            my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
+                            plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
+                        }
                     } else {
-                        my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
-                        plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
+                        plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. Seek them out, and return to me.");
                     }
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
