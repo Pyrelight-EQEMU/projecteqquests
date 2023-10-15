@@ -410,6 +410,6 @@ sub execute_upgrade {
             }
         }
     }
-
+    quest::debug("FAILED TO UPGRADE. ITEM LOSS HAS OCCURRED.");
     return 0; # No upgrade executed
 }
