@@ -14,7 +14,9 @@ sub EVENT_ITEM {
             foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_link = quest::varlink($item_id);
 
-                if (is_item_upgradable($item_id) && test_upgrade($item_id)) {
+                my $test_result = test_upgrade($item_id);
+
+                if (is_item_upgradable($item_id) && $test_result->{success}) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
                     #execute_upgrade($item_id);
@@ -340,7 +342,7 @@ sub test_upgrade {
         #quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
         
 
-        my $loop_limit = 3400; # A limit to prevent infinite loops
+        my $loop_limit = 100; # A limit to prevent infinite loops
         my $loop_count = 0;
 
         while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
