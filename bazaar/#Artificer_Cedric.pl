@@ -45,6 +45,7 @@ sub EVENT_ITEM {
         while ($total_money >= (500 * 1000)) {
             $total_money = $total_money - (500 * 1000);
             $earned_points++;
+            $$CMC_Available++;
         }
 
         if ($earned_points > 0) {
@@ -53,7 +54,7 @@ sub EVENT_ITEM {
             } else {
                 plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
             }
-            $client->SetBucket("Artificer_CMC", $CMC_Available + $earned_points);
+            $client->SetBucket("Artificer_CMC", $CMC_Available);
         } else {
             plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
         }
