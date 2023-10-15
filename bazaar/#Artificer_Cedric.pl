@@ -154,6 +154,7 @@ sub EVENT_SAY {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
             $client->SummonItem($item_id);
+            $client->DeleteBucket("Artificer-WorkOrder");
             plugin::NPCTell("No problem! Here, have this back.");
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
@@ -164,6 +165,7 @@ sub EVENT_SAY {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
             execute_upgrade($item_id);
+            $client->DeleteBucket("Artificer-WorkOrder");
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
         }
