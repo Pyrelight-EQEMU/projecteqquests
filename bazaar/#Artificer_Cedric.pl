@@ -380,7 +380,7 @@ sub execute_upgrade {
         quest::debug("Direct upgrade possible for item ID: $current_item_id");
         $client->RemoveItem($current_item_id);
         $client->RemoveItem($current_item_id) if $is_recursive; 
-        $client->AddItem($target_item_id,1);
+        $client->AddItem($target_item_id);
         return 1; # Upgrade executed
     }
     
@@ -399,7 +399,7 @@ sub execute_upgrade {
                     quest::debug("Direct upgrade possible after recursive upgrade for item ID: $current_item_id");
                     $client->RemoveItem($current_item_id);
                     $client->RemoveItem($current_item_id) if $is_recursive; 
-                    $client->AddItem($target_item_id,1);
+                    $client->AddItem($target_item_id);
                     return 1; # Upgrade executed
                 }
             }
