@@ -314,7 +314,7 @@ sub get_prev_upgrade_id {
     my $item_id = shift;
 
     if (is_item_upgradable($item_id) && $item_id > 1000000) {
-        return ($item_id + 1000000);
+        return ($item_id - 1000000);
     } else {
         return 0;
     }    
