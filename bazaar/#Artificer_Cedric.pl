@@ -353,48 +353,29 @@ sub test_upgrade {
     my $target_item_id = get_next_upgrade_id($current_item_id);
     my $prev_item_id = get_prev_upgrade_id($current_item_id);
 
-    my %changes; # To store the summary of changes
-    my %rec_changes;
-
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
             $virtual_inventory = get_filtered_inventory($current_item_id);
             $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
         }
 
-        quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
-        quest::debug("Trying to combine $current_item_id, next:$target_item_id, prev:$prev_item_id");
+        quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+        quest::debug("Trying to combine $current_item_id, next: $target_item_id, prev: $prev_item_id");
 
         my $loop_limit = 2; # A limit to prevent infinite loops
         my $loop_count = 0;
 
-        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && !%rec_changes && $loop_count++ < $loop_limit) {            
+        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
 
-            $rec_changes = test_upgrade($prev_item_id, 1, $virtual_inventory);
-
-            if (%{$rec_changes}) { # If there are changes
-                # Apply changes to $virtual_inventory
-                foreach my $changed_item_id (keys %{$rec_changes}) {
-                    $virtual_inventory->{$changed_item_id} += $rec_changes->{$changed_item_id};
-                }
-                last;
-            }
+            test_upgrade($prev_item_id, 1, $virtual_inventory);
         }
 
         if ($virtual_inventory->{$current_item_id} >= 2) {
             $virtual_inventory->{$current_item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
 
-            # Record these changes
-            $changes{$current_item_id} = -2;
-            $changes{$target_item_id} = 1;
+            quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
-    }
-
-    if (!%changes) {
-        quest::debug("Upgrade call failed");
-    } else {
-        quest::debug("Upgrade Occurred");
     }
 
     return \%changes; # Return summary of changes
