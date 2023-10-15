@@ -163,9 +163,10 @@ sub EVENT_SAY {
 
     elsif ($text eq "link_proceed") {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
+        quest::debug("item_id: $item_id");
         if (item_exists_in_db($item_id)) {
             execute_upgrade($item_id);
-            $client->DeleteBucket("Artificer-WorkOrder");
+            #$client->DeleteBucket("Artificer-WorkOrder");
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
         }
