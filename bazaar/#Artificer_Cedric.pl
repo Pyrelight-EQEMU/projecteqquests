@@ -10,19 +10,12 @@ sub EVENT_ITEM {
         } else {             
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
 
-                $Data::Dumper::Terse   = 1;   # avoids $VAR1 = ...
+                
                 $Data::Dumper::Indent  = 0;   # no whitespace or line breaks
                 $Data::Dumper::Useqq   = 1;   # use double quotes always
                 $Data::Dumper::Purity  = 1;   # attempts to produce valid perl code
 
                 quest::debug(Dumper(\%item_data));
-
-                my $item_name = quest::varlink($item_id);
-                #if (is_item_upgradable($item_id)) {                    
-
-                #} else {
-                #    plugin::NPCTell("I'm sorry, $clientName, I do not have the skills to improve your [$item_name].");
-                #}
              }
              plugin::return_items(\%itemcount);
         }
