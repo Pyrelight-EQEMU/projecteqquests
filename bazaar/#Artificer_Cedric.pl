@@ -331,44 +331,52 @@ sub get_filtered_inventory {
 }
 
 sub test_upgrade {
-    my ($current_item_id, $is_recursive) = @_;
+    my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
+
+    # If it's the top-level call, fetch the real inventory
+    if (!$is_recursive) {
+        $virtual_inventory = get_filtered_inventory($current_item_id);
+        # Include the 'missing' item currently held by the NPC
+        $virtual_inventory->{$current_item_id}++;
+    }
 
     # Determine the target upgrade ID
     my $target_item_id = get_next_upgrade_id($current_item_id);
-
-    # Fetch the filtered inventory based on the current item's base ID
-    my %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
-
-    # Include the 'missing' item currently held by the NPC if it's not a recursive call
-    $filtered_inventory{$current_item_id}++ unless $is_recursive;
+    quest::debug("Testing upgrade for item ID: $current_item_id. Target Upgrade ID: $target_item_id. Is Recursive: " . ($is_recursive ? 1 : 0));
 
     # Direct upgrade check
-    if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
+    if ($virtual_inventory->{$current_item_id} && $virtual_inventory->{$current_item_id} >= 2) {
+        quest::debug("Direct upgrade possible for item ID: $current_item_id");
+        # Virtually "consume" the items for upgrade in direct path
+        $virtual_inventory->{$current_item_id} -= 2;
+        $virtual_inventory->{$target_item_id}++;
         return 1; # Upgrade is possible
     }
-    
+
     # Recursive upgrade check
     my $base_id = get_base_id($current_item_id);
-    foreach my $item_id (keys %filtered_inventory) {
+    foreach my $item_id (keys %{$virtual_inventory}) {
         next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
         
+        quest::debug("Checking recursive upgrade for lesser item ID: $item_id related to $current_item_id");
+
         # Recursively check if this lesser item can be upgraded
-        if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
-            if (test_upgrade($item_id, 1)) { # Recursive call
-                
-                # After the successful recursive test, re-fetch the filtered inventory
-                %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
-                
-                # Re-check the direct upgrade possibility
-                if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
-                    return 1; # Upgrade is possible after recursive test
-                }
+        if ($virtual_inventory->{$item_id} && $virtual_inventory->{$item_id} >= 2) {
+            # Virtually "consume" the items for upgrade
+            $virtual_inventory->{$item_id} -= 2;
+            $virtual_inventory->{$target_item_id}++;
+
+            # Recursive call with updated virtual inventory
+            if (test_upgrade($item_id, 1, $virtual_inventory)) {
+                return 1; # Upgrade is possible
             }
         }
     }
 
     return 0; # Upgrade is not possible
 }
+
+
 
 
 sub execute_upgrade {
