@@ -390,7 +390,7 @@ sub execute_upgrade {
 
             $client->RemoveItem($current_item_id) if $is_recursive;
             $client->RemoveItem($current_item_id);
-            $client->SummonItem($target_item_id) unless $is_recursive;
+            $client->SummonItem($target_item_id);
 
             quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
