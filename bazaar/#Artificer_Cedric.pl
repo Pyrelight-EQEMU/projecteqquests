@@ -385,6 +385,11 @@ sub test_upgrade {
         }
     }
 
-    quest::debug("No further upgrades possible after recursively upgrading item ID: $current_item_id");
+    if ($changes = 0) {
+        quest::debug("Upgrade call failed");
+    } else {
+        quest::debug("Upgrade Occurred");
+    }
+
     return \%changes; # Return summary of changes
 }
