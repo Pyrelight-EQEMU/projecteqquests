@@ -7,20 +7,21 @@ sub EVENT_ITEM {
     if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
         if ($total_money > 0) {
             plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
-        } else {             
-             foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
-
-                $Data::Dumper::Terse   = 1;   # avoids $VAR1 = ...
-                $Data::Dumper::Indent  = 0;   # no whitespace or line breaks
-                $Data::Dumper::Useqq   = 1;   # use double quotes always
-                $Data::Dumper::Purity  = 1;   # attempts to produce valid perl code
-
-                quest::debug(Dumper(plugin::val('$item1_inst')));
-             }
-             plugin::return_items(\%itemcount);
+        } elsif ($itemcount{'0'} < 3) {             
+            plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
+        } else {
+            foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
+                my $item_link = quest::varlink($item_id);
+                if (is_item_upgradable($item_id)) {
+                    my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
+                    plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
+                } else {
+                    plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
+                }
+            }
         }
-    } else {
-        plugin::return_items(\%itemcount);        
+
+    } else {               
         my $earned_points = 0;
 
         while ($total_money >= (500 * 1000)) {
@@ -52,7 +53,8 @@ sub EVENT_ITEM {
         my $copper_remainder = $total_money;
 
         $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
-    }     
+    }
+    plugin::return_items_silent(\%itemcount);
 }
 
 sub EVENT_SAY {
@@ -70,10 +72,6 @@ sub EVENT_SAY {
     my $link_siphon_all = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
 
     if($text=~/hail/i) {
-
-        $client->RemoveItem(29439, 2);
-
-
         if (!$client->GetBucket("CedricVisit")) {
             plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
         } else {
@@ -200,4 +198,59 @@ sub exists_limbo {
 
     # Check and return if the value exists
     return grep { $_ eq $value } @$data_array ? 1 : 0;
+}
+
+# Returns the base ID of an item
+sub get_base_id {
+    my $item_id = shift;
+    return $item_id % 1000000; # Assuming item IDs increment by 1000000 per tier
+}
+
+# Returns the upgrade tier of an item
+sub get_upgrade_tier {
+    my $item_id = shift;
+    return int($item_id / 1000000); # Assuming item IDs increment by 1000000 per tier
+}
+
+# Wrapper function to return both base ID and upgrade tier
+sub get_base_id_and_tier {
+    my $item_id = shift;
+    return (get_base_id($item_id), get_upgrade_tier($item_id));
+}
+
+sub get_next_upgrade_id {
+    my $item_id = shift;
+
+    if (is_item_upgradable($item_id) && $item_id < 20000000) {
+        return ($item_id + 1000000);
+    } else {
+        return 0;
+    }    
+}
+
+sub is_item_upgradable {
+    my $item_id = shift;
+
+    #shortcut if we are already an upgraded item
+    if ($item_id >= 1000000) {
+        return 1;
+    }
+
+    # Calculate the next-tier item ID
+    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+
+    # Check if the next-tier item exists in the database
+    return item_exists_in_db($next_tier_item_id);
+}
+
+# Check if the specified item ID exists
+sub item_exists_in_db {
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
+    my $sth = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
+    $sth->execute($item_id);
+
+    my $result = $sth->fetchrow_array();
+
+    return $result > 0 ? 1 : 0;
 }
