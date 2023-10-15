@@ -24,13 +24,15 @@ sub EVENT_ITEM {
                     my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost ";
 
                     if ( $cmc_avail >= $cmc_cost) {
-                        $response = $response . "of your $cmc_avail Concentrated Mana Crystals. Would you [like to proceed]?";
+                        my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
+                        my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
+                        plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
+                        $client->SetBucket("Artificer-WorkOrder", $item_id);
+                        return;
                     } else {
                         my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
-                        $response = $response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?";
+                        plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
                     }
-
-                    plugin::NPCTell($response);
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                 }
@@ -145,6 +147,25 @@ sub EVENT_SAY {
             plugin::NPCTell("Ahh. Excellent. I've added $aa_drained crystals under your name to my ledger.");
         } else {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
+        }
+    }
+
+    elsif ($test eq "link_cancel") {
+        my $item_id = $client->GetBucket("Artificer-WorkOrder") || 0;
+        if (item_exists_in_db($item_id)) {
+            $client->SummonItem($item_id);
+            plugin::NPCTell("No problem! Here, have this back.");
+        } else {
+            plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
+        }
+    }
+
+    elsif ($test eq "link_proceed") {
+        my $item_id = $client->GetBucket("Artificer-WorkOrder") || 0;
+        if (item_exists_in_db($item_id)) {
+            execute_upgrade($item_id);
+        } else {
+            plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
         }
     }
 }
@@ -388,7 +409,9 @@ sub test_upgrade {
 sub execute_upgrade {
     my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
 
-    if ($is_recursive or test_upgrade($current_item_id)) {
+    my $test_result = test_upgrade($item_id); 
+
+    if ($is_recursive && $test_result->{success} && $test_result->{total_cost} <= get_upgrade_points()) {
 
         my $target_item_id = get_next_upgrade_id($current_item_id);
         my $prev_item_id = get_prev_upgrade_id($current_item_id);
@@ -419,6 +442,8 @@ sub execute_upgrade {
                 $client->RemoveItem($current_item_id);
                 $client->SummonItem($target_item_id);
 
+                subtract_upgrade_points(get_upgrade_cost($target_item_id));
+
                 quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             }
         }
@@ -438,6 +463,12 @@ sub get_upgrade_cost {
 sub get_upgrade_points {
     my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
     return $CMC_Available;
+}
+
+sub subtract_upgrade_points {
+    my $amount = shift;
+    my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
+    $client->SetBucket("Artificer_CMC", $CMC_Available - $amount);
 }
 
 sub calculate_heroic_stat_sum {
