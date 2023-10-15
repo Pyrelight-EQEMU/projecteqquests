@@ -13,14 +13,12 @@ sub EVENT_ITEM {
         } else {
             foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_link = quest::varlink($item_id);
-
                 my $test_result = test_upgrade($item_id);
 
                 if (is_item_upgradable($item_id) && $test_result->{success}) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
-                    plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
-                    #execute_upgrade($item_id);
-                    #return;
+                    my $cmc_cost = $test_result->{total_cost};
+                    plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost Concentrated Mana Crystals. Would you [like to proceed]?");
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                 }
@@ -345,8 +343,7 @@ sub test_upgrade {
         my $loop_limit = 2; # A limit to prevent infinite loops
         my $loop_count = 0;
 
-        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
-
+        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {
             test_upgrade($prev_item_id, 1, $virtual_inventory, $total_cmc_cost);
         }
 
