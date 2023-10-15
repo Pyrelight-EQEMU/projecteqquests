@@ -336,8 +336,8 @@ sub test_upgrade {
         $original_target_count = $virtual_inventory->{$target_item_id};
         my $count = $client->CountItem($current_item_id);
 
-        quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
-        quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
+        #quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+        #quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
         
 
         my $loop_limit = 3400; # A limit to prevent infinite loops
@@ -354,7 +354,7 @@ sub test_upgrade {
 
             $total_cmc_cost += get_upgrade_cost($target_item_id);
 
-            quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+            #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
     }
 
