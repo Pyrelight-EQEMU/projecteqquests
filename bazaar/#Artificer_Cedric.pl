@@ -308,7 +308,7 @@ sub get_upgrade_items {
     # Continue until the item_id is reduced to a value less than or equal to 999999
     while ($item_id > 999999) {
         # Count the current item
-        $item_counts{$item_id} = $client->CountItem($item_id);
+        $item_counts{$item_id} += $client->CountItem($item_id);
         # Subtract 1 million to get to the next 'tier' of item
         $item_id -= 1000000;
     }
