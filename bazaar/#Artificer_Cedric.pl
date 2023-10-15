@@ -225,16 +225,6 @@ sub get_base_id_and_tier {
     return (get_base_id($item_id), get_upgrade_tier($item_id));
 }
 
-sub get_next_upgrade_id {
-    my $item_id = shift;
-
-    if (is_item_upgradable($item_id) && $item_id < 20000000) {
-        return ($item_id + 1000000);
-    } else {
-        return 0;
-    }    
-}
-
 sub is_item_upgradable {
     my $item_id = shift;
 
@@ -310,14 +300,41 @@ sub get_all_items_in_inventory {
     return \%items_in_inventory;
 }
 
+sub get_next_upgrade_id {
+    my $item_id = shift;
+
+    if (is_item_upgradable($item_id) && $item_id < 20000000) {
+        return ($item_id + 1000000);
+    } else {
+        return 0;
+    }    
+}
+
+sub get_prev_upgrade_id {
+    my $item_id = shift;
+
+    if (is_item_upgradable($item_id) && $item_id > 1000000) {
+        return ($item_id + 1000000);
+    } else {
+        return 0;
+    }    
+}
+
+# Deep copy a hash
+sub deep_copy_hash {
+    my $hash_ref = shift;
+    my %new_hash = %{$hash_ref};
+    return \%new_hash;
+}
+
 sub get_filtered_inventory {
-    my ($item_id) = @_;
+    my ($item_id, $provided_inventory) = @_;
     
     # Get the base ID of the given item
     my $base_id_of_item = get_base_id($item_id);
-
-    # Retrieve all items in inventory
-    my %all_items = %{ get_all_items_in_inventory($client) };
+    
+    # Retrieve all items in inventory, unless an inventory hash is provided
+    my %all_items = defined $provided_inventory ? %{$provided_inventory} : %{ get_all_items_in_inventory($client) };
     
     # Filter items based on the given item's base ID and their item_id
     my %filtered_items;
@@ -333,100 +350,43 @@ sub get_filtered_inventory {
 sub test_upgrade {
     my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
 
-    # If it's the top-level call, fetch the real inventory
-    if (!$is_recursive) {
-        $virtual_inventory = get_filtered_inventory($current_item_id);
-        $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
-    }
-
-    # Debugging
-    quest::debug("Current virtual inventory for item ID: $current_item_id -> $virtual_inventory->{$current_item_id}");
-
-    # Determine the target upgrade ID
     my $target_item_id = get_next_upgrade_id($current_item_id);
 
-    # Direct upgrade check
-    if ($virtual_inventory->{$current_item_id} && $virtual_inventory->{$current_item_id} >= 2) {
-        quest::debug("Direct upgrade possible for item ID: $current_item_id");
-        $virtual_inventory->{$current_item_id} -= 2;
-        $virtual_inventory->{$target_item_id}++;
-        quest::debug("Current virtual inventory: " . join(", ", map { "$_: $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
-        return 1; # Upgrade is possible
-    }
+    my %changes; # To store the summary of changes
 
-    # Recursive upgrade check
-    my $base_id = get_base_id($current_item_id);
-    foreach my $item_id (keys %{$virtual_inventory}) {
-        next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
-        
-        quest::debug("Checking recursive upgrade for lesser item ID: $item_id related to $current_item_id with count: $virtual_inventory->{$item_id}");
+    if (is_item_upgradable($current_item_id) && $target_item_id) {
+        if (!$is_recursive) {
+            $virtual_inventory = get_filtered_inventory($current_item_id);
+            $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
+        }
 
-        # Recursively check if this lesser item can be upgraded
-        if ($virtual_inventory->{$item_id} && $virtual_inventory->{$item_id} >= 2) {
-            my $temp_inventory = {%$virtual_inventory}; # Clone the virtual inventory
-            $temp_inventory->{$item_id} -= 2;
-            $temp_inventory->{$target_item_id}++;
-            quest::debug("Temporary virtual inventory: " . join(", ", map { "$_: $temp_inventory->{$_}" } keys %{$temp_inventory}));
-            
-            if (test_upgrade($item_id, 1, $temp_inventory)) {
-                %$virtual_inventory = %$temp_inventory; # Commit the changes to the original virtual inventory
-                return 1; # Upgrade is possible
+        quest::debug("Current virtual inventory for item ID: $current_item_id -> $virtual_inventory->{$current_item_id}");
+
+        while ($virtual_inventory->{$current_item_id} < 2) {
+            my $virtual_inventory_copy = deep_copy_hash($virtual_inventory);
+            %{$virtual_inventory_copy} = %{ get_filtered_inventory(get_prev_upgrade_id($current_item_id), $virtual_inventory_copy) };
+
+            my $rec_changes = test_upgrade($current_item_id, 1, $virtual_inventory_copy);
+
+            if (%{$rec_changes}) { # If there are changes
+                # Apply changes to $virtual_inventory
+                foreach my $changed_item_id (keys %{$rec_changes}) {
+                    $virtual_inventory->{$changed_item_id} += $rec_changes->{$changed_item_id};
+                }
+                last;
             }
+        }
+
+        if ($virtual_inventory->{$current_item_id} >= 2) {
+            $virtual_inventory->{$current_item_id} -= 2;
+            $virtual_inventory->{$target_item_id}++;
+
+            # Record these changes
+            $changes{$current_item_id} = -2;
+            $changes{$target_item_id} = 1;
         }
     }
 
     quest::debug("No further upgrades possible after recursively upgrading item ID: $current_item_id");
-    return 0; # Upgrade is not possible
-}
-
-
-
-sub execute_upgrade {
-    my ($current_item_id, $is_recursive) = @_;
-
-    # Determine the target upgrade ID
-    my $target_item_id = get_next_upgrade_id($current_item_id);
-    quest::debug("Checking upgrade for item ID: $current_item_id. Target Upgrade ID: $target_item_id. Is Recursive: " . ($is_recursive ? 1 : 0));
-
-    # Fetch the filtered inventory based on the current item's base ID
-    my %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
-
-    # Include the 'missing' item currently held by the NPC if it's not a recursive call
-    $filtered_inventory{$current_item_id}++ unless $is_recursive;
-
-    # Direct upgrade check
-    if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
-        quest::debug("Direct upgrade possible for item ID: $current_item_id");
-
-        $client->RemoveItem($current_item_id);
-        $client->RemoveItem($current_item_id) if $is_recursive; 
-        $client->SummonItem($target_item_id);
-
-        return 1; # Upgrade executed
-    }
-    
-    # If direct upgrade is not possible, proceed with recursive upgrade check
-    my $base_id = get_base_id($current_item_id);
-    foreach my $item_id (keys %filtered_inventory) {
-        next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
-
-        quest::debug("Checking recursive upgrade for lesser item ID: $item_id related to $current_item_id");
-        
-        # Recursively check if this lesser item can be upgraded
-        if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
-            if (execute_upgrade($item_id, 1)) { # Recursive call
-                # After successful recursive upgrade, check direct upgrade for current item again
-                %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
-                if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
-                    quest::debug("Direct upgrade possible after recursive upgrade for item ID: $current_item_id");
-                    $client->RemoveItem($current_item_id);
-                    $client->RemoveItem($current_item_id) if $is_recursive; 
-                    $client->SummonItem($target_item_id);
-                    return 1; # Upgrade executed
-                }
-            }
-        }
-    }
-    quest::debug("FAILED TO UPGRADE. ITEM LOSS HAS OCCURRED.");
-    return 0; # No upgrade executed
+    return \%changes; # Return summary of changes
 }
