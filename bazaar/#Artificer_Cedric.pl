@@ -10,12 +10,12 @@ sub EVENT_ITEM {
         } else {             
              foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
 
-                
+                $Data::Dumper::Terse   = 1;   # avoids $VAR1 = ...
                 $Data::Dumper::Indent  = 0;   # no whitespace or line breaks
                 $Data::Dumper::Useqq   = 1;   # use double quotes always
                 $Data::Dumper::Purity  = 1;   # attempts to produce valid perl code
 
-                quest::debug(Dumper(\plugin::val('$item4_inst')));
+                quest::debug(Dumper(plugin::val('$item1_inst')));
              }
              plugin::return_items(\%itemcount);
         }
