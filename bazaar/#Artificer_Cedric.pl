@@ -352,7 +352,8 @@ sub test_upgrade {
 
     my $target_item_id = get_next_upgrade_id($current_item_id);
 
-    my %changes = 0; # To store the summary of changes
+    my %changes; # To store the summary of changes
+    my $rec_changes;
 
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
@@ -364,7 +365,7 @@ sub test_upgrade {
 
         while ($virtual_inventory->{$current_item_id} < 2 && get_prev_upgrade_id($current_item_id) && !%{$rec_changes}) {            
 
-            my $rec_changes = test_upgrade($current_item_id, 1, $virtual_inventory);
+            $rec_changes = test_upgrade($current_item_id, 1, $virtual_inventory);
 
             if (%{$rec_changes}) { # If there are changes
                 # Apply changes to $virtual_inventory
@@ -385,7 +386,7 @@ sub test_upgrade {
         }
     }
 
-    if ($changes = 0) {
+    if (!%changes) {
         quest::debug("Upgrade call failed");
     } else {
         quest::debug("Upgrade Occurred");
