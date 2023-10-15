@@ -355,9 +355,10 @@ sub test_upgrade {
 
     if ($virtual_inventory->{$target_item_id} >= 1) {
         quest::debug("Successfully produced the $target_item_id");
+        return 1;
     }
 
-    return \%changes; # Return summary of changes
+    return 0; # Return summary of changes
 }
 
 sub execute_upgrade {
