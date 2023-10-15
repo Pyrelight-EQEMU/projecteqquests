@@ -15,14 +15,14 @@ sub EVENT_ITEM {
                 $Data::Dumper::Useqq   = 1;   # use double quotes always
                 $Data::Dumper::Purity  = 1;   # attempts to produce valid perl code
 
-                quest::debug(Dumper(\%itemcount));
+                quest::debug(Dumper(\%item_data));
 
                 my $item_name = quest::varlink($item_id);
-                if (is_item_upgradable($item_id)) {                    
+                #if (is_item_upgradable($item_id)) {                    
 
-                } else {
-                    plugin::NPCTell("I'm sorry, $clientName, I do not have the skills to improve your [$item_name].");
-                }
+                #} else {
+                #    plugin::NPCTell("I'm sorry, $clientName, I do not have the skills to improve your [$item_name].");
+                #}
              }
              plugin::return_items(\%itemcount);
         }
