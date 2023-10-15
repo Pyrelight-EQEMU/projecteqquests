@@ -150,7 +150,7 @@ sub EVENT_SAY {
         }
     }
 
-    elsif ($test eq "link_cancel") {
+    elsif ($text eq "link_cancel") {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
             $client->SummonItem($item_id);
@@ -160,7 +160,7 @@ sub EVENT_SAY {
         }
     }
 
-    elsif ($test eq "link_proceed") {
+    elsif ($text eq "link_proceed") {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
             execute_upgrade($item_id);
