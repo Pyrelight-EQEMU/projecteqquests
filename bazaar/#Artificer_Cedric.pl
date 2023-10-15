@@ -26,7 +26,8 @@ sub EVENT_ITEM {
                     if ( $cmc_avail >= $cmc_cost) {
                         $response = $response . "of your $cmc_avail Concentrated Mana Crystals. Would you [like to proceed]?";
                     } else {
-                        $response = $response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to [obtain more]?";
+                        my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
+                        $response = $response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?";
                     }
 
                     plugin::NPCTell($response);
