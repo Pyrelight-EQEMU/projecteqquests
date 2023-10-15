@@ -300,6 +300,26 @@ sub get_all_items_in_inventory {
     return \%items_in_inventory;
 }
 
+sub get_filtered_inventory {
+    my ($item_id, $provided_inventory) = @_;
+    
+    # Get the base ID of the given item
+    my $base_id_of_item = get_base_id($item_id);
+    
+    # Retrieve all items in inventory, unless an inventory hash is provided
+    my %all_items = defined $provided_inventory ? %{$provided_inventory} : %{ get_all_items_in_inventory($client) };
+    
+    # Filter items based on the given item's base ID and their item_id
+    my %filtered_items;
+    foreach my $inventory_item_id (keys %all_items) {
+        if (get_base_id($inventory_item_id) == $base_id_of_item && $inventory_item_id <= $item_id) {
+            $filtered_items{$inventory_item_id} = $all_items{$inventory_item_id};
+        }
+    }
+    
+    return \%filtered_items;
+}
+
 sub get_next_upgrade_id {
     my $item_id = shift;
 
@@ -327,24 +347,22 @@ sub deep_copy_hash {
     return \%new_hash;
 }
 
-sub get_filtered_inventory {
-    my ($item_id, $provided_inventory) = @_;
-    
-    # Get the base ID of the given item
-    my $base_id_of_item = get_base_id($item_id);
-    
-    # Retrieve all items in inventory, unless an inventory hash is provided
-    my %all_items = defined $provided_inventory ? %{$provided_inventory} : %{ get_all_items_in_inventory($client) };
-    
-    # Filter items based on the given item's base ID and their item_id
-    my %filtered_items;
-    foreach my $inventory_item_id (keys %all_items) {
-        if (get_base_id($inventory_item_id) == $base_id_of_item && $inventory_item_id <= $item_id) {
-            $filtered_items{$inventory_item_id} = $all_items{$inventory_item_id};
-        }
+sub get_upgrade_item {
+    my ($item_id) = @_;
+    my %item_counts;
+
+    # Continue until the item_id is reduced to a value less than or equal to 999999
+    while ($item_id > 999999) {
+        # Count the current item
+        $item_counts{$item_id} = $client->CountItem($item_id);
+        # Subtract 1 million to get to the next 'tier' of item
+        $item_id -= 1000000;
     }
     
-    return \%filtered_items;
+    # Finally, count the base item
+    $item_counts{$item_id} = $client->CountItem($item_id);
+
+    return \%item_counts;
 }
 
 sub test_upgrade {
@@ -355,7 +373,7 @@ sub test_upgrade {
 
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
-            $virtual_inventory = get_filtered_inventory($current_item_id);
+            $virtual_inventory = get_upgrade_item($current_item_id);
             $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
         }
 
