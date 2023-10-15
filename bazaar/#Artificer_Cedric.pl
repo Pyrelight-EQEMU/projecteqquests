@@ -350,6 +350,7 @@ sub test_upgrade {
         quest::debug("Direct upgrade possible for item ID: $current_item_id");
         $virtual_inventory->{$current_item_id} -= 2;
         $virtual_inventory->{$target_item_id}++;
+        quest::debug("Current virtual inventory: " . join(", ", map { "$_: $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         return 1; # Upgrade is possible
     }
 
@@ -364,6 +365,7 @@ sub test_upgrade {
         if ($virtual_inventory->{$item_id} && $virtual_inventory->{$item_id} >= 2) {
             $virtual_inventory->{$item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
+            quest::debug("Current virtual inventory: " . join(", ", map { "$_: $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             if (test_upgrade($item_id, 1, $virtual_inventory)) {
                 return 1; # Upgrade is possible
             }
