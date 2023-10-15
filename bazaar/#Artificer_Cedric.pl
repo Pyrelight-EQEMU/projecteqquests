@@ -12,7 +12,10 @@ sub EVENT_ITEM {
         } else {
             foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_link = quest::varlink($item_id);
-                if (is_item_upgradable($item_id) && simulate_upgrade($item_id)) {
+
+                my %simulated_inventory = %{ get_all_items_in_inventory($client) };
+
+                if (is_item_upgradable($item_id) && simulate_upgrade(\%simulated_inventory, $item_id, $item_id + 1000000)) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
                 } else {
@@ -260,7 +263,7 @@ sub item_exists_in_db {
 }
 
 sub auto_upgrade_item {
-    my ($client, $item_id_to_upgrade, $target_upgrade) = @_;
+    my ($item_id_to_upgrade, $target_upgrade) = @_;
 
     # Create a clone of the player's inventory for simulation purposes
     my %simulated_inventory = %{ get_all_items_in_inventory($client) };
