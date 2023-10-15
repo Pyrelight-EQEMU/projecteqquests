@@ -357,7 +357,7 @@ sub get_upgrade_items {
 }
 
 sub test_upgrade {
-    my ($current_item_id, $is_recursive, $virtual_inventory, $total_cmc_cost) = @_;
+    my ($current_item_id, $is_recursive, $virtual_inventory, $total_cmc_cost_ref) = @_;
 
     my $target_item_id = get_next_upgrade_id($current_item_id);
     my $prev_item_id = get_prev_upgrade_id($current_item_id);
@@ -367,7 +367,8 @@ sub test_upgrade {
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
             $virtual_inventory = get_upgrade_items($current_item_id, 1);
-            $total_cmc_cost = 0;
+            my $total_cmc_cost = 0;
+            $total_cmc_cost_ref = \$total_cmc_cost;
         }
         
         $original_target_count = $virtual_inventory->{$target_item_id};
@@ -381,14 +382,14 @@ sub test_upgrade {
         my $loop_count = 0;
 
         while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {
-            test_upgrade($prev_item_id, 1, $virtual_inventory, $total_cmc_cost);
+            test_upgrade($prev_item_id, 1, $virtual_inventory, $total_cmc_cost_ref);
         }
 
         if ($virtual_inventory->{$current_item_id} >= 2) {
             $virtual_inventory->{$current_item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
 
-            $total_cmc_cost += get_upgrade_cost($target_item_id);
+            $$total_cmc_cost_ref += get_upgrade_cost($target_item_id);
 
             #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
@@ -396,7 +397,7 @@ sub test_upgrade {
 
     my $result = {
         success => 0,
-        total_cost => $total_cmc_cost
+        total_cost => $$total_cmc_cost_ref
     };
 
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
