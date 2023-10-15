@@ -352,7 +352,7 @@ sub test_upgrade {
 
     my $target_item_id = get_next_upgrade_id($current_item_id);
 
-    my %changes; # To store the summary of changes
+    my %changes = 0; # To store the summary of changes
 
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
@@ -362,7 +362,7 @@ sub test_upgrade {
 
         quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
 
-        while (($virtual_inventory->{$current_item_id} < 2) and get_prev_upgrade_id($current_item_id)) {
+        while ($virtual_inventory->{$current_item_id} < 2 && get_prev_upgrade_id($current_item_id) && !%{$rec_changes}) {
             my $virtual_inventory_copy = deep_copy_hash($virtual_inventory);
             %{$virtual_inventory_copy} = %{ get_filtered_inventory(get_prev_upgrade_id($current_item_id), $virtual_inventory_copy) };
 
