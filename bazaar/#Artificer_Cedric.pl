@@ -20,6 +20,7 @@ sub EVENT_ITEM {
                     my $cmc_cost = $test_result->{total_cost};
                     my $cmc_avail = get_upgrade_points();
 
+                    plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
                     my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost Concentrated Mana Crystals";
 
                     if ( $cmc_avail >= $cmc_cost) {
