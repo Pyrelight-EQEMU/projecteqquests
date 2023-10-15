@@ -327,7 +327,7 @@ sub get_filtered_inventory {
 }
 
 sub test_upgrade {
-    my ($current_item_id) = @_;
+    my ($current_item_id, $is_recursive) = @_;
 
     # Determine the target upgrade ID
     my $target_item_id = get_next_upgrade_id($current_item_id);
@@ -335,16 +335,29 @@ sub test_upgrade {
     # Fetch the filtered inventory based on the current item's base ID
     my %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
 
-    # Include the 'missing' item currently held by the NPC
-    $filtered_inventory{$current_item_id}++;
+    # Include the 'missing' item currently held by the NPC if it's not a recursive call
+    $filtered_inventory{$current_item_id}++ unless $is_recursive;
 
     # Direct upgrade check
     if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
         return 1; # Upgrade is possible
     }
 
+    # Recursive upgrade check
+    # Fetch all lesser-tier items related to the current item
+    my $base_id = get_base_id($current_item_id);
+    foreach my $item_id (keys %filtered_inventory) {
+        next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
+        
+        # Recursively check if this lesser item can be upgraded
+        if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
+            return test_upgrade($item_id, 1); # Recursive call
+        }
+    }
+
     return 0; # Upgrade is not possible
 }
+
 
 
 
