@@ -45,7 +45,7 @@ sub EVENT_ITEM {
         while ($total_money >= (500 * 1000)) {
             $total_money = $total_money - (500 * 1000);
             $earned_points++;
-            $$CMC_Available++;
+            $CMC_Available++;
         }
 
         if ($earned_points > 0) {
