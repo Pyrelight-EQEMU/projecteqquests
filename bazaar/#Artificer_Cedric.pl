@@ -17,8 +17,8 @@ sub EVENT_ITEM {
                 if (is_item_upgradable($item_id) && test_upgrade($item_id)) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link].");
-                    execute_upgrade($item_id);
-                    return;
+                    #execute_upgrade($item_id);
+                    #return;
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                 }
@@ -330,6 +330,7 @@ sub test_upgrade {
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
             $virtual_inventory = get_upgrade_items($current_item_id, 1);
+            $total_cmc_cost = 0;
         }
         
         $original_target_count = $virtual_inventory->{$target_item_id};
@@ -339,7 +340,7 @@ sub test_upgrade {
         quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
         
 
-        my $loop_limit = 2; # A limit to prevent infinite loops
+        my $loop_limit = 3400; # A limit to prevent infinite loops
         my $loop_count = 0;
 
         while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
@@ -357,14 +358,20 @@ sub test_upgrade {
         }
     }
 
+    my $result = {
+        success => 0,
+        total_cost => $total_cmc_cost
+    };
+
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
         quest::debug("Successfully produced the $target_item_id");
+        $result->{success} = 1;
         quest::debug("Total Cost: $total_cmc_cost") unless $is_recursive;
-        return 1;
     } else {
         quest::debug("Unable to upgrade $current_item_id to $target_item_id");
-        return 0; # Return summary of changes
-    }    
+    }
+
+    return $result; 
 }
 
 sub execute_upgrade {
