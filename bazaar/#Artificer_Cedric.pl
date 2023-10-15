@@ -348,6 +348,12 @@ sub test_upgrade {
     # Direct upgrade check
     if ($virtual_inventory->{$current_item_id} && $virtual_inventory->{$current_item_id} >= 2) {
         quest::debug("Direct upgrade possible for item ID: $current_item_id");
+
+        # Virtually "consume" the items for upgrade
+        $virtual_inventory->{$item_id}-- if $is_recursive;;
+        $virtual_inventory->{$item_id}--;
+        $virtual_inventory->{$target_item_id}++;
+
         return 1; # Upgrade is possible
     }
 
@@ -363,7 +369,8 @@ sub test_upgrade {
             quest::debug("Recursive upgrade possible for lesser item ID: $item_id");
 
             # Virtually "consume" the items for upgrade
-            $virtual_inventory->{$item_id} -= 2;
+            $virtual_inventory->{$item_id}-- if $is_recursive;;
+            $virtual_inventory->{$item_id}--;
             $virtual_inventory->{$target_item_id}++;
 
             # Recursive call with updated virtual inventory
