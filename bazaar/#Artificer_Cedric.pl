@@ -361,44 +361,36 @@ sub test_upgrade {
 }
 
 sub execute_upgrade {
-    my ($current_item_id) = @_;
+    my ($current_item_id, $is_recursive) = @_;
 
-    # Get the current inventory, considering the item given to the NPC
-    my %inventory = %{ get_filtered_inventory($current_item_id) };
-    $inventory{$current_item_id}++;
+    # Determine the target upgrade ID
+    my $target_item_id = get_next_upgrade_id($current_item_id);
 
-    my $next_upgrade_id = get_next_upgrade_id($current_item_id);
-    
-    # Check if a direct upgrade is possible
-    if ($inventory{$current_item_id} && $inventory{$current_item_id} >= 2) {
-        # Consume the item from the client's inventory
+    # Fetch the filtered inventory based on the current item's base ID
+    my %filtered_inventory = %{ get_filtered_inventory($current_item_id) };
+
+    # Include the 'missing' item currently held by the NPC if it's not a recursive call
+    $filtered_inventory{$current_item_id}++ unless $is_recursive;
+
+    # Direct upgrade check
+    if ($filtered_inventory{$current_item_id} && $filtered_inventory{$current_item_id} >= 2) {
+        $client->RemoveItem($current_item_id) if $is_recursive; 
         $client->RemoveItem($current_item_id);
-        
-        # Add upgraded item to client's inventory
-        $client->SummonItem($next_upgrade_id);
-        return 1; # Indicate success
+        $client->SummonItem($target_item_id);
+        return 1; # Upgrade is possible
     }
-    
-    # If direct upgrade isn't possible, try recursive upgrade
+
+    # Recursive upgrade check
+    # Fetch all lesser-tier items related to the current item
     my $base_id = get_base_id($current_item_id);
-    my $current_tier = get_upgrade_tier($current_item_id);
-    
-    for (my $tier = $current_tier - 1; $tier >= 0; $tier--) {
-        my $item_id_at_tier = $base_id + ($tier * 1000000);
+    foreach my $item_id (keys %filtered_inventory) {
+        next unless $item_id < $current_item_id && get_base_id($item_id) == $base_id;
         
-        if ($inventory{$item_id_at_tier} && $inventory{$item_id_at_tier} >= 2) {
-            if (execute_upgrade($client, $item_id_at_tier)) {
-                # Try direct upgrade again after the recursive upgrade
-                if ($inventory{$current_item_id} && $inventory{$current_item_id} >= 2) {
-                    $client->RemoveItem($current_item_id);
-                    $client->SummonItem($next_upgrade_id);
-                    return 1; # Indicate success
-                }
-            }
+        # Recursively check if this lesser item can be upgraded
+        if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
+            return execute_upgrade($item_id, 1); # Recursive call
         }
     }
 
-    return 0; # Indicate failure
+    return 0; # Upgrade is not possible
 }
-
-
