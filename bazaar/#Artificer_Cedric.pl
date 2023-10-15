@@ -18,7 +18,17 @@ sub EVENT_ITEM {
                 if (is_item_upgradable($item_id) && $test_result->{success}) {
                     my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                     my $cmc_cost = $test_result->{total_cost};
-                    plugin::NPCTell("This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost Concentrated Mana Crystals. Would you [like to proceed]?");
+                    my $cmc_avail = get_upgrade_points();
+
+                    my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to an [$next_item_link], it will cost you $cmc_cost Concentrated Mana Crystals";
+
+                    if ( $cmc_avail >= $cmc_cost) {
+                        $response = $response . ". Would you [like to proceed]?";
+                    } else {
+                        $response = $response . ", but you only have $cmc_avail. Would you like to [obtain more]?";
+                    }
+
+                    plugin::NPCTell($response);
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                 }
