@@ -325,34 +325,55 @@ sub auto_upgrade_item {
 }
 
 sub simulate_upgrade {
-    my ($inventory_ref, $item_id_to_upgrade, $target_upgrade) = @_;
+    my ($inventory_ref, $item_id_to_upgrade, $target_item_id) = @_;
+
+    my %simulated_inventory = %$inventory_ref;
 
     my ($base_id, $current_tier) = get_base_id_and_tier($item_id_to_upgrade);
-    my $desired_tier = $current_tier + $target_upgrade;
+    my $desired_tier = get_upgrade_tier($target_item_id);
+
+    # Debug: print current and desired tiers
+    plugin::NPCTell("Debug: Attempting to upgrade from tier $current_tier to tier $desired_tier.");
 
     # Check if desired tier exceeds the limit
-    return 0 unless is_item_upgradable($base_id + ($desired_tier * 1000000));
+    if (!is_item_upgradable($base_id + ($desired_tier * 1000000))) {
+        plugin::NPCTell("Debug: Desired tier exceeds limit.");
+        return 0;
+    }
 
-    # If we already have a direct upgrade path, do it
-    if ($inventory_ref->{$base_id + ($desired_tier * 1000000)} &&
-        $inventory_ref->{$base_id + ($desired_tier * 1000000)} >= 2) {
+    # If we already have a direct upgrade path, return true
+    if ($simulated_inventory{$base_id + ($desired_tier * 1000000)} &&
+        $simulated_inventory{$base_id + ($desired_tier * 1000000)} >= 2) {
+        plugin::NPCTell("Debug: Direct upgrade path available.");
         return 1; # Success
+    }
+
+    # Debug: print current inventory state
+    foreach my $item (keys %simulated_inventory) {
+        plugin::NPCTell("Debug: Inventory has $simulated_inventory{$item} of item ID $item.");
     }
 
     # If direct path isn't available, attempt cascading upgrades
     for (my $tier = $desired_tier - 1; $tier > $current_tier; $tier--) {
-        if ($inventory_ref->{$base_id + ($tier * 1000000)} &&
-            $inventory_ref->{$base_id + ($tier * 1000000)} >= 2) {
-            
-            # Recursively try to upgrade in simulation
-            if (simulate_upgrade($inventory_ref, $base_id + ($tier * 1000000), $target_upgrade)) {
+        if ($simulated_inventory{$base_id + ($tier * 1000000)} &&
+            $simulated_inventory{$base_id + ($tier * 1000000)} >= 2) {
+            # Debug: print current tier under consideration
+            plugin::NPCTell("Debug: Checking upgrade possibility from tier $tier.");
+
+            # Recursively try to upgrade
+            if (simulate_upgrade(\%simulated_inventory, $base_id + ($tier * 1000000), $target_item_id)) {
+                plugin::NPCTell("Debug: Upgrade possible from tier $tier.");
                 return 1; # Success
+            } else {
+                plugin::NPCTell("Debug: Upgrade not possible from tier $tier.");
             }
         }
     }
-    
+
+    plugin::NPCTell("Debug: Overall upgrade failed.");
     return 0; # Upgrade failed
 }
+
 
 sub execute_upgrade {
     my ($client, $item_id_to_upgrade, $target_upgrade) = @_;
