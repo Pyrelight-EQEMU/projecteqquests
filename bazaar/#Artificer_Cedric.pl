@@ -358,9 +358,10 @@ sub test_upgrade {
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
         quest::debug("Successfully produced the $target_item_id");
         return 1;
-    }
-
-    return 0; # Return summary of changes
+    } else {
+        quest::debug("Unable to upgrade $current_item_id to $target_item_id");
+        return 0; # Return summary of changes
+    }    
 }
 
 sub execute_upgrade {
