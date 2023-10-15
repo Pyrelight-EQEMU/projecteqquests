@@ -359,3 +359,46 @@ sub test_upgrade {
 
     return \%changes; # Return summary of changes
 }
+
+sub execute_upgrade {
+    my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
+
+    my $target_item_id = get_next_upgrade_id($current_item_id);
+    my $prev_item_id = get_prev_upgrade_id($current_item_id);
+
+    if (is_item_upgradable($current_item_id) && $target_item_id) {
+        if (!$is_recursive) {
+            $virtual_inventory = get_upgrade_items($current_item_id, 1);
+        }
+
+        my $count = $client->CountItem($current_item_id);
+
+        quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+        quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");        
+
+        my $loop_limit = 2; # A limit to prevent infinite loops
+        my $loop_count = 0;
+
+        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
+
+            execute_upgrade($prev_item_id, 1, $virtual_inventory);
+        }
+
+        if ($virtual_inventory->{$current_item_id} >= 2) {
+            $virtual_inventory->{$current_item_id} -= 2;
+            $virtual_inventory->{$target_item_id}++;
+
+            $client->RemoveItem($current_item_id) if $is_recursive;
+            $client->RemoveItem($current_item_id);
+            $client->SummonItem($target_item_id) unless $is_recursive;
+
+            quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+        }
+    }
+
+    if ($virtual_inventory->{$target_item_id} >= 1) {
+        quest::debug("Successfully produced the $target_item_id");
+    }
+
+    return \%changes; # Return summary of changes
+}
