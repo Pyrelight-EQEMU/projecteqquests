@@ -362,6 +362,7 @@ sub test_upgrade {
         }
 
         quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
+        quest::debug("Trying to combine $current_item_id");
 
         my $loop_limit = 20; # A limit to prevent infinite loops
         my $loop_count = 0;
