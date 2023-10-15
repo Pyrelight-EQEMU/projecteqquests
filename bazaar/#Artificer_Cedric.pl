@@ -351,6 +351,7 @@ sub test_upgrade {
     my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
 
     my $target_item_id = get_next_upgrade_id($current_item_id);
+    my $prev_item_id = get_prev_upgrade_id($current_item_id);
 
     my %changes; # To store the summary of changes
     my %rec_changes;
@@ -362,14 +363,14 @@ sub test_upgrade {
         }
 
         quest::debug("Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
-        quest::debug("Trying to combine $current_item_id");
+        quest::debug("Trying to combine $current_item_id, next:$target_item_id, prev:");
 
         my $loop_limit = 2; # A limit to prevent infinite loops
         my $loop_count = 0;
 
-        while ($virtual_inventory->{$current_item_id} < 2 && get_prev_upgrade_id($current_item_id) && !%rec_changes && $loop_count++ < $loop_limit) {            
+        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && !%rec_changes && $loop_count++ < $loop_limit) {            
 
-            $rec_changes = test_upgrade($current_item_id, 1, $virtual_inventory);
+            $rec_changes = test_upgrade($prev_item_id, 1, $virtual_inventory);
 
             if (%{$rec_changes}) { # If there are changes
                 # Apply changes to $virtual_inventory
