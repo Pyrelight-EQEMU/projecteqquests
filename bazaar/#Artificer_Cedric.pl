@@ -365,7 +365,7 @@ sub test_upgrade {
         
         # Recursively check if this lesser item can be upgraded
         if ($filtered_inventory{$item_id} && $filtered_inventory{$item_id} >= 2) {
-            if (test_upgrade($item_id, 1)) { # Recursive call            
+            if (test_upgrade($item_id, 1, $virtual_inventory)) { # Recursive call            
                 if ($virtual_inventory{$current_item_id} && $virtual_inventory{$current_item_id} >= 2) {
                     quest::debug("Direct upgrade possible after recursive upgrade for item ID: $current_item_id");
 
