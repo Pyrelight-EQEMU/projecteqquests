@@ -314,7 +314,7 @@ sub get_upgrade_items {
     }
     
     # Finally, count the base item
-    $item_counts{$item_id} = $client->CountItem($item_id);
+    $item_counts{$item_id} += $client->CountItem($item_id);
 
     return \%item_counts;
 }
