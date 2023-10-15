@@ -351,7 +351,7 @@ sub test_upgrade {
             $virtual_inventory->{$current_item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
 
-            $total_cmc_cost += get_upgrade_cost($item_id);
+            $total_cmc_cost += get_upgrade_cost($target_item_id);
 
             quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
