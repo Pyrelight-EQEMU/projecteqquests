@@ -377,8 +377,11 @@ sub test_upgrade {
             $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
         }
 
+        my $count = $client->CountItem($current_item_id);
+
         quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
-        quest::debug("Trying to combine $current_item_id, next: $target_item_id, prev: $prev_item_id");
+        quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
+        
 
         my $loop_limit = 2; # A limit to prevent infinite loops
         my $loop_count = 0;
