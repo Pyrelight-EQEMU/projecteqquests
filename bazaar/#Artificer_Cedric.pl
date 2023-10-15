@@ -376,7 +376,6 @@ sub test_upgrade {
     if (is_item_upgradable($current_item_id) && $target_item_id) {
         if (!$is_recursive) {
             $virtual_inventory = get_upgrade_items($current_item_id, 1);
-            $virtual_inventory->{$current_item_id}++; # Include the 'missing' item currently held by the NPC
         }
 
         my $count = $client->CountItem($current_item_id);
