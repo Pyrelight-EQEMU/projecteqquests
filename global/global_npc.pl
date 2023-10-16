@@ -389,7 +389,7 @@ sub UPDATE_PET_STATS
                 #    my $hsta_total += $pet->GetItemStat($item_id, "heroicsta");
                 #}
 
-                $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $hsta_total);                            
+                #$bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $hsta_total);                            
             }
 
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
@@ -413,7 +413,7 @@ sub UPDATE_PET_STATS
                     $bucket_value = max($damage_bonus*2, $bucket_value);
                 }
 
-                $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() / 10);            
+                $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() * 10);            
             }
 
             $bucket_value *= $pet_scalar;
