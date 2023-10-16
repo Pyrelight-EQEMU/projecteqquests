@@ -122,7 +122,7 @@ sub upgrade_item_tier {
     $tier = $current_tier + $tier;
 
     $entity->RemoveItem($item_id);
-    $entity->AddItem($base_id + ($tier * 1000000));
+    $entity->AddItem($base_id + ($tier * 1000000), 1);
 }
 
 sub CHECK_CHARM_STATUS
