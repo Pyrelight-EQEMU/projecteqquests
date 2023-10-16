@@ -123,7 +123,11 @@ for my $tier (1..20) {
                     $row->{healamt}  = $row->{healamt} + floor($tier * 0.10 * (max($row->{aint}, $row->{awis}, $row->{astr})));
                 }
                 
-                $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 5 : 20));
+                if ($row->{itemtype} == 54) {
+                    $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 0 : 5));
+                } else {
+                    $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 5 : 20));
+                }
 				
 				# Adjusting Heroic Stats
 				$row->{heroic_str} = ceil($row->{heroic_str} * $modifier) + ceil($row->{astr} * $modifier_raw);
