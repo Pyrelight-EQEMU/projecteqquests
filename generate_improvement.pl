@@ -132,7 +132,7 @@ for my $tier (1..20) {
 
 $dbh->disconnect();
 
-sub is_slot_in {
+sub slots {
     my ($bitmask, @slots) = @_;
     my %slot_to_bitmask = (
         'Secondary' => 16384,
