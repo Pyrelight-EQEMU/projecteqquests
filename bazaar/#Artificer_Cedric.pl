@@ -470,11 +470,13 @@ sub execute_upgrade {
 
                     $client->RemoveItem($item_id);
 
-                    #my $count_after = $client->CountItem($item_id);
+                    my $count_after = $client->CountItem($item_id);
 
-                    #if ($count_before == $count_after) {
-                    #    quest::debug("WARNING: ITEM NOT DELETED: $item_id");
-                    #}
+                    if ($count_before == $count_after) {
+                        plugin::RedText("WARNING: ITEM NOT DELETED: $item_id");
+                    } else {
+                        quest::debug("DELETED $item_id");
+                    }
 
                     $ledger->{$item_id}++;
                 }
