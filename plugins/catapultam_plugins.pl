@@ -359,3 +359,18 @@ sub return_items_silent {
 	# Return true if items were returned
 	return ($items_returned || $returned_money);
 }
+
+# Check if the specified item ID exists
+sub item_exists_in_db {
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
+    my $sth = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
+    $sth->execute($item_id);
+
+    my $result = $sth->fetchrow_array();
+
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $result > 0 ? 1 : 0;
+}

@@ -294,6 +294,9 @@ sub item_exists_in_db {
 
     my $result = $sth->fetchrow_array();
 
+    $sth->finish();
+    $dbh->disconnect();
+
     return $result > 0 ? 1 : 0;
 }
 
