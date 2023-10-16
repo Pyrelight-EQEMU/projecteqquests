@@ -30,7 +30,6 @@ sub EVENT_ITEM {
         } else {
             foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
                 my $item_link = quest::varlink($item_id);
-                my $test_result = test_upgrade($item_id);
 
                 if ($item_id >= 1000000) {
                     my $base_id = get_base_id($item_id);
