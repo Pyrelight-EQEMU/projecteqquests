@@ -417,7 +417,7 @@ sub test_upgrade {
 }
 
 sub execute_upgrade {
-    my ($current_item_id, $is_recursive, $virtual_inventory) = @_;
+    my ($current_item_id, $is_recursive, $virtual_inventory, $ledger) = @_;
     
     my $test_result = test_upgrade($current_item_id) unless $is_recursive;
 
@@ -429,6 +429,7 @@ sub execute_upgrade {
         if (is_item_upgradable($current_item_id) && $target_item_id) {
             if (!$is_recursive) {
                 $virtual_inventory = get_upgrade_items($current_item_id, 1);
+                $ledger = {};
             }
 
             my $count = $client->CountItem($current_item_id);
@@ -441,22 +442,40 @@ sub execute_upgrade {
 
             while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {           
 
-                execute_upgrade($prev_item_id, 1, $virtual_inventory);
+                execute_upgrade($prev_item_id, 1, $virtual_inventory, $ledger);
             }
 
             if ($virtual_inventory->{$current_item_id} >= 2) {
                 $virtual_inventory->{$current_item_id} -= 2;
-                $virtual_inventory->{$target_item_id}++;
+                $virtual_inventory->{$target_item_id}++;                
 
-                $client->RemoveItem($current_item_id) if $is_recursive;
-                $client->RemoveItem($current_item_id);
-                $client->SummonItem($target_item_id);
+                $ledger->{$current_item_id}-- if $is_recursive;
+                $ledger->{$current_item_id}--;
+                $ledger->{$target_item_id}++;
 
                 subtract_upgrade_points(get_upgrade_cost($target_item_id));
 
                 #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             }
         }
+
+        if (not $is_recursive) {
+            # Apply changes in ledger to actual inventory
+            foreach my $item_id (keys %$ledger) {
+                # If the value is negative, remove items
+                while ($ledger->{$item_id} < 0) {
+                    $client->RemoveItem($item_id);
+                    $ledger->{$item_id}++;
+                }
+
+                # If the value is positive, summon items
+                while ($ledger->{$item_id} > 0) {
+                    $client->SummonItem($item_id);
+                    $ledger->{$item_id}--;
+                }
+            }
+        }
+
     } else {
         quest::debug("Pre-Upgrade Test Failed!");
     }
