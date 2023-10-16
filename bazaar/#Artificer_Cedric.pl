@@ -466,15 +466,15 @@ sub execute_upgrade {
                 # If the value is negative, remove items
                 while ($ledger->{$item_id} < 0) {
 
-                    my $count_before = $client->CountItem($item_id);
+                    #my $count_before = $client->CountItem($item_id);
 
                     $client->RemoveItem($item_id);
 
-                    my $count_after = $client->CountItem($item_id);
+                    #my $count_after = $client->CountItem($item_id);
 
-                    if ($count_before == $count_after) {
-                        quest::debug("WARNING: ITEM NOT DELETED: $item_id");
-                    }
+                    #if ($count_before == $count_after) {
+                    #    quest::debug("WARNING: ITEM NOT DELETED: $item_id");
+                    #}
 
                     $ledger->{$item_id}++;
                 }
@@ -495,7 +495,7 @@ sub execute_upgrade {
 sub get_upgrade_cost {
     my $item_id = shift;
     my $item_tier = get_upgrade_tier($item_id);
-    my $cost = POSIX::floor((0.25 * (calculate_heroic_stat_sum($item_id) * $item_tier) + $item_tier));    
+    my $cost = int((0.25 * (calculate_heroic_stat_sum($item_id) * $item_tier) + $item_tier));    
 
     return $cost;
 }
