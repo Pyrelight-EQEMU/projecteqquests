@@ -98,7 +98,7 @@ for my $tier (1..20) {
 
                 next if $all_zero; # Skip to next iteration if all values are zero or less
 
-                my $modifier_raw 	  = ($tier * 0.10);
+                my $modifier_raw 	  = ($tier * 0.15);
                 my $modifier_half_raw = $modifier_raw/2;
 				
 				my $modifier      = $modifier_raw + 1;
