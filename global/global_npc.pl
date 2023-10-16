@@ -89,16 +89,30 @@ sub EVENT_ITEM
     }
 }
 
-sub EVENT_DEATH_COMPLETE
-{
+sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();
 
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-
     my @lootlist = $corpse->GetLootList();
+
     foreach my $item_id (@lootlist) {
-        quest::debug($item_id);
+        my $chance = rand();
+        if ($chance < 0.10) {
+            upgrade_item_tier($item_id, 1, $corpse);
+        }
+
+        elsif ($chance < 0.01) {
+            upgrade_item_tier($item_id, 2, $corpse);
+        }
     }
+}
+
+
+sub upgrade_item_tier {
+    my ($item_id, $tier, $entity)  = @_;
+
+    $entity->RemoveItem($item_id);
+    $entity->AddItem($item_id + ($tier * 1000000));
 }
 
 sub CHECK_CHARM_STATUS
