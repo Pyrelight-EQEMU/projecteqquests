@@ -465,6 +465,7 @@ sub execute_upgrade {
                 # If the value is negative, remove items
                 while ($ledger->{$item_id} < 0) {
                     $client->RemoveItem($item_id);
+                    quest::debug("DELETING: $item_id");
                     $ledger->{$item_id}++;
                 }
 
