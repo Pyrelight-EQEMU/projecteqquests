@@ -110,6 +110,8 @@ for my $tier (1..20) {
 				if ($row->{charmfile} =~ /^(\d+)#/) {
 					$row->{charmfile} =~ s/^\d+#/$row->{id}#/;
 				}
+
+                $row->{attuneable} = 1;
 				
 				# Basic Stats                                
                 if ($row->{damage} > 0) {

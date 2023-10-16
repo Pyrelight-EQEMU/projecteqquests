@@ -483,7 +483,7 @@ sub execute_upgrade {
 
                 # If the value is positive, summon items
                 while ($ledger->{$item_id} > 0) {
-                    $client->SummonItem($item_id);
+                    $client->SummonItem($item_id, 1, 1);
                     $ledger->{$item_id}--;
                 }
             }
