@@ -77,7 +77,11 @@ sub slots {
 my $max_id = 999999;
 my $chunk_size = 1000;
 
-for my $tier (1..20) {
+#delete existing scaled items
+my $delquery = $dbh->prepare("DELETE FROM items WHERE items.id > ?");
+$delquery->execute($max_id);
+
+for my $tier (1..10) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
         # Fetch data from the table
         my $sth = $dbh->prepare("SELECT * FROM items WHERE items.id BETWEEN ? AND ?");
@@ -98,7 +102,7 @@ for my $tier (1..20) {
 
                 next if $all_zero; # Skip to next iteration if all values are zero or less
 
-                my $modifier_raw 	  = ($tier * 0.15);
+                my $modifier_raw 	  = ($tier * 0.30);
                 my $modifier_half_raw = $modifier_raw/2;
 				
 				my $modifier      = $modifier_raw + 1;
