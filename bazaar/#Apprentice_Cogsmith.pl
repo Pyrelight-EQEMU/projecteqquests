@@ -16,6 +16,10 @@ sub EVENT_SAY {
       $response = "I'd be happy to help you! Just hand me the item, and I'll make it happen for you.";
       $client->SetBucket("Artificer_Apprentice", 1);
    }
+
+    if ($response ne "") {
+        plugin::NPCTell($response);
+    }
 }
 
 sub EVENT_ITEM {
