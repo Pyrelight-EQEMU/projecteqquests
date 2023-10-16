@@ -497,9 +497,10 @@ sub execute_upgrade {
 sub get_upgrade_cost {
     my $item_id = shift;
     my $item_tier = get_upgrade_tier($item_id);
-    my $cost = (0.25 * (calculate_heroic_stat_sum($item_id) * $item_tier) + $item_tier);
+    my $stat_sum = calculate_heroic_stat_sum($item_id);
+    my $cost = (0.25 * ($stat_sum * $item_tier) + $item_tier);
 
-    if ($cost < 1) {
+    if ($stat_sum < 1) {
         return 0;
     }    
 
