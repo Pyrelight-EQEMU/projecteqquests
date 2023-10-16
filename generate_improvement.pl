@@ -118,12 +118,8 @@ for my $tier (1..20) {
                     $row->{ac} = $row->{ac} + $tier;
                 } elsif (slots($row->{slots}, 'Ear 1', 'Ear 2', 'Neck', 'Primary', 'Ring 1', 'Ring 2', 'Waist')) {
                     $row->{hp}       = ceil($row->{hp} + ($tier * 5));
-                    $row->{spelldmg} = $row->{spelldmg} + $tier;
-                    $row->{healamt}  = $row->{healamt} + $tier;
-                }
-
-                if ($row->{itemtype} ~~ [1, 4, 35]) {
-                    $row->{delay} = ($row->{delay} - $tier) < 25 ? ($row->{delay} - $tier) : 25;                
+                    $row->{spelldmg} = $row->{spelldmg} + floor($tier * 0.10 * (max($row->{aint}, $row->{awis}, $row->{astr})));
+                    $row->{healamt}  = $row->{healamt} + floor($tier * 0.10 * (max($row->{aint}, $row->{awis}, $row->{astr})));
                 }
                 
                 $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 5 : 20));
