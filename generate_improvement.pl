@@ -135,21 +135,21 @@ for my $tier (1..10) {
                     $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 5 : 20));
                 }
 				
-				# Adjusting Heroic Stats
-				$row->{heroic_str} = ceil($row->{heroic_str} * $modifier) + ceil($row->{astr} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				$row->{heroic_sta} = ceil($row->{heroic_sta} * $modifier) + ceil($row->{asta} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				$row->{heroic_dex} = ceil($row->{heroic_dex} * $modifier) + ceil($row->{adex} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				$row->{heroic_agi} = ceil($row->{heroic_agi} * $modifier) + ceil($row->{aagi} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				$row->{heroic_int} = ceil($row->{heroic_int} * $modifier) + ceil($row->{aint} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				$row->{heroic_wis} = ceil($row->{heroic_wis} * $modifier) + ceil($row->{awis} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				$row->{heroic_cha} = ceil($row->{heroic_cha} * $modifier) + ceil($row->{acha} * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-				
-				# Adjusting Heroic Resists
-				$row->{heroic_mr} = ceil($row->{heroic_mr} * $modifier_half) + ceil($row->{mr} * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-				$row->{heroic_cr} = ceil($row->{heroic_cr} * $modifier_half) + ceil($row->{cr} * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-				$row->{heroic_fr} = ceil($row->{heroic_fr} * $modifier_half) + ceil($row->{fr} * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-				$row->{heroic_dr} = ceil($row->{heroic_dr} * $modifier_half) + ceil($row->{dr} * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-				$row->{heroic_pr} = ceil($row->{heroic_pr} * $modifier_half) + ceil($row->{pr} * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
+                # Adjusting Heroic Stats
+                $row->{heroic_str} = $row->{heroic_str} + (($row->{heroic_str} + $row->{astr}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_sta} = $row->{heroic_sta} + (($row->{heroic_sta} + $row->{asta}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_dex} = $row->{heroic_dex} + (($row->{heroic_dex} + $row->{adex}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_agi} = $row->{heroic_agi} + (($row->{heroic_agi} + $row->{aagi}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_int} = $row->{heroic_int} + (($row->{heroic_int} + $row->{aint}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_wis} = $row->{heroic_wis} + (($row->{heroic_wis} + $row->{awis}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_cha} = $row->{heroic_cha} + (($row->{heroic_cha} + $row->{acha}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+
+                # Adjusting Heroic Resists
+                $row->{heroic_mr} = $row->{heroic_mr} + (($row->{heroic_mr} + $row->{mr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
+                $row->{heroic_cr} = $row->{heroic_cr} + (($row->{heroic_cr} + $row->{cr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
+                $row->{heroic_fr} = $row->{heroic_fr} + (($row->{heroic_fr} + $row->{fr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
+                $row->{heroic_dr} = $row->{heroic_dr} + (($row->{heroic_dr} + $row->{dr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
+                $row->{heroic_pr} = $row->{heroic_pr} + (($row->{heroic_pr} + $row->{pr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
 
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
