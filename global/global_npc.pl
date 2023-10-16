@@ -93,7 +93,7 @@ sub EVENT_DEATH_COMPLETE
 {
     CHECK_CHARM_STATUS();
 
-    my @lootlist = $npc->GetLootList();
+    my @lootlist = $corpse->GetLootList();
     foreach my $item_id (@lootlist) {
         quest::debug($item_id);
     }
