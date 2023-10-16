@@ -466,7 +466,7 @@ sub execute_upgrade {
                 # If the value is negative, remove items
                 while ($ledger->{$item_id} < 0) {
 
-                    #my $count_before = $client->CountItem($item_id);
+                    my $count_before = $client->CountItem($item_id);
 
                     $client->RemoveItem($item_id);
 
