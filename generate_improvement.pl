@@ -85,7 +85,7 @@ for my $tier (1..20) {
                 if ($row->{damage} > 0) {
                     $row->{damage} = $row->{damage} + $tier;
                     $row->{procrate}        = $row->{proceffect} ? $row->{procrate} + ($tier * 5) : $row->{procrate};
-                } elsif $row->{ac} > 0 && slots($row->{slots}, 'Secondary', 'Head', 'Face', 'Shoulder', 'Arms', 'Back', 'Bracer 1', 'Bracer 2', 'Hands', 'Chest', 'Legs', 'Feet')) {
+                } elsif ($row->{ac} > 0 && slots($row->{slots}, 'Secondary', 'Head', 'Face', 'Shoulder', 'Arms', 'Back', 'Bracer 1', 'Bracer 2', 'Hands', 'Chest', 'Legs', 'Feet')) {
                     $row->{ac} = $row->{ac} + $tier;
                 } elsif (slots($row->{slots}, 'Ear 1', 'Ear 2', 'Neck', 'Primary', 'Ring 1', 'Ring 2', 'Waist')) {
                     $row->{hp}       = ceil($row->{hp} + ($tier * 5));
