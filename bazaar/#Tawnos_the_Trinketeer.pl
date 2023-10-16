@@ -88,4 +88,3 @@ sub EVENT_ITEM {
     $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
     plugin::return_items(\%itemcount); 
 }
-
