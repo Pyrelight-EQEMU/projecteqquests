@@ -44,6 +44,35 @@ unless ($dbh) {
     die "Failed to connect to database.";
 }
 
+sub slots {
+    my ($bitmask, @slots) = @_;
+    my %slot_to_bitmask = (
+        'Secondary' => 16384,
+        'Head' => 4,
+        'Face' => 8,
+        'Shoulder' => 64,
+        'Arms' => 128,
+        'Back' => 256,
+        'Bracer 1' => 512,
+        'Bracer 2' => 1024,
+        'Hands' => 4096,
+        'Chest' => 131072,
+        'Legs' => 262144,
+        'Feet' => 524288,
+        'Ear 1' => 2,
+        'Ear 2' => 16,
+        'Neck' => 32,
+        'Primary' => 8192,
+        'Ring 1' => 32768,
+        'Ring 2' => 65536,
+        'Waist' => 1048576
+    );
+    foreach my $slot (@slots) {
+        return 1 if ($bitmask & $slot_to_bitmask{$slot});
+    }
+    return 0;
+}
+
 my $max_id = 999999;
 my $chunk_size = 1000;
 
@@ -131,32 +160,3 @@ for my $tier (1..20) {
 }
 
 $dbh->disconnect();
-
-sub slots {
-    my ($bitmask, @slots) = @_;
-    my %slot_to_bitmask = (
-        'Secondary' => 16384,
-        'Head' => 4,
-        'Face' => 8,
-        'Shoulder' => 64,
-        'Arms' => 128,
-        'Back' => 256,
-        'Bracer 1' => 512,
-        'Bracer 2' => 1024,
-        'Hands' => 4096,
-        'Chest' => 131072,
-        'Legs' => 262144,
-        'Feet' => 524288,
-        'Ear 1' => 2,
-        'Ear 2' => 16,
-        'Neck' => 32,
-        'Primary' => 8192,
-        'Ring 1' => 32768,
-        'Ring 2' => 65536,
-        'Waist' => 1048576
-    );
-    foreach my $slot (@slots) {
-        return 1 if ($bitmask & $slot_to_bitmask{$slot});
-    }
-    return 0;
-}
