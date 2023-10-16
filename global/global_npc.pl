@@ -97,12 +97,17 @@ sub EVENT_DEATH_COMPLETE {
 
     foreach my $item_id (@lootlist) {
         my $chance = rand();
-        if ($chance < 0.10) {
-            upgrade_item_tier($item_id, 1, $corpse);
+
+        if ($chance < 0.01) {
+            upgrade_item_tier($item_id, 3, $corpse);
         }
 
-        elsif ($chance < 0.01) {
+        elsif ($chance < 0.10) {
             upgrade_item_tier($item_id, 2, $corpse);
+        }
+
+        elsif ($chance < 0.25) {
+            upgrade_item_tier($item_id, 1, $corpse);
         }
     }
 }
@@ -111,8 +116,13 @@ sub EVENT_DEATH_COMPLETE {
 sub upgrade_item_tier {
     my ($item_id, $tier, $entity)  = @_;
 
+    my $current_tier = int($item_id / 1000000);
+    my $base_id = $item_id % 1000000;
+
+    $tier = $current_tier + $tier;
+
     $entity->RemoveItem($item_id);
-    $entity->AddItem($item_id + ($tier * 1000000));
+    $entity->AddItem($base_id + ($tier * 1000000));
 }
 
 sub CHECK_CHARM_STATUS
