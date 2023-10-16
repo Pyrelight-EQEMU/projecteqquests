@@ -501,7 +501,7 @@ sub get_upgrade_cost {
     my $cost = (0.25 * ($stat_sum * $item_tier) + $item_tier);
 
     if ($stat_sum < 1) {
-        return 0;
+        return $item_tier - 1;
     }    
 
     return $cost;
