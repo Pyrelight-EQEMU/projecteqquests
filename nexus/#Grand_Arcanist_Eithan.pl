@@ -24,10 +24,10 @@ sub EVENT_SAY {
                     blind transit, however. There are other sites with weak dimensional barriers to which you can personally be attuned, though - you'll simply need 
                     to reach them on your own first." );
     
-    my $acctMoneyFlagKey = $client->AccountID() . "-InitMoneyFlag" || 0;
-    my $acctMoneyFlagValue = quest::get_data($acctMoneyFlagKey);
+    my $acctMoneyFlagKey = $client->AccountID() . "-InitMoneyFlag";
+    my $acctMoneyFlagValue = quest::get_data($acctMoneyFlagKey) || 0;
 
-    if ($client->GetBucket("InitMoneyFlag") <= 10 && $progress <= 0) {
+    if ($acctMoneyFlagValue <= 10 && $progress <= 0) {
       plugin::NPCTell("Also, take these coins. You'll need them to get started, and you can pay me back sometime if your pride demands it.");
       quest::givecash(0, 0, 0, 100);
       quest::set_data($acctMoneyFlagKey, ++$acctMoneyFlagValue);
