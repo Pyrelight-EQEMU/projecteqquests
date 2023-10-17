@@ -681,7 +681,7 @@ sub get_continent_prefix {
 # Get character's saved zone data
 sub get_zone_data_for_character {
     my ($characterID, $suffix) = @_;
-    my $charKey = $characterID . $suffix;
+    my $charKey = $characterID . -"-TL-" . $suffix;
     my $charDataString = quest::get_data($charKey);
 
     # Debug: Print the raw string data
@@ -700,7 +700,7 @@ sub get_zone_data_for_character {
 
 sub set_zone_data_for_character {
     my ($characterID, $zone_data_hash_ref, $suffix) = @_;
-    my $charKey = $characterID . $suffix;
+    my $charKey = $characterID . -"-TL-" . $suffix;
 
     # Debug: Print the key used to store data
     quest::debug("Setting data with key: $charKey");
