@@ -796,6 +796,6 @@ sub fix_zone_data {
             delete $data_hash->{$key};
         }
     }
-    my $new_serialized_data = plugin::serialize_zone_data($data_hash);
-    quest::set_data($charKey, $new_serialized_data);
+    
+    quest::set_data($charKey, plugin::serialize_zone_data($data_hash));
 }
