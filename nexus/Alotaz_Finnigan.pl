@@ -3,19 +3,21 @@ sub EVENT_SAY {
   my $suffix = "K";
 
   # Fix old style data
-  # Call the deserialize_zone_data function to parse the serialized data
+  # Deserialize the data
   my $serialized_data = "dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
-  my $data_hash = plugin::deserialize_zone_data($serialized_data);
+  my $data_hash = deserialize_zone_data($serialized_data);
 
-  # Access the 1st and 2nd elements of each sub-element within the hash
+  # Modify the data (for example, let's add "_modified" to the end of each first element)
   foreach my $key (keys %$data_hash) {
-      my $first_element = $data_hash->{$key}[0];
-      my $second_element = $data_hash->{$key}[1];
-
-      quest::debug("key: " . $key);
-      quest::debug($first_element . ":" . quest::GetZoneLongName($first_element));
-      quest::debug($second_element . ":" . quest::GetZoneLongName($second_element));
+      if (quest::GetZoneLongName($key) ne "UNKNOWN") {
+        $data_hash->{$key}[0] .= "_modified";
+      }
   }
+
+  # Serialize the modified data with the key and the first element reversed
+  my $new_serialized_data = serialize_zone_data($data_hash);
+
+  quest::debug($new_serialized_data);  # Output the reserialized data
 
   # Add static data
   plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires)", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
