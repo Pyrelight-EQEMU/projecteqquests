@@ -3,9 +3,10 @@ sub EVENT_SAY {
   my $suffix = "K";
 
   # Fix old style data
-  # Deserialize the data
-  my $serialized_data = "dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
-  my $data_hash = plugin::deserialize_zone_data($serialized_data);
+  # Deserialize the data  
+  my $charKey = $characterID . "-TL-" . $suffix;
+  my $charDataString = quest::get_data($charKey);
+  my $data_hash = plugin::deserialize_zone_data($charDataString);
 
   # Modify the data (for example, let's add "_modified" to the end of each first element)
   foreach my $key (keys %$data_hash) {
