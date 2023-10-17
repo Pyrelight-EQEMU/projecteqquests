@@ -12,6 +12,8 @@ function event_connect(e)
 	check_starting_attunement(e)
 	refresh_instance_task(e);
 
+	check_skills(e)
+
 	local bucket = e.self:GetBucket("FirstLoginAnnounce")
 	if (not bucket or bucket == "") and e.self:GetLevel() == 1 then
 	  e.self:SetBucket("FirstLoginAnnounce", "1")
@@ -21,18 +23,12 @@ function event_connect(e)
 end
 
 function event_level_up(e)
-  local free_skills =  {0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76};
+	check_skills(e)
 
-  for k,v in ipairs(free_skills) do
-    if ( e.self:MaxSkill(v) > 0 and e.self:GetRawSkill(v) < 1 and e.self:CanHaveSkill(v) ) then 
-      e.self:SetSkill(v, 1);
-    end      
-  end
-
-  if (e.self:GetLevel() % 5 == 0) then
-	eq.world_emote(15,e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
-	eq.discord_send("ooc", e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
-  end
+	if (e.self:GetLevel() % 5 == 0) then
+		eq.world_emote(15,e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
+		eq.discord_send("ooc", e.self:GetCleanName() .. " has reached level " .. e.self:GetLevel() .. "!")
+	end
 end
 
 function check_level_flag(e)
@@ -86,7 +82,7 @@ function event_loot(e)
 	eq.debug("event_loot:" .. eq.get_item_name(e.item:GetID()))
     if string.find(eq.get_item_name(e.item:GetID()), "^Fabled ") ~= nil then
         eq.world_emote(15, e.self:GetCleanName() .. " has claimed the " .. eq.item_link(e.item:GetID()) .. "!")
-		eq.discord_send("ooc", e.self:GetCleanName() .. " has claimed the " .. eq.get_item_name(e.item:GetID()) .. "! (https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:GetID() ..")")
+		eq.discord_send("ooc", e.self:GetCleanName() .. " has claimed the [[" .. eq.get_item_name(e.item:GetID()) .. "](https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:GetID() ..")]!")
     end
 end
 
@@ -99,7 +95,15 @@ function event_discover_item(e)
 			eq.set_data(key,tostring(tonumber(eq.get_data(key)) + 1));
 		end
 		eq.world_emote(15,e.self:GetCleanName() .. " is the first to discover " .. eq.item_link(e.item:ID()) .. "!")
-		eq.discord_send("ooc", e.self:GetCleanName() .. " is the first to discover " .. e.item:Name() .. "! (https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:ID() ..")")
+		eq.discord_send("ooc", e.self:GetCleanName() .. " is the first to discover [[" .. e.item:Name() .. "](https://www.pyrelight.net/allaclone/?a=item&id=" .. e.item:ID() ..")]!")
+	end
+
+	if eq.get_zone_short_name() == "lavastorm" and e.self:GetGMStatus() >= 80 then 
+		e.self:Message(MT.DimGray, "There are GM commands available for Dragons of Norrath, use " .. eq.say_link("#don") .. " to get started")
+	end
+
+	if eq.get_zone_short_name() == "lavastorm" and e.self:GetGMStatus() >= 80 then 
+		e.self:Message(MT.DimGray, "There are GM commands available for Dragons of Norrath, use " .. eq.say_link("#don") .. " to get started")
 	end
 end
 
@@ -363,5 +367,14 @@ function DeserializeHash(str)
         local k, v = match:match("(%w+)=(%w+)")
         hash[k] = v
     end
-    return hash
+return hash
+
+function check_skills(e)
+	local free_skills =  {0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76};
+
+	for k,v in ipairs(free_skills) do
+		if ( e.self:MaxSkill(v) > 0 and e.self:GetRawSkill(v) < 1 and e.self:CanHaveSkill(v) ) then 
+			e.self:SetSkill(v, 1);
+		end      
+	end
 end

@@ -2,8 +2,7 @@ name: Push to Servers
 on: 
   push:
     branches:
-      - master
-      - dev
+      - '**'
 jobs:
   build_master:
     if: github.ref == 'refs/heads/master'
@@ -21,7 +20,7 @@ jobs:
           git pull
 
   build_dev:
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref != 'refs/heads/master'
     name: Build on dev
     runs-on: ubuntu-latest
     steps:
