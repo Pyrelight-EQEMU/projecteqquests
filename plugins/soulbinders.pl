@@ -14,7 +14,11 @@ sub soulbinder_say {
 
 		my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . " ($npcName)";
 		my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
+		my $suffix = get_continent_fix(quest::GetZoneShortName($npc->GetZoneID()));
 
-		quest::debug("$descData + $locData");
+
+		quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
+		plugin::add_zone_entry($characterID, $descData, $locData, $suffix);
+		quest::say("I have attuned you. You may now teleport here from the nexus.");
 	}
 }  

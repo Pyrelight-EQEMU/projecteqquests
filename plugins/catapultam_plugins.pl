@@ -427,7 +427,7 @@ sub is_item_upgradable {
     return item_exists_in_db($next_tier_item_id);
 }
 
-sub get_continent_prefix {
+sub get_continent_fix {
     my %zone_to_continent = (
 
         # Faydwer
