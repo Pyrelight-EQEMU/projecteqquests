@@ -11,17 +11,12 @@ sub EVENT_CONNECT {
     # Get the current time as a Unix timestamp
     my $current_time = time();
 
-    plugin::RedText("TIME: $current_time");
-
     # Retrieve the stored time (as a Unix timestamp)
     my $stored_time = $client->GetBucket("LastLoginTime");
-    plugin::RedText("STORED TIME: $stored_time");
+    # Determine the start of the 'new day' (6 am CST)
+    my $today_6am = (localtime->truncate(to => 'day') + ONE_DAY * 6/24)->epoch;
 
-    if ($stored_time) {
-        # Determine the start of the 'new day' (6 am CST)
-        my $today_6am = (localtime->truncate(to => 'day') + ONE_DAY * 6/24)->epoch;
-        plugin::RedText("6AM TIME: $today_6am");
-
+    if ($stored_time) {        
         # Determine if the stored time is before today's 6 am
         if ($stored_time < $today_6am) {
             # The stored time is from yesterday (or earlier), announce the login
@@ -38,7 +33,7 @@ sub EVENT_CONNECT {
             plugin::WorldAnnounce($announceString);
 
             # Update the stored time with the current time
-            $client->SetBucket("LastLoginTime", $current_time);
+            $client->SetBucket("LastLoginTime", $today_6am);
         }
     }
     else {
@@ -56,7 +51,7 @@ sub EVENT_CONNECT {
         plugin::WorldAnnounce($announceString);
 
         # Store the current time
-        $client->SetBucket("LastLoginTime", $current_time);
+        $client->SetBucket("LastLoginTime", $today_6am);
         #$client->SummonItem(40605, 1);
         #plugin::YellowText("You have been granted a daily log-in reward!");
     }
