@@ -13,8 +13,6 @@ sub EVENT_ENTER {
     my $suffix = $tokens[0];
     my $characterID = $client->CharacterID();
 
-    my $key = '-TL-' . $suffix;
-
     my $TLDesc = "";
     if ($tokens[1] eq "") {
         $TLDesc = quest::GetZoneLongNameByID($npc->GetZoneID());
@@ -30,7 +28,7 @@ sub EVENT_ENTER {
         quest::ding();
 
         # Adding the new attunement location to the character's data
-        plugin::add_zone_entry($characterID, $TLDesc, $locData, $key);
+        plugin::add_zone_entry($characterID, $TLDesc, $locData, $suffix);
 
     } elsif ($suffix eq "") {
         quest::debug("Configuration Error.");
