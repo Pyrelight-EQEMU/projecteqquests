@@ -1,6 +1,6 @@
 sub EVENT_SAY {
     my $characterID = $client->CharacterID();
-    my $suffix = "-K";
+    my $suffix = "K";
 
     # Fetch the zone data using our abstracted function
     my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
