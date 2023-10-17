@@ -783,9 +783,9 @@ sub fix_zone_data {
 
     delete $data_hash->{''};
     
-    foreach my $key (keys %$data_hash) {
-        quest::debug("Fixed an element");  
+    foreach my $key (keys %$data_hash) {        
         if (quest::GetZoneLongName($key) ne "UNKNOWN") {
+            quest::debug("Fixed an element");  
             my $zone_sn = $key;
             my $zone_desc = $data_hash->{$key}[0];  # Access the elements using ->
 
@@ -796,6 +796,6 @@ sub fix_zone_data {
             delete $data_hash->{$key};
         }
     }
-    
+
     quest::set_data($charKey, plugin::serialize_zone_data($data_hash));
 }
