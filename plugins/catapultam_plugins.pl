@@ -685,7 +685,7 @@ sub get_zone_data_for_character {
     my $charDataString = quest::get_data($charKey);
 
     # Debug: Print the raw string data
-    quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
+    #quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
 
     my %teleport_zones;
     my @zone_entries = split /:/, $charDataString;
@@ -703,7 +703,7 @@ sub set_zone_data_for_character {
     my $charKey = $characterID . "-TL-" . $suffix;
 
     # Debug: Print the key used to store data
-    quest::debug("Setting data with key: $charKey");
+    #quest::debug("Setting data with key: $charKey");
 
     my @data_entries;
 
@@ -715,11 +715,10 @@ sub set_zone_data_for_character {
     my $charDataString = join(":", @data_entries);
 
     # Debug: Print the data string being set
-    quest::debug("Setting Raw Data: $charDataString");
+    #quest::debug("Setting Raw Data: $charDataString");
 
     quest::set_data($charKey, $charDataString);
 }
-
 
 # Serializes the data structure for storage
 # Usage:
@@ -752,19 +751,16 @@ sub deserialize_zone_data {
     return \%data;
 }
 
-
-
 # Check if a particular piece of data (by zone description) is present
 sub has_zone_entry {
     my ($characterID, $zone_desc, $suffix) = @_;
     my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
 
-    quest::debug("Checking for description: $zone_desc");
-    quest::debug("Current Data: " . join(", ", keys %{$teleport_zones}));
+    #quest::debug("Checking for description: $zone_desc");
+    #quest::debug("Current Data: " . join(", ", keys %{$teleport_zones}));
 
     return exists($teleport_zones->{$zone_desc});
 }
-
 
 # Add (or overwrite) data to teleport_zones
 # Usage:
