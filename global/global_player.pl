@@ -11,6 +11,8 @@ sub EVENT_CONNECT {
     # Get the current time as a Unix timestamp
     my $current_time = time();
 
+    plugin::RedText("TIME: $current_time");
+
     # Retrieve the stored time (as a Unix timestamp)
     my $stored_time = $client->GetBucket("LastLoginTime");
 
