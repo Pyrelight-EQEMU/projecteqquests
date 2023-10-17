@@ -10,7 +10,11 @@ sub EVENT_SAY {
   # Modify the data (for example, let's add "_modified" to the end of each first element)
   foreach my $key (keys %$data_hash) {
       if (quest::GetZoneLongName($key) ne "UNKNOWN") {
-        $data_hash->{$key}[0] .= "_modified";
+        $zone_sn = $key;
+        $zone_desc = $data_hash{$key}[0];
+
+        $data_hash{$zone_desc} = [$key, $data_hash{$key}[1], $data_hash{$key}[2], $data_hash{$key}[3], $data_hash{$key}[4]];
+        delete $data_hash{$key};
       }
   }
 
