@@ -98,10 +98,6 @@ sub get_rank_name {
 my $max_id = 999999;
 my $chunk_size = 1000;
 
-#delete existing scaled items
-my $delquery = $dbh->prepare("DELETE FROM items WHERE items.id > ?");
-$delquery->execute($max_id);
-
 for my $tier (1..10) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
         # Fetch data from the table
@@ -111,7 +107,7 @@ for my $tier (1..10) {
         while (my $row = $sth->fetchrow_hashref()) {
             if ($row->{slots} > 0 and $row->{classes} > 0 and $row->{Name} !~ /^Apocryphal/) {
 
-                my @keys = qw(proceffect damage mr cr fr pr dr astr asta adex aagi aint awis heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_cr heroic_fr heroic_dr heroic_pr);
+                my @keys = qw(hp mana endur proceffect damage mr cr fr pr dr astr asta adex aagi aint awis heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_cr heroic_fr heroic_dr heroic_pr);
 
                 my $all_zero = 1;
                 for my $key (@keys) {
@@ -175,7 +171,7 @@ for my $tier (1..10) {
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
                 my $values  = join(",", map { $dbh->quote($_) } values %$row);
-                my $sql = "INSERT INTO items ($columns) VALUES ($values)";
+                my $sql = "REPLACE INTO items ($columns) VALUES ($values)";
 
                 print "Creating: $row->{id} ($row->{Name})\n";
                 # Insert the new row into the table
