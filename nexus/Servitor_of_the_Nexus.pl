@@ -16,7 +16,8 @@ sub POPUP_DISPLAY {
   my $purple = plugin::PWColor("Purple");
 
   my $break = "<br><br>";
-  my $desc = "Pyrelight is a single box server, meant to offer a challenging soloable experience for veteran players and an alternative take on the 'solo progression' mold.              
+  my $desc = "Pyrelight is a single box server, meant to offer a challenging soloable experience for veteran players and an alternative take on the 'solo progression' mold.
+              Zones through $green Luclin</c> are currently available, and the level cap is currently 60. Content through Dragons of Norrath and level 75 is planned.             
               For more detailed information and ongoing discussion, please join the server 
               discord (". plugin::PWHyperLink("https://discord.com/invite/5cFCA7TVgA","5cFCA7TVgA") .").<br><br>";
 
@@ -29,7 +30,7 @@ sub POPUP_DISPLAY {
                       are built-in to the client. You can see mobs on your map (names become visible with Tracking skill or custom Situational Awareness AA), you can see info
                       on spells and the value of items on inspect windows.$break
                       $green Heroic Stats</c> - Most direct increases to character strength are accomplished by way of abdundant Heroic stats on items. You will recieve extra
-                      combat feedback to inform you of how these stats are helping you, which can be disabled with the $green #filterhoeric</c> command. Your 
+                      combat feedback to inform you of how these stats are helping you, which can be disabled with the $green #filterheroic</c> command. Your 
                       [$purple Adventurer's Soul</c>] is the best way to grow in power early on, as it will scale with the amount of the world you've visited and become Attuned
                       to. All of these stats have additional, custom effects, such as directly scaling melee and spell damage, or increasing the duration of spells.$break
                       $green Item Improvement</c> - Artificer Cedric in the Bazaar will assist you in combining identical items to create improved versions. If you find yourself
@@ -37,12 +38,10 @@ sub POPUP_DISPLAY {
                       $green Buffs</c> - Buffs work differently on Pyrelight! The intention is for you to have access to the buffs that you or your group mates actually own,
                       either through your class(es), or items can use. Any buff that meets these criteria is PERMANENT until it no longer meets those criteria. Additionally, 
                       $green runes</c> provide additional feedback and will regenerate over time instead of disappearing when they have absorbed all of their damage.$break
-                      $green Pets</c> - Pets will recieve a significant benefit from your Heroic stats, as one third of their effectiveness is applied to your pets. Additionally,
+                      $green Pets</c> - Pets will recieve a significant benefit from your Heroic stats, as two thirds of their effectiveness is applied to your pets. Additionally,
                       the [$purple Summoner's Synchrosatchel</c>], purchased in the Bazaar, offers a unique experience - it serves as a 'proxy inventory' for your pet. Any
                       equipment placed within it will be equipped by your pet! Finally, pets are able to hold aggro over players in melee range so long as their Taunt avility
                       is activated.$break
-
-                      
                       ";
 
   my $text = quest::popupcentermessage("$red NEW PLAYERS PLEASE READ THIS WINDOW</c><br>") .
