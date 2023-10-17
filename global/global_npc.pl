@@ -98,15 +98,15 @@ sub EVENT_DEATH_COMPLETE {
     foreach my $item_id (@lootlist) {
         my $chance = rand();
 
-        if ($chance < 0.01) {
+        if ($chance < 0.03) {
             upgrade_item_tier($item_id, 3, $corpse);
         }
 
-        elsif ($chance < 0.10) {
+        elsif ($chance < 0.11) {
             upgrade_item_tier($item_id, 2, $corpse);
         }
 
-        elsif ($chance < 0.25) {
+        elsif ($chance < 0.33) {
             upgrade_item_tier($item_id, 1, $corpse);
         }
     }
