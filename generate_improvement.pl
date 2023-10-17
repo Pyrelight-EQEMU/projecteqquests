@@ -175,7 +175,7 @@ for my $tier (1..10) {
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
                 my $values  = join(",", map { $dbh->quote($_) } values %$row);
-                my $sql = "REPLACE INTO items ($columns) VALUES ($values)";
+                my $sql = "INSERT INTO items ($columns) VALUES ($values)";
 
                 print "Creating: $row->{id} ($row->{Name})\n";
                 # Insert the new row into the table
