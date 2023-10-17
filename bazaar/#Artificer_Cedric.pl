@@ -390,7 +390,7 @@ sub test_upgrade {
         #quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
         
 
-        my $loop_limit = 2; # A limit to prevent infinite loops
+        my $loop_limit = 3; # A limit to prevent infinite loops
         my $loop_count = 0;
 
         while ($virtual_inventory->{$current_item_id} < 3 && $prev_item_id && $loop_count++ < $loop_limit) {
@@ -443,7 +443,7 @@ sub execute_upgrade {
             #quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");        
 
-            my $loop_limit = 2; # A limit to prevent infinite loops
+            my $loop_limit = 3; # A limit to prevent infinite loops
             my $loop_count = 0;
 
             while ($virtual_inventory->{$current_item_id} < 3 && $prev_item_id && $loop_count++ < $loop_limit) {
