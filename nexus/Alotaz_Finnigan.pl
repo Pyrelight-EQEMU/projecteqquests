@@ -10,16 +10,19 @@ sub EVENT_SAY {
   # Modify the data (for example, let's add "_modified" to the end of each first element)
   foreach my $key (keys %$data_hash) {
       if (quest::GetZoneLongName($key) ne "UNKNOWN") {
-        $zone_sn = $key;
-        $zone_desc = $data_hash{$key}[0];
+          my $zone_sn = $key;
+          my $zone_desc = $data_hash->{$key}[0];  # Access the elements using ->
 
-        $data_hash{$zone_desc} = [$key, $data_hash{$key}[1], $data_hash{$key}[2], $data_hash{$key}[3], $data_hash{$key}[4]];
-        delete $data_hash{$key};
+          # Create a new entry in the hash with the zone_desc as the key
+          $data_hash->{$zone_desc} = [$key, @{$data_hash->{$key}}[1..4]];
+
+          # Delete the original key from the hash
+          delete $data_hash->{$key};
       }
   }
 
-  # Serialize the modified data with the key and the first element reversed
-  my $new_serialized_data = plugin::serialize_zone_data($data_hash);
+# Serialize the modified data with the key and the first element reversed
+my $new_serialized_data = plugin::serialize_zone_data($data_hash);
 
   quest::debug($new_serialized_data);  # Output the reserialized data
 
