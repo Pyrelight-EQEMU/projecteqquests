@@ -9,6 +9,8 @@ function event_connect(e)
 	e.self:GrantAlternateAdvancementAbility(938, 8, true)
 
 	check_class_switch_aa(e)
+	check_starting_attunement(e)
+	refresh_instance_task(e);
 
 	check_skills(e)
 
@@ -17,7 +19,7 @@ function event_connect(e)
 	  e.self:SetBucket("FirstLoginAnnounce", "1")
 	  eq.world_emote(15, e.self:GetCleanName() .. " has logged in for the first time!")
 	  eq.discord_send("ooc", e.self:GetCleanName() .. " has logged in for the first time!")
-	end	
+	end
 end
 
 function event_level_up(e)
@@ -35,6 +37,44 @@ function check_level_flag(e)
 	if eq.get_data(key) == "" then
 		eq.set_data(key, "60")
 		e.self:Message(15, "Your Level Cap has been set to 60.")
+	end
+end
+
+function event_enter_zone(e)
+	eq.debug("Hello from Lua");
+end
+
+function event_task_complete(e)
+	eq.debug("count " .. e.count);
+	eq.debug("activity_id " .. e.activity_id);
+	eq.debug("task_id " .. e.task_id);
+end
+
+function refresh_instance_task(e)
+    -- Get client and dynamic zone info
+    local client = e.self
+    local dz     = client:GetExpedition()
+    local dz_id  = dz:GetZoneID()
+    local config = eq.get_data("instance-" .. eq.get_zone_short_name_by_id(dz_id) .. "-" .. dz:GetInstanceID())
+	local reward = tonumber(string.match(config, 'reward=(%d+)')) or 0
+
+    -- Loop over the tasks from 1 to 999
+    for i = 1, 999 do
+        if client:IsTaskActive(1000 + i) then
+			if i ~= dz_id or reward == 0 then
+            	client:FailTask(1000 + i)				
+			end
+        end
+    end
+
+	if reward > 0 then
+		eq.debug("zone_id:" .. dz:GetZoneID() .. " reward:" .. reward)
+		if eq.get_zone_id() ==  dz:GetZoneID() and eq.get_zone_instance_id() == dz:GetInstanceID() then
+			eq.debug("check")
+			if not client:IsTaskActive(1000 + dz_id) then
+				client:AssignTask(1000 + dz_id)
+			end
+		end
 	end
 end
 
@@ -296,6 +336,38 @@ function convert_spellunlocks(e)
 		e.self:SetBucket("unlocked-spells", table.concat(UNLOCKED_SPELLS, " "))
 	end
 end
+
+-- Serializer for List
+function SerializeList(list)
+    return table.concat(list, ',')
+end
+
+-- Deserializer for List
+function DeserializeList(str)
+    local list = {}
+    for match in (str..','):gmatch("(.-)"..',') do
+        table.insert(list, match)
+    end
+    return list
+end
+
+-- Serializer for Hash (Table in Lua context)
+function SerializeHash(tbl)
+    local str = ""
+    for k, v in pairs(tbl) do
+        str = str..k.."="..v..";"
+    end
+    return str
+end
+
+-- Deserializer for Hash (Table in Lua context)
+function DeserializeHash(str)
+    local hash = {}
+    for match in (str..';'):gmatch("(.-)"..';') do
+        local k, v = match:match("(%w+)=(%w+)")
+        hash[k] = v
+    end
+return hash
 
 function check_skills(e)
 	local free_skills =  {0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76};
