@@ -32,7 +32,7 @@ sub EVENT_SAY {
       quest::set_data($acctMoneyFlagKey, ++$acctMoneyFlagValue);
     }
     
-    $client->SetBucket("MAO-Progress",1);
+    $client->SetBucket("MAO-Progress",1) if $progress = 0;
     quest::message(15,"You have gained the ability to use the Nexus teleportation network.");   
   }
 }
