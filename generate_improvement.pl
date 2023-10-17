@@ -74,6 +74,27 @@ sub slots {
     return 0;
 }
 
+sub get_rank_name {
+    my ($rank) = @_;
+    
+    my @rank_names = (
+        "Enhanced",
+        "Superior",
+        "Elite",
+        "Masterwork",
+        "Exquisite",
+        "Legendary",
+        "Mythical",
+        "Ascendant",
+        "Divine",
+        "Transcendent"
+    );
+
+    return $rank_names[$rank - 1] if ($rank >= 1 && $rank <= 10);
+
+    return undef; # Return undefined if rank is outside the valid range
+}
+
 my $max_id = 999999;
 my $chunk_size = 1000;
 
@@ -102,11 +123,8 @@ for my $tier (1..10) {
 
                 next if $all_zero; # Skip to next iteration if all values are zero or less
 
-                my $modifier_raw 	  = ($tier * 0.30);
-                my $modifier_half_raw = $modifier_raw/2;
-				
-				my $modifier      = $modifier_raw + 1;
-				my $modifier_half = $modifier_half_raw + 1;
+                my $modifier 	   = ($tier * 0.33);
+                my $modifier_minor = ($tier * 0.10);
 				
 				# Name & ID
 				$row->{id} = $row->{id} + (1000000 * $tier);
@@ -120,36 +138,39 @@ for my $tier (1..10) {
 				# Basic Stats                                
                 if ($row->{damage} > 0) {
                     $row->{damage} = $row->{damage} + $tier;
-                    $row->{procrate}        = $row->{proceffect} ? $row->{procrate} + ($tier * 5) : $row->{procrate};
                 } elsif ($row->{ac} > 0 && slots($row->{slots}, 'Secondary', 'Head', 'Face', 'Shoulder', 'Arms', 'Back', 'Bracer 1', 'Bracer 2', 'Hands', 'Chest', 'Legs', 'Feet')) {
                     $row->{ac} = $row->{ac} + $tier;
-                } elsif (slots($row->{slots}, 'Ear 1', 'Ear 2', 'Neck', 'Primary', 'Ring 1', 'Ring 2', 'Waist')) {
+                } elsif (slots($row->{slots}, 'Ear 1', 'Ear 2', 'Neck', 'Primary', 'Secondary', 'Ring 1', 'Ring 2', 'Waist')) {
                     $row->{hp}       = ceil($row->{hp} + ($tier * 5));
                     $row->{spelldmg} = $row->{spelldmg} + floor($tier * 0.10 * (max($row->{aint}, $row->{awis}, $row->{astr})));
                     $row->{healamt}  = $row->{healamt} + floor($tier * 0.10 * (max($row->{aint}, $row->{awis}, $row->{astr})));
                 }
                 
                 if ($row->{itemtype} == 54) {
-                    $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 0 : 5));
+                    $row->{hp}   = $row->{hp} + ($tier * ($row->{ac} ? 0 : 5));
+                    $row->{mana} = $row->{mana} + ($tier * ($row->{ac} ? 0 : 2));
                 } else {
-                    $row->{hp} = $row->{hp} + ($tier * ($row->{ac} ? 5 : 20));
+                    $row->{hp}   = $row->{hp} + ($tier * ($row->{ac} ? 5 : 10));
+                    $row->{mana} = $row->{mana} + ($tier * ($row->{ac} ? 2 : 5));
                 }
+                
+                $row->{procrate} = ($row->{proceffect} && $row->{procrate}) ? $row->{procrate} + ($tier * 10) : $row->{procrate};
 				
                 # Adjusting Heroic Stats
-                $row->{heroic_str} = $row->{heroic_str} + (($row->{heroic_str} + $row->{astr}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-                $row->{heroic_sta} = $row->{heroic_sta} + (($row->{heroic_sta} + $row->{asta}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-                $row->{heroic_dex} = $row->{heroic_dex} + (($row->{heroic_dex} + $row->{adex}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-                $row->{heroic_agi} = $row->{heroic_agi} + (($row->{heroic_agi} + $row->{aagi}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-                $row->{heroic_int} = $row->{heroic_int} + (($row->{heroic_int} + $row->{aint}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-                $row->{heroic_wis} = $row->{heroic_wis} + (($row->{heroic_wis} + $row->{awis}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
-                $row->{heroic_cha} = $row->{heroic_cha} + (($row->{heroic_cha} + $row->{acha}) * ($row->{itemtype} == 54 ? $modifier_half_raw : $modifier_raw));
+                $row->{heroic_str} = $row->{heroic_str} + (($row->{heroic_str} + $row->{astr}) * ($row->{itemtype} == 54 ? $modifier_minor ));
+                $row->{heroic_sta} = $row->{heroic_sta} + (($row->{heroic_sta} + $row->{asta}) * ($row->{itemtype} == 54 ? $modifier_minor ));
+                $row->{heroic_dex} = $row->{heroic_dex} + (($row->{heroic_dex} + $row->{adex}) * ($row->{itemtype} == 54 ? $modifier_minor ));
+                $row->{heroic_agi} = $row->{heroic_agi} + (($row->{heroic_agi} + $row->{aagi}) * ($row->{itemtype} == 54 ? $modifier_minor ));
+                $row->{heroic_int} = $row->{heroic_int} + (($row->{heroic_int} + $row->{aint}) * ($row->{itemtype} == 54 ? $modifier_minor ));
+                $row->{heroic_wis} = $row->{heroic_wis} + (($row->{heroic_wis} + $row->{awis}) * ($row->{itemtype} == 54 ? $modifier_minor ));
+                $row->{heroic_cha} = $row->{heroic_cha} + (($row->{heroic_cha} + $row->{acha}) * ($row->{itemtype} == 54 ? $modifier_minor ));
 
                 # Adjusting Heroic Resists
-                $row->{heroic_mr} = $row->{heroic_mr} + (($row->{heroic_mr} + $row->{mr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-                $row->{heroic_cr} = $row->{heroic_cr} + (($row->{heroic_cr} + $row->{cr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-                $row->{heroic_fr} = $row->{heroic_fr} + (($row->{heroic_fr} + $row->{fr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-                $row->{heroic_dr} = $row->{heroic_dr} + (($row->{heroic_dr} + $row->{dr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
-                $row->{heroic_pr} = $row->{heroic_pr} + (($row->{heroic_pr} + $row->{pr}) * ($row->{itemtype} == 54 ? int($modifier_half_raw/2) : $modifier_raw));
+                $row->{heroic_mr} = $row->{heroic_mr} + (($row->{heroic_mr} + $row->{mr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) ));
+                $row->{heroic_cr} = $row->{heroic_cr} + (($row->{heroic_cr} + $row->{cr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) ));
+                $row->{heroic_fr} = $row->{heroic_fr} + (($row->{heroic_fr} + $row->{fr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) ));
+                $row->{heroic_dr} = $row->{heroic_dr} + (($row->{heroic_dr} + $row->{dr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) ));
+                $row->{heroic_pr} = $row->{heroic_pr} + (($row->{heroic_pr} + $row->{pr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) ));
 
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
