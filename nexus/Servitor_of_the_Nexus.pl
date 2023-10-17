@@ -10,9 +10,8 @@
  }
 
 sub POPUP_DISPLAY {
-
   my $yellow = plugin::PWColor("Yellow");
-  my $green = plugin::PWColor("Green"); 
+  my $green  = plugin::PWColor("Green"); 
 
   my $discord = "Server Discord: " . plugin::PWHyperLink("https://discord.com/invite/5cFCA7TVgA","5cFCA7TVgA") . "<br><br>";
   my $header = $yellow . plugin::PWAutoCenter("Welcome to Pyrelight!") . "</c><br><br>";
@@ -25,9 +24,8 @@ sub POPUP_DISPLAY {
 
   my $text = $header .
              $discord .
-             $desc .
+             $desc . quest::popupbreak() .
              $feature_header .
-             $desc .
-             $desc;  
+             $desc ;  
   quest::popup('', $text);
 }
