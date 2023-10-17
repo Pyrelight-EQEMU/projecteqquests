@@ -21,11 +21,12 @@ sub POPUP_DISPLAY {
 
   my $feature_header = $yellow . "Features</c><br>";
 
-  my $feature_desc = ""
+  my $feature_desc = "";
 
   my $text = $discord .
              $desc .
              $feature_header .
              $desc ;  
+
   quest::popup('Welcome to Pyrelight', $text);
 }
