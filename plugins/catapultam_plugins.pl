@@ -729,7 +729,7 @@ sub get_zone_data_for_character {
     my $charDataString = quest::get_data($charKey);
 
     # Debug: Print the raw string data
-    quest::debug("Raw Data: $charDataString");
+    quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
 
     my %teleport_zones;
     my @zone_entries = split /:/, $charDataString;
