@@ -374,3 +374,36 @@ sub item_exists_in_db {
 
     return $result > 0 ? 1 : 0;
 }
+
+sub get_total_attunements {
+    my $client = shift;
+    my @suffixes = ('A', 'O', 'F', 'K', 'V', 'L'); # Add more suffixes as needed
+    my $total = 0;
+    foreach my $suffix (@suffixes) {
+        $total += count_teleport_zones($client, $suffix);
+    }
+
+    return $total;
+}
+
+sub count_teleport_zones {
+    my ($client, $suffix) = @_;
+
+    # Check for a provided suffix or default to 'A'
+    $suffix //= 'A';
+
+    my $charKey = $client->CharacterID() . "-TL";
+    my $charTargetsString = quest::get_data($charKey . "-" . $suffix);
+
+    my %teleport_zones = ();
+    
+    my @zones = split /:/, $charTargetsString;
+    foreach my $z (@zones) {      
+        my @tokens = split /,/, $z;
+        if ($tokens[1] ne '') {
+            $teleport_zones{$tokens[1]} = [ @tokens ];
+        }
+    }
+    
+    return scalar(keys %teleport_zones);
+}
