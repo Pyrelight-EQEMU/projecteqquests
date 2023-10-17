@@ -13,12 +13,12 @@ sub EVENT_SAY {
                          more experience. I will have work for you.");
       }
 
-  } elsif ($text=~"/nurture/i") { 
+  } elsif ($text=~/nurture/i) { 
     plugin::NPCTell("That tiny kernel within you will not sustain you yet, much less bring you the wealth and power you undoubtedly chase. You may first cause it to 
                     grow by simple exploration. There are other benefits, namely your access to the [Nexus Teleportation Network] will expand as your Soul does.");
   }
   
-  elsif ($text=~"exus Teleportation Network") { #teleportation network
+  elsif ($text=~/Nexus Teleportation Network/i) { #teleportation network
     plugin::NPCTell("There are wizards of the brotherhood located near each of the minor spires within the Nexus complex, they can assist you with traveling to the ".
                     "continents to which they are attuned. Only the existing Combine spires, or locations that you are already strongly familiar with, will allow a 
                     blind transit, however. There are other sites with weak dimensional barriers to which you can personally be attuned, though - you'll simply need 
