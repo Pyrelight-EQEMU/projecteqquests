@@ -678,18 +678,48 @@ sub get_continent_prefix {
     }
 }
 
-# Fetches the zone data for a character from the data store
-# Usage:
-#    my $zones = get_zone_data_for_character(12345, '-K');
-#    foreach my $zone (keys %{$zones}) {
-#        print "Zone: $zone\n";
-#    }
+# Get character's saved zone data
 sub get_zone_data_for_character {
     my ($characterID, $suffix) = @_;
-    my $charKey = $characterID . "-TL-" . $suffix;
-    my $data = quest::get_data($charKey);
-    return deserialize_zone_data($data);
+    my $charKey = $characterID . $suffix;
+    my $charDataString = quest::get_data($charKey);
+
+    # Debug: Print the raw string data
+    quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
+
+    my %teleport_zones;
+    my @zone_entries = split /:/, $charDataString;
+
+    foreach my $entry (@zone_entries) {
+        my @tokens = split /,/, $entry;
+        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
+    }
+
+    return \%teleport_zones;
 }
+
+sub set_zone_data_for_character {
+    my ($characterID, $zone_data_hash_ref, $suffix) = @_;
+    my $charKey = $characterID . $suffix;
+
+    # Debug: Print the key used to store data
+    quest::debug("Setting data with key: $charKey");
+
+    my @data_entries;
+
+    while (my ($desc, $zone_data) = each %{$zone_data_hash_ref}) {
+        my $entry = join(",", $desc, @{$zone_data});
+        push @data_entries, $entry;
+    }
+
+    my $charDataString = join(":", @data_entries);
+
+    # Debug: Print the data string being set
+    quest::debug("Setting Raw Data: $charDataString");
+
+    quest::set_data($charKey, $charDataString);
+}
+
 
 # Serializes the data structure for storage
 # Usage:
@@ -722,25 +752,7 @@ sub deserialize_zone_data {
     return \%data;
 }
 
-# Get character's saved zone data
-sub get_zone_data_for_character {
-    my ($characterID, $suffix) = @_;
-    my $charKey = $characterID . $suffix;
-    my $charDataString = quest::get_data($charKey);
 
-    # Debug: Print the raw string data
-    quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
-
-    my %teleport_zones;
-    my @zone_entries = split /:/, $charDataString;
-
-    foreach my $entry (@zone_entries) {
-        my @tokens = split /,/, $entry;
-        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
-    }
-
-    return \%teleport_zones;
-}
 
 # Check if a particular piece of data (by zone description) is present
 sub has_zone_entry {
