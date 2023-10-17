@@ -1,14 +1,14 @@
-sub EVENT_SAY {
-  
-    $client->AddAlternateCurrencyValue(10, 10);
-  
+sub EVENT_SAY {  
   my $charKey = $client->CharacterID() . "-MAO-Progress";
   my $progress = quest::get_data($charKey);
+  my $clientName = $client->GetCleanName();
+
   if ($text=~/hail/i) {     
       if ($progress <= 0) {
-        plugin::NPCTell("Hail, ". $client->GetCleanName() .". You must be the latest bit of [".quest::saylink("mao1a",1,"dimensional flotsam")."] to wash up.");
+        plugin::NPCTell("Hail, $clientName. You must be the latest bit of [dimensional flotsam] to wash up.");
       } else {
-        plugin::NPCTell("Hail, ". $client->GetCleanName() .". Return to me when you've gained more experience. I will have work for you.");
+        plugin::NPCTell("It is good to see you again, $clientName. I don't have anything for you right now, but return to me when you've gained 
+                         more experience. I will have work for you.");
       }
   } elsif ($text=~"mao1a") { #dimensional flotsam
     plugin::NPCTell("Apologies! Allow my to introduce myself; I am Eithan, the head archaeologist of the Wayfarer's Brotherhood. This site is an ". 
