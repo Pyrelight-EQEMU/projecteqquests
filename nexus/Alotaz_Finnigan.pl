@@ -17,11 +17,7 @@ sub EVENT_SAY {
         plugin::NPCTell("Hail, traveler. I can transport you to the Great Spires of Kunark, or any other location on that continent that you've become attuned to.");
         $client->Message(257, " ------- Select a Destination ------- ");
         
-        foreach my $t (sort keys %{$teleport_zones}) {
-            # Output all elements of the current teleport zone
-            quest::debug("Zone Description: $t Data: " . join(", ", @{$teleport_zones->{$t}}));
-            
-            # Display the zone description as the saylink's text
+        foreach my $t (sort keys %{$teleport_zones}) {            
             $client->Message(257, "-> " . quest::saylink($t, 0, $t));
         }
     } elsif (exists($teleport_zones->{$text})) {
