@@ -2,6 +2,21 @@ sub EVENT_SAY {
   my $characterID = $client->CharacterID();
   my $suffix = "K";
 
+  # Call the deserialize_zone_data function to parse the serialized data
+  my $serialized_data = ":dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
+  my $data_hash = plugin::deserialize_zone_data($serialized_data);
+
+  # Access the 1st and 2nd elements of each sub-element within the hash
+  foreach my $key (keys %$data_hash) {
+      my $first_element = $data_hash->{$key}[0];
+      my $second_element = $data_hash->{$key}[1];
+
+      print "Key: $key\n";
+      print "1st Element: $first_element\n";
+      print "2nd Element: $second_element\n";
+      print "\n";
+  }
+
   # Add static data
   plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires)", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
 
