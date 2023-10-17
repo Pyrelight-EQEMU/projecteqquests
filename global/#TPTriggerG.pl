@@ -20,7 +20,8 @@ sub EVENT_ENTER {
         $TLDesc = quest::GetZoneLongNameByID($npc->GetZoneID()) . " " . $tokens[1];
     }
 
-    my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $TLDesc, $npc->GetX(), $npc->GetY(), $npc->GetZ(), $npc->GetHeading()];
+    # Use $TLDesc as key and structure our data with zone short name, coordinates, and heading
+    my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $npc->GetX(), $npc->GetY(), $npc->GetZ(), $npc->GetHeading()];
 
     if (!plugin::has_zone_entry($characterID, $TLDesc, $suffix) and !($suffix eq "")) {
         quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
