@@ -53,7 +53,7 @@ sub EVENT_CONNECT {
 
         my $announceString = "$name (Level $level $active_class)"
                            . ($inactive_classes ? " ($inactive_classes)" : "") 
-                           . " has logged in for the first time today!";
+                           . " has logged in for the first time!";
 
         plugin::WorldAnnounce($announceString);
 
