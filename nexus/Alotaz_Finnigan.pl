@@ -3,11 +3,11 @@ sub EVENT_SAY {
   my $suffix = "K";
 
   # Add static data
-  plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires [Default])", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
+  plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires)", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
 
   # Iksar
   if ($client->GetRace() == 128) {
-      plugin::add_zone_entry($characterID, "Cabilis (The Block [Racial])", ["cabeast", 63, 679, -10, 285], $suffix);
+      plugin::add_zone_entry($characterID, "Cabilis (The Block)", ["cabeast", 63, 679, -10, 285], $suffix);
   }
 
   # Fetch the zone data using our abstracted function

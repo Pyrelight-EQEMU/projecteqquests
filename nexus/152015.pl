@@ -3,7 +3,7 @@ sub EVENT_SAY {
   my $suffix = "L"; 
 
   if ($client->GetRace() == 128) {
-      plugin::add_zone_entry($characterID, "Shar Vahl (The Tavern [Racial])", ["sharvahl", "Shar Vahl (The Tavern [Racial])", -254, -281, -188, 46], $suffix);
+      plugin::add_zone_entry($characterID, "Shar Vahl (The Tavern)", ["sharvahl", -254, -281, -188, 46], $suffix);
   }
 
   # Fetch the zone data using our abstracted function
