@@ -433,8 +433,6 @@ sub UPDATE_PET_STATS
                         my $delay = $npc->GetItemStat($equipment_id, "delay");
                         my $ratio = $damage / $delay;
 
-                        quest::debug("My Ratio is $ratio");
-
                         $damage_bonus += $ratio;
                     }
                 }
@@ -445,8 +443,6 @@ sub UPDATE_PET_STATS
                 } else {
                     $bucket_value = max($damage_bonus*2, $bucket_value);
                 }
-
-                quest::debug("applying damage mod: $bucket_value");
 
                 $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() / 10);            
             }
