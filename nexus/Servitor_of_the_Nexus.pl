@@ -4,7 +4,7 @@
   if ($text=~/hail/i) {
     POPUP_DISPLAY();
 
-    quest::emote("The Servitor");
+    $client->Message(263, "The golem stares at you, lifelessly, and a soulless voice echos from its lifeless mouth.");
 
   }
  }
