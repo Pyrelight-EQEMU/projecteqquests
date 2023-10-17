@@ -2,9 +2,6 @@ sub EVENT_SAY {
     my $characterID = $client->CharacterID();
     my $suffix = "K";
 
-    # Fetch the zone data using our abstracted function
-    my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
-
     # Add static data
     plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires [Default])", ["dreadlands", "The Dreadlands (Great Combine Spires [Default])", 9651, 3052, 1048, 489], $suffix);
 
@@ -12,6 +9,9 @@ sub EVENT_SAY {
     if ($client->GetRace() == 128) {
         plugin::add_zone_entry($characterID, "Cabilis (The Block [Racial])", ["cabeast", "Cabilis (The Block [Racial])", 63, 679, -10, 285], $suffix);
     }
+
+    # Fetch the zone data using our abstracted function
+    my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
 
     if ($text =~ /hail/i) {
         plugin::NPCTell("Hail, traveler. I can transport you to the Great Spires of Kunark, or any other location on that continent that you've become attuned to.");
