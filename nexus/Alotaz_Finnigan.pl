@@ -5,7 +5,7 @@ sub EVENT_SAY {
   # Fix old style data
   # Deserialize the data
   my $serialized_data = "dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
-  my $data_hash = deserialize_zone_data($serialized_data);
+  my $data_hash = plugin::deserialize_zone_data($serialized_data);
 
   # Modify the data (for example, let's add "_modified" to the end of each first element)
   foreach my $key (keys %$data_hash) {
@@ -15,7 +15,7 @@ sub EVENT_SAY {
   }
 
   # Serialize the modified data with the key and the first element reversed
-  my $new_serialized_data = serialize_zone_data($data_hash);
+  my $new_serialized_data = plugin::serialize_zone_data($data_hash);
 
   quest::debug($new_serialized_data);  # Output the reserialized data
 
