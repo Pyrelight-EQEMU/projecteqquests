@@ -15,10 +15,12 @@ sub EVENT_CONNECT {
 
     # Retrieve the stored time (as a Unix timestamp)
     my $stored_time = $client->GetBucket("LastLoginTime");
+    plugin::RedText("STORED TIME: $stored_time");
 
     if ($stored_time) {
         # Determine the start of the 'new day' (6 am CST)
         my $today_6am = (localtime->truncate(to => 'day') + ONE_DAY * 6/24)->epoch;
+        plugin::RedText("6AM TIME: $today_6am")
 
         # Determine if the stored time is before today's 6 am
         if ($stored_time < $today_6am) {
