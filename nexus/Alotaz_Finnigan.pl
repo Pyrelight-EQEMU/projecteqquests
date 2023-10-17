@@ -18,9 +18,13 @@ sub EVENT_SAY {
         $client->Message(257, " ------- Select a Destination ------- ");
         
         foreach my $t (sort keys %{$teleport_zones}) {
+            # Output all elements of the current teleport zone
+            quest::debug("Zone Description: $t Data: " . join(", ", @{$teleport_zones->{$t}}));
+            
+            # Display the zone description as the saylink's text
             $client->Message(257, "-> " . quest::saylink($t, 0, $t));
         }
     } elsif (exists($teleport_zones->{$text})) {
-        $client->MovePC(quest::GetZoneID($teleport_zones->{$text}[0]), $teleport_zones->{$text}[1], $teleport_zones->{$text}[2], $teleport_zones->{$text}[3], $teleport_zones->{$text}[4]);
+        $client->MovePC(quest::GetZoneID($teleport_zones->{$text}[0]), $teleport_zones->{$text}[2], $teleport_zones->{$text}[3], $teleport_zones->{$text}[4], $teleport_zones->{$text}[5]);
     }
 }
