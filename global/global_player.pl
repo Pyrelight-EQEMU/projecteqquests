@@ -39,8 +39,8 @@ sub EVENT_CONNECT {
 
             # Update the stored time with the current time
             $client->SetBucket("LastLoginTime", $current_time);
-            $client->SummonItem(40605, 1);
-            plugin::YellowText("You have been granted a daily log-in reward!");
+            #$client->SummonItem(40605, 1);
+            #plugin::YellowText("You have been granted a daily log-in reward!");
         }
     }
     else {
