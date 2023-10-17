@@ -3,16 +3,16 @@ sub EVENT_SAY {
   my $suffix = "O";
 
   # Static data
-  plugin::add_zone_entry($characterID, "Toxxulia Forest (Great Combine Spires)", ["tox", -910,-1522,-38,8], $suffix);
-  
-  # Erudite
-  if ($client->GetRace() == 3) {
-      plugin::add_zone_entry($characterID, "Erudin (The Vasty Deep Inn)", ["erudnext", -76, -1098, 67, 176], $suffix);
-      plugin::add_zone_entry($characterID, "Paineel (Darkglow Palace)", ["paineel", 768, 1218, -38, 313], $suffix);
-  }
+  plugin::add_zone_entry($characterID, "Toxxulia Forest (Great Combine Spires)", ["tox", -910,-1522,-38,8], $suffix); 
 
   # Fetch the zone data using our abstracted function
   my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
+
+  # Erudite
+  if ($client->GetRace() == 3) {
+      $teleport_zones{"Paineel (Darkglow Palace)"} = ["paineel", 768, 1218, -38, 313];
+      $teleport_zones{"Erudin (The Vasty Deep Inn)"} = ["erudnext", -76, -1098, 67, 176];
+  }
 
   if ($text =~ /hail/i) {
       if (scalar(keys %{$teleport_zones}) > 0) {

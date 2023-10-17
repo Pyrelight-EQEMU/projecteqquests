@@ -2,12 +2,12 @@ sub EVENT_SAY {
   my $characterID = $client->CharacterID();
   my $suffix = "L"; 
 
-  if ($client->GetRace() == 128) {
-      plugin::add_zone_entry($characterID, "Shar Vahl (The Tavern)", ["sharvahl", -254, -281, -188, 46], $suffix);
-  }
-
   # Fetch the zone data using our abstracted function
   my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
+
+  if ($client->GetRace() == 128) {
+      $teleport_zones{"Shar Vahl (The Tavern)"} = ["sharvahl", -254, -281, -188, 46];
+  }
 
   if ($text =~ /hail/i) {
       if (scalar(keys %{$teleport_zones}) > 0) {
