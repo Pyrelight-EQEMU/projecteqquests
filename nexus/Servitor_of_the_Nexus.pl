@@ -38,7 +38,7 @@ sub POPUP_DISPLAY {
                       either through your class(es), or items can use. Any buff that meets these criteria is PERMANENT until it no longer meets those criteria. Additionally, 
                       $green runes</c> provide additional feedback and will regenerate over time instead of disappearing when they have absorbed all of their damage.$break
                       $green Pets</c> - Pets will recieve a significant benefit from your Heroic stats, as one third of their effectiveness is applied to your pets. Additionally,
-                      the [$purple Summoner's Synchrosatchel</cr>], purchased in the Bazaar, offers a unique experience - it serves as a 'proxy inventory' for your pet. Any
+                      the [$purple Summoner's Synchrosatchel</c>], purchased in the Bazaar, offers a unique experience - it serves as a 'proxy inventory' for your pet. Any
                       equipment placed within it will be equipped by your pet! Finally, pets are able to hold aggro over players in melee range so long as their Taunt avility
                       is activated.$break
 
