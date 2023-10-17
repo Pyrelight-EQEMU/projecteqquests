@@ -1,5 +1,7 @@
 sub EVENT_SCALE_CALC 
 {
+	
+  quest::debug("EVENT_SCALE_CALC fired");
 	my $flags = 0;
 	if((defined $qglobals{pop_poi_behometh_preflag} &&  defined $qglobals{pop_poi_behometh_flag}) || defined $qglobals{pop_alt_access_potactics}){
 		$flags++;
