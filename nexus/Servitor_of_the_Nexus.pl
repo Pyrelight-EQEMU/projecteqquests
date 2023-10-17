@@ -15,7 +15,8 @@ sub POPUP_DISPLAY {
   my $red = plugin::PWColor("Red");
 
   my $desc = "Pyrelight is a single box server, meant to offer a challenging soloable experience for veteran players and an alternative take on the 'solo progression' mold.              
-              For more detailed information and ongoing discussion, please join the server discord (". plugin::PWHyperLink("https://discord.com/invite/5cFCA7TVgA","5cFCA7TVgA") .").<br><br>";
+              For more detailed information and ongoing discussion, please join the server 
+              discord (". plugin::PWHyperLink("https://discord.com/invite/5cFCA7TVgA","5cFCA7TVgA") .").<br><br>";
 
   my $feature_header = $yellow . "Server Custom Features</c><br><br>";
 
@@ -26,7 +27,7 @@ sub POPUP_DISPLAY {
 
   my $text = quest::popupcentermessage("$red NEW PLAYERS PLEASE READ THIS WINDOW</c><br>") .
              $desc .
-             $feature_header) .
+             $feature_header .
              $feature_desc ;  
 
   quest::popup('Welcome to Pyrelight', $text);
