@@ -18,7 +18,7 @@ sub soulbinder_say {
 
 
 		quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
-		plugin::add_zone_entry($characterID, $descData, $locData, $suffix);
+		plugin::add_zone_entry($client->GetID(), $descData, $locData, $suffix);
 		quest::say("I have attuned you. You may now teleport here from the nexus.");
 	}
 }  
