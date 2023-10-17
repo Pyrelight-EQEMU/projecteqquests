@@ -722,15 +722,24 @@ sub deserialize_zone_data {
     return \%data;
 }
 
-# Adds or updates a zone entry for a character
-# Usage:
-#    my %new_zone_data = ('Zone3' => ['data5', 'data6']);
-#    set_zone_data_for_character(12345, \%new_zone_data, '-K');
-sub set_zone_data_for_character {
-    my ($characterID, $zone_data, $suffix) = @_;
-    my $charKey = $characterID . "-TL" . $suffix;
-    my $data_string = serialize_zone_data($zone_data);
-    quest::set_data($charKey, $data_string);
+# Get character's saved zone data
+sub get_zone_data_for_character {
+    my ($characterID, $suffix) = @_;
+    my $charKey = $characterID . $suffix;
+    my $charDataString = quest::get_data($charKey);
+
+    # Debug: Print the raw string data
+    quest::debug("Raw Data: $charDataString");
+
+    my %teleport_zones;
+    my @zone_entries = split /:/, $charDataString;
+
+    foreach my $entry (@zone_entries) {
+        my @tokens = split /,/, $entry;
+        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
+    }
+
+    return \%teleport_zones;
 }
 
 # Check if a particular piece of data (by zone description) is present
