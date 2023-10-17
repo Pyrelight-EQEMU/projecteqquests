@@ -19,7 +19,9 @@ sub POPUP_DISPLAY {
 
   my $feature_header = $yellow . "Features</c><br>";
 
-  my $feature_desc = "";
+  my $feature_desc = "Pyrelight has a number of custom features.<br>
+  * Item One<br>
+  * Item Two<br>";
 
   my $text = $desc .
              quest::popupcentermessage($feature_header) .
