@@ -686,7 +686,7 @@ sub get_continent_prefix {
 #    }
 sub get_zone_data_for_character {
     my ($characterID, $suffix) = @_;
-    my $charKey = $characterID . "-TL" . $suffix;
+    my $charKey = $characterID . "-TL-" . $suffix;
     my $data = quest::get_data($charKey);
     return deserialize_zone_data($data);
 }
