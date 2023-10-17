@@ -7,7 +7,13 @@ sub soulbinder_say {
 	} elsif($text=~/bind my soul/i) {
 	    quest::say("Binding your soul. You will return here when you die.");
 	    quest::selfcast(2049);
-	} elsif($text=~/attune/i) {	
-		
+	} elsif($text=~/attune/i) {
+		my $client     = plugin::val('client');
+		my $npc        = plugin::val('npc');
+
+		my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . "(${name})"
+		my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
+
+		quest::debug("$descData + $locData");
 	}
 }  
