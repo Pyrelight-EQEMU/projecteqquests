@@ -24,9 +24,9 @@ sub POPUP_DISPLAY {
                       your Inventory, Skills, spent AA, and progression achievements are automatically shared between all of your classes. Additionally, your Spells may be 
                       shared with your alternate classes through the Spellshaper in the Bazaar. This system has some ";
 
-  my $text = quest::popupcentermessage("$red PLEASE READ THIS ENTIRE WINDOW</c>") .
+  my $text = quest::popupcentermessage("$red NEW PLAYERS PLEASE READ THIS WINDOW</c><br>") .
              $desc .
-             quest::popupcentermessage($feature_header) .
+             $feature_header) .
              $feature_desc ;  
 
   quest::popup('Welcome to Pyrelight', $text);
