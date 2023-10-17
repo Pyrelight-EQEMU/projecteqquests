@@ -11,10 +11,9 @@ sub EVENT_SAY {
       my $first_element = $data_hash->{$key}[0];
       my $second_element = $data_hash->{$key}[1];
 
-      print "Key: $key\n";
-      print "1st Element: $first_element\n";
-      print "2nd Element: $second_element\n";
-      print "\n";
+      quest::debug("Key: $key");
+      quest::debug("1st Element: $first_element");
+      quest::debug("2nd Element: $second_element");      
   }
 
   # Add static data
