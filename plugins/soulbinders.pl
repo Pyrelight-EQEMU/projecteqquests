@@ -10,8 +10,9 @@ sub soulbinder_say {
 	} elsif($text=~/attune/i) {
 		my $client     = plugin::val('client');
 		my $npc        = plugin::val('npc');
+		my $npcName    = $npc->GetCleanName();
 
-		my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . "(${name})";
+		my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . " ($npcName)";
 		my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
 
 		quest::debug("$descData + $locData");
