@@ -733,15 +733,15 @@ sub set_zone_data_for_character {
     quest::set_data($charKey, $data_string);
 }
 
-# Check if a particular piece of data is present
-# Usage:
-#    if (has_zone_entry(12345, "Zone1", "-K")) {
-#        print "Zone1 exists for character 12345 with suffix -K\n";
-#    }
+# Check if a particular piece of data (by zone description) is present
+# $characterID: ID of the character
+# $zone_desc: The human-readable description of the zone
+# $suffix: The specific data suffix
+# Returns: 1 (true) if the zone description is found, otherwise 0 (false)
 sub has_zone_entry {
-    my ($characterID, $zone_name, $suffix) = @_;
-    my $teleport_zones = get_zone_data_for_character($characterID, $suffix);
-    return exists($teleport_zones->{$zone_name});
+    my ($characterID, $zone_desc, $suffix) = @_;
+    my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
+    return exists($teleport_zones->{$zone_desc});
 }
 
 # Add (or overwrite) data to teleport_zones
