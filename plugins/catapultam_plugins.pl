@@ -780,9 +780,11 @@ sub fix_zone_data {
     my $charKey = $characterID . "-TL-" . $suffix;
     my $charDataString = quest::get_data($charKey);
     my $data_hash = plugin::deserialize_zone_data($charDataString);  
+
+    delete $data_hash->{''};
     
     foreach my $key (keys %$data_hash) {
-        delete $data_hash->{''};
+        quest::debug("Fixed an element");  
         if (quest::GetZoneLongName($key) ne "UNKNOWN") {
             my $zone_sn = $key;
             my $zone_desc = $data_hash->{$key}[0];  # Access the elements using ->
@@ -795,7 +797,5 @@ sub fix_zone_data {
         }
     }
     my $new_serialized_data = plugin::serialize_zone_data($data_hash);
-
-    quest::debug("$charKey, $new_serialized_data");
     quest::set_data($charKey, $new_serialized_data);
 }
