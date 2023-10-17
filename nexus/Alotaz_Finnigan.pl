@@ -12,8 +12,8 @@ sub EVENT_SAY {
       my $first_element = $data_hash->{$key}[0];
       my $second_element = $data_hash->{$key}[1];
 
-      quest::debug(quest::GetZoneLongName($first_element));
-      quest::debug(quest::GetZoneLongName($second_element));
+      quest::debug($first_element . ":" . quest::GetZoneLongName($first_element));
+      quest::debug($second_element . ":" . quest::GetZoneLongName($second_element));
   }
 
   # Add static data
