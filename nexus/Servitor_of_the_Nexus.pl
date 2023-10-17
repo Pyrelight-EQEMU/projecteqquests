@@ -13,10 +13,10 @@ sub POPUP_DISPLAY {
   my $yellow = plugin::PWColor("Yellow");
   my $green  = plugin::PWColor("Green"); 
 
-  my $discord = "Server Discord: " . plugin::PWHyperLink("https://discord.com/invite/5cFCA7TVgA","5cFCA7TVgA") . "<br><br>";
+  my $discord = "Server Discord: "  "<br><br>";
 
   my $desc = "Pyrelight is a solo-balanced server, meant to offer a challenging experience for veteran players and an alternative take on the 'solo progression' mold.<br><br>
-              For more detailed information and ongoing discussion, please join the server discord. The " . $green . "#server-info</c>, 
+              For more detailed information and ongoing discussion, please join the server discord (". plugin::PWHyperLink("https://discord.com/invite/5cFCA7TVgA","5cFCA7TVgA") ."). The " . $green . "#server-info</c>, 
               " . $green . "#faq</c>, and " . $green . "#changelog</c> channels may be particularly interesting.<br><br>";
 
   my $feature_header = $yellow . "Features</c><br>";
