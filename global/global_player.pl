@@ -8,19 +8,15 @@ sub EVENT_CONNECT {
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
-    # Get the current time in CDT
-    my $current_time = localtime->strftime('%Y-%m-%d %H:%M:%S %z');
+    # Get the current time as a Unix timestamp
+    my $current_time = time();
 
-    # Retrieve the stored time
-    my $stored_time_str = $client->GetBucket("LastLoginTime");
+    # Retrieve the stored time (as a Unix timestamp)
+    my $stored_time = $client->GetBucket("LastLoginTime");
 
-    if ($stored_time_str) {
-        my $stored_time = Time::Piece->strptime($stored_time_str, '%Y-%m-%d %H:%M:%S %z');
-        # Convert the stored time to local time (CST)
-        $stored_time -= $stored_time->localtime->tzoffset;
-
+    if ($stored_time) {
         # Determine the start of the 'new day' (6 am CST)
-        my $today_6am = localtime->truncate(to => 'day') + ONE_DAY * 6/24;
+        my $today_6am = (localtime->truncate(to => 'day') + ONE_DAY * 6/24)->epoch;
 
         # Determine if the stored time is before today's 6 am
         if ($stored_time < $today_6am) {
@@ -32,15 +28,13 @@ sub EVENT_CONNECT {
             my $inactive_classes = plugin::GetInactiveClasses($client);
 
             my $announceString = "$name (Level $level $active_class)"
-                               . ($inactive_classes ? " ($inactive_classes)" : "") 
+                               . ($inactive_classes ? " ($inactive_classes)" : "")
                                . " has logged in for the first time today!";
 
             plugin::WorldAnnounce($announceString);
 
             # Update the stored time with the current time
             $client->SetBucket("LastLoginTime", $current_time);
-            #$client->SummonItem(40605, 1);
-            #plugin::YellowText("You have been granted a daily log-in reward!");
         }
     }
     else {
@@ -52,7 +46,7 @@ sub EVENT_CONNECT {
         my $inactive_classes = plugin::GetInactiveClasses($client);
 
         my $announceString = "$name (Level $level $active_class)"
-                           . ($inactive_classes ? " ($inactive_classes)" : "") 
+                           . ($inactive_classes ? " ($inactive_classes)" : "")
                            . " has logged in for the first time!";
 
         plugin::WorldAnnounce($announceString);
