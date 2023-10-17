@@ -4,7 +4,7 @@ sub EVENT_SAY {
 
   # Fix old style data
   # Call the deserialize_zone_data function to parse the serialized data
-  my $serialized_data = ":dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
+  my $serialized_data = "dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
   my $data_hash = plugin::deserialize_zone_data($serialized_data);
 
   # Access the 1st and 2nd elements of each sub-element within the hash
