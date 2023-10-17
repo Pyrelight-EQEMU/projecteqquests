@@ -1,5 +1,5 @@
 sub EVENT_SAY {  
-  my $progress = $client->GetBucket("MAO-Progress");
+  my $progress = $client->GetBucket("MAO-Progress") || 0;
   my $clientName = $client->GetCleanName();
 
   if ($text=~/hail/i) {     
