@@ -12,7 +12,7 @@ sub EVENT_CONNECT {
     my $current_time = localtime->strftime('%Y-%m-%d %H:%M:%S %z');
 
     # Retrieve the stored time
-    my $stored_time_str = $client->GetBucket("FirstLoginAnnounceTime");
+    my $stored_time_str = $client->GetBucket("LastLoginTime");
 
     if ($stored_time_str) {
         my $stored_time = Time::Piece->strptime($stored_time_str, '%Y-%m-%d %H:%M:%S %z');
@@ -38,7 +38,7 @@ sub EVENT_CONNECT {
             plugin::WorldAnnounce($announceString);
 
             # Update the stored time with the current time
-            $client->SetBucket("FirstLoginAnnounceTime", $current_time);
+            $client->SetBucket("LastLoginTime", $current_time);
             $client->SummonItem(40605, 1);
             plugin::YellowText("You have been granted a daily log-in reward!");
         }
@@ -58,7 +58,9 @@ sub EVENT_CONNECT {
         plugin::WorldAnnounce($announceString);
 
         # Store the current time
-        $client->SetBucket("FirstLoginAnnounceTime", $current_time);
+        $client->SetBucket("LastLoginTime", $current_time);
+        $client->SummonItem(40605, 1);
+        plugin::YellowText("You have been granted a daily log-in reward!");
     }
 
     #quest::debug($client->CharacterID());
