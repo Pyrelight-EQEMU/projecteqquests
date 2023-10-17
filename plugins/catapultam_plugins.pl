@@ -738,11 +738,23 @@ sub set_zone_data_for_character {
 # $zone_desc: The human-readable description of the zone
 # $suffix: The specific data suffix
 # Returns: 1 (true) if the zone description is found, otherwise 0 (false)
+# Check if a particular piece of data (by zone description) is present
 sub has_zone_entry {
     my ($characterID, $zone_desc, $suffix) = @_;
     my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
-    return exists($teleport_zones->{$zone_desc});
+    my $exists = 0;  # default to not found
+
+    # Iterate through each zone description to check if it matches the provided description
+    foreach my $desc (keys %{$teleport_zones}) {
+        if ($desc eq $zone_desc) {
+            $exists = 1;  # found a match
+            last;
+        }
+    }
+
+    return $exists;
 }
+
 
 # Add (or overwrite) data to teleport_zones
 # Usage:
