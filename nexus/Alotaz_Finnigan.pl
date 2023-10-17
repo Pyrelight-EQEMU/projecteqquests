@@ -1,32 +1,6 @@
 sub EVENT_SAY {
   my $characterID = $client->CharacterID();
-  my $suffix = "K";
-
-  # Fix old style data
-  # Deserialize the data  
-  my $charKey = $characterID . "-TL-" . $suffix;
-  my $charDataString = quest::get_data($charKey);
-  my $data_hash = plugin::deserialize_zone_data($charDataString);
-
-  # Modify the data (for example, let's add "_modified" to the end of each first element)
-  foreach my $key (keys %$data_hash) {
-      delete $data_hash->{''};
-      if (quest::GetZoneLongName($key) ne "UNKNOWN") {
-          my $zone_sn = $key;
-          my $zone_desc = $data_hash->{$key}[0];  # Access the elements using ->
-
-          # Create a new entry in the hash with the zone_desc as the key
-          $data_hash->{$zone_desc} = [$key, @{$data_hash->{$key}}[1..4]];
-
-          # Delete the original key from the hash
-          delete $data_hash->{$key};
-      }
-  }
-
-# Serialize the modified data with the key and the first element reversed
-my $new_serialized_data = plugin::serialize_zone_data($data_hash);
-
-  quest::debug($new_serialized_data);  # Output the reserialized data
+  my $suffix = "K";  
 
   # Add static data
   plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires)", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
