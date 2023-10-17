@@ -6,11 +6,11 @@ sub EVENT_SAY {
     my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
 
     # Add static data
-    $teleport_zones->{"The Dreadlands (Great Combine Spires [Default])"} = ["dreadlands", "The Dreadlands (Great Combine Spires [Default])", 9651, 3052, 1048, 489];
+    plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires [Default])", ["dreadlands", "The Dreadlands (Great Combine Spires [Default])", 9651, 3052, 1048, 489], $suffix);
 
     # Iksar
     if ($client->GetRace() == 128) {
-        $teleport_zones->{"Cabilis (The Block [Racial])"} = ["cabeast", "Cabilis (The Block [Racial])", 63, 679, -10, 285];
+        plugin::add_zone_entry($characterID, "Cabilis (The Block [Racial])", ["cabeast", "Cabilis (The Block [Racial])", 63, 679, -10, 285], $suffix);
     }
 
     if ($text =~ /hail/i) {
