@@ -2,6 +2,7 @@ sub EVENT_SAY {
   my $characterID = $client->CharacterID();
   my $suffix = "K";
 
+  # Fix old style data
   # Call the deserialize_zone_data function to parse the serialized data
   my $serialized_data = ":dreadlands,The Dreadlands (Near Karnor's Castle),-1870,600,24.0625,120:frontiermtns,Frontier Mountains (Giant Fort),-1620,35,-128.140045166016,180";
   my $data_hash = plugin::deserialize_zone_data($serialized_data);
@@ -11,9 +12,7 @@ sub EVENT_SAY {
       my $first_element = $data_hash->{$key}[0];
       my $second_element = $data_hash->{$key}[1];
 
-      quest::debug("Key: $key");
-      quest::debug("1st Element: $first_element");
-      quest::debug("2nd Element: $second_element");      
+      quest::debug(quest::GetZoneLongName($first_element));
   }
 
   # Add static data
