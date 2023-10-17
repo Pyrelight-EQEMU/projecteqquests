@@ -21,7 +21,6 @@ sub EVENT_SAY {
             $client->Message(257, "-[" . quest::saylink($t, 1, 'ZONE') . "]- $t");
         }
     } elsif (exists($teleport_zones->{$text})) {
-        quest::debug("$teleport_zones->{$text}[1], $teleport_zones->{$text}[2], $teleport_zones->{$text}[3], $teleport_zones->{$text}[4]");
         $client->MovePC(quest::GetZoneID($teleport_zones->{$text}[0]), $teleport_zones->{$text}[1], $teleport_zones->{$text}[2], $teleport_zones->{$text}[3], $teleport_zones->{$text}[4]);
     }
 }
