@@ -738,8 +738,12 @@ sub has_zone_entry {
     my ($characterID, $zone_desc, $suffix) = @_;
     my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
 
+    quest::debug("Checking for description: $zone_desc");
+    quest::debug("Current Data: " . join(", ", keys %{$teleport_zones}));
+
     return exists($teleport_zones->{$zone_desc});
 }
+
 
 # Add (or overwrite) data to teleport_zones
 # Usage:
