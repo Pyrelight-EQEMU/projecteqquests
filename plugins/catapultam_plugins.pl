@@ -407,3 +407,349 @@ sub count_teleport_zones {
     
     return scalar(keys %teleport_zones);
 }
+
+sub is_item_upgradable {
+    my $item_id = shift;
+
+    #shortcut if we are already an upgraded item
+    if ($item_id >= 1000000) {
+        return 1;
+    }
+
+    if ($item_id > 20000000) {
+        return 0;
+    }
+
+    # Calculate the next-tier item ID
+    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+
+    # Check if the next-tier item exists in the database
+    return item_exists_in_db($next_tier_item_id);
+}
+
+sub get_continent_prefix {
+    my %zone_to_continent = (
+
+        # Faydwer
+        'akanon'     => 'F',
+        'butcher'    => 'F',
+        'cauldron'   => 'F',
+        'crushbone'  => 'F',
+        'felwithea'  => 'F',
+        'felwitheb'  => 'F',
+        'gfaydark'   => 'F',
+        'kedge'      => 'F',
+        'kaladima'   => 'F',
+        'kaladimb'   => 'F',
+        'lfaydark'   => 'F',
+        'mistmoore'  => 'F',
+        'steamfont'  => 'F',
+        'unrest'     => 'F',
+
+        # Antonica
+        'arena'         => 'A',
+        'befallen'      => 'A',
+        'beholder'      => 'A',
+        'blackburrow'   => 'A',
+        'cazicthule'    => 'A',
+        'commons'       => 'A',
+        'ecommons'      => 'A',
+        'eastkarana'    => 'A',
+        'erudsxing'     => 'A',
+        'everfrost'     => 'A',
+        'feerrott'      => 'A',
+        'freporte'      => 'A',
+        'freportn'      => 'A',
+        'freportw'      => 'A',
+        'grobb'         => 'A',
+        'gukbottom'     => 'A',
+        'guktop'        => 'A',
+        'halas'         => 'A',
+        'highkeep'      => 'A',
+        'highpasshold'  => 'A',
+        'innothule'     => 'A',
+        'kithicor'      => 'A',
+        'lakerathe'     => 'A',
+        'lavastorm'     => 'A',
+        'misty'         => 'A',
+        'najena'        => 'A',
+        'neriaka'       => 'A',
+        'neriakb'       => 'A',
+        'neriakc'       => 'A',
+        'neriakd'       => 'A',
+        'nektulos'      => 'A',
+        'northkarana'   => 'A',
+        'nro'           => 'A',
+        'oasis'         => 'A',
+        'oggok'         => 'A',
+        'oot'           => 'A',
+        'paw'           => 'A',
+        'permafrost'    => 'A',
+        'qcat'          => 'A',
+        'qey2hh1'       => 'A',
+        'qeynos'        => 'A',
+        'qeynos2'       => 'A',
+        'qeytoqrg'      => 'A',
+        'qrg'           => 'A',
+        'rathemtn'      => 'A',
+        'rivervale'     => 'A',
+        'runnyeye'      => 'A',
+        'soldunga'      => 'A',
+        'soldungb'      => 'A',
+        'soltemple'     => 'A',
+        'southkarana'   => 'A',
+        'sro'           => 'A',
+        'gunthak'       => 'A',
+        'dulak'         => 'A',
+        'nadox'         => 'A',
+        'torgiran'      => 'A',
+        'hatesfury'     => 'A',
+        'jaggedpine'    => 'A',
+        
+        # Odus
+        'hole'          => 'O',
+        'kerraridge'    => 'O',
+        'paineel'       => 'O',
+        'tox'           => 'O',
+        'warrens'       => 'O',
+        'stonebrunt'    => 'O',
+
+        # Kunark
+        'burningwood'   => 'K',
+        'cabeast'       => 'K',
+        'cabwest'       => 'K',
+        'chardok'       => 'K',
+        'charasis'      => 'K',
+        'citymist'      => 'K',
+        'dalnir'        => 'K',
+        'dreadlands'    => 'K',
+        'droga'         => 'K',
+        'emeraldjungle' => 'K',
+        'fieldofbone'   => 'K',
+        'firiona'       => 'K',
+        'frontiermtns'  => 'K',
+        'kaesora'       => 'K',
+        'karnor'        => 'K',
+        'kurn'          => 'K',
+        'lakeofillomen' => 'K',
+        'nurga'         => 'K',
+        'overthere'     => 'K',
+        'sebilis'       => 'K',
+        'skyfire'       => 'K',
+        'swampofnohope' => 'K',
+        'timorous'      => 'K',
+        'trakanon'      => 'K',
+        'veeshan'       => 'K',
+        'warslikswood'  => 'K',
+        
+        # Velious
+        'cobaltscar'    => 'V',
+        'crystal'       => 'V',
+        'eastwastes'    => 'V',
+        'frozenshadow'  => 'V',
+        'greatdivide'   => 'V',
+        'iceclad'       => 'V',
+        'kael'          => 'V',
+        'necropolis'    => 'V',
+        'sirens'        => 'V',
+        'sleepers'      => 'V',
+        'skyshrine'     => 'V',
+        'templeveeshan' => 'V',
+        'thurgadina'    => 'V',
+        'thurgadinb'    => 'V',
+        'velketor'      => 'V',
+        'wakening'      => 'V',
+        'westwastes'    => 'V',
+
+        # Luclin
+        'acrylia'      => 'L',
+        'akheva'       => 'L',
+        'bazaar'       => 'L',
+        'dawnshroud'   => 'L',
+        'echo'         => 'L',
+        'fungusgrove'  => 'L',
+        'griegsend'    => 'L',
+        'grimling'     => 'L',
+        'hollowshade'  => 'L',
+        'katta'        => 'L',
+        'letalis'      => 'L',
+        'maiden'       => 'L',
+        'mseru'        => 'L',
+        'netherbian'   => 'L',
+        'nexus'        => 'L',
+        'paludal'      => 'L',
+        'scarlet'      => 'L',
+        'shadeweaver'  => 'L',
+        'shadowhaven'  => 'L',
+        'sharvahl'     => 'L',
+        'sseru'        => 'L',
+        'ssratemple'   => 'L',
+        'tenebrous'    => 'L',
+        'thedeep'      => 'L',
+        'thegrey'      => 'L',
+        'umbral'       => 'L',
+        'vexthal'      => 'L',
+
+        # Planes of Power
+        'poknowledge'         => 'P',
+        'potranquility'       => 'P',        
+        'pojustice'           => 'P', # Plane of Justice
+        'podisease'           => 'P', # Plane of Disease
+        'poinnovation'        => 'P', # Plane of Innovation
+        'ponightmare'         => 'P', # Plane of Nightmare
+        'nightmareb'          => 'P', # The Lair of Terris Thule
+        'povalor'             => 'P', # Plane of Valor
+        'postorms'            => 'P', # Plane of Storms
+        'potorment'           => 'P', # Plane of Torment
+        'codecay'             => 'P',
+        'hohonora'            => 'P',
+        'hohonorb'            => 'P',
+        'bothunder'           => 'P',
+        'potactics'           => 'P',
+        'solrotower'          => 'P',
+        'pofire'              => 'P',
+        'poair'               => 'P',
+        'powater'             => 'P',
+        'poeartha'            => 'P',
+        'poearthb'            => 'P',
+        'potimea'             => 'P',
+        'potimeb'             => 'P',
+        'hateplaneb'          => 'P',
+        'mischiefplane'       => 'P',
+        'airplane'            => 'P',
+        'fearplane'           => 'P',
+
+        # Gates of Discord
+        'abysmal'      => 'G',
+        'barindu'      => 'G',
+        'ferubi'       => 'G',
+        'ikkinz'       => 'G',
+        'inktuta'      => 'G',
+        'kodtaz'       => 'G',
+        'natimbi'      => 'G',
+        'qinimi'       => 'G',
+        'qvic'         => 'G',
+        'riwwi'        => 'G',
+        'snlair'       => 'G',
+        'snplant'      => 'G',
+        'snpool'       => 'G',
+        'sncrematory'  => 'G',
+        'tacvi'        => 'G',
+        'tipt'         => 'G',
+        'txevu'        => 'G',
+        'uqua'         => 'G',
+        'vxed'         => 'G',
+        'yxtta'        => 'G',
+
+        # Omens of Discord
+        'anguish'           => 'O',
+        'bloodfields'       => 'O',
+        'causeway'          => 'O',
+        'chambersa'         => 'O',
+        'chambersb'         => 'O',
+        'chambersc'         => 'O',
+        'chambersd'         => 'O',
+        'chamberse'         => 'O',
+        'chambersf'         => 'O',
+        'dranik'            => 'O',
+        'dranikcatacombsa'  => 'O',
+        'dranikcatacombsb'  => 'O',
+        'dranikcatacombsc'  => 'O',
+        'dranikhollowsa'    => 'O',
+        'dranikhollowsb'    => 'O',
+        'dranikhollowsc'    => 'O',
+        'dranikscar'        => 'O',
+        'drainksewersa'     => 'O',
+        'drainksewersb'     => 'O',
+        'drainksewersc'     => 'O',
+        'harbingers'        => 'O',
+        'provinggrounds'    => 'O',
+        'riftseekers'       => 'O',
+        'wallofslaughter'   => 'O',
+
+    );
+
+    my $zonesn = shift;
+
+    if (exists $zone_to_continent{$zonesn}) {
+        return $zone_to_continent{$zonesn};
+    } else {
+        return undef;
+    }
+}
+
+# Fetches the zone data for a character from the data store
+# Usage:
+#    my $zones = get_zone_data_for_character(12345, '-K');
+#    foreach my $zone (keys %{$zones}) {
+#        print "Zone: $zone\n";
+#    }
+sub get_zone_data_for_character {
+    my ($characterID, $suffix) = @_;
+    my $charKey = $characterID . "-TL" . $suffix;
+    my $data = quest::get_data($charKey);
+    return deserialize_zone_data($data);
+}
+
+# Serializes the data structure for storage
+# Usage:
+#    my %zone_data = ('Zone1' => ['data1', 'data2'], 'Zone2' => ['data3', 'data4']);
+#    my $serialized_data = serialize_zone_data(\%zone_data);
+#    print $serialized_data;
+sub serialize_zone_data {
+    my ($data) = @_;
+    my @entries = ();
+    foreach my $key (keys %{$data}) {
+        push @entries, join(',', $key, @{$data->{$key}});
+    }
+    return join(':', @entries);
+}
+
+# Deserializes the data structure from the stored string
+# Usage:
+#    my $data_string = "Zone1,data1,data2:Zone2,data3,data4";
+#    my $zone_data = deserialize_zone_data($data_string);
+#    foreach my $zone (keys %{$zone_data}) {
+#        print "Zone: $zone\n";
+#    }
+sub deserialize_zone_data {
+    my ($string) = @_;
+    my %data = ();
+    foreach my $entry (split /:/, $string) {
+        my @tokens = split /,/, $entry;
+        $data{$tokens[1]} = [ @tokens ];
+    }
+    return \%data;
+}
+
+# Adds or updates a zone entry for a character
+# Usage:
+#    my %new_zone_data = ('Zone3' => ['data5', 'data6']);
+#    set_zone_data_for_character(12345, \%new_zone_data, '-K');
+sub set_zone_data_for_character {
+    my ($characterID, $zone_data, $suffix) = @_;
+    my $charKey = $characterID . "-TL" . $suffix;
+    my $data_string = serialize_zone_data($zone_data);
+    quest::set_data($charKey, $data_string);
+}
+
+# Check if a particular piece of data is present
+# Usage:
+#    if (has_zone_entry(12345, "Zone1", "-K")) {
+#        print "Zone1 exists for character 12345 with suffix -K\n";
+#    }
+sub has_zone_entry {
+    my ($characterID, $zone_name, $suffix) = @_;
+    my $teleport_zones = get_zone_data_for_character($characterID, $suffix);
+    return exists($teleport_zones->{$zone_name});
+}
+
+# Add (or overwrite) data to teleport_zones
+# Usage:
+#    add_zone_entry(12345, "Zone4", ['data7', 'data8'], '-K');
+sub add_zone_entry {
+    my ($characterID, $zone_name, $zone_data, $suffix) = @_;
+    my $teleport_zones = get_zone_data_for_character($characterID, $suffix);
+    $teleport_zones->{$zone_name} = $zone_data;
+    set_zone_data_for_character($characterID, $teleport_zones, $suffix);
+}
