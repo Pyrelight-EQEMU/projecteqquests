@@ -1,6 +1,5 @@
 sub EVENT_SAY {  
-  my $charKey = $client->CharacterID() . "-MAO-Progress";
-  my $progress = quest::get_data($charKey);
+  my $progress = $client->GetBucket("MAO-Progress");
   my $clientName = $client->GetCleanName();
 
   if ($text=~/hail/i) {     
@@ -33,7 +32,7 @@ sub EVENT_SAY {
       quest::set_data($acctMoneyFlagKey, ++$acctMoneyFlagValue);
     }
     
-    quest::set_data($charKey, "1");
+    $client->SetBucket("MAO-Progress",1);
     quest::message(15,"You have gained the ability to use the Nexus teleportation network.");   
   }
 }
