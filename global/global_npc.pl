@@ -448,7 +448,7 @@ sub UPDATE_PET_STATS
 
                 quest::debug("applying damage mod: $bucket_value");
 
-                $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() * 10);            
+                $bucket_value += floor($owner->GetItemBonuses()->GetHeroicSTR() / 10);            
             }
 
             $bucket_value *= $pet_scalar;
