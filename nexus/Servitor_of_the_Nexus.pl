@@ -22,8 +22,8 @@ sub POPUP_DISPLAY {
   my $feature_desc = "";
 
   my $text = $desc .
-             $feature_header .
-             $desc ;  
+             quest::popupcentermessage($feature_header) .
+             $feature_desc ;  
 
   quest::popup('Welcome to Pyrelight', $text);
 }
