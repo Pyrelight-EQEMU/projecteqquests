@@ -26,6 +26,8 @@ sub POPUP_DISPLAY {
   my $text = $header .
              $discord .
              $desc .
-             $feature_header;  
+             $feature_header .
+             $desc .
+             $desc;  
   quest::popup('', $text);
 }
