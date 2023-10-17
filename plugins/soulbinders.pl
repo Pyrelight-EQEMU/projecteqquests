@@ -11,7 +11,7 @@ sub soulbinder_say {
 		my $client     = plugin::val('client');
 		my $npc        = plugin::val('npc');
 
-		my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . "(${name})"
+		my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . "(${name})";
 		my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
 
 		quest::debug("$descData + $locData");
