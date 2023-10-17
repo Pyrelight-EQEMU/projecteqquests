@@ -3,5 +3,5 @@ sub EVENT_SCALE_CALC {
 
     my $attunements = plugin::get_total_attunements($client);
 
-    $questitem->SetScale($client, $attunements/5);
+    $questitem->SetScale($attunements/5);
 }
