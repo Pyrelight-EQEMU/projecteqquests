@@ -400,7 +400,7 @@ sub count_teleport_zones {
     my @zones = split /:/, $charTargetsString;
     foreach my $z (@zones) {      
         my @tokens = split /,/, $z;
-        if ($tokens[1] ne '') {
+        if ($tokens[1]) {
             $teleport_zones{$tokens[1]} = [ @tokens ];
         }
     }
