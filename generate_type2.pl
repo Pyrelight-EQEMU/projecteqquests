@@ -3,7 +3,8 @@ use warnings;
 use DBI;
 use POSIX;
 use JSON;
-use List::Util;
+use List::Util 'min';
+use List::Util 'max';
 use Digest::MD5 qw(md5_hex);
 
 sub LoadMysql {
