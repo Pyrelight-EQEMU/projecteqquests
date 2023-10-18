@@ -453,5 +453,11 @@ sub UPDATE_PET_STATS
             $bucket_value *= $pet_scalar;
             $pet->ModifyNPCStat($stat, ceil($bucket_value));
         }
+
+        my $owner_speed = $owner->CastToNPC()->GetNPCStat("runspeed");
+        my $pet_speed = $pet->GetNPCStat("runspeed");
+        if ($owner_speed > $pet_speed) {
+            $pet->ModifyNPCStat("runspeed", $owner_speed);
+        }
     }
 }
