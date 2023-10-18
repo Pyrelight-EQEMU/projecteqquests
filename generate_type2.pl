@@ -25,7 +25,7 @@ sub LoadMysql {
         $config = $json->decode($content);
 
         #::: Set MySQL Connection vars
-        $db   = "peq";
+        $db   = $config->{"server"}{"database"}{"db"};
         $host = "10.10.20.220";
         $user = $config->{"server"}{"database"}{"username"};
         $pass = $config->{"server"}{"database"}{"password"};
@@ -55,7 +55,7 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT items.*, spells_new.Name as spell_name
+    SELECT items.*
     FROM items 
     INNER JOIN spells_new ON items.clickeffect = spells_new.id
     WHERE items.clickeffect > 0 
@@ -84,7 +84,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
 	
     # Set New Attributes
     $base_data{id} = $new_id;
-	$base_data{Name} = $row{spell_name} . " Spellstone";
+	#$base_data{Name} = $row{spell_name} . " Spellstone";
     $base_data{clickeffect} = $row{clickeffect};
     $base_data{casttime} = $row{casttime};
     $base_data{casttime_} = $row{casttime_};
