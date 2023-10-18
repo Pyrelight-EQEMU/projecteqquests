@@ -242,45 +242,16 @@ sub CheckLevelFlags {
     }
 }
 
-#function check_class_switch_aa(e)
-#	accum = 0
-#	for i=16,1,-1
-#	do
-#		eq.debug("Checking class: " .. i);
-#		if (e.self:GetBucket("class-"..i.."-unlocked") == '1') then
-#			eq.debug("Unlocked Class: " .. i);
-#			e.self:GrantAlternateAdvancementAbility(20000 + i, 1, true)			
-#			accum = accum + 1			
-#		end		 
-#	end
-#	eq.debug("Unlocked Classes: " .. accum);
-#	expPenalty = calculate_modifier(accum)
-#	e.self:SetEXPModifier(0, expPenalty)
-#	eq.debug("Setting your Exp Modifier to: " .. expPenalty)
-#end
-
 sub CheckClassAA {
     my $client = shift;
-    my $accum  = 0;
-
-    foreach my $i (reverse 1..16) {
-        quest::debug("Checking Class ID: $i");
-        if ($client->GetBucket("class-$i-unlocked")) {
-            quest::debug("ClassID $i is unlocked");
-            $client->GrantAlternateAdvancementAbility(20000+$i, 1, 1);
-            $accum++;
-        }
-    }
-
-    if ($accum == 0) {
-        $accum++;
-    }
-
-    my $expPenalty = CalculateExpPenalty($accum);
-    $client->SetEXPModifier(0, $expPenalty);
+    my $class_ability_base = 20000;
     
-    quest::debug("Unlocked Class Count: $accum");
-    quest::debug("Set Exp Penalty to: $expPenalty");
+    # Use the GetUnlockedClasses method to get the unlocked classes
+    my %unlocked_classes = GetUnlockedClasses($client);
+    
+    foreach my $class_id (keys %unlocked_classes) {
+        $client->GrantAlternateAdvancementAbility($class_ability_base + $class_id, 1, 1);
+    }    
 }
 
 #function calculate_modifier(count)

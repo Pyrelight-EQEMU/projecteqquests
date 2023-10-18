@@ -4,6 +4,7 @@ sub EVENT_SAY {
   my $classCount = my $count = keys %{ { plugin::GetUnlockedClasses($client) } } || 1;
   my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;  
   my @locked_classes = plugin::GetLockedClasses($client);
+  my %class = map { quest::getclassname($_) => $_ } @locked_classes;
 
   if ($text=~/hail/i) {     
       if ($progress <= 0) {
@@ -71,7 +72,7 @@ sub EVENT_SAY {
       }
       my $out_string;
       if (@formatted_classes > 1) {
-          $out_string = join(", ", @formatted_classes[0..$#formatted_classes-1]) . ", or the " . $formatted_classes[-1];
+          $out_string = join(", ", @formatted_classes[0..$#formatted_classes-1]) . ", or " . $formatted_classes[-1];
       } else {
           $out_string = $formatted_classes[0];
       }
@@ -79,9 +80,16 @@ sub EVENT_SAY {
       plugin::NPCTell("I can open your mind to the ways of the $out_string. Choose wisely.");
   }
 
-  elsif (grep { $_ eq $text } map { quest::getclassname($_) } @locked_classes) {
-    my $selected_class = $text;
-    quest::debug("You have chosen the $selected_class class!");
+  elsif (exists $class{$text} and $unlocksAvailable >= 1) {
+    my $class_ability_base = 20000;
+
+    $client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
+    $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
+    plugin::YellowText("You have spent a Class Unlock point.");
+    plugin::NPCTell("It is done. You should feel a new ability which will allow you to switch to your new persona. Grow, and come back when you have obtained more power.");
+
+    $client->GrantAlternateAdvancementAbility($client->GetClass + $class_ability_base, 1, 1);
+    $client->GrantAlternateAdvancementAbility($class{$text} + $class_ability_base, 1, 1)
   }
 }
 
