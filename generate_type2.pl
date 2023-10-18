@@ -26,7 +26,7 @@ sub LoadMysql {
 
         #::: Set MySQL Connection vars
         $db   = $config->{"server"}{"database"}{"db"};
-        $host = $config->{"server"}{"database"}{"host"};
+        $host = $config->10.10.20.220;
         $user = $config->{"server"}{"database"}{"username"};
         $pass = $config->{"server"}{"database"}{"password"};
 
