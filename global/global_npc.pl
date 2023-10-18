@@ -414,7 +414,7 @@ sub UPDATE_PET_STATS
 
         # This is so damned weird. The value reported by GetNPCStat is 40x lower than the 'real' value.
         # this is actually correct to set pet's speed to slightly faster than owner's.
-        my $owner_speed = $owner->GetRunspeed() + 20;
+        my $owner_speed = $owner->GetRunspeed() *2;
         my $pet_speed = $pet->GetNPCStat("runspeed")*40;
 
         quest::debug("$owner_speed - $pet_speed");
