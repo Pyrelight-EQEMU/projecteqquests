@@ -92,5 +92,3 @@ sub EVENT_SAY {
     $client->GrantAlternateAdvancementAbility($class{$text} + $class_ability_base, 1, 1)
   }
 }
-
-#$client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
