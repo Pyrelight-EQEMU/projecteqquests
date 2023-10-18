@@ -81,7 +81,7 @@ sub EVENT_SAY {
   }
 
   elsif (exists $class{$text} and $unlocksAvailable >= 1) {
-    if (plugin::UnlockClass($class{$text})) {
+    if (plugin::UnlockClass($client, $class{$text})) {
       $client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
       plugin::NPCTell("It is done. You should feel a new ability which will allow you to switch to your new persona. Grow, and come back when you have obtained more power.");
     }
