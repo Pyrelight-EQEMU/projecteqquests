@@ -11,8 +11,8 @@ sub EVENT_SAY {
                         your journey to [nurture] it.");
       } elsif ($client->GetLevel() >= 20 and $classCount < 2) {
         if ($unlocksAvailable < 1) {
-          plugin::NPCTell("I'm happy that you've returned, $clientName. I sense that you've gained quite a bit of experience, enough for me to trust you with [additional
-                          power] and responsibility. Are you ready for your soul to properly grow?");
+          plugin::NPCTell("I'm happy that you've returned, $clientName. I sense that you've gained quite a bit of experience, enough for me to trust you with 
+                          [additional power] and responsibility. Are you ready for your soul to properly grow?");
         } else {
           plugin::NPCTell("I've already unlocked your potential, $clientName. You only need to seize it and [choose your class].");
         }
