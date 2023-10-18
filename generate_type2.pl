@@ -80,43 +80,6 @@ while (my $row = $select_query->fetchrow_hashref()) {
     foreach my $key (keys %$row) {
         print "$key: $row{$key}\n";
     }
-    # Set data for id, name, and idfile from current row
-    my $hash = md5_hex($row{id});
-    my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
-	
-    # Set New Attributes
-    $base_data{id} = $new_id;
-	$base_data{Name} = $row{spell_name} . " Spellstone";
-    $base_data{clickeffect} = $row{clickeffect};
-    $base_data{casttime} = $row{casttime};
-    $base_data{casttime_} = $row{casttime_};
-    $base_data{recastdelay} = min(60, ($row{recastdelay} || 0));
-    $base_data{recasttype} = $row{recasttype};
-    $base_data{lore} = (defined $row{lore} ? $row{lore} : "") . "<br>Made from: " . (defined $row{Name} ? $row{Name} : "");
-    $base_data{slots} = $row{slots};
-    $base_data{classes} = $row{classes};
-    $base_data{deity} = $row{deity};
-    $base_data{augtype} = 2;
-    $base_data{augrestrict} = 0;
-    $base_data{idfile} = 'IT63';
-    $base_data{icon} = $possible_icons[$index];
-
-	# Construct dynamic SQL for insertion
-	my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
-	my $placeholders = join(", ", map { "?" } keys %$base_data);
-	my $values = [values %$base_data];
-
-    my $insert_sql = "REPLACE INTO items ($columns) VALUES ($placeholders)";
-
-    # Prepare the dynamic SQL statement and execute
-    my $insert = $dbh->prepare($insert_sql);
-    eval {
-        $insert->execute(@$values);
-    };
-    if ($@) {
-        die "Error inserting for new ID $new_id. Perhaps it already exists? Error message: $@";
-    }
-
     $new_id++;
     $insert->finish();
 }
