@@ -2,7 +2,8 @@ sub EVENT_SAY {
   my $progress = $client->GetBucket("MAO-Progress") || 0;
   my $clientName = $client->GetCleanName();
   my $classCount = my $count = keys %{ { plugin::GetUnlockedClasses($client) } } || 1;
-  my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;
+  my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;  
+  my @locked_classes = plugin::GetLockedClasses($client);
 
   if ($text=~/hail/i) {     
       if ($progress <= 0) {
@@ -56,31 +57,32 @@ sub EVENT_SAY {
     }
   }
 
-  elsif ($text=~/additional Class/i and $classCount < 2 and $unlocksAvailable < 1) {
-    $client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
+  elsif ($text=~/additional Class/i and $classCount < 2 and $unlocksAvailable < 1) {    
     plugin::NPCTell("It is done. Let me know when you are ready to [choose your class], and I will assist you.");
     plugin::YellowText("You have gained a Class Unlock point.");
     $client->SetBucket("ClassUnlocksAvailable", 1);    
   }
 
   elsif ($text =~ /choose your class/i and $unlocksAvailable >= 1) {
-      my @locked_classes = plugin::GetLockedClasses($client);
       my @formatted_classes;
-
-      # Format class names
       foreach my $class (@locked_classes) {
           my $class_name = quest::getclassname($class);
           push @formatted_classes, "[$class_name]";
       }
-
-      # Convert the array into a comma-separated string with 'and' before the last class
       my $out_string;
       if (@formatted_classes > 1) {
-          $out_string = join(", ", @formatted_classes[0..$#formatted_classes-1]) . ", or " . $formatted_classes[-1];
+          $out_string = join(", ", @formatted_classes[0..$#formatted_classes-1]) . ", or the " . $formatted_classes[-1];
       } else {
           $out_string = $formatted_classes[0];
       }
 
-      quest::debug($out_string);
+      plugin::NPCTell("I can open your mind to the ways of the $out_string. Choose wisely.");
+  }
+
+  elsif (grep { $_ eq $text } map { quest::getclassname($_) } @locked_classes) {
+    my $selected_class = $text;
+    quest::debug("You have chosen the $selected_class class!");
   }
 }
+
+#$client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
