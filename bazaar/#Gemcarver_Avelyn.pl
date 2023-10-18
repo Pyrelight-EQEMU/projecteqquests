@@ -38,6 +38,9 @@ sub EVENT_ITEM {
       if ($item_id != 0) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
          quest::debug(is_global_aug($item_id));
+
+         delete $itemcount{$item_id};
+         $client->SummonItem(get_global_aug());
       }
    }
 
