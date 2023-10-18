@@ -4,7 +4,7 @@ use DBI;
 use POSIX;
 use JSON;
 use List::Util;
-use Digest::MD5;
+use Digest::MD5 qw(md5_hex);
 
 sub LoadMysql {
         use DBI;
