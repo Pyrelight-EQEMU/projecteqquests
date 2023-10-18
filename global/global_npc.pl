@@ -412,7 +412,7 @@ sub UPDATE_PET_STATS
         # Create Scalar.
         my $pet_scalar = APPLY_FOCUS();
 
-        my $owner_speed = $owner->GetRunspeed() * 2;
+        my $owner_speed = $owner->GetRunspeed() * 1.5;
         my $pet_speed = $pet->GetRunspeed();
 
         quest::debug("$owner_speed - $pet_speed");
