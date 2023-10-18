@@ -55,8 +55,9 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT *
-    FROM items
+    SELECT items.*
+    FROM items 
+    INNER JOIN spells_new ON items.clickeffect = spells_new.id
     WHERE items.clickeffect > 0 
       AND items.slots > 0 
       AND items.slots < 4194304 
@@ -68,7 +69,7 @@ my $select_query = $dbh->prepare(<<SQL);
       ORDER BY id;
 SQL
 
-$select_query->execute();
+$select_query->execute() or die;
 
 # Create an array of the possible icon values based on the ranges
 my @possible_icons = (1940..2002, 6464..6473, 944..965, 1429..1443);
@@ -78,9 +79,9 @@ my $new_id = 910000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
-    my $hash = md5_hex($row{id});
-    my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
-
+    #my $hash = md5_hex($row{id});
+    #my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
+    
     # Set New Attributes
     $base_data{id} = $new_id;
 	#$base_data{Name} = $row{spell_name} . " Spellstone";
@@ -96,7 +97,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data{augtype} = 2;
     $base_data{augrestrict} = 0;
     $base_data{idfile} = 'IT63';
-    $base_data{icon} = $possible_icons[$index];
+    #$base_data{icon} = $possible_icons[$index];
 
 	# Construct dynamic SQL for insertion
 	my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
