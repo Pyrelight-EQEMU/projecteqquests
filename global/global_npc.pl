@@ -85,7 +85,7 @@ sub EVENT_ITEM
 {
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
         plugin::YellowText("You must use a Summoner's Syncrosatchel to equip your pet.");
-        plugin::return_items(\%itemcount);
+        plugin::return_items_silent(\%itemcount);
     }
 }
 
@@ -111,7 +111,6 @@ sub EVENT_DEATH_COMPLETE {
         }
     }
 }
-
 
 sub upgrade_item_tier {
     my ($item_id, $tier, $entity)  = @_;

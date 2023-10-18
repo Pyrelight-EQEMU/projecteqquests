@@ -262,3 +262,42 @@ sub EVENT_COMBINE_SUCCESS {
         quest::delglobal("paladin_epic_hollowc");
     }
 }
+
+sub EVENT_SCRIBE_SPELL {
+    quest::debug("slot_id " . $slot_id);
+    quest::debug("spell_id " . $spell_id);
+    quest::debug("spell " . $spell);
+    add_illusions($client);
+}
+
+sub EVENT_UNSCRIBE_SPELL {
+    quest::debug("slot_id " . $slot_id);
+    quest::debug("spell_id " . $spell_id);
+    quest::debug("spell " . $spell);
+    add_illusions($client);
+}
+
+sub add_illusions {
+    my $client = shift;
+    my %illusion_spells = ( 643 =>  9492, #Call of Bones
+                            644 =>  9490, #Lich
+                            1416 => 9495, #Arch Lich
+                            1611 => 9490, #Demi Lich
+                            2114 => 9495, #Ancient: Master of Death
+                            3311 => 9491, #Seduction of Saryrn
+                            4978 => 9491, #Ancient: Seduction of Chaos
+                            5434 => 9491, #Dark Posession
+                            8520 => 9493, #Grave Pact 
+                            );
+
+    foreach my $spell_id (keys %illusion_spells) {
+        $slot_spell = $client->GetSpellBookSlotBySpellID($spell_id);
+        $slot_illus = $client->GetSpellBookSlotBySpellID($illusion_spells{$spell_id});
+
+        if ($slot_spell and not $slot_illus) {
+            $client->ScribeSpell($illusion_spells{$spell_id}, $client->GetFreeSpellBookSlot(), 1);
+        } elsif {not $slot_spell and $slot_illus} {
+            $client->UnscribeSpell($slot_illus, 1);
+        }
+    }
+}
