@@ -413,12 +413,12 @@ sub UPDATE_PET_STATS
         my $pet_scalar = APPLY_FOCUS();
 
         my $owner_speed = $owner->GetRunspeed();
-        my $pet_speed = $pet->GetNPCStat("runspeed");
+        my $pet_speed = $pet->GetNPCStat("runspeed")*40;
 
         quest::debug("$owner_speed - $pet_speed");
 
         
-            $pet->ModifyNPCStat("runspeed", $owner_speed/40);
+        $pet->ModifyNPCStat("runspeed", $owner_speed/40);
         
 
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
