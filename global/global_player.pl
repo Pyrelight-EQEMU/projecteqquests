@@ -296,7 +296,7 @@ sub add_illusions {
 
         if ($slot_spell and not $slot_illus) {
             $client->ScribeSpell($illusion_spells{$spell_id}, $client->GetFreeSpellBookSlot(), 1);
-        } elsif {not $slot_spell and $slot_illus} {
+        } elsif (not $slot_spell and $slot_illus) {
             $client->UnscribeSpell($slot_illus, 1);
         }
     }
