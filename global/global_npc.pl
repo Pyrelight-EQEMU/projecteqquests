@@ -412,13 +412,16 @@ sub UPDATE_PET_STATS
         # Create Scalar.
         my $pet_scalar = APPLY_FOCUS();
 
-        my $owner_speed = $owner->GetRunspeed();
+        # This is so damned weird. The value reported by GetNPCStat is 40x lower than the 'real' value.
+        # this is actually correct to set pet's speed to slightly faster than owner's.
+        my $owner_speed = $owner->GetRunspeed() + 5;
         my $pet_speed = $pet->GetNPCStat("runspeed")*40;
 
         quest::debug("$owner_speed - $pet_speed");
 
-        
-        $pet->ModifyNPCStat("runspeed", $owner_speed/40);
+        if ($owner_speed < $pet_speed) {
+            $pet->ModifyNPCStat("runspeed", $owner_speed/40);
+        }
         
 
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
