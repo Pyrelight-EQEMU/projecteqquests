@@ -162,7 +162,7 @@ sub GetLockedClasses {
     my %unlocked_classes = GetUnlockedClasses($client);
 
     # All the class IDs excluding the ones you've specified
-    my @all_classes = (2, 3, 4, 5, 6, 10, 11, 13, 14, 15, 16);
+    my @all_classes = (2, 3, 4, 5, 6, 10, 11, 13, 14, 15);
 
     # Filtering out the unlocked class IDs
     my @locked_classes = grep { not exists $unlocked_classes{$_} } @all_classes;
