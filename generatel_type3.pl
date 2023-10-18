@@ -75,7 +75,7 @@ $select_query->execute() or die;
 my @possible_icons = (967, 1562..1469);
 
 # Start inserting with ID 901000
-my $new_id = 910000;
+my $new_id = 920000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
