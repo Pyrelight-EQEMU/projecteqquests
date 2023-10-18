@@ -396,7 +396,6 @@ sub SAVE_PET_STATS
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             $owner->SetBucket("pet_$stat", $pet->GetNPCStat($stat));
-            my $petstat = $pet->GetNPCStat($stat);
         }
         
         $owner->SetBucket("pet_race", $pet->GetBaseRace());
@@ -418,6 +417,7 @@ sub UPDATE_PET_STATS
         my $pet_speed = $pet->GetNPCStat("runspeed")*40;
 
         if ($owner_speed > $pet_speed) {
+            my $spell_bonus = $npc->GetSpellBonuses()->Runspeed
             $pet->ModifyNPCStat("runspeed", $owner_speed/40);
         }        
 
