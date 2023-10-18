@@ -56,8 +56,7 @@ $base_data_query->finish();
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
     SELECT *
-    FROM items 
-    INNER JOIN spells_new ON items.clickeffect = spells_new.id
+    FROM items
     WHERE items.clickeffect > 0 
       AND items.slots > 0 
       AND items.slots < 4194304 
