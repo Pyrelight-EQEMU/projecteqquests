@@ -1,7 +1,7 @@
 sub EVENT_SAY {  
   my $progress = $client->GetBucket("MAO-Progress") || 0;
   my $clientName = $client->GetCleanName();
-  my $classCount = my $count = keys %{ { GetUnlockedClasses($client) } } || 1;
+  my $classCount = my $count = keys %{ { plugin::GetUnlockedClasses($client) } } || 1;
   my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;
 
   if ($text=~/hail/i) {     
