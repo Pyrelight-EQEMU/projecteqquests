@@ -77,6 +77,9 @@ my @possible_icons = (1940..2002, 6464..6473, 944..965, 1429..1443);
 my $new_id = 910000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
+    foreach my $key (keys %$row) {
+        print "$key: $row{$key}\n";
+    }
     # Set data for id, name, and idfile from current row
     my $hash = md5_hex($row{id});
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
@@ -87,9 +90,9 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data{clickeffect} = $row{clickeffect};
     $base_data{casttime} = $row{casttime};
     $base_data{casttime_} = $row{casttime_};
-    #$base_data{recastdelay} = min(60, ($row{recastdelay} || 0));
+    $base_data{recastdelay} = min(60, ($row{recastdelay} || 0));
     $base_data{recasttype} = $row{recasttype};
-    #$base_data{lore} = (defined $row{lore} ? $row{lore} : "") . "<br>Made from: " . (defined $row{Name} ? $row{Name} : "");
+    $base_data{lore} = (defined $row{lore} ? $row{lore} : "") . "<br>Made from: " . (defined $row{Name} ? $row{Name} : "");
     $base_data{slots} = $row{slots};
     $base_data{classes} = $row{classes};
     $base_data{deity} = $row{deity};
