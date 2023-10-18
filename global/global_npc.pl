@@ -454,8 +454,10 @@ sub UPDATE_PET_STATS
             $pet->ModifyNPCStat($stat, ceil($bucket_value));
         }
 
-        my $owner_speed = $owner->CastToNPC()->GetNPCStat("runspeed");
+        my $owner_speed = $owner->CastToNPC()->GetNPCStat("runspeed") + 10;
         my $pet_speed = $pet->GetNPCStat("runspeed");
+
+        quest::debug("$owner_speed - $pet_speed");
         if ($owner_speed > $pet_speed) {
             $pet->ModifyNPCStat("runspeed", $owner_speed);
         }
