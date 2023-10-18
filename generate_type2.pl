@@ -82,6 +82,8 @@ while (my $row = $select_query->fetchrow_hashref()) {
     #my $hash = md5_hex($row{id});
     #my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
     
+    print $base_data{id};
+    print $row{id};
     # Set New Attributes
     $base_data{id} = $new_id;
 	#$base_data{Name} = $row{spell_name} . " Spellstone";
