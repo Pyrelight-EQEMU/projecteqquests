@@ -188,97 +188,99 @@ sub UPDATE_PET {
                 }
             }
         }
-        # Determine contents
-        if ($bag_slot >= quest::getinventoryslotid("general.begin") && $bag_slot <= quest::getinventoryslotid("general.end")) {
-            %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("general.begin"), quest::getinventoryslotid("generalbags.begin"), $bag_size);
-        } elsif ($bag_slot >= quest::getinventoryslotid("bank.begin") && $bag_slot <= quest::getinventoryslotid("bank.end")) {
-            %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("bank.begin"), quest::getinventoryslotid("bankbags.begin"), $bag_size);
-        } else {
-            return;
-        }
-
-        # Fetching pet's inventory
-        my @lootlist = $npc->GetLootList();
-
-        # Sort the lootlist based on criteria
-        @lootlist = sort {
-            my $a_proceffect = $npc->GetItemStat($a, "proceffect") || 0;
-            my $a_damage = $npc->GetItemStat($a, "damage") || 0;
-            my $a_delay = $npc->GetItemStat($a, "delay") || 0;
-            my $a_ratio = ($a_delay > 0 ? $a_damage / $a_delay : 0);
-            my $a_ac = $npc->GetItemStat($a, "ac") || 0;
-            my $a_hp = $npc->GetItemStat($a, "hp") || 0;
-
-            my $b_proceffect = $npc->GetItemStat($b, "proceffect") || 0;
-            my $b_damage = $npc->GetItemStat($b, "damage") || 0;
-            my $b_delay = $npc->GetItemStat($b, "delay") || 0;
-            my $b_ratio = ($b_delay > 0 ? $b_damage / $b_delay : 0);
-            my $b_ac = $npc->GetItemStat($b, "ac") || 0;
-            my $b_hp = $npc->GetItemStat($b, "hp") || 0;
-
-            ($b_proceffect > 0 ? 1 : 0) <=> ($a_proceffect > 0 ? 1 : 0)
-            || $b_ratio <=> $a_ratio
-            || $b_ac <=> $a_ac
-            || $b_hp <=> $a_hp
-            || $b <=> $a  # using item IDs for final tiebreaker
-        } @lootlist;
-
-        foreach my $item_id (@lootlist) {
-            my $quantity = $npc->CountItem($item_id);
-            if ($quantity > 1) {
-                $updated = 1;
-                last;
+        if ($bag_slot) {
+            # Determine contents
+            if ($bag_slot >= quest::getinventoryslotid("general.begin") && $bag_slot <= quest::getinventoryslotid("general.end")) {
+                %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("general.begin"), quest::getinventoryslotid("generalbags.begin"), $bag_size);
+            } elsif ($bag_slot >= quest::getinventoryslotid("bank.begin") && $bag_slot <= quest::getinventoryslotid("bank.end")) {
+                %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("bank.begin"), quest::getinventoryslotid("bankbags.begin"), $bag_size);
+            } else {
+                return;
             }
-            $new_pet_inventory{$item_id} += $quantity;
-        }
-        
-        foreach my $item_id (keys %new_pet_inventory) {
-            # if the key doesn't exist in new_bag_inventory or the values don't match
-            if (!exists $new_bag_inventory{$item_id}) {
-                $updated = 1; # set updated to true
-                quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
-                last; # exit the loop as we have found a difference
-            }
-        }
 
-        # if $updated is still false, it could be because new_bag_inventory has more items, check for that
-        if (!$updated) {
-            foreach my $item_id (keys %new_bag_inventory) {
-                # if the key doesn't exist in new_pet_inventory
-                if (!exists $new_pet_inventory{$item_id}) {                    
+            # Fetching pet's inventory
+            my @lootlist = $npc->GetLootList();
+
+            # Sort the lootlist based on criteria
+            @lootlist = sort {
+                my $a_proceffect = $npc->GetItemStat($a, "proceffect") || 0;
+                my $a_damage = $npc->GetItemStat($a, "damage") || 0;
+                my $a_delay = $npc->GetItemStat($a, "delay") || 0;
+                my $a_ratio = ($a_delay > 0 ? $a_damage / $a_delay : 0);
+                my $a_ac = $npc->GetItemStat($a, "ac") || 0;
+                my $a_hp = $npc->GetItemStat($a, "hp") || 0;
+
+                my $b_proceffect = $npc->GetItemStat($b, "proceffect") || 0;
+                my $b_damage = $npc->GetItemStat($b, "damage") || 0;
+                my $b_delay = $npc->GetItemStat($b, "delay") || 0;
+                my $b_ratio = ($b_delay > 0 ? $b_damage / $b_delay : 0);
+                my $b_ac = $npc->GetItemStat($b, "ac") || 0;
+                my $b_hp = $npc->GetItemStat($b, "hp") || 0;
+
+                ($b_proceffect > 0 ? 1 : 0) <=> ($a_proceffect > 0 ? 1 : 0)
+                || $b_ratio <=> $a_ratio
+                || $b_ac <=> $a_ac
+                || $b_hp <=> $a_hp
+                || $b <=> $a  # using item IDs for final tiebreaker
+            } @lootlist;
+
+            foreach my $item_id (@lootlist) {
+                my $quantity = $npc->CountItem($item_id);
+                if ($quantity > 1) {
+                    $updated = 1;
+                    last;
+                }
+                $new_pet_inventory{$item_id} += $quantity;
+            }
+            
+            foreach my $item_id (keys %new_pet_inventory) {
+                # if the key doesn't exist in new_bag_inventory or the values don't match
+                if (!exists $new_bag_inventory{$item_id}) {
                     $updated = 1; # set updated to true
+                    quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
                     last; # exit the loop as we have found a difference
                 }
             }
-        }
 
-        if ($updated) {
-            quest::debug("--Pet Inventory Reset Triggered--");
-            my @lootlist = $npc->GetLootList();
-            while (@lootlist) { # While lootlist has elements
-                foreach my $item_id (@lootlist) {
-                    $npc->RemoveItem($item_id);
-                }
-                @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
-            }            
-
-            while (grep { $_->{quantity} > 0 } values %new_bag_inventory) {
-                # Preprocess and sort item_ids by GetItemStat in ascending order
-                my @sorted_item_ids = sort {
-                    my $count_a = () = unpack('B*', $owner->GetItemStat($a, "slots")) =~ /1/g;
-                    my $count_b = () = unpack('B*', $owner->GetItemStat($b, "slots")) =~ /1/g;
-                    $count_a <=> $count_b
-                } keys %new_bag_inventory;
-                
-                foreach my $item_id (@sorted_item_ids) {
-                    quest::debug("Processing item to add: $item_id");
-                    if ($new_bag_inventory{$item_id}->{quantity} > 0) {
-                        $npc->AddItem($item_id, 1, 1, @{$new_bag_inventory{$item_id}->{augments}});
-                        $new_bag_inventory{$item_id}->{quantity}--;
+            # if $updated is still false, it could be because new_bag_inventory has more items, check for that
+            if (!$updated) {
+                foreach my $item_id (keys %new_bag_inventory) {
+                    # if the key doesn't exist in new_pet_inventory
+                    if (!exists $new_pet_inventory{$item_id}) {                    
+                        $updated = 1; # set updated to true
+                        last; # exit the loop as we have found a difference
                     }
                 }
             }
 
+            if ($updated) {
+                quest::debug("--Pet Inventory Reset Triggered--");
+                my @lootlist = $npc->GetLootList();
+                while (@lootlist) { # While lootlist has elements
+                    foreach my $item_id (@lootlist) {
+                        $npc->RemoveItem($item_id);
+                    }
+                    @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
+                }            
+
+                while (grep { $_->{quantity} > 0 } values %new_bag_inventory) {
+                    # Preprocess and sort item_ids by GetItemStat in ascending order
+                    my @sorted_item_ids = sort {
+                        my $count_a = () = unpack('B*', $owner->GetItemStat($a, "slots")) =~ /1/g;
+                        my $count_b = () = unpack('B*', $owner->GetItemStat($b, "slots")) =~ /1/g;
+                        $count_a <=> $count_b
+                    } keys %new_bag_inventory;
+                    
+                    foreach my $item_id (@sorted_item_ids) {
+                        quest::debug("Processing item to add: $item_id");
+                        if ($new_bag_inventory{$item_id}->{quantity} > 0) {
+                            $npc->AddItem($item_id, 1, 1, @{$new_bag_inventory{$item_id}->{augments}});
+                            $new_bag_inventory{$item_id}->{quantity}--;
+                        }
+                    }
+                }
+
+            }
         }
 
         if (not $npc->Charmed()) {
