@@ -3,8 +3,8 @@ use warnings;
 use DBI;
 use POSIX;
 use JSON;
-use List::Util 'min';
-use Digest::MD5 qw(md5_hex);
+use List::Util;
+use Digest::MD5;
 
 sub LoadMysql {
         use DBI;
@@ -88,7 +88,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data->{clickeffect} = $row->{clickeffect};
     $base_data->{casttime} = $row->{casttime};
     $base_data->{casttime_} = $row->{casttime_};
-    $base_data->{recastdelay} = min(60, ($row->{recastdelay} || 0));
+    $base_data->{recastdelay} = max(60, ($row->{recastdelay} || 0));
     $base_data->{recasttype} = $row->{recasttype};
     $base_data->{lore} = $row->{Name};
     $base_data->{slots} = $row->{slots};
