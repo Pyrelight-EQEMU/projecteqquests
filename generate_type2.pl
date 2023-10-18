@@ -55,7 +55,7 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT items.*
+    SELECT *
     FROM items 
     INNER JOIN spells_new ON items.clickeffect = spells_new.id
     WHERE items.clickeffect > 0 
@@ -81,8 +81,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
     #my $hash = md5_hex($row{id});
     #my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
-	
-    print $row{clickeffect};
+
     # Set New Attributes
     $base_data{id} = $new_id;
 	#$base_data{Name} = $row{spell_name} . " Spellstone";
