@@ -55,7 +55,7 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT items.*
+    SELECT items.*, spells_new.Name as spell_name
     FROM items 
     INNER JOIN spells_new ON items.clickeffect = spells_new.id
     WHERE items.clickeffect > 0 
@@ -66,7 +66,7 @@ my $select_query = $dbh->prepare(<<SQL);
       AND items.maxcharges = -1 
       AND items.id <= 999999 
       AND items.Name NOT LIKE 'Apocryphal%'
-      ORDER BY id;
+      ORDER BY items.id;
 SQL
 
 $select_query->execute() or die;
