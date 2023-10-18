@@ -294,12 +294,10 @@ sub add_illusions {
         $slot_spell = $client->GetSpellBookSlotBySpellID($spell_id);
         $slot_illus = $client->GetSpellBookSlotBySpellID($illusion_spells{$spell_id});
 
-        quest::debug("$slot_spell : $slot_illus");
-
         if ($slot_spell >= 0 and $slot_illus == -1) {
             quest::debug("Add the illusion here");
 
-
+            $client->ScribeSpell(($illusion_spells{$spell_id}, $client->GetFreeSpellBookSlot(), 1);
            
         } 
     }
