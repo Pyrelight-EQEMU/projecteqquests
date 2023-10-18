@@ -4,6 +4,7 @@ use Time::Seconds; # for ONE_DAY constant
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, true);
+    fix_palshd_horse($client);
 
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
@@ -264,16 +265,10 @@ sub EVENT_COMBINE_SUCCESS {
 }
 
 sub EVENT_SCRIBE_SPELL {
-    quest::debug("slot_id " . $slot_id);
-    quest::debug("spell_id " . $spell_id);
-    quest::debug("spell " . $spell);
     add_illusions($client);
 }
 
 sub EVENT_UNSCRIBE_SPELL {
-    quest::debug("slot_id " . $slot_id);
-    quest::debug("spell_id " . $spell_id);
-    quest::debug("spell " . $spell);
     add_illusions($client);
 }
 
@@ -296,9 +291,27 @@ sub add_illusions {
 
         if ($slot_spell >= 0 and $slot_illus == -1) {
             quest::debug("Add the illusion here");
-
-            $client->ScribeSpell($illusion_spells{$spell_id}, $client->GetFreeSpellBookSlot(), 1);
-           
+            $client->ScribeSpell($illusion_spells{$spell_id}, $client->GetFreeSpellBookSlot(), 1);           
         } 
+    }
+}
+
+sub EVENT_AA_BUY {
+    fix_palshd_horse($client);
+}
+
+sub fix_palshd_horse {
+    my $client = shift;
+    #Holy Steed
+    if ($client->GetAAByAAID(77)) {
+        if ($client->HasSpellScribed(2874)) {
+            $client->ScribeSpell(2874, $client->GetFreeSpellBookSlot(), 1);
+        }
+    }
+    #UnHoly Steed
+    if ($client->GetAAByAAID(85)) {
+        if ($client->HasSpellScribed(2875)) {
+            $client->ScribeSpell(2875, $client->GetFreeSpellBookSlot(), 1);
+        }
     }
 }
