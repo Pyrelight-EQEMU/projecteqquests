@@ -82,9 +82,9 @@ while (my $row = $select_query->fetchrow_hashref()) {
     #my $hash = md5_hex($row{id});
     #my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
     
-    print "$row{id}\n";
+    print "$row->{id}\n";
     # Set New Attributes
-    $base_data{id} = $new_id;
+    $base_data->{id} = $new_id;
 	#$base_data{Name} = $row{spell_name} . " Spellstone";
     $base_data{clickeffect} = $row{clickeffect};
     $base_data{casttime} = $row{casttime};
