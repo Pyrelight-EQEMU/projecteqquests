@@ -93,21 +93,23 @@ sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();
 
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-    my @lootlist = $corpse->GetLootList();
+    if ($corpse) {
+        my @lootlist = $corpse->GetLootList();
 
-    foreach my $item_id (@lootlist) {
-        my $chance = rand();
+        foreach my $item_id (@lootlist) {
+            my $chance = rand();
 
-        if ($chance < 0.03) {
-            upgrade_item_tier($item_id, 3, $corpse);
-        }
+            if ($chance < 0.03) {
+                upgrade_item_tier($item_id, 3, $corpse);
+            }
 
-        elsif ($chance < 0.11) {
-            upgrade_item_tier($item_id, 2, $corpse);
-        }
+            elsif ($chance < 0.11) {
+                upgrade_item_tier($item_id, 2, $corpse);
+            }
 
-        elsif ($chance < 0.33) {
-            upgrade_item_tier($item_id, 1, $corpse);
+            elsif ($chance < 0.33) {
+                upgrade_item_tier($item_id, 1, $corpse);
+            }
         }
     }
 }
