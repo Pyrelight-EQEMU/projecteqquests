@@ -79,8 +79,8 @@ my $new_id = 910000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
-    my $hash = md5_hex($row{id});
-    my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
+    #my $hash = md5_hex($row{id});
+    #my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 	
     # Set New Attributes
     $base_data{id} = $new_id;
@@ -97,7 +97,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data{augtype} = 2;
     $base_data{augrestrict} = 0;
     $base_data{idfile} = 'IT63';
-    $base_data{icon} = $possible_icons[$index];
+    #$base_data{icon} = $possible_icons[$index];
 
 	# Construct dynamic SQL for insertion
 	my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
