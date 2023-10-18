@@ -78,7 +78,7 @@ my $new_id = 910000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
-    my $hash = md5_hex($base_data{$row{id}});
+    my $hash = md5_hex($row{id});
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 	
     # Set New Attributes
