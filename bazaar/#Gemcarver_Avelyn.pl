@@ -37,34 +37,7 @@ sub EVENT_ITEM {
    foreach my $item_id (keys %itemcount) {
       if ($item_id != 0) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-
-         my $item_name = quest::getitemname($item_id);
-
-         # Strip prefix with possible whitespace
-         $item_name =~ s/^\s*(Rose Colored|Apocryphal|Fabled)\s*//;
-
-         # Strip suffix with possible whitespace
-         $item_name =~ s/\s*\+\d{1,2}\s*$//;
-
-         quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
-
-         # Use a prepared statement to prevent SQL injection
-         my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
-         $sth->execute("'" . $item_name . "' Glamour-Stone");
-         if (my $row = $sth->fetchrow_hashref()) {                
-               if ($total_money >= (5000 * 1000)) {
-                  $total_money -= (5000 * 1000);
-                  plugin::NPCTell("Perfect! Here, I had a Glamour-Stone almost ready. I'll just need to attune it to your $item_name! Enjoy!");
-                  $client->SummonItem($row->{id});
-                  
-                  # Remove the $item_id from the hash %itemcount
-                  delete $itemcount{$item_id};                  
-               } else {
-                  plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
-               }
-         } else {
-               plugin::NPCTell("I don't think that I can create a Glamour-Stone for that item, $clientName. It must be something that you hold in your hand, such as a weapon or shield.");
-         }
+         quest::debug(is_global_aug($item_id));
       }
    }
 
@@ -82,4 +55,32 @@ sub EVENT_ITEM {
 
     $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
     plugin::return_items(\%itemcount); 
+}
+
+sub is_global_aug {
+   my $item_id = shift;
+   my $dbh = plugin::LoadMysql();
+
+   my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 AND lootdrop_entries.item_id = ?");
+   $sth->execute($item_id);
+   
+   $dbh->disconnect();
+   
+   if ($sth->fetchrow_array) {
+       return 1; # Item ID is present
+   } else {
+       return 0; # Item ID is not present
+   }
+}
+
+sub get_global_aug {
+    my $dbh = plugin::LoadMysql();
+
+    my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 ORDER BY RAND() LIMIT 1");
+    $sth->execute();
+    
+    my ($random_item_id) = $sth->fetchrow_array;
+
+    $dbh->disconnect();
+    return $random_item_id;
 }

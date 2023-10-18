@@ -56,15 +56,14 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT items.*, spells_new.Name as spell_name
+    SELECT spells_new.Name as spell_name, items.* 
     FROM items 
-    INNER JOIN spells_new ON items.clickeffect = spells_new.id
-    WHERE items.clickeffect > 0 
+    INNER JOIN spells_new ON items.focuseffect = spells_new.id
+    WHERE items.focuseffect > 0 
       AND items.slots > 0 
       AND items.slots < 4194304 
       AND items.classes > 0 
-      AND items.races > 0 
-      AND items.maxcharges = -1 
+      AND items.races > 0
       AND items.id <= 999999 
       AND items.Name NOT LIKE 'Apocryphal%'
       ORDER BY items.id;
@@ -73,7 +72,7 @@ SQL
 $select_query->execute() or die;
 
 # Create an array of the possible icon values based on the ranges
-my @possible_icons = (1940..2002, 6464..6473, 944..965, 1429..1443);
+my @possible_icons = (967, 1562..1469);
 
 # Start inserting with ID 901000
 my $new_id = 910000;
@@ -85,12 +84,8 @@ while (my $row = $select_query->fetchrow_hashref()) {
 
     # Set New Attributes
     $base_data->{id} = $new_id;
-    $base_data->{Name} = "Spellstone: " . $row->{spell_name};
-    $base_data->{clickeffect} = $row->{clickeffect};
-    $base_data->{casttime} = $row->{casttime};
-    $base_data->{casttime_} = $row->{casttime_};
-    $base_data->{recastdelay} = max(60, ($row->{recastdelay} || 0));
-    $base_data->{recasttype} = $row->{recasttype};    
+    $base_data->{Name} = "Spellglyph: " . $row->{spell_name};
+    $base_data->{focuseffect} = $row->{focuseffect};
     $base_data->{slots} = $row->{slots};
     $base_data->{classes} = $row->{classes};
     $base_data->{deity} = $row->{deity};
