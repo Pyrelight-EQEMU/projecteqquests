@@ -30,9 +30,10 @@ sub POPUP_DISPLAY {
                       are built-in to the client. You can see mobs on your map (names become visible with Tracking skill or custom Situational Awareness AA), you can see info
                       on spells and the value of items on inspect windows.$break
                       $green Heroic Stats</c> - Most direct increases to character strength are accomplished by way of abundant Heroic stats on items. You will recieve extra
-                      combat feedback to inform you of how these stats are helping you, which can be disabled with the $green #filterheroic</c> command. Your 
+                      combat feedback to inform you of how these stats are helping you, which can be disabled with the $green #filterheroic</c> command. All of these stats have 
+                      additional, custom effects, such as directly scaling melee and spell damage, or increasing the duration of spells. Your 
                       [$purple Adventurer's Soul</c>] is the best way to grow in power early on, as it will scale with the amount of the world you've visited and become Attuned
-                      to. All of these stats have additional, custom effects, such as directly scaling melee and spell damage, or increasing the duration of spells.$break
+                      to.$break
                       $green Item Improvement</c> - Artificer Cedric in the Bazaar will assist you in combining identical items to create improved versions. If you find yourself
                       stuck or otherwise underpowered, this is an excellent way to continue to progress.$break
                       $green Buffs</c> - Buffs work differently on Pyrelight! The intention is for you to have access to the buffs that you or your group mates actually own,
