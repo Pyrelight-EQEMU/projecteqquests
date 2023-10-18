@@ -3,7 +3,7 @@ use warnings;
 use DBI;
 use POSIX;
 use JSON;
-use List::Util;
+use List::Util 'min';
 use Digest::MD5 qw(md5_hex);
 
 sub LoadMysql {
@@ -78,14 +78,6 @@ my $new_id = 910000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
-
-    # Fetch the spell name from the spells_new table based on the clickeffect ID from base_data
-    my $spell_name_query = $dbh->prepare("SELECT Name FROM spells_new WHERE id = ?");
-    $spell_name_query->execute($base_data->{clickeffect});
-    my $spell_name_ref = $spell_name_query->fetchrow_hashref();
-    my $spell_name = $spell_name_ref->{Name};
-    $spell_name_query->finish();
-
     my $hash = md5_hex($base_data{$row{id}});
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 	
