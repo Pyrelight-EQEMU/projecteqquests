@@ -135,6 +135,48 @@ sub GetPotName {
     return $strings[int(rand(@strings))];
 }
 
+sub UnlockClass {
+    my ($client, $class_id) = @_;
+    my $class_ability_base = 20000;
+    my $character_id = $client->CharacterID();
+    my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;
+
+    if ($unlocksAvailable >= 1) {
+
+        # Load database handler
+        my $dbh = plugin::LoadMysql();
+
+        # Check if the class is already unlocked
+        my $sth = $dbh->prepare("SELECT * FROM multiclass_data WHERE id = ? AND class = ?");
+        $sth->execute($character_id, $class_id);
+        
+        if ($sth->fetchrow_hashref()) {
+            plugin::NPCTell("This class is already unlocked for you.");
+            $sth->finish();
+            $dbh->disconnect(); # disconnect from the database
+            return 0;
+        } else { 
+            $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
+            plugin::YellowText("You have spent a Class Unlock point.");
+
+            # Insert data into multiclass_data table for the new class
+            $sth = $dbh->prepare("INSERT INTO multiclass_data (id, class) VALUES (?, ?)");
+            $sth->execute($character_id, $class_id);
+
+            # Grant class abilities
+            $client->GrantAlternateAdvancementAbility($client->GetClass + $class_ability_base, 1, 1);
+            $client->GrantAlternateAdvancementAbility($class_id + $class_ability_base, 1, 1);
+        }
+
+        $sth->finish();
+        $dbh->disconnect(); # disconnect from the database
+        return 1;
+    } else {
+        plugin::NPCTell("Sorry, you don't have any available class unlocks.");
+        return 0;
+    }
+}
+
 sub GetUnlockedClasses {
     my $client = shift;
     my $dbh    = plugin::LoadMysql();

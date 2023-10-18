@@ -81,14 +81,9 @@ sub EVENT_SAY {
   }
 
   elsif (exists $class{$text} and $unlocksAvailable >= 1) {
-    my $class_ability_base = 20000;
-
-    $client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
-    $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
-    plugin::YellowText("You have spent a Class Unlock point.");
-    plugin::NPCTell("It is done. You should feel a new ability which will allow you to switch to your new persona. Grow, and come back when you have obtained more power.");
-
-    $client->GrantAlternateAdvancementAbility($client->GetClass + $class_ability_base, 1, 1);
-    $client->GrantAlternateAdvancementAbility($class{$text} + $class_ability_base, 1, 1)
+    if (plugin::UnlockClass($class{$text})) {
+      $client->Message(263, "The Grand Arcanist closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
+      plugin::NPCTell("It is done. You should feel a new ability which will allow you to switch to your new persona. Grow, and come back when you have obtained more power.");
+    }
   }
 }
