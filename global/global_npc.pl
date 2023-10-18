@@ -422,6 +422,9 @@ sub UPDATE_PET_STATS
         if ($owner_speed < $pet_speed) {
             $pet->ModifyNPCStat("runspeed", $owner_speed/40);
         }
+
+        
+        quest::debug("$owner_speed - $pet_speed");
         
 
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
