@@ -408,6 +408,14 @@ sub UPDATE_PET_STATS
         # Create Scalar.
         my $pet_scalar = APPLY_FOCUS();
 
+        my $owner_speed = $owner->CastToNPC()->GetNPCStat("runspeed") + 10;
+        my $pet_speed = $pet->GetNPCStat("runspeed");
+
+        quest::debug("$owner_speed - $pet_speed");
+        if ($owner_speed > $pet_speed) {
+            $pet->ModifyNPCStat("runspeed", $owner_speed);
+        }
+
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             my $bucket_value = $owner->GetBucket("pet_$stat");
@@ -452,14 +460,6 @@ sub UPDATE_PET_STATS
 
             $bucket_value *= $pet_scalar;
             $pet->ModifyNPCStat($stat, ceil($bucket_value));
-        }
-
-        my $owner_speed = $owner->CastToNPC()->GetNPCStat("runspeed") + 10;
-        my $pet_speed = $pet->GetNPCStat("runspeed");
-
-        quest::debug("$owner_speed - $pet_speed");
-        if ($owner_speed > $pet_speed) {
-            $pet->ModifyNPCStat("runspeed", $owner_speed);
         }
     }
 }
