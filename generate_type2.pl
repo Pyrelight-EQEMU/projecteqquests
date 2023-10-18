@@ -79,31 +79,30 @@ my $new_id = 910000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
-    #my $hash = md5_hex($row{id});
-    #my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
-    
-    print "$row->{id}\n";
+    my $hash = md5_hex($row->{id});
+    my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
+
     # Set New Attributes
     $base_data->{id} = $new_id;
-	#$base_data{Name} = $row{spell_name} . " Spellstone";
-    $base_data{clickeffect} = $row{clickeffect};
-    $base_data{casttime} = $row{casttime};
-    $base_data{casttime_} = $row{casttime_};
-    $base_data{recastdelay} = min(60, ($row{recastdelay} || 0));
-    $base_data{recasttype} = $row{recasttype};
-    $base_data{lore} = (defined $row{lore} ? $row{lore} : "") . "<br>Made from: " . (defined $row{Name} ? $row{Name} : "");
-    $base_data{slots} = $row{slots};
-    $base_data{classes} = $row{classes};
-    $base_data{deity} = $row{deity};
-    $base_data{augtype} = 2;
-    $base_data{augrestrict} = 0;
-    $base_data{idfile} = 'IT63';
-    #$base_data{icon} = $possible_icons[$index];
+    $base_data->{Name} = $row->{spell_name} . " Spellstone";
+    $base_data->{clickeffect} = $row->{clickeffect};
+    $base_data->{casttime} = $row->{casttime};
+    $base_data->{casttime_} = $row->{casttime_};
+    $base_data->{recastdelay} = min(60, ($row->{recastdelay} || 0));
+    $base_data->{recasttype} = $row->{recasttype};
+    $base_data->{lore} = (defined $row->{lore} ? $row->{lore} : "") . "<br>Made from: " . (defined $row->{Name} ? $row->{Name} : "");
+    $base_data->{slots} = $row->{slots};
+    $base_data->{classes} = $row->{classes};
+    $base_data->{deity} = $row->{deity};
+    $base_data->{augtype} = 2;
+    $base_data->{augrestrict} = 0;
+    $base_data->{idfile} = 'IT63';
+    $base_data->{icon} = $possible_icons[$index];
 
-	# Construct dynamic SQL for insertion
-	my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
-	my $placeholders = join(", ", map { "?" } keys %$base_data);
-	my $values = [values %$base_data];
+    # Construct dynamic SQL for insertion
+    my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
+    my $placeholders = join(", ", map { "?" } keys %$base_data);
+    my $values = [values %$base_data];
 
     my $insert_sql = "REPLACE INTO items ($columns) VALUES ($placeholders)";
 
@@ -119,6 +118,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $new_id++;
     $insert->finish();
 }
+
 
 $select_query->finish();
 $dbh->disconnect();
