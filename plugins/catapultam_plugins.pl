@@ -138,7 +138,7 @@ sub GetPotName {
 sub GetUnlockedClasses {
     my $client = shift;
     my $dbh    = plugin::LoadMysql();
-    my $sth    = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ?");
+    my $sth    = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ? AND class NOT IN (1, 7, 8, 9, 12, 16)");
 
     $sth->execute($client->CharacterID());
 
@@ -155,6 +155,19 @@ sub GetUnlockedClasses {
     $unlocked_classes{$current_class} = $current_level;
 
     return %unlocked_classes;
+}
+
+sub GetLockedClasses {
+    my $client = shift;
+    my %unlocked_classes = GetUnlockedClasses($client);
+
+    # All the class IDs excluding the ones you've specified
+    my @all_classes = (2, 3, 4, 5, 6, 10, 11, 13, 14, 15, 16);
+
+    # Filtering out the unlocked class IDs
+    my @locked_classes = grep { not exists $unlocked_classes{$_} } @all_classes;
+
+    return @locked_classes;
 }
 
 sub GetClassListString {

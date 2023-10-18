@@ -434,9 +434,10 @@ sub UPDATE_PET_STATS
                     if ($equipment_id > 0) {        
                         my $damage = $npc->GetItemStat($equipment_id, "damage");
                         my $delay = $npc->GetItemStat($equipment_id, "delay");
-                        my $ratio = $damage / $delay;
-
-                        $damage_bonus += $ratio;
+                        if ($delay > 0) {
+                            my $ratio = $damage / $delay;
+                            $damage_bonus += $ratio;
+                        }                        
                     }
                 }
                 $damage_bonus = $damage_bonus/2 * $npc->GetLevel();
