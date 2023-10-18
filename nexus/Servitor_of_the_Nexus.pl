@@ -29,7 +29,7 @@ sub POPUP_DISPLAY {
                       $green MQ2-Style Quality of Life</c> - While$red MQ2 is not allowed on this server</c>, many of the reasons why you would want it on a single-box server
                       are built-in to the client. You can see mobs on your map (names become visible with Tracking skill or custom Situational Awareness AA), you can see info
                       on spells and the value of items on inspect windows.$break
-                      $green Heroic Stats</c> - Most direct increases to character strength are accomplished by way of abdundant Heroic stats on items. You will recieve extra
+                      $green Heroic Stats</c> - Most direct increases to character strength are accomplished by way of abundant Heroic stats on items. You will recieve extra
                       combat feedback to inform you of how these stats are helping you, which can be disabled with the $green #filterheroic</c> command. Your 
                       [$purple Adventurer's Soul</c>] is the best way to grow in power early on, as it will scale with the amount of the world you've visited and become Attuned
                       to. All of these stats have additional, custom effects, such as directly scaling melee and spell damage, or increasing the duration of spells.$break
