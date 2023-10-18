@@ -412,10 +412,11 @@ sub UPDATE_PET_STATS
         # Create Scalar.
         my $pet_scalar = APPLY_FOCUS();
 
-        my $owner_speed = $owner->GetRunspeed();
+        my $owner_speed = $owner->CastToNPC()->GetNPCStat("runspeed");
         my $pet_speed = $pet->GetNPCStat("runspeed");
 
         quest::debug("$owner_speed - $pet_speed");
+
         if ($owner_speed > $pet_speed) {
             $pet->ModifyNPCStat("runspeed", $owner_speed);
         }
