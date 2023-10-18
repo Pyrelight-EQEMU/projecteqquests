@@ -90,8 +90,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data->{casttime} = $row->{casttime};
     $base_data->{casttime_} = $row->{casttime_};
     $base_data->{recastdelay} = max(60, ($row->{recastdelay} || 0));
-    $base_data->{recasttype} = $row->{recasttype};
-    $base_data->{lore} = $row->{lore} . "<br>" . $row->{Name};
+    $base_data->{recasttype} = $row->{recasttype};    
     $base_data->{slots} = $row->{slots};
     $base_data->{classes} = $row->{classes};
     $base_data->{deity} = $row->{deity};
@@ -99,6 +98,13 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data->{augrestrict} = 0;
     $base_data->{idfile} = 'IT63';
     $base_data->{icon} = $possible_icons[$index];
+
+    my $lore_content = $row->{lore} . "<br>" . $row->{Name};
+    if (length($lore_content) > 80) {
+        $lore_content = substr($lore_content, 0, 77) . "...";
+    }
+    $base_data->{lore} = $lore_content;
+
 
     # Construct dynamic SQL for insertion
     my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
