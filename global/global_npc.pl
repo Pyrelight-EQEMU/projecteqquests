@@ -359,29 +359,18 @@ sub APPLY_FOCUS {
     #Mage Epic 1.0 - Orb of Mastery
     if ($owner->GetClass() == 13 && $inventory->HasItemEquippedByID(28034)) {
         if (!$npc->FindBuff(847)) {
-            $npc->CastSpell(847, $npc->GetID());       
+            $npc->CastSpell(847, $npc->GetID());
+            $npc->AddMeleeProc(5234, 100);
+            $npc->AddMeleeProc(848, 100);
         }
         $total_focus_scale += 0.30;
-    } elsif ($npc->FindBuff(847)) {
-        $npc->BuffFadeBySpellID(847);
-        $owner->BuffFadeBySpellID(847);
-    }
-    
-    #Necro Epic 1.0 - Scythe of the Shadowed Soul
-    if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544) && $npc->GetBodyType() == 8)  {              
-        $total_focus_scale += 0.25;
-        if ($npc->GetRace() == $true_race) {
-            $npc->SetRace(491); # Bone Golem
-            $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") + 1000);
+    } else {
+        if ($npc->FindBuff(847)) {
+            $npc->BuffFadeBySpellID(847);
+            $owner->BuffFadeBySpellID(847);
         }
-    } elsif ($npc->GetRace() == 491) {
-        $npc->SetRace($true_race);
-        $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") - 1000);
-    }
-
-    #Beastlord Epic 1.0 - Claw of the Savage Spirit
-    if ($owner->GetClass() == 15 && $inventory->HasItemEquippedByID(8495) && $npc->GetBodyType() == 21)  {
-        $total_focus_scale += 0.30;
+        $npc->RemoveMeleeProc(5234);
+        $npc->RemoveMeleeProc(848);
     }
 
     return $total_focus_scale;

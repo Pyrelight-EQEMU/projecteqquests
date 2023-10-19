@@ -43,6 +43,8 @@ sub POPUP_DISPLAY {
                       the [$purple Summoner's Synchrosatchel</c>], purchased in the Bazaar, offers a unique experience - it serves as a 'proxy inventory' for your pet. Any
                       equipment placed within it will be equipped by your pet! Finally, pets are able to hold aggro over players in melee range so long as their Taunt avility
                       is activated.$break
+                      $green Procs</c> - All procs that could normally trigger on melee hits can also trigger on spell casts. Ranged weapon attacks can also trigger procs in primary
+                      and secondary slots. Any procs you might obtain for your Power Source slots also trigger any time another proc could trigger.$break
                       ";
 
   my $text = quest::popupcentermessage("$red NEW PLAYERS PLEASE READ THIS WINDOW</c><br>") .

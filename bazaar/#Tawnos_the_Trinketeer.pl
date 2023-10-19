@@ -72,7 +72,8 @@ sub EVENT_ITEM {
 
                   $total_money -= (5000 * 1000);
                   plugin::NPCTell("Perfect! Here, I had a Glamour-Stone almost ready. I'll just need to attune it to your $item_name! Enjoy!");
-                  $client->SummonItem($row->{id});                
+                  $client->SummonItem($row->{id});
+                  $client->SummonItem(902386) if ($row->{id} == 902385); #Special Case of handle offhand beastlord epic         
                  
                } else {
                   plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
