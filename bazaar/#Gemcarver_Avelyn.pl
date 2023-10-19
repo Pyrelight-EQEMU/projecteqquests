@@ -49,7 +49,7 @@ sub EVENT_ITEM {
       foreach my $item_id (keys %itemcount) {
          if ($item_id != 0) {
             quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-            my $item_name = quest::varlink($item_id);
+            my $item_name = quest::varlink(plugin::get_base_id($item_id));
             my $response = "Alright then, let's take a look at this [$item_name]. ";
             my $found_work = 0;
 
