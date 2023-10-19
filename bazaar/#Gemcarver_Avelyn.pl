@@ -57,7 +57,7 @@ sub EVENT_ITEM {
             if ($proc_id > 0) {
                my $binding_id = get_binding($item_id);
                my $binding_name = quest::varlink($binding_id);
-               $response .= " I see an [$binding_name] that I can extract.";
+               $response .= " I see an [$binding_name] ($binding_id) that I can extract.";
                $found_work = 1;
             }
 
