@@ -49,30 +49,30 @@ sub EVENT_ITEM {
       foreach my $item_id (keys %itemcount) {
          if ($item_id != 0) {
             quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-            my $item_name = quest::varlink(plugin::get_base_id($item_id));
+            my $item_name = quest::varlink($ietm_id);
+            my $base_id = plugin::get_base_id($item_id);
             my $response = "Alright then, let's take a look at this [$item_name]. ";
             my $found_work = 0;
 
-            my $proc_id = quest::getitemstat($item_id, 'proceffect');
+            my $proc_id = quest::getitemstat($base_id, 'proceffect');
             if ($proc_id > 0) {
-               my $binding_id = get_binding($item_id);
+               my $binding_id = get_binding(base_id);
                my $binding_name = quest::varlink($binding_id);
                $response .= " I see an [$binding_name] ($binding_id) that I can extract.";
                $found_work = 1;
             }
 
-            my $proc_id = quest::getitemstat($item_id, 'clickeffect');
+            my $proc_id = quest::getitemstat($base_id, 'clickeffect');
             if ($proc_id > 0) {
-               my $spellstone_id = get_spellstone($item_id);
+               my $spellstone_id = get_spellstone($base_id);
                my $spellstone_name = quest::varlink($spellstone_id);
                $response .= " I see an [$spellstone_name] that I can extract.";
-               $client->SetBucket("Gemcarver-WorkOrder", $item_id);
                $found_work = 1;
             }
 
-            my $proc_id = quest::getitemstat($item_id, 'focuseffect');
+            my $proc_id = quest::getitemstat($base_id, 'focuseffect');
             if ($proc_id > 0) {
-               my $glyph_id = get_glyph($item_id);
+               my $glyph_id = get_glyph($base_id);
                my $glyph_name = quest::varlink($spellstone_id);
                $response .= " I see an [$glyph_name] that I can extract.";
                $found_work = 1;
