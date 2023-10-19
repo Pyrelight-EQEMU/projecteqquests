@@ -10,86 +10,92 @@ sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
     my $CMC_Available = $client->GetBucket("Artificer_CMC");
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
+    my $work_order = $client->GetBucket("Artificer-WorkOrder") || 0;
 
-    if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
-        if ($total_money > 0) {
-            plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
-        } elsif ($itemcount{'0'} < 3) {             
-            plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
-        } else {
-            foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
-                my $item_link = quest::varlink($item_id);
-                my $test_result = test_upgrade($item_id);
+    my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
+    my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
 
-                if (is_item_upgradable($item_id)) {
-                    if ((grep { $_ == $item_id } @array) or $test_result->{success}) {
-                        my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
-                        my $cmc_cost = $test_result->{total_cost};
-                        my $cmc_avail = get_upgrade_points();
+    if ($work_order == 0) {
+        if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
+            if ($total_money > 0) {
+                plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
+            } elsif ($itemcount{'0'} < 3) {             
+                plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
+            } else {
+                foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
+                    my $item_link = quest::varlink($item_id);
+                    my $test_result = test_upgrade($item_id);
 
-                        if ((grep { $_ == $item_id } @epics)) {
-                            $cmc_cost *= 5;
-                        }
+                    if (is_item_upgradable($item_id)) {
+                        if ((grep { $_ == $item_id } @array) or $test_result->{success}) {
+                            my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
+                            my $cmc_cost = $test_result->{total_cost};
+                            my $cmc_avail = get_upgrade_points();
 
-                        plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
-                        my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to a [$next_item_link], it will cost you $cmc_cost ";
+                            if ((grep { $_ == $item_id } @epics)) {
+                                $cmc_cost *= 5;
+                            }
 
-                        if ( $cmc_avail >= $cmc_cost) {
-                            my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
-                            my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
-                            plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
-                            plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
-                                                any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
-                            $client->SetBucket("Artificer-WorkOrder", $item_id);
-                            return;
+                            plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
+                            my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to a [$next_item_link], it will cost you $cmc_cost ";
+
+                            if ( $cmc_avail >= $cmc_cost) {
+                                plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
+                                plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
+                                                    any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
+                                $client->SetBucket("Artificer-WorkOrder", $item_id);
+                                return;
+                            } else {
+                                my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
+                                plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
+                            }
                         } else {
-                            my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
-                            plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
+                            plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. 
+                                            Seek them out, and return to me.");
                         }
                     } else {
-                        plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. 
-                                        Seek them out, and return to me.");
+                        plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                     }
-                } else {
-                    plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                 }
             }
-        }
 
-    } else {               
-        my $earned_points = 0;
+        } else {               
+            my $earned_points = 0;
 
-        while ($total_money >= (500 * 1000)) {
-            $total_money = $total_money - (500 * 1000);
-            $earned_points++;
-            $CMC_Available++;
-        }
-
-        if ($earned_points > 0) {
-            plugin::YellowText("You currently have $CMC_Available Concentrated Mana Crystals available.");
-            if ($total_money > 0) {
-                plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
-            } else {
-                plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+            while ($total_money >= (500 * 1000)) {
+                $total_money = $total_money - (500 * 1000);
+                $earned_points++;
+                $CMC_Available++;
             }
-            $client->SetBucket("Artificer_CMC", $CMC_Available);
-        } else {
-            plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
+
+            if ($earned_points > 0) {
+                plugin::YellowText("You currently have $CMC_Available Concentrated Mana Crystals available.");
+                if ($total_money > 0) {
+                    plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
+                } else {
+                    plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+                }
+                $client->SetBucket("Artificer_CMC", $CMC_Available);
+            } else {
+                plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
+            }
+
+            # After processing all items, return any remaining money
+            my $platinum_remainder = int($total_money / 1000);
+            $total_money %= 1000;
+
+            my $gold_remainder = int($total_money / 100);
+            $total_money %= 100;
+
+            my $silver_remainder = int($total_money / 10);
+            $total_money %= 10;
+
+            my $copper_remainder = $total_money;
+
+            $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
         }
-
-        # After processing all items, return any remaining money
-        my $platinum_remainder = int($total_money / 1000);
-        $total_money %= 1000;
-
-        my $gold_remainder = int($total_money / 100);
-        $total_money %= 100;
-
-        my $silver_remainder = int($total_money / 10);
-        $total_money %= 10;
-
-        my $copper_remainder = $total_money;
-
-        $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
+    } else {
+      plugin::NPCTell("I'm sorry, $clientName, but I already have a work order in progress for you. Please $link_proceed or $link_cancel it before giving me another item.");
     }
     plugin::return_items_silent(\%itemcount);
 }

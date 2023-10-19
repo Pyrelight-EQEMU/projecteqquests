@@ -30,25 +30,49 @@ sub EVENT_ITEM {
     my $gold = plugin::val('gold');
     my $platinum = plugin::val('platinum');
     my $clientName = $client->GetCleanName();
+    my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;
+
+   my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
+   my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
 
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
-    my $dbh = plugin::LoadMysql();
 
-   foreach my $item_id (keys %itemcount) {
-      if ($item_id != 0) {
-         quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-         my $item_name = quest::varlink($item_id);
-         my $response = "Alright then, let's take a look at this [$item_name].";
+   if ($work_order == 0) {
+      foreach my $item_id (keys %itemcount) {
+         if ($item_id != 0) {
+            quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
+            my $item_name = quest::varlink($item_id);
+            my $response = "Alright then, let's take a look at this [$item_name].";
 
-         my $proc_id = quest::getitemstat($item_id, 'proceffect');
-         if ($proc_id > 0) {
-            my $binding_id = get_binding($item_id);
-            my $binding_name = quest::varlink($binding_id);
-            $response .= " I see an [$binding_name] that I can extract."
+            my $proc_id = quest::getitemstat($item_id, 'proceffect');
+            if ($proc_id > 0) {
+               my $binding_id = get_binding($item_id);
+               my $binding_name = quest::varlink($binding_id);
+               $response .= " I see an [$binding_name] that I can extract."
+               $client->SetBucket("Gemcarver-WorkOrder", $item_id);
+            }
+
+            my $proc_id = quest::getitemstat($item_id, 'clickeffect');
+            if ($proc_id > 0) {
+               my $spellstone_id = get_spellstone($item_id);
+               my $spellstone_name = quest::varlink($spellstone_id);
+               $response .= " I see an [$spellstone_name] that I can extract."
+               $client->SetBucket("Gemcarver-WorkOrder", $item_id);
+            }
+
+            my $proc_id = quest::getitemstat($item_id, 'focuseffect');
+            if ($proc_id > 0) {
+               my $glyph_id = get_glyph($item_id);
+               my $glyph_name = quest::varlink($spellstone_id);
+               $response .= " I see an [$glyph_name] that I can extract."
+               $client->SetBucket("Gemcarver-WorkOrder", $item_id);
+            }
+
+            plugin::NPCTell($response);
          }
-
-         plugin::NPCTell($response);
       }
+   } else {
+      plugin::NPCTell("I'm sorry, $clientName, but I already have a work order in progress for you. Please $link_proceed or $link_cancel it before giving me another item.");
    }
 
     # After processing all items, return any remaining money
@@ -101,7 +125,33 @@ sub get_binding() {
 
    my $dbh = plugin::LoadMysql();
 
-   my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 920000 AND id < 999999 AND proceffect > 0 AND itemtype = 54");
+   my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 930000 AND id < 999999 AND proceffect > 0 AND itemtype = 54");
+   $sth->execute($item_name);
+
+   $dbh->disconnect();
+   return $sth->fetchrow_array || 0;
+}
+
+sub get_spellstone() {
+   my $item_id = shift;
+   my $item_name = quest::getitemname($item_id);
+
+   my $dbh = plugin::LoadMysql();
+
+   my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 910000 AND id < 999999 AND focuseffect > 0 AND itemtype = 54");
+   $sth->execute($item_name);
+
+   $dbh->disconnect();
+   return $sth->fetchrow_array || 0;
+}
+
+sub get_glyph() {
+   my $item_id = shift;
+   my $item_name = quest::getitemname($item_id);
+
+   my $dbh = plugin::LoadMysql();
+
+   my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 920000 AND id < 999999 AND clickeffect > 0 AND itemtype = 54");
    $sth->execute($item_name);
 
    $dbh->disconnect();
