@@ -2,6 +2,9 @@ use Data::Dumper;
 use POSIX;
 
 my $combo_count = 3;
+my @epics    = (20542, 8495, 8496, 68299, 5532, 20490, 10650, 28034, 10652, 36224, 
+                20544, 10099, 20488, 20487, 11057, 14383, 10651, 14341, 66175, 
+                66177, 66176);
 
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
@@ -19,10 +22,14 @@ sub EVENT_ITEM {
                 my $test_result = test_upgrade($item_id);
 
                 if (is_item_upgradable($item_id)) {
-                    if ($test_result->{success}) {
+                    if ((grep { $_ == $item_id } @array) or $test_result->{success}) {
                         my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                         my $cmc_cost = $test_result->{total_cost};
                         my $cmc_avail = get_upgrade_points();
+
+                        if ((grep { $_ == $item_id } @epics)) {
+                            $cmc_cost *= 5;
+                        }
 
                         plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
                         my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to a [$next_item_link], it will cost you $cmc_cost ";
@@ -181,9 +188,12 @@ sub EVENT_SAY {
 
     elsif ($text eq "link_proceed") {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
-        quest::debug("item_id: $item_id");
-        if (item_exists_in_db($item_id)) {
-            execute_upgrade($item_id);
+        if (item_exists_in_db($item_id)) {            
+            if ((grep { $_ == $item_id } @epics)) {
+                $client->SummonItem($item_id + 1000000);
+            } else {
+                execute_upgrade($item_id);
+            }
             $client->DeleteBucket("Artificer-WorkOrder");
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
