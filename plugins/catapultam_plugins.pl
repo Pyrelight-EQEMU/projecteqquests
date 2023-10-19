@@ -459,6 +459,18 @@ sub get_base_id {
     return $item_id % 1000000; # Assuming item IDs increment by 1000000 per tier
 }
 
+# Returns the upgrade tier of an item
+sub get_upgrade_tier {
+    my $item_id = shift;
+    return int($item_id / 1000000); # Assuming item IDs increment by 1000000 per tier
+}
+
+# Wrapper function to return both base ID and upgrade tier
+sub get_base_id_and_tier {
+    my $item_id = shift;
+    return (get_base_id($item_id), get_upgrade_tier($item_id));
+}
+
 sub get_continent_fix {
     my %zone_to_continent = (
 
