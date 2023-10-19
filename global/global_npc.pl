@@ -405,8 +405,7 @@ sub UPDATE_PET_STATS
         my $owner_speed = $owner->GetRunspeed() + 20;
         my $pet_speed = $pet->GetNPCStat("runspeed")*40;
 
-        if ($owner_speed > $pet_speed) {
-            my $spell_bonus = $npc->GetSpellBonuses()->Runspeed
+        if ($owner_speed > $pet_speed) {            
             $pet->ModifyNPCStat("runspeed", $owner_speed/40);
         }        
 
