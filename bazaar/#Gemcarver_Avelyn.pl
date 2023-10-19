@@ -20,7 +20,7 @@ sub EVENT_SAY {
       my $item_id = $work_order;
       if ($work_order and plugin::item_exists_in_db($item_id)) {
          $client->SummonItem($item_id);
-         $client->DeleteBucket("Artificer-WorkOrder");
+         $client->DeleteBucket("Gemcarver-WorkOrder");
          plugin::NPCTell("No problem! Here, have this back.");
       } else {
          plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
