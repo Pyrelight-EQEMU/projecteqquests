@@ -453,8 +453,6 @@ sub UPDATE_PET_STATS
                 $bucket_value += 10 * $pet_hagi;
             }
 
-            if ($spell)
-
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
                 my $damage_bonus = 0;
                 foreach my $item_id (7..8) {
