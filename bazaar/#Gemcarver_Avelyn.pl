@@ -48,25 +48,42 @@ sub EVENT_ITEM {
    if ($work_order == 0) {
       foreach my $item_id (keys %itemcount) {
          if ($item_id != 0) {
-            quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-            my $item_name = quest::varlink($item_id);
-            my $base_id = plugin::get_base_id($item_id);
-            my $response = "Alright then, let's take a look at this [$item_name]. ";
-            my $found_work = 0;
+               quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
+               my $item_name = quest::varlink($item_id);
+               my $base_id = plugin::get_base_id($item_id);
+               my $found_work = 0;
 
-            my $binding    = get_binding($base_id);
-            my $glyph      = get_glyph($base_id);
-            my $spellstone = get_spellstone($base_id);
+               my $binding    = get_binding($base_id);
+               my $glyph      = get_glyph($base_id);
+               my $spellstone = get_spellstone($base_id);
 
-            quest::debug ("$binding : $glyph : $spellstone");
+               quest::debug ("$binding : $glyph : $spellstone");
 
-            if ($found_work) {
-               $client->SetBucket("Gemcarver-WorkOrder", $item_id);
-            } else {
-               $response = "I'm sorry, $clientName. I don't see anything that I can extract from [$item_name] for you.";
-            }
+               my @found_items;
+               
+               push(@found_items, "a [" . quest::varlink($binding) . "]"    ) if $binding;
+               push(@found_items, "a [" . quest::varlink($glyph) . "]"      ) if $glyph;
+               push(@found_items, "a [" . quest::varlink($spellstone) . "]" ) if $spellstone;
 
-            plugin::NPCTell($response);
+               if (@found_items) {
+                  my $last_item = pop(@found_items);
+                  my $response = "Alright then, let's take a look at this [$item_name]. I found ";
+                  
+                  if (@found_items) {
+                     $response .= join(", ", @found_items) . ", and " . $last_item . ".";
+                  } else {
+                     $response .= $last_item . ".";
+                  }
+                  
+                  $client->SetBucket("Gemcarver-WorkOrder", $item_id);
+                  $found_work = 1;
+                  plugin::NPCTell($response);
+               }
+
+               unless ($found_work) {
+                  my $response = "I'm sorry, $clientName. I don't see anything that I can extract from [$item_name] for you.";
+                  plugin::NPCTell($response);
+               }
          }
       }
    } else {
