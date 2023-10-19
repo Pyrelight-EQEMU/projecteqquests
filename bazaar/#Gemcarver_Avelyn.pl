@@ -144,7 +144,7 @@ sub get_binding() {
    my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 930000 AND id < 999999 AND proceffect > 0 AND itemtype = 54");
    $sth->execute($item_name);
 
-   my $retval = $sth->fetchrow_array || 0
+   my $retval = $sth->fetchrow_array || 0;
    $sth->finish();
    $dbh->disconnect();
    return $retval;
@@ -159,7 +159,7 @@ sub get_spellstone() {
    my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 910000 AND id < 999999 AND focuseffect > 0 AND itemtype = 54");
    $sth->execute($item_name);
 
-   my $retval = $sth->fetchrow_array || 0
+   my $retval = $sth->fetchrow_array || 0;
    $sth->finish();
    $dbh->disconnect();
    return $retval;
@@ -174,7 +174,7 @@ sub get_glyph() {
    my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 920000 AND id < 999999 AND clickeffect > 0 AND itemtype = 54");
    $sth->execute($item_name);
 
-   my $retval = $sth->fetchrow_array || 0
+   my $retval = $sth->fetchrow_array || 0;
    $sth->finish();
    $dbh->disconnect();
    return $retval;
