@@ -72,7 +72,7 @@ SQL
 $select_query->execute() or die;
 
 # Create an array of the possible icon values based on the ranges
-my @possible_icons = (5576..5901);
+my @possible_icons = (5776..5901);
 
 # Start inserting with ID 901000
 my $new_id = 920000;
