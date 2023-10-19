@@ -50,7 +50,7 @@ sub EVENT_ITEM {
          if ($item_id != 0) {
             quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
             my $item_name = quest::varlink($item_id);
-            my $response = "Alright then, let's take a look at this [$item_name].";
+            my $response = "Alright then, let's take a look at this [$item_name]. ";
             my $found_work = 0;
 
             my $proc_id = quest::getitemstat($item_id, 'proceffect');
@@ -80,6 +80,8 @@ sub EVENT_ITEM {
 
             if ($found_work) {
                $client->SetBucket("Gemcarver-WorkOrder", $item_id);
+            } else {
+               $response = "I'm sorry, $clientName. I don't see anything that I can extract from [$item_name] for you.";
             }
 
             plugin::NPCTell($response);
