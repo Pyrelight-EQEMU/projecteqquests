@@ -64,7 +64,8 @@ my $select_query = $dbh->prepare(<<SQL);
       AND items.slots < 4194304 
       AND items.classes > 0 
       AND items.races > 0 
-      AND items.maxcharges = -1 
+      AND items.maxcharges = -1
+      AND items.itemtype != 54
       AND items.id <= 999999 
       AND items.Name NOT LIKE 'Apocryphal%'
       ORDER BY items.id;
