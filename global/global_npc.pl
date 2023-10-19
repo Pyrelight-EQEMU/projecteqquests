@@ -443,7 +443,7 @@ sub UPDATE_PET_STATS
 
         my @stat_list = qw(avoidance atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
-            my $bucket_value = $owner->GetBucket("pet_$stat");
+            my $bucket_value = $owner->GetBucket("pet_$stat") || 0;
 
             if ($stat eq 'max_hp') {
                 $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $pet_hsta);                            
