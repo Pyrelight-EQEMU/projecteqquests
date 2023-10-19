@@ -96,7 +96,7 @@ sub get_rank_name {
 }
 
 my $max_id = 900000;
-my $chunk_size = 1000;
+my $chunk_size = 100;
 
 for my $tier (1..10) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
