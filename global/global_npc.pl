@@ -416,24 +416,44 @@ sub UPDATE_PET_STATS
 
         if ($owner_speed > $pet_speed) {            
             $pet->ModifyNPCStat("runspeed", $owner_speed/40);
-        }        
+        }
 
-        my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
+        my $pet_hstr = 0;
+        my $pet_hsta = 0;
+        my $pet_hagi = 0;
+        my $pet_hdex = 0;
+        my $pet_hint = 0;
+        my $pet_hwis = 0;
+        my $pet_hcha = 0;
+        my $pet_hstat_total = 0;
+
+        # Fetching pet's inventory
+        my @lootlist = $npc->GetLootList();                
+        foreach my $item_id (@lootlist) {
+            $pet_hsta += $pet->GetItemStat($item_id, "heroicsta");
+            $pet_hstr += $pet->GetItemStat($item_id, "heroicstr");
+            $pet_hagi += $pet->GetItemStat($item_id, "heroicagi");
+            $pet_hdex += $pet->GetItemStat($item_id, "heroicdex");
+            $pet_hint += $pet->GetItemStat($item_id, "heroicint");
+            $pet_hwis += $pet->GetItemStat($item_id, "heroicwis");
+            $pet_hcha += $pet->GetItemStat($item_id, "heroiccha");
+        }
+
+        $pet_hstat_total = $pet_hsta + $pet_hstr + $pet_hagi + $pet_hdex + $pet_hint + $pet_hwis + $pet_hcha;
+
+        my @stat_list = qw(avoidance atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             my $bucket_value = $owner->GetBucket("pet_$stat");
 
             if ($stat eq 'max_hp') {
-
-                my $hsta_total = 0;
-
-                # Fetching pet's inventory
-                my @lootlist = $npc->GetLootList();                
-                foreach my $item_id (@lootlist) {
-                    my $hsta_total += $pet->GetItemStat($item_id, "heroicsta");
-                }
-
-                $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $hsta_total);                            
+                $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $pet_hsta);                            
             }
+
+            if ($stat eq 'avoidance') {
+                $bucket_value += 10 * $pet_hagi;
+            }
+
+            if ($spell)
 
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
                 my $damage_bonus = 0;
