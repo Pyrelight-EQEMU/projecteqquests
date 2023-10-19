@@ -109,7 +109,9 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_equipment") {
-                plugin::NPCTell("I can intensify the magic of certain equipment and weapons through the use of $link_concentrated_mana_crystals as well as two additional identical items to donate their aura. If you'd like me to appraise an item, simply hand it to me. Please be careful to remove any augmentations which you have added, though! They can interfere with the appraisal process.");
+                plugin::NPCTell("I can intensify the magic of certain equipment and weapons through the use of $link_concentrated_mana_crystals as 
+                                well as an identical item to donate its aura. If you'd like me to appraise an item, simply hand it to me. 
+                                Please be careful to remove any augmentations which you have added, though! They can interfere with the appraisal process.");
         $client->SetBucket("CedricVisit", 1);
     }
 
@@ -390,15 +392,15 @@ sub test_upgrade {
         #quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");
         
 
-        my $loop_limit = 3; # A limit to prevent infinite loops
+        my $loop_limit = 2; # A limit to prevent infinite loops
         my $loop_count = 0;
 
-        while ($virtual_inventory->{$current_item_id} < 3 && $prev_item_id && $loop_count++ < $loop_limit) {
+        while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {
             test_upgrade($prev_item_id, 1, $virtual_inventory, $total_cmc_cost_ref);
         }
 
-        if ($virtual_inventory->{$current_item_id} >= 3) {
-            $virtual_inventory->{$current_item_id} -= 3;
+        if ($virtual_inventory->{$current_item_id} >= 2) {
+            $virtual_inventory->{$current_item_id} -= 2;
             $virtual_inventory->{$target_item_id}++;
 
             $$total_cmc_cost_ref += get_upgrade_cost($target_item_id);
@@ -443,19 +445,18 @@ sub execute_upgrade {
             #quest::debug("(Before) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             quest::debug("Trying to combine $current_item_id ($count), next: $target_item_id, prev: $prev_item_id");        
 
-            my $loop_limit = 3; # A limit to prevent infinite loops
+            my $loop_limit = 2; # A limit to prevent infinite loops
             my $loop_count = 0;
 
-            while ($virtual_inventory->{$current_item_id} < 3 && $prev_item_id && $loop_count++ < $loop_limit) {
+            while ($virtual_inventory->{$current_item_id} < 2 && $prev_item_id && $loop_count++ < $loop_limit) {
                 execute_upgrade($prev_item_id, 1, $virtual_inventory, $ledger);
             }
 
-            if ($virtual_inventory->{$current_item_id} >= 3) {
-                $virtual_inventory->{$current_item_id} -= 3;
+            if ($virtual_inventory->{$current_item_id} >= 2) {
+                $virtual_inventory->{$current_item_id} -= 2;
                 $virtual_inventory->{$target_item_id}++;                
 
                 $ledger->{$current_item_id}-- if $is_recursive;
-                $ledger->{$current_item_id}--;
                 $ledger->{$current_item_id}--;
                 $ledger->{$target_item_id}++;
 
