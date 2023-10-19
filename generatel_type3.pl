@@ -89,7 +89,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data->{slots} = $row->{slots};
     $base_data->{classes} = $row->{classes};
     $base_data->{deity} = $row->{deity};
-    $base_data->{augtype} = 2;
+    $base_data->{augtype} = 4;
     $base_data->{augrestrict} = 0;
     $base_data->{idfile} = 'IT63';
     $base_data->{icon} = $possible_icons[$index];
@@ -119,4 +119,3 @@ while (my $row = $select_query->fetchrow_hashref()) {
 
 $select_query->finish();
 $dbh->disconnect();
-
