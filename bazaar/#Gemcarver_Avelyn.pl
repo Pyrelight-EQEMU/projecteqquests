@@ -54,29 +54,11 @@ sub EVENT_ITEM {
             my $response = "Alright then, let's take a look at this [$item_name]. ";
             my $found_work = 0;
 
-            my $proc_id = quest::getitemstat($base_id, 'proceffect');
-            if ($proc_id > 0) {
-               my $binding_id = get_binding(base_id);
-               my $binding_name = quest::varlink($binding_id);
-               $response .= " I see an [$binding_name] ($binding_id) that I can extract.";
-               $found_work = 1;
-            }
+            my $binding    = get_binding($base_id);
+            my $glyph      = get_glyph($base_id);
+            my $spellstone = get_spellstone($base_id);
 
-            my $proc_id = quest::getitemstat($base_id, 'clickeffect');
-            if ($proc_id > 0) {
-               my $spellstone_id = get_spellstone($base_id);
-               my $spellstone_name = quest::varlink($spellstone_id);
-               $response .= " I see an [$spellstone_name] that I can extract.";
-               $found_work = 1;
-            }
-
-            my $proc_id = quest::getitemstat($base_id, 'focuseffect');
-            if ($proc_id > 0) {
-               my $glyph_id = get_glyph($base_id);
-               my $glyph_name = quest::varlink($spellstone_id);
-               $response .= " I see an [$glyph_name] that I can extract.";
-               $found_work = 1;
-            }
+            quest::debug ("$binding : $glyph : $spellstone");
 
             if ($found_work) {
                $client->SetBucket("Gemcarver-WorkOrder", $item_id);
