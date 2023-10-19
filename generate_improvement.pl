@@ -95,7 +95,7 @@ sub get_rank_name {
     return undef; # Return undefined if rank is outside the valid range
 }
 
-my $max_id = 999999;
+my $max_id = 900000;
 my $chunk_size = 1000;
 
 for my $tier (1..10) {
