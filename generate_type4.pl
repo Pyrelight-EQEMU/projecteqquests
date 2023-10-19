@@ -85,7 +85,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     # Set New Attributes
     $base_data->{id} = $new_id;
     $base_data->{Name} = "Eldritch Binding: " . $row->{spell_name};
-    $base_data->{focuseffect} = $row->{focuseffect};
+    $base_data->{proceffect} = $row->{proceffect};
     $base_data->{procrate} = ${row}->{procrate};
     $base_data->{slots} = $row->{slots};
     $base_data->{classes} = $row->{classes};
