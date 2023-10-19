@@ -95,8 +95,8 @@ sub get_rank_name {
     return undef; # Return undefined if rank is outside the valid range
 }
 
-my $max_id = 999999;
-my $chunk_size = 1000;
+my $max_id = 900000;
+my $chunk_size = 100;
 
 for my $tier (1..10) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
@@ -161,12 +161,12 @@ for my $tier (1..10) {
                 $row->{heroic_wis} = $row->{heroic_wis} + (($row->{heroic_wis} + $row->{awis}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
                 $row->{heroic_cha} = $row->{heroic_cha} + (($row->{heroic_cha} + $row->{acha}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
 
-                # Adjusting Heroic Resists
-                $row->{heroic_mr} = $row->{heroic_mr} + (($row->{heroic_mr} + $row->{mr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) : $modifier_minor));
-                $row->{heroic_cr} = $row->{heroic_cr} + (($row->{heroic_cr} + $row->{cr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) : $modifier_minor));
-                $row->{heroic_fr} = $row->{heroic_fr} + (($row->{heroic_fr} + $row->{fr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) : $modifier_minor));
-                $row->{heroic_dr} = $row->{heroic_dr} + (($row->{heroic_dr} + $row->{dr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) : $modifier_minor));
-                $row->{heroic_pr} = $row->{heroic_pr} + (($row->{heroic_pr} + $row->{pr}) * ($row->{itemtype} == 54 ? int($modifier_minor/2) : $modifier_minor));
+                # Adjusting Heroic Resists   
+                $row->{heroic_mr} = $row->{heroic_mr} + ($row->{heroic_mr} * $modifier) if ($row->{heroic_mr} > 0);
+                $row->{heroic_fr} = $row->{heroic_fr} + ($row->{heroic_fr} * $modifier) if ($row->{heroic_fr} > 0);
+                $row->{heroic_cr} = $row->{heroic_cr} + ($row->{heroic_cr} * $modifier) if ($row->{heroic_cr} > 0);
+                $row->{heroic_dr} = $row->{heroic_dr} + ($row->{heroic_dr} * $modifier) if ($row->{heroic_dr} > 0);
+                $row->{heroic_pr} = $row->{heroic_pr} + ($row->{heroic_pr} * $modifier) if ($row->{heroic_pr} > 0);
 
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);

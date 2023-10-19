@@ -135,10 +135,52 @@ sub GetPotName {
     return $strings[int(rand(@strings))];
 }
 
+sub UnlockClass {
+    my ($client, $class_id) = @_;
+    my $class_ability_base = 20000;
+    my $character_id = $client->CharacterID();
+    my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;
+
+    if ($unlocksAvailable >= 1) {
+
+        # Load database handler
+        my $dbh = plugin::LoadMysql();
+
+        # Check if the class is already unlocked
+        my $sth = $dbh->prepare("SELECT * FROM multiclass_data WHERE id = ? AND class = ?");
+        $sth->execute($character_id, $class_id);
+        
+        if ($sth->fetchrow_hashref()) {
+            plugin::NPCTell("This class is already unlocked for you.");
+            $sth->finish();
+            $dbh->disconnect(); # disconnect from the database
+            return 0;
+        } else { 
+            $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
+            plugin::YellowText("You have spent a Class Unlock point.");
+
+            # Insert data into multiclass_data table for the new class
+            $sth = $dbh->prepare("INSERT INTO multiclass_data (id, class) VALUES (?, ?)");
+            $sth->execute($character_id, $class_id);
+
+            # Grant class abilities
+            $client->GrantAlternateAdvancementAbility($client->GetClass + $class_ability_base, 1, 1);
+            $client->GrantAlternateAdvancementAbility($class_id + $class_ability_base, 1, 1);
+        }
+
+        $sth->finish();
+        $dbh->disconnect(); # disconnect from the database
+        return 1;
+    } else {
+        plugin::NPCTell("Sorry, you don't have any available class unlocks.");
+        return 0;
+    }
+}
+
 sub GetUnlockedClasses {
     my $client = shift;
     my $dbh    = plugin::LoadMysql();
-    my $sth    = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ?");
+    my $sth    = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ? AND class NOT IN (1, 7, 8, 9, 12, 16)");
 
     $sth->execute($client->CharacterID());
 
@@ -155,6 +197,19 @@ sub GetUnlockedClasses {
     $unlocked_classes{$current_class} = $current_level;
 
     return %unlocked_classes;
+}
+
+sub GetLockedClasses {
+    my $client = shift;
+    my %unlocked_classes = GetUnlockedClasses($client);
+
+    # All the class IDs excluding the ones you've specified
+    my @all_classes = (2, 3, 4, 5, 6, 10, 11, 13, 14, 15);
+
+    # Filtering out the unlocked class IDs
+    my @locked_classes = grep { not exists $unlocked_classes{$_} } @all_classes;
+
+    return @locked_classes;
 }
 
 sub GetClassListString {
@@ -229,45 +284,16 @@ sub CheckLevelFlags {
     }
 }
 
-#function check_class_switch_aa(e)
-#	accum = 0
-#	for i=16,1,-1
-#	do
-#		eq.debug("Checking class: " .. i);
-#		if (e.self:GetBucket("class-"..i.."-unlocked") == '1') then
-#			eq.debug("Unlocked Class: " .. i);
-#			e.self:GrantAlternateAdvancementAbility(20000 + i, 1, true)			
-#			accum = accum + 1			
-#		end		 
-#	end
-#	eq.debug("Unlocked Classes: " .. accum);
-#	expPenalty = calculate_modifier(accum)
-#	e.self:SetEXPModifier(0, expPenalty)
-#	eq.debug("Setting your Exp Modifier to: " .. expPenalty)
-#end
-
 sub CheckClassAA {
     my $client = shift;
-    my $accum  = 0;
-
-    foreach my $i (reverse 1..16) {
-        quest::debug("Checking Class ID: $i");
-        if ($client->GetBucket("class-$i-unlocked")) {
-            quest::debug("ClassID $i is unlocked");
-            $client->GrantAlternateAdvancementAbility(20000+$i, 1, 1);
-            $accum++;
-        }
-    }
-
-    if ($accum == 0) {
-        $accum++;
-    }
-
-    my $expPenalty = CalculateExpPenalty($accum);
-    $client->SetEXPModifier(0, $expPenalty);
+    my $class_ability_base = 20000;
     
-    quest::debug("Unlocked Class Count: $accum");
-    quest::debug("Set Exp Penalty to: $expPenalty");
+    # Use the GetUnlockedClasses method to get the unlocked classes
+    my %unlocked_classes = GetUnlockedClasses($client);
+    
+    foreach my $class_id (keys %unlocked_classes) {
+        $client->GrantAlternateAdvancementAbility($class_ability_base + $class_id, 1, 1);
+    }    
 }
 
 #function calculate_modifier(count)
@@ -373,4 +399,429 @@ sub item_exists_in_db {
     $dbh->disconnect();
 
     return $result > 0 ? 1 : 0;
+}
+
+sub get_total_attunements {
+    my $client = shift;
+    my @suffixes = ('A', 'O', 'F', 'K', 'V', 'L'); # Add more suffixes as needed
+    my $total = 0;
+    foreach my $suffix (@suffixes) {
+        $total += count_teleport_zones($client, $suffix);
+    }
+
+    return $total;
+}
+
+sub count_teleport_zones {
+    my ($client, $suffix) = @_;
+
+    # Check for a provided suffix or default to 'A'
+    $suffix //= 'A';
+
+    my $charKey = $client->CharacterID() . "-TL";
+    my $charTargetsString = quest::get_data($charKey . "-" . $suffix);
+
+    my %teleport_zones = ();
+    
+    my @zones = split /:/, $charTargetsString;
+    foreach my $z (@zones) {      
+        my @tokens = split /,/, $z;
+        if ($tokens[1]) {
+            $teleport_zones{$tokens[1]} = [ @tokens ];
+        }
+    }
+    
+    return scalar(keys %teleport_zones);
+}
+
+sub is_item_upgradable {
+    my $item_id = shift;
+
+    #shortcut if we are already an upgraded item
+    if ($item_id >= 1000000) {
+        return 1;
+    }
+
+    if ($item_id > 20000000) {
+        return 0;
+    }
+
+    # Calculate the next-tier item ID
+    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+
+    # Check if the next-tier item exists in the database
+    return item_exists_in_db($next_tier_item_id);
+}
+
+sub get_continent_fix {
+    my %zone_to_continent = (
+
+        # Faydwer
+        'akanon'     => 'F',
+        'butcher'    => 'F',
+        'cauldron'   => 'F',
+        'crushbone'  => 'F',
+        'felwithea'  => 'F',
+        'felwitheb'  => 'F',
+        'gfaydark'   => 'F',
+        'kedge'      => 'F',
+        'kaladima'   => 'F',
+        'kaladimb'   => 'F',
+        'lfaydark'   => 'F',
+        'mistmoore'  => 'F',
+        'steamfont'  => 'F',
+        'unrest'     => 'F',
+
+        # Antonica
+        'arena'         => 'A',
+        'befallen'      => 'A',
+        'beholder'      => 'A',
+        'blackburrow'   => 'A',
+        'cazicthule'    => 'A',
+        'commons'       => 'A',
+        'ecommons'      => 'A',
+        'eastkarana'    => 'A',
+        'erudsxing'     => 'A',
+        'everfrost'     => 'A',
+        'feerrott'      => 'A',
+        'freporte'      => 'A',
+        'freportn'      => 'A',
+        'freportw'      => 'A',
+        'grobb'         => 'A',
+        'gukbottom'     => 'A',
+        'guktop'        => 'A',
+        'halas'         => 'A',
+        'highkeep'      => 'A',
+        'highpasshold'  => 'A',
+        'innothule'     => 'A',
+        'kithicor'      => 'A',
+        'lakerathe'     => 'A',
+        'lavastorm'     => 'A',
+        'misty'         => 'A',
+        'najena'        => 'A',
+        'neriaka'       => 'A',
+        'neriakb'       => 'A',
+        'neriakc'       => 'A',
+        'neriakd'       => 'A',
+        'nektulos'      => 'A',
+        'northkarana'   => 'A',
+        'nro'           => 'A',
+        'oasis'         => 'A',
+        'oggok'         => 'A',
+        'oot'           => 'A',
+        'paw'           => 'A',
+        'permafrost'    => 'A',
+        'qcat'          => 'A',
+        'qey2hh1'       => 'A',
+        'qeynos'        => 'A',
+        'qeynos2'       => 'A',
+        'qeytoqrg'      => 'A',
+        'qrg'           => 'A',
+        'rathemtn'      => 'A',
+        'rivervale'     => 'A',
+        'runnyeye'      => 'A',
+        'soldunga'      => 'A',
+        'soldungb'      => 'A',
+        'soltemple'     => 'A',
+        'southkarana'   => 'A',
+        'sro'           => 'A',
+        'gunthak'       => 'A',
+        'dulak'         => 'A',
+        'nadox'         => 'A',
+        'torgiran'      => 'A',
+        'hatesfury'     => 'A',
+        'jaggedpine'    => 'A',
+        
+        # Odus
+        'hole'          => 'O',
+        'kerraridge'    => 'O',
+        'paineel'       => 'O',
+        'tox'           => 'O',
+        'warrens'       => 'O',
+        'stonebrunt'    => 'O',
+
+        # Kunark
+        'burningwood'   => 'K',
+        'cabeast'       => 'K',
+        'cabwest'       => 'K',
+        'chardok'       => 'K',
+        'charasis'      => 'K',
+        'citymist'      => 'K',
+        'dalnir'        => 'K',
+        'dreadlands'    => 'K',
+        'droga'         => 'K',
+        'emeraldjungle' => 'K',
+        'fieldofbone'   => 'K',
+        'firiona'       => 'K',
+        'frontiermtns'  => 'K',
+        'kaesora'       => 'K',
+        'karnor'        => 'K',
+        'kurn'          => 'K',
+        'lakeofillomen' => 'K',
+        'nurga'         => 'K',
+        'overthere'     => 'K',
+        'sebilis'       => 'K',
+        'skyfire'       => 'K',
+        'swampofnohope' => 'K',
+        'timorous'      => 'K',
+        'trakanon'      => 'K',
+        'veeshan'       => 'K',
+        'warslikswood'  => 'K',
+        
+        # Velious
+        'cobaltscar'    => 'V',
+        'crystal'       => 'V',
+        'eastwastes'    => 'V',
+        'frozenshadow'  => 'V',
+        'greatdivide'   => 'V',
+        'iceclad'       => 'V',
+        'kael'          => 'V',
+        'necropolis'    => 'V',
+        'sirens'        => 'V',
+        'sleepers'      => 'V',
+        'skyshrine'     => 'V',
+        'templeveeshan' => 'V',
+        'thurgadina'    => 'V',
+        'thurgadinb'    => 'V',
+        'velketor'      => 'V',
+        'wakening'      => 'V',
+        'westwastes'    => 'V',
+
+        # Luclin
+        'acrylia'      => 'L',
+        'akheva'       => 'L',
+        'bazaar'       => 'L',
+        'dawnshroud'   => 'L',
+        'echo'         => 'L',
+        'fungusgrove'  => 'L',
+        'griegsend'    => 'L',
+        'grimling'     => 'L',
+        'hollowshade'  => 'L',
+        'katta'        => 'L',
+        'letalis'      => 'L',
+        'maiden'       => 'L',
+        'mseru'        => 'L',
+        'netherbian'   => 'L',
+        'nexus'        => 'L',
+        'paludal'      => 'L',
+        'scarlet'      => 'L',
+        'shadeweaver'  => 'L',
+        'shadowhaven'  => 'L',
+        'sharvahl'     => 'L',
+        'sseru'        => 'L',
+        'ssratemple'   => 'L',
+        'tenebrous'    => 'L',
+        'thedeep'      => 'L',
+        'thegrey'      => 'L',
+        'umbral'       => 'L',
+        'vexthal'      => 'L',
+
+        # Planes of Power
+        'poknowledge'         => 'P',
+        'potranquility'       => 'P',        
+        'pojustice'           => 'P', # Plane of Justice
+        'podisease'           => 'P', # Plane of Disease
+        'poinnovation'        => 'P', # Plane of Innovation
+        'ponightmare'         => 'P', # Plane of Nightmare
+        'nightmareb'          => 'P', # The Lair of Terris Thule
+        'povalor'             => 'P', # Plane of Valor
+        'postorms'            => 'P', # Plane of Storms
+        'potorment'           => 'P', # Plane of Torment
+        'codecay'             => 'P',
+        'hohonora'            => 'P',
+        'hohonorb'            => 'P',
+        'bothunder'           => 'P',
+        'potactics'           => 'P',
+        'solrotower'          => 'P',
+        'pofire'              => 'P',
+        'poair'               => 'P',
+        'powater'             => 'P',
+        'poeartha'            => 'P',
+        'poearthb'            => 'P',
+        'potimea'             => 'P',
+        'potimeb'             => 'P',
+        'hateplaneb'          => 'P',
+        'mischiefplane'       => 'P',
+        'airplane'            => 'P',
+        'fearplane'           => 'P',
+
+        # Gates of Discord
+        'abysmal'      => 'G',
+        'barindu'      => 'G',
+        'ferubi'       => 'G',
+        'ikkinz'       => 'G',
+        'inktuta'      => 'G',
+        'kodtaz'       => 'G',
+        'natimbi'      => 'G',
+        'qinimi'       => 'G',
+        'qvic'         => 'G',
+        'riwwi'        => 'G',
+        'snlair'       => 'G',
+        'snplant'      => 'G',
+        'snpool'       => 'G',
+        'sncrematory'  => 'G',
+        'tacvi'        => 'G',
+        'tipt'         => 'G',
+        'txevu'        => 'G',
+        'uqua'         => 'G',
+        'vxed'         => 'G',
+        'yxtta'        => 'G',
+
+        # Omens of Discord
+        'anguish'           => 'O',
+        'bloodfields'       => 'O',
+        'causeway'          => 'O',
+        'chambersa'         => 'O',
+        'chambersb'         => 'O',
+        'chambersc'         => 'O',
+        'chambersd'         => 'O',
+        'chamberse'         => 'O',
+        'chambersf'         => 'O',
+        'dranik'            => 'O',
+        'dranikcatacombsa'  => 'O',
+        'dranikcatacombsb'  => 'O',
+        'dranikcatacombsc'  => 'O',
+        'dranikhollowsa'    => 'O',
+        'dranikhollowsb'    => 'O',
+        'dranikhollowsc'    => 'O',
+        'dranikscar'        => 'O',
+        'drainksewersa'     => 'O',
+        'drainksewersb'     => 'O',
+        'drainksewersc'     => 'O',
+        'harbingers'        => 'O',
+        'provinggrounds'    => 'O',
+        'riftseekers'       => 'O',
+        'wallofslaughter'   => 'O',
+
+    );
+
+    my $zonesn = shift;
+
+    if (exists $zone_to_continent{$zonesn}) {
+        return $zone_to_continent{$zonesn};
+    } else {
+        return undef;
+    }
+}
+
+# Get character's saved zone data
+sub get_zone_data_for_character {
+    my ($characterID, $suffix) = @_;
+    my $charKey = $characterID . "-TL-" . $suffix;
+
+    fix_zone_data($characterID, $suffix);
+
+    my $charDataString = quest::get_data($charKey);
+
+    # Debug: Print the raw string data
+    #quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
+
+    my %teleport_zones;
+    my @zone_entries = split /:/, $charDataString;
+
+    foreach my $entry (@zone_entries) {
+        my @tokens = split /,/, $entry;
+        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
+    }
+
+    return \%teleport_zones;
+}
+
+sub set_zone_data_for_character {
+    my ($characterID, $zone_data_hash_ref, $suffix) = @_;
+    my $charKey = $characterID . "-TL-" . $suffix;
+
+    # Debug: Print the key used to store data
+    #quest::debug("Setting data with key: $charKey");
+
+    my @data_entries;
+
+    while (my ($desc, $zone_data) = each %{$zone_data_hash_ref}) {
+        my $entry = join(",", $desc, @{$zone_data});
+        push @data_entries, $entry;
+    }
+
+    my $charDataString = join(":", @data_entries);
+
+    # Debug: Print the data string being set
+    #quest::debug("Setting Raw Data: $charDataString");
+
+    quest::set_data($charKey, $charDataString);
+}
+
+# Serializes the data structure for storage
+# Usage:
+#    my %zone_data = ('Zone1' => ['data1', 'data2'], 'Zone2' => ['data3', 'data4']);
+#    my $serialized_data = serialize_zone_data(\%zone_data);
+#    print $serialized_data;
+sub serialize_zone_data {
+    my ($data) = @_;
+    my @entries = ();
+    foreach my $key (keys %{$data}) {
+        push @entries, join(',', $key, @{$data->{$key}});
+    }
+    return join(':', @entries);
+}
+
+# Deserializes the data structure from the stored string
+# Usage:
+#    my $data_string = "Zone1,data1,data2:Zone2,data3,data4";
+#    my $zone_data = deserialize_zone_data($data_string);
+#    foreach my $zone (keys %{$zone_data}) {
+#        print "Zone: $zone\n";
+#    }
+sub deserialize_zone_data {
+    my ($string) = @_;
+    my %data = ();
+    foreach my $entry (split /:/, $string) {
+        my @tokens = split /,/, $entry;
+        $data{$tokens[0]} = [ @tokens[1..5] ];
+    }
+    return \%data;
+}
+
+# Check if a particular piece of data (by zone description) is present
+sub has_zone_entry {
+    my ($characterID, $zone_desc, $suffix) = @_;
+    my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
+
+    #quest::debug("Checking for description: $zone_desc");
+    #quest::debug("Current Data: " . join(", ", keys %{$teleport_zones}));
+
+    return exists($teleport_zones->{$zone_desc});
+}
+
+# Add (or overwrite) data to teleport_zones
+# Usage:
+#    add_zone_entry(12345, "Zone4", ['data7', 'data8'], '-K');
+sub add_zone_entry {
+    my ($characterID, $zone_name, $zone_data, $suffix) = @_;
+    my $teleport_zones = get_zone_data_for_character($characterID, $suffix);
+    $teleport_zones->{$zone_name} = $zone_data;
+    set_zone_data_for_character($characterID, $teleport_zones, $suffix);
+}
+
+sub fix_zone_data {
+    my ($characterID, $suffix) = @_;
+    my $charKey = $characterID . "-TL-" . $suffix;
+    my $charDataString = quest::get_data($charKey);
+    my $data_hash = plugin::deserialize_zone_data($charDataString);  
+
+    delete $data_hash->{''};
+    
+    foreach my $key (keys %$data_hash) {        
+        if (quest::GetZoneLongName($key) ne "UNKNOWN") {
+            quest::debug("Fixed an element");  
+            my $zone_sn = $key;
+            my $zone_desc = $data_hash->{$key}[0];  # Access the elements using ->
+
+            # Create a new entry in the hash with the zone_desc as the key
+            $data_hash->{$zone_desc} = [$key, @{$data_hash->{$key}}[1..4]];
+
+            # Delete the original key from the hash
+            delete $data_hash->{$key};
+        }
+    }
+
+    quest::set_data($charKey, plugin::serialize_zone_data($data_hash));
 }

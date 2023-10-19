@@ -4,6 +4,7 @@ use Time::Seconds; # for ONE_DAY constant
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, true);
+    fix_palshd_horse($client);
 
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
@@ -260,5 +261,57 @@ sub EVENT_COMBINE_SUCCESS {
         quest::setglobal("paladin_epic", "11", 5, "F");
         quest::delglobal("paladin_epic_mmcc");
         quest::delglobal("paladin_epic_hollowc");
+    }
+}
+
+sub EVENT_SCRIBE_SPELL {
+    add_illusions($client);
+}
+
+sub EVENT_UNSCRIBE_SPELL {
+    add_illusions($client);
+}
+
+sub add_illusions {
+    my $client = shift;
+    my %illusion_spells = ( 643 =>  9492, #Call of Bones
+                            644 =>  9490, #Lich
+                            1416 => 9495, #Arch Lich
+                            1611 => 9490, #Demi Lich
+                            2114 => 9495, #Ancient: Master of Death
+                            3311 => 9491, #Seduction of Saryrn
+                            4978 => 9491, #Ancient: Seduction of Chaos
+                            5434 => 9491, #Dark Posession
+                            8520 => 9493, #Grave Pact 
+                            );
+
+    foreach my $spell_id (keys %illusion_spells) {
+        $slot_spell = $client->GetSpellBookSlotBySpellID($spell_id);
+        $slot_illus = $client->GetSpellBookSlotBySpellID($illusion_spells{$spell_id});
+
+        if ($slot_spell >= 0 and $slot_illus == -1) {
+            quest::debug("Add the illusion here");
+            $client->ScribeSpell($illusion_spells{$spell_id}, $client->GetFreeSpellBookSlot(), 1);           
+        } 
+    }
+}
+
+sub EVENT_AA_BUY {
+    fix_palshd_horse($client);
+}
+
+sub fix_palshd_horse {
+    my $client = shift;
+    #Holy Steed
+    if ($client->GetAAByAAID(77)) {
+        if ($client->HasSpellScribed(2874)) {
+            $client->ScribeSpell(2874, $client->GetFreeSpellBookSlot(), 1);
+        }
+    }
+    #UnHoly Steed
+    if ($client->GetAAByAAID(85)) {
+        if ($client->HasSpellScribed(2875)) {
+            $client->ScribeSpell(2875, $client->GetFreeSpellBookSlot(), 1);
+        }
     }
 }

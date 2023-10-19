@@ -85,7 +85,7 @@ sub EVENT_ITEM
 {
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
         plugin::YellowText("You must use a Summoner's Syncrosatchel to equip your pet.");
-        plugin::return_items(\%itemcount);
+        plugin::return_items_silent(\%itemcount);
     }
 }
 
@@ -93,36 +93,40 @@ sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();
 
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-    my @lootlist = $corpse->GetLootList();
+    if ($corpse) {
+        my @lootlist = $corpse->GetLootList();
 
-    foreach my $item_id (@lootlist) {
-        my $chance = rand();
+        foreach my $item_id (@lootlist) {
+            my $chance = rand();
 
-        if ($chance < 0.01) {
-            upgrade_item_tier($item_id, 3, $corpse);
-        }
+            if ($chance < 0.03) {
+                upgrade_item_tier($item_id, 3, $corpse);
+            }
 
-        elsif ($chance < 0.10) {
-            upgrade_item_tier($item_id, 2, $corpse);
-        }
+            elsif ($chance < 0.11) {
+                upgrade_item_tier($item_id, 2, $corpse);
+            }
 
-        elsif ($chance < 0.25) {
-            upgrade_item_tier($item_id, 1, $corpse);
+            elsif ($chance < 0.33) {
+                upgrade_item_tier($item_id, 1, $corpse);
+            }
         }
     }
 }
 
-
 sub upgrade_item_tier {
     my ($item_id, $tier, $entity)  = @_;
 
-    my $current_tier = int($item_id / 1000000);
-    my $base_id = $item_id % 1000000;
+    if (plugin::is_item_upgradable($item_id)) {
+        my $current_tier = int($item_id / 1000000);
+        my $base_id = $item_id % 1000000;
 
-    $tier = $current_tier + $tier;
-
-    $entity->RemoveItemByID($item_id);
-    $entity->AddItem($base_id + ($tier * 1000000), 1);
+        $tier = $current_tier + $tier;
+        if (plugin::item_exists_in_db($base_id + ($tier * 1000000))) {
+            $entity->RemoveItemByID($item_id);
+            $entity->AddItem($base_id + ($tier * 1000000), 1);
+        }
+    }
 }
 
 sub CHECK_CHARM_STATUS
@@ -184,97 +188,99 @@ sub UPDATE_PET {
                 }
             }
         }
-        # Determine contents
-        if ($bag_slot >= quest::getinventoryslotid("general.begin") && $bag_slot <= quest::getinventoryslotid("general.end")) {
-            %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("general.begin"), quest::getinventoryslotid("generalbags.begin"), $bag_size);
-        } elsif ($bag_slot >= quest::getinventoryslotid("bank.begin") && $bag_slot <= quest::getinventoryslotid("bank.end")) {
-            %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("bank.begin"), quest::getinventoryslotid("bankbags.begin"), $bag_size);
-        } else {
-            return;
-        }
-
-        # Fetching pet's inventory
-        my @lootlist = $npc->GetLootList();
-
-        # Sort the lootlist based on criteria
-        @lootlist = sort {
-            my $a_proceffect = $npc->GetItemStat($a, "proceffect") || 0;
-            my $a_damage = $npc->GetItemStat($a, "damage") || 0;
-            my $a_delay = $npc->GetItemStat($a, "delay") || 0;
-            my $a_ratio = ($a_delay > 0 ? $a_damage / $a_delay : 0);
-            my $a_ac = $npc->GetItemStat($a, "ac") || 0;
-            my $a_hp = $npc->GetItemStat($a, "hp") || 0;
-
-            my $b_proceffect = $npc->GetItemStat($b, "proceffect") || 0;
-            my $b_damage = $npc->GetItemStat($b, "damage") || 0;
-            my $b_delay = $npc->GetItemStat($b, "delay") || 0;
-            my $b_ratio = ($b_delay > 0 ? $b_damage / $b_delay : 0);
-            my $b_ac = $npc->GetItemStat($b, "ac") || 0;
-            my $b_hp = $npc->GetItemStat($b, "hp") || 0;
-
-            ($b_proceffect > 0 ? 1 : 0) <=> ($a_proceffect > 0 ? 1 : 0)
-            || $b_ratio <=> $a_ratio
-            || $b_ac <=> $a_ac
-            || $b_hp <=> $a_hp
-            || $b <=> $a  # using item IDs for final tiebreaker
-        } @lootlist;
-
-        foreach my $item_id (@lootlist) {
-            my $quantity = $npc->CountItem($item_id);
-            if ($quantity > 1) {
-                $updated = 1;
-                last;
+        if ($bag_slot) {
+            # Determine contents
+            if ($bag_slot >= quest::getinventoryslotid("general.begin") && $bag_slot <= quest::getinventoryslotid("general.end")) {
+                %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("general.begin"), quest::getinventoryslotid("generalbags.begin"), $bag_size);
+            } elsif ($bag_slot >= quest::getinventoryslotid("bank.begin") && $bag_slot <= quest::getinventoryslotid("bank.end")) {
+                %new_bag_inventory = GET_BAG_CONTENTS(\%new_bag_inventory, $owner, $bag_slot, quest::getinventoryslotid("bank.begin"), quest::getinventoryslotid("bankbags.begin"), $bag_size);
+            } else {
+                return;
             }
-            $new_pet_inventory{$item_id} += $quantity;
-        }
-        
-        foreach my $item_id (keys %new_pet_inventory) {
-            # if the key doesn't exist in new_bag_inventory or the values don't match
-            if (!exists $new_bag_inventory{$item_id}) {
-                $updated = 1; # set updated to true
-                quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
-                last; # exit the loop as we have found a difference
-            }
-        }
 
-        # if $updated is still false, it could be because new_bag_inventory has more items, check for that
-        if (!$updated) {
-            foreach my $item_id (keys %new_bag_inventory) {
-                # if the key doesn't exist in new_pet_inventory
-                if (!exists $new_pet_inventory{$item_id}) {                    
+            # Fetching pet's inventory
+            my @lootlist = $npc->GetLootList();
+
+            # Sort the lootlist based on criteria
+            @lootlist = sort {
+                my $a_proceffect = $npc->GetItemStat($a, "proceffect") || 0;
+                my $a_damage = $npc->GetItemStat($a, "damage") || 0;
+                my $a_delay = $npc->GetItemStat($a, "delay") || 0;
+                my $a_ratio = ($a_delay > 0 ? $a_damage / $a_delay : 0);
+                my $a_ac = $npc->GetItemStat($a, "ac") || 0;
+                my $a_hp = $npc->GetItemStat($a, "hp") || 0;
+
+                my $b_proceffect = $npc->GetItemStat($b, "proceffect") || 0;
+                my $b_damage = $npc->GetItemStat($b, "damage") || 0;
+                my $b_delay = $npc->GetItemStat($b, "delay") || 0;
+                my $b_ratio = ($b_delay > 0 ? $b_damage / $b_delay : 0);
+                my $b_ac = $npc->GetItemStat($b, "ac") || 0;
+                my $b_hp = $npc->GetItemStat($b, "hp") || 0;
+
+                ($b_proceffect > 0 ? 1 : 0) <=> ($a_proceffect > 0 ? 1 : 0)
+                || $b_ratio <=> $a_ratio
+                || $b_ac <=> $a_ac
+                || $b_hp <=> $a_hp
+                || $b <=> $a  # using item IDs for final tiebreaker
+            } @lootlist;
+
+            foreach my $item_id (@lootlist) {
+                my $quantity = $npc->CountItem($item_id);
+                if ($quantity > 1) {
+                    $updated = 1;
+                    last;
+                }
+                $new_pet_inventory{$item_id} += $quantity;
+            }
+            
+            foreach my $item_id (keys %new_pet_inventory) {
+                # if the key doesn't exist in new_bag_inventory or the values don't match
+                if (!exists $new_bag_inventory{$item_id}) {
                     $updated = 1; # set updated to true
+                    quest::debug("Inconsistency detected: $item_id not in bag or quantities differ.");
                     last; # exit the loop as we have found a difference
                 }
             }
-        }
 
-        if ($updated) {
-            quest::debug("--Pet Inventory Reset Triggered--");
-            my @lootlist = $npc->GetLootList();
-            while (@lootlist) { # While lootlist has elements
-                foreach my $item_id (@lootlist) {
-                    $npc->RemoveItem($item_id);
-                }
-                @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
-            }            
-
-            while (grep { $_->{quantity} > 0 } values %new_bag_inventory) {
-                # Preprocess and sort item_ids by GetItemStat in ascending order
-                my @sorted_item_ids = sort {
-                    my $count_a = () = unpack('B*', $owner->GetItemStat($a, "slots")) =~ /1/g;
-                    my $count_b = () = unpack('B*', $owner->GetItemStat($b, "slots")) =~ /1/g;
-                    $count_a <=> $count_b
-                } keys %new_bag_inventory;
-                
-                foreach my $item_id (@sorted_item_ids) {
-                    quest::debug("Processing item to add: $item_id");
-                    if ($new_bag_inventory{$item_id}->{quantity} > 0) {
-                        $npc->AddItem($item_id, 1, 1, @{$new_bag_inventory{$item_id}->{augments}});
-                        $new_bag_inventory{$item_id}->{quantity}--;
+            # if $updated is still false, it could be because new_bag_inventory has more items, check for that
+            if (!$updated) {
+                foreach my $item_id (keys %new_bag_inventory) {
+                    # if the key doesn't exist in new_pet_inventory
+                    if (!exists $new_pet_inventory{$item_id}) {                    
+                        $updated = 1; # set updated to true
+                        last; # exit the loop as we have found a difference
                     }
                 }
             }
 
+            if ($updated) {
+                quest::debug("--Pet Inventory Reset Triggered--");
+                my @lootlist = $npc->GetLootList();
+                while (@lootlist) { # While lootlist has elements
+                    foreach my $item_id (@lootlist) {
+                        $npc->RemoveItem($item_id);
+                    }
+                    @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
+                }            
+
+                while (grep { $_->{quantity} > 0 } values %new_bag_inventory) {
+                    # Preprocess and sort item_ids by GetItemStat in ascending order
+                    my @sorted_item_ids = sort {
+                        my $count_a = () = unpack('B*', $owner->GetItemStat($a, "slots")) =~ /1/g;
+                        my $count_b = () = unpack('B*', $owner->GetItemStat($b, "slots")) =~ /1/g;
+                        $count_a <=> $count_b
+                    } keys %new_bag_inventory;
+                    
+                    foreach my $item_id (@sorted_item_ids) {
+                        quest::debug("Processing item to add: $item_id");
+                        if ($new_bag_inventory{$item_id}->{quantity} > 0) {
+                            $npc->AddItem($item_id, 1, 1, @{$new_bag_inventory{$item_id}->{augments}});
+                            $new_bag_inventory{$item_id}->{quantity}--;
+                        }
+                    }
+                }
+
+            }
         }
 
         if (not $npc->Charmed()) {
@@ -351,31 +357,29 @@ sub APPLY_FOCUS {
     my $true_race = $owner->GetBucket("pet_race");
 
     #Mage Epic 1.0 - Orb of Mastery
-    if ($owner->GetClass() == 13 && $inventory->HasItemEquippedByID(28034)) {
-        if (!$npc->FindBuff(847)) {
-            $npc->CastSpell(847, $npc->GetID());       
+    my $mage_epic = 0;
+
+    foreach my $i (0..10) {
+        if ($inventory->HasAugmentEquippedByID(28034 + ($i * 1000000))) {
+            $mage_epic = 1;
+            last; # Exit the loop if we found the item
         }
-        $total_focus_scale += 0.30;
-    } elsif ($npc->FindBuff(847)) {
-        $npc->BuffFadeBySpellID(847);
-        $owner->BuffFadeBySpellID(847);
-    }
-    
-    #Necro Epic 1.0 - Scythe of the Shadowed Soul
-    if ($owner->GetClass() == 11 && $inventory->HasItemEquippedByID(20544) && $npc->GetBodyType() == 8)  {              
-        $total_focus_scale += 0.25;
-        if ($npc->GetRace() == $true_race) {
-            $npc->SetRace(491); # Bone Golem
-            $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") + 1000);
-        }
-    } elsif ($npc->GetRace() == 491) {
-        $npc->SetRace($true_race);
-        $owner->SetBucket("pet_max_hp", $owner->GetBucket("pet_max_hp") - 1000);
     }
 
-    #Beastlord Epic 1.0 - Claw of the Savage Spirit
-    if ($owner->GetClass() == 15 && $inventory->HasItemEquippedByID(8495) && $npc->GetBodyType() == 21)  {
+    if ($mage_epic) {
+        if (!$npc->FindBuff(847)) {
+            $npc->CastSpell(847, $npc->GetID());
+            $npc->AddMeleeProc(5234, 100);
+            $npc->AddMeleeProc(848, 100);
+        }
         $total_focus_scale += 0.30;
+    } else {
+        if ($npc->FindBuff(847)) {
+            $npc->BuffFadeBySpellID(847);
+            $owner->BuffFadeBySpellID(847);
+        }
+        $npc->RemoveMeleeProc(5234);
+        $npc->RemoveMeleeProc(848);
     }
 
     return $total_focus_scale;
@@ -390,7 +394,6 @@ sub SAVE_PET_STATS
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             $owner->SetBucket("pet_$stat", $pet->GetNPCStat($stat));
-            my $petstat = $pet->GetNPCStat($stat);
         }
         
         $owner->SetBucket("pet_race", $pet->GetBaseRace());
@@ -405,6 +408,15 @@ sub UPDATE_PET_STATS
     if ($owner) {
         # Create Scalar.
         my $pet_scalar = APPLY_FOCUS();
+
+        # This is so damned weird. The value reported by GetNPCStat is 40x lower than the 'real' value.
+        # this is actually correct to set pet's speed to slightly faster than owner's.
+        my $owner_speed = $owner->GetRunspeed() + 20;
+        my $pet_speed = $pet->GetNPCStat("runspeed")*40;
+
+        if ($owner_speed > $pet_speed) {            
+            $pet->ModifyNPCStat("runspeed", $owner_speed/40);
+        }        
 
         my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
@@ -431,9 +443,10 @@ sub UPDATE_PET_STATS
                     if ($equipment_id > 0) {        
                         my $damage = $npc->GetItemStat($equipment_id, "damage");
                         my $delay = $npc->GetItemStat($equipment_id, "delay");
-                        my $ratio = $damage / $delay;
-
-                        $damage_bonus += $ratio;
+                        if ($delay > 0) {
+                            my $ratio = $damage / $delay;
+                            $damage_bonus += $ratio;
+                        }                        
                     }
                 }
                 $damage_bonus = $damage_bonus/2 * $npc->GetLevel();
