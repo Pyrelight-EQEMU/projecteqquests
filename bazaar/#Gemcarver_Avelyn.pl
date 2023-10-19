@@ -37,10 +37,17 @@ sub EVENT_ITEM {
    foreach my $item_id (keys %itemcount) {
       if ($item_id != 0) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-         quest::debug(is_global_aug($item_id));
+         my $item_name = quest::varlink($item_id);
+         my $reponse = "Alright then, let's take a look at this [$item_name].";
 
-         delete $itemcount{$item_id};
-         $client->SummonItem(get_global_aug());
+         my $proc_id = quest::getitemstat($item_id, 'proceffect');
+         if ($proc_id > 0) {
+            my $binding_id = get_binding($item_id);
+            my $binding_name = quest::varlink($binding_id);
+            $response .= " I see an [$binding_name] that I can extract."
+         }
+
+         plugin::NPCTell($response);
       }
    }
 
@@ -86,4 +93,17 @@ sub get_global_aug {
 
     $dbh->disconnect();
     return $random_item_id;
+}
+
+sub get_binding() {
+   my $item_id = shift;
+   my $item_name = quest::getitemname($item_id);
+
+   my $dbh = plugin::LoadMysql();
+
+   my $sth = $dbh->prepare("SELECT id FROM items WHERE lore = ? AND id >= 920000 AND id < 999999 AND proceffect > 0 AND itemtype = 54");
+   $sth->execute($item_name);
+
+   $dbh->disconnect();
+   return $sth->fetchrow_array || 0;
 }
