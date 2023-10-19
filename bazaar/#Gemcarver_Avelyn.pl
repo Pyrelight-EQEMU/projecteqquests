@@ -1,6 +1,7 @@
 sub EVENT_SAY {
    my $response = "";
    my $clientName = $client->GetCleanName();
+   my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;
 
    my $link_services = "[".quest::saylink("link_services", 1, "services")."]";
    my $link_services_2 = "[".quest::saylink("link_services", 1, "do for you")."]";
@@ -15,8 +16,15 @@ sub EVENT_SAY {
       }    
    }
 
-   elsif ($text eq "link_glamour_stone") {
-      $response = "If you are interested in a $link_glamour_stone, simply hand me the item or items which you'd like me to duplic asking me to duplicate.";
+   elsif ($text eq "link_cancel") {
+      my $item_id = $work_order;
+      if ($work_order and item_exists_in_db($item_id)) {
+         $client->SummonItem($item_id);
+         $client->DeleteBucket("Artificer-WorkOrder");
+         plugin::NPCTell("No problem! Here, have this back.");
+      } else {
+         plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
+      }
    }
 
    if ($response ne "") {
