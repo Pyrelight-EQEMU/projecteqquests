@@ -38,7 +38,7 @@ sub EVENT_ITEM {
       if ($item_id != 0) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
          my $item_name = quest::varlink($item_id);
-         my $reponse = "Alright then, let's take a look at this [$item_name].";
+         my $response = "Alright then, let's take a look at this [$item_name].";
 
          my $proc_id = quest::getitemstat($item_id, 'proceffect');
          if ($proc_id > 0) {
