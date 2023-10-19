@@ -357,7 +357,16 @@ sub APPLY_FOCUS {
     my $true_race = $owner->GetBucket("pet_race");
 
     #Mage Epic 1.0 - Orb of Mastery
-    if ($owner->GetClass() == 13 && $inventory->HasItemEquippedByID(28034)) {
+    my $mage_epic = 0;
+
+    foreach my $i (0..10) {
+        if ($inventory->HasAugmentEquippedByID(28034 + ($i * 1000000))) {
+            $mage_epic = 1;
+            last; # Exit the loop if we found the item
+        }
+    }
+
+    if ($mage_epic) {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());
             $npc->AddMeleeProc(5234, 100);
