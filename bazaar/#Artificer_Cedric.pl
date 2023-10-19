@@ -31,7 +31,8 @@ sub EVENT_ITEM {
                             my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
                             my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
                             plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
-                            plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
+                            plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
+                                                any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
                             $client->SetBucket("Artificer-WorkOrder", $item_id);
                             return;
                         } else {
@@ -39,7 +40,8 @@ sub EVENT_ITEM {
                             plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
                         }
                     } else {
-                        plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. Seek them out, and return to me.");
+                        plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. 
+                                        Seek them out, and return to me.");
                     }
                 } else {
                     plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
@@ -101,7 +103,8 @@ sub EVENT_SAY {
 
     if($text=~/hail/i) {
         if (!$client->GetBucket("CedricVisit")) {
-            plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
+            plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the 
+                            properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
         } else {
             plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
             plugin::NPCTell("Ah, it's you again, $clientName. Do you have $link_equipment that needs to be enhanced? Do you need extra $link_concentrated_mana_crystals?");
@@ -117,15 +120,18 @@ sub EVENT_SAY {
 
     elsif ($text eq "link_concentrated_mana_crystals") {
         plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
-        plugin::NPCTell("These mana crystals can be somewhat hard to locate. If you have trouble finding enough, I have a reasonable supply that I am willing to trade for your $link_aa_points or even mere $link_platinum.");        
+        plugin::NPCTell("These mana crystals can be somewhat hard to locate. If you have trouble finding enough, I have a reasonable supply that I am 
+                        willing to trade for your $link_aa_points or even mere $link_platinum.");        
     }
 
     elsif ($text eq "link_platinum") {
-        plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with platinum, simply hand the coins to me. I will credit you with one crystal for each 500 coins.");
+        plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with platinum, simply hand the coins to me. I will credit you with one 
+                        crystal for each 500 coins.");
     }
 
     elsif ($text eq "link_aa_points") {
-        plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with temporal energy, simply say the word. I can $link_siphon_10, $link_siphon_100, or $link_siphon_all and credit you with one crystal for each point removed.");
+        plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with temporal energy, simply say the word. 
+                        I can $link_siphon_10, $link_siphon_100, or $link_siphon_all and credit you with one crystal for each point removed.");
     }
 
     elsif ($text eq "link_siphon_10") {
