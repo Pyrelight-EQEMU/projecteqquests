@@ -48,7 +48,7 @@ sub EVENT_ITEM {
             if ($proc_id > 0) {
                my $binding_id = get_binding($item_id);
                my $binding_name = quest::varlink($binding_id);
-               $response .= " I see an [$binding_name] that I can extract."
+               $response .= " I see an [$binding_name] that I can extract.";
                $client->SetBucket("Gemcarver-WorkOrder", $item_id);
             }
 
@@ -56,7 +56,7 @@ sub EVENT_ITEM {
             if ($proc_id > 0) {
                my $spellstone_id = get_spellstone($item_id);
                my $spellstone_name = quest::varlink($spellstone_id);
-               $response .= " I see an [$spellstone_name] that I can extract."
+               $response .= " I see an [$spellstone_name] that I can extract.";
                $client->SetBucket("Gemcarver-WorkOrder", $item_id);
             }
 
@@ -64,7 +64,7 @@ sub EVENT_ITEM {
             if ($proc_id > 0) {
                my $glyph_id = get_glyph($item_id);
                my $glyph_name = quest::varlink($spellstone_id);
-               $response .= " I see an [$glyph_name] that I can extract."
+               $response .= " I see an [$glyph_name] that I can extract.";
                $client->SetBucket("Gemcarver-WorkOrder", $item_id);
             }
 
