@@ -1,19 +1,31 @@
 sub EVENT_SAY {
    my $response = "";
    my $clientName = $client->GetCleanName();
-   my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;
+   my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;s
+   my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
 
-   my $link_services = "[".quest::saylink("link_services", 1, "services")."]";
-   my $link_services_2 = "[".quest::saylink("link_services", 1, "do for you")."]";
-   my $link_glamour_stone = "[".quest::saylink("link_glamour_stone", 1, "Glamour-Stone")."]";
-   my $link_custom_work = "[".quest::saylink("link_custom_work", 1, "custom enchantments")."]";
+   my $link_spellstones_glyphs_bindings = "[".quest::saylink("link_spellstones_glyphs_bindings", 1, "Spellstones, Glyphs, and Bindings")."]";
+   my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
 
    if($text=~/hail/i) {
       if (!$client->GetBucket("Avelyn")) {
-         $response = "Hail, $clientName. I carve $link_spellstones, pretty simple. I can imbue ";
+         plugin::NPCTell("Hail, $clientName. I ply my trade here in the bazaar, extracting the magical essence of artifacts. I can create a variety of 
+         $link_spellstones_glyphs_bindings, each allowing you to augment the abilities of a different item.");
       } else {
-         $response = "Welcome back, $clientName. Do you need a $link_spellstones? ";
+         plugin::YellowText("You currently have $CMC_Available Concentrated Mana Crystals available.");
+         plugin::NPCTell("Welcome back, $clientName. Do you need $link_spellstones_glyphs_bindings?");
       }    
+   }
+
+   elseif ($text eq "link_spellstones_glyphs_bindings") {
+      plugin::NPCTell("They are magical augments, each containing one type of active effect from an artifact. Spellstones allow you to cast a spell, Glyphs enhance
+                     your existing spells, and Bindings produce an effect when you strike your enemy. There is, however, a cost in $link_concentrated_mana_crystals 
+                     for my services. If you'd like me to evaluate an item, simply hand it to me.");
+   }
+
+   elseif ($text eq "link_concentrated_mana_crystals") {
+      plugin::NPCTell("These are stones absolutely brimming with magical energy. I don't carry a supply of them, but my friend Artificer Cedric can help you out.
+                     You may also have luck exploring the world and taking them from various opponents.");
    }
 
    elsif ($text eq "link_cancel") {
@@ -25,10 +37,6 @@ sub EVENT_SAY {
       } else {
          plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
       }
-   }
-
-   if ($response ne "") {
-      plugin::NPCTell($response);
    }
 }
 
@@ -45,65 +53,57 @@ sub EVENT_ITEM {
 
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
 
-   if ($work_order == 0) {
-      foreach my $item_id (keys %itemcount) {
-         if ($item_id != 0) {
-               quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-               my $item_name = quest::varlink($item_id);
-               my $base_id = plugin::get_base_id($item_id);
-               my $found_work = 0;
+    if ($work_order == 0) {
+        if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
+            if ($total_money > 0) {
+                plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
+            } elsif ($itemcount{'0'} < 3) {             
+                plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
+            } else {
+                foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
+                  # Handle items here
+                }
+            }
 
-               my $binding    = get_binding($base_id);
-               my $glyph      = get_glyph($base_id);
-               my $spellstone = get_spellstone($base_id);
+        } else {               
+            my $earned_points = 0;
 
-               quest::debug ("$binding : $glyph : $spellstone");
+            while ($total_money >= (500 * 1000)) {
+                $total_money = $total_money - (500 * 1000);
+                $earned_points++;
+                $CMC_Available++;
+            }
 
-               my @found_items;
-               
-               push(@found_items, "a [" . quest::varlink($binding) . "]"    ) if $binding;
-               push(@found_items, "a [" . quest::varlink($glyph) . "]"      ) if $glyph;
-               push(@found_items, "a [" . quest::varlink($spellstone) . "]" ) if $spellstone;
+            if ($earned_points > 0) {
+                plugin::YellowText("You currently have $CMC_Available Concentrated Mana Crystals available.");
+                if ($total_money > 0) {
+                    plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
+                } else {
+                    plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+                }
+                $client->SetBucket("Artificer_CMC", $CMC_Available);
+            } else {
+                plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
+            }
 
-               if (@found_items) {
-                  my $last_item = pop(@found_items);
-                  my $response = "Alright then, let's take a look at this [$item_name]. I found ";
-                  
-                  if (@found_items) {
-                     $response .= join(", ", @found_items) . ", and " . $last_item . ".";
-                  } else {
-                     $response .= $last_item . ".";
-                  }
-                  
-                  $client->SetBucket("Gemcarver-WorkOrder", $item_id);
-                  $found_work = 1;
-                  plugin::NPCTell($response);
-               }
+            # After processing all items, return any remaining money
+            my $platinum_remainder = int($total_money / 1000);
+            $total_money %= 1000;
 
-               unless ($found_work) {
-                  my $response = "I'm sorry, $clientName. I don't see anything that I can extract from [$item_name] for you.";
-                  plugin::NPCTell($response);
-               }
-         }
-      }
-   } else {
+            my $gold_remainder = int($total_money / 100);
+            $total_money %= 100;
+
+            my $silver_remainder = int($total_money / 10);
+            $total_money %= 10;
+
+            my $copper_remainder = $total_money;
+
+            $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
+        }
+    } else {
       plugin::NPCTell("I'm sorry, $clientName, but I already have a work order in progress for you. Please $link_proceed or $link_cancel it before giving me another item.");
-   }
-
-    # After processing all items, return any remaining money
-    my $platinum_remainder = int($total_money / 1000);
-    $total_money %= 1000;
-
-    my $gold_remainder = int($total_money / 100);
-    $total_money %= 100;
-
-    my $silver_remainder = int($total_money / 10);
-    $total_money %= 10;
-
-    my $copper_remainder = $total_money;
-
-    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
-    plugin::return_items(\%itemcount); 
+    }
+    plugin::return_items_silent(\%itemcount);
 }
 
 sub is_global_aug {
