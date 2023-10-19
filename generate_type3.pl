@@ -78,7 +78,7 @@ my @possible_icons = (967, 1562..1469);
 # Start inserting with ID 901000
 my $new_id = 920000;
 
-while (my $row = $select_query->fetchrow_hashref() && $row{itemtype} != 54) {
+while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
     my $hash = md5_hex($row->{id});
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
