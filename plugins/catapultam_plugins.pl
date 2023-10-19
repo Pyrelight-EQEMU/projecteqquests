@@ -453,6 +453,12 @@ sub is_item_upgradable {
     return item_exists_in_db($next_tier_item_id);
 }
 
+# Returns the base ID of an item
+sub get_base_id {
+    my $item_id = shift;
+    return $item_id % 1000000; # Assuming item IDs increment by 1000000 per tier
+}
+
 sub get_continent_fix {
     my %zone_to_continent = (
 
