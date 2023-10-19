@@ -60,7 +60,7 @@ sub EVENT_ITEM {
     quest::exp(10000);
     quest::summonitem(18087); #Tome of Instruction
   }
-  elsif(plugin::check_handin(\%itemcount, 20652 => 1)) { #Gkzzallk in a Box
+  elsif($client->GetClass() == 11 and plugin::check_handin(\%itemcount, 20652 => 1)) { #Gkzzallk in a Box
     quest::emote("grins wildly and his eyes flare a deep red. The scythe he promised you flies through the air and into your hand. 'Enjoy your toy, I have no more need of you as a servant.'");
     quest::exp(10000);
     quest::summonitem(20544); #Scythe of the Shadowed Soul

@@ -14,7 +14,7 @@ sub EVENT_SAY {
 sub EVENT_ITEM {
   $faction = $client->GetCharacterFactionLevel(404); #True Spirit
   if ($faction >= 82) {
-    if (plugin::check_handin(\%itemcount, 14384 => 1)) { #Lhranc's Token
+    if ($client->GetClass() == 5 and plugin::check_handin(\%itemcount, 14384 => 1)) { #Lhranc's Token
       quest::say("Very good, I will go deliver this right away.");
       quest::summonitem(14383); #Innoruuk's Curse
       quest::depop();
