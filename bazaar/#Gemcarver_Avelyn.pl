@@ -24,7 +24,6 @@ sub EVENT_SAY {
    }
 
    elsif ($text eq "link_concentrated_mana_crystals") {
-      plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
       plugin::NPCTell("These mana crystals can be somewhat hard to locate. If you have trouble finding enough, I have a reasonable supply that I am 
                      willing to trade for your $link_aa_points or even mere $link_platinum.");        
    }
@@ -74,7 +73,7 @@ sub EVENT_SAY {
    }
 
    elsif ($text eq "link_cancel") {
-      my $item_id = $client->GetBucket("Artificer-WorkOrder");
+      my $item_id = $client->GetBucket("Gemcarver-WorkOrder");
       if (item_exists_in_db($item_id)) {
          $client->SummonItem($item_id);
          $client->DeleteBucket("Gemcarver-WorkOrder");
@@ -85,7 +84,7 @@ sub EVENT_SAY {
    }
 
    elsif ($text eq "link_proceed") {
-      my $item_id = $client->GetBucket("Artificer-WorkOrder");
+      my $item_id = $client->GetBucket("Gemcarver-WorkOrder");
       if (item_exists_in_db($item_id)) {            
          if ((grep { $_ == $item_id } @epics)) {
                $client->SummonItem($item_id + 1000000);
