@@ -35,6 +35,7 @@ sub EVENT_ITEM {
                         plugin::NPCTell("I'd be happy to take this in trade. Here, try this one on for size!");
                         plugin::spend_cmc($trade_cost);
                         $client->SummonItem(get_global_aug(), 1, 1);
+                        return;
                      } else {
                          plugin::NPCTell("I'd be happy to take this in trade, but I do require $trade_cost $link_converted_mana_crystals.");
                      }
