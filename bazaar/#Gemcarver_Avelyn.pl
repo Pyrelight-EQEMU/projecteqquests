@@ -355,6 +355,8 @@ sub get_augs {
     my @item_ids;
     while (my $row = $sth->fetchrow_hashref()) {
         push @item_ids, $row->{id};
+        my $id = $row->{id};
+        quest::debug("id: $id");
     }
 
     # Cleanup
