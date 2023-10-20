@@ -418,13 +418,13 @@ sub UPDATE_PET_STATS
             $pet->ModifyNPCStat("runspeed", $owner_speed/40);
         }
 
-        my $pet_hstr = 0;
-        my $pet_hsta = 0;
-        my $pet_hagi = 0;
-        my $pet_hdex = 0;
-        my $pet_hint = 0;
-        my $pet_hwis = 0;
-        my $pet_hcha = 0;
+        my $pet_hstr = $owner->GetItemBonuses()->GetHeroicSTR();
+        my $pet_hsta = $owner->GetItemBonuses()->GetHeroicSTA();
+        my $pet_hagi = $owner->GetItemBonuses()->GetHeroicAGI();
+        my $pet_hdex = $owner->GetItemBonuses()->GetHeroicDEX();
+        my $pet_hint = $owner->GetItemBonuses()->GetHeroicINT();
+        my $pet_hwis = $owner->GetItemBonuses()->GetHeroicWIS();
+        my $pet_hcha = $owner->GetItemBonuses()->GetHeroicCHA();
         my $pet_hstat_total = 0;
 
         # Fetching pet's inventory
@@ -446,15 +446,15 @@ sub UPDATE_PET_STATS
             my $bucket_value = $owner->GetBucket("pet_$stat") || 0;
 
             if ($stat eq 'max_hp') {
-                $bucket_value += 20 * ($owner->GetItemBonuses()->GetHeroicSTA() + $pet_hsta);                            
+                $bucket_value += 20 * ($pet_hsta);                            
             }
 
             if ($stat eq 'avoidance') {
-                $bucket_value += $pet_hagi;
+                $bucket_value += 2 * $pet_hagi;
             }
 
             if ($stat eq 'ac') {
-                $bucket_value += 5* $pet_hagi;
+                $bucket_value += 10 * $pet_hagi;
             }
 
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
