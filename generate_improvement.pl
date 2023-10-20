@@ -114,7 +114,11 @@ for my $tier (1..10) {
 				}
 
                 $row->{attuneable} = 1;
-                $row->{attuneable} = 1;
+                $row->{nodrop} = 1;
+
+                if ($row->{skillmodvalue} > 0 && $row->{skillmodmax} > 0) {
+                    $row->{skillmodmax} = $row->{skillmodmax} + ceil($row->{skillmodmax}*$modifier);
+                }
 				
 				# Basic Stats                                
                 if ($row->{damage} > 0) {
