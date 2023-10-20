@@ -65,7 +65,7 @@ sub EVENT_ITEM {
                             plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                         }
                     } else {
-                        plugin::NPCTell("This item is as strong as I could possibly make it, $cientName");
+                        plugin::NPCTell("This item is as strong as I could possibly make it, $clientName");
                     }
                 }
             }

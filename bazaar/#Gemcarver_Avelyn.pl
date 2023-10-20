@@ -53,7 +53,7 @@ sub EVENT_ITEM {
                               $response .= "and " . quest::varlink($augs[-1]) . ".";
                            }
                      
-                           $response .= " It will cost you $cost Concentrated Mana Crystals");
+                           $response .= " It will cost you $cost Concentrated Mana Crystals";
                            if ($CMC_Available >= $cost) {
                               plugin::NPCTell($response . ". Would you like to $link_proceed, or $link_cancel?");
                               $client->SetBucket("Gemcarver-WorkOrder", $item_id);
