@@ -5,7 +5,7 @@ sub EVENT_SAY {
    my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
 
    my $link_spellstones_glyphs_bindings = "[".quest::saylink("link_spellstones_glyphs_bindings", 1, "Spellstones, Glyphs, and Bindings")."]";
-   my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
+   my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
    my $link_aa_points = "[".quest::saylink("link_aa_points", 1, "temporal energy (AA Points)")."]";
    my $link_platinum = "[".quest::saylink("link_platinum", 1, "platinum")."]";
    my $link_siphon_10 = "[".quest::saylink("link_siphon_10", 1, "siphon 10 points")."]";
