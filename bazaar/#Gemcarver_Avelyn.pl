@@ -17,7 +17,7 @@ sub EVENT_SAY {
       }    
    }
 
-   elseif ($text eq "link_spellstones_glyphs_bindings") {
+   elsif ($text eq "link_spellstones_glyphs_bindings") {
       plugin::NPCTell("They are magical augments, each containing one type of active effect from an artifact. Spellstones allow you to cast a spell, Glyphs enhance
                      your existing spells, and Bindings produce an effect when you strike your enemy. There is, however, a cost in $link_concentrated_mana_crystals 
                      for my services. If you'd like me to evaluate an item, simply hand it to me.");
