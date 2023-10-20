@@ -34,13 +34,13 @@ sub EVENT_ITEM {
 
                             if ($CMC_Available >= $epic_cost) {
                                 $message .= "Would you like to $link_proceed or $link_cancel?";
-                                $client->SetBucket("Artificer-WorkOrder", $item_id);
-                                return;                                
+                                $client->SetBucket("Artificer-WorkOrder", $item_id);                                                              
                             } else {
                                 $message .= "However, you only have $CMC_Available right now. I can help you $link_obtain_more";
                             }
 
                             plugin::NPCTell($message);
+                            return;  
                         } elsif (is_item_upgradable($item_id)) {                        
                             if ($test_result->{success}) {
                                 my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
