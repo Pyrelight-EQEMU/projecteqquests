@@ -10,10 +10,12 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;
 
-    my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
-    my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
-    my $link_obtain_more = "[".quest::saylink("link_obtain_more", 1, "obtain more")."]";
-    my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
+    my $link_proceed                      = "[".quest::saylink("link_proceed", 1, "proceed")."]";
+    my $link_cancel                       = "[".quest::saylink("link_cancel", 1, "cancel")."]";
+    my $link_obtain_more                  = "[".quest::saylink("link_obtain_more", 1, "obtain more")."]";
+    my $link_concentrated_mana_crystals   = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
+      my $link_bindings_glyphs_and_spells = "[".quest::saylink("link_bindings_glyphs_and_spells", 1, "Bindings, Glyphs, and Spells")."]";
+    my $link_trade                        = "[".quest::saylink("link_trade", 1, "trade")."]";
 
     if ($work_order == 0) {
         if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
@@ -119,6 +121,8 @@ sub EVENT_SAY {
     my $link_siphon_all                 = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
     my $link_proceed                    = "[".quest::saylink("link_proceed", 1, "proceed")."]";
     my $link_cancel                     = "[".quest::saylink("link_cancel", 1, "cancel")."]";
+    my $link_bindings_glyphs_and_spells = "[".quest::saylink("link_bindings_glyphs_and_spells", 1, "Bindings, Glyphs, and Spells")."]";
+    my $link_trade                      = "[".quest::saylink("link_trade", 1, "trade")."]";
 
     if($text=~/hail/i) {
         if ($item_id) {
