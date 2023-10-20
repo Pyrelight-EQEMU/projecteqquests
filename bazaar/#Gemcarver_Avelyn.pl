@@ -226,6 +226,8 @@ sub EVENT_SAY {
             my @augs = @{ get_augs($base_id) };
             my $cost = get_upgrade_cost($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
             my $cmc  = plugin::get_cmc();
+            my $num = scalar @augs;
+            quest::debug("$cost, $cmc, $num");
             if (scalar @augs && $cmc >= $cost) {
                plugin::NPCTell("Excellent, lets do it.");
                plugin::spend_cmc($cost);
