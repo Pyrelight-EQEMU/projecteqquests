@@ -147,6 +147,12 @@ sub EVENT_SAY {
       $client->SetBucket("AvelynVisit", 1);
    }
 
+   elsif ($text eq "link_equipment") {
+      plugin::NPCTell("If you stumble upon augments out in the world, they may be ones that I want to add to my collection. Bring me an augment, and spend one whole
+                     $link_concentrated_mana_crystal and I'll give you a new, random one in return.");
+      $client->SetBucket("AvelynVisit", 1);
+   }
+
    elsif ($text eq "link_bindings_glyphs_and_spells") {
       plugin::NPCTell("It's a dance of magic and essence. Combat effects transform into the Eldritch Bindings, while Focus effects take the form of Glyphs. And the 
                      Activated ones? They become Spellstones. Would you like me to look at your $link_equipment?");
