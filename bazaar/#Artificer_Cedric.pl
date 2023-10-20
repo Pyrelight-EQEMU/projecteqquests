@@ -30,11 +30,17 @@ sub EVENT_ITEM {
 
                         if ((grep { $_ == $base_id } @epics)) {
                             my $epic_cost = 100 * (get_upgrade_tier($item_id)+1);
+                            my $message = "Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment in $link_concentrated_mana_crystals - I'll need $epic_cost, in fact. ";
 
-                            plugin::NPCTell("Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment in
-                                            $link_concentrated_mana_crystals - I'll need $epic_cost, in fact. Would you like to $link_proceed or $link_cancel?");
-                            $client->SetBucket("Artificer-WorkOrder", $item_id);
-                            delete $item_counts{$item_id};
+                            if ($CMC_Available >= $epic_cost) {
+                                $message .= "Would you like to $link_proceed or $link_cancel?";
+                                $client->SetBucket("Artificer-WorkOrder", $item_id);
+                                delete $item_counts{$item_id};
+                            } else {
+                                $message .= "However, you only have $CMC_Available right now. I can help you $link_obtain_more";
+                            }
+
+                            plugin::NPCTell($message);
                         } elsif (is_item_upgradable($item_id)) {                        
                             if ($test_result->{success}) {
                                 my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
@@ -191,14 +197,23 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_proceed") {
-        my $item_id = $client->GetBucket("Artificer-WorkOrder");
-        if (item_exists_in_db($item_id)) {            
-            if ((grep { $_ == $item_id } @epics)) {
+        my $item_id = $client->GetBucket("Artificer-WorkOrder");        
+        if (item_exists_in_db($item_id) and item_exists_in_db($item_id + 1000000)) {            
+            my $base_id     = get_base_id($item_id); 
+            my $epic_cost   = (get_upgrade_tier($item_id)+1) * 100;
+            if ((grep { $_ == $base_id } @epics) and plugin::get_cmc() <= $epic_cost) {                
+                plugin::spend_cmc($epic_cost);
                 $client->SummonItem($item_id + 1000000);
             } else {
-                execute_upgrade($item_id);
-            }
-            $client->DeleteBucket("Artificer-WorkOrder");
+                my $test_result = test_upgrade($current_item_id);
+                if ($test_result->{success} and plugin::get_cmc() >= $test_result->{total_cost}) {
+                    execute_upgrade($item_id);
+                    $client->DeleteBucket("Artificer-WorkOrder");
+                } else {
+                    plugin::NPCTell("I'm sorry, but you don't have the resources on you or in your bank in order to complete 
+                                    that upgrade. Obtain more items or $link_concentrated_mana_crystals.");
+                } 
+            }    
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
         }
@@ -366,9 +381,6 @@ sub test_upgrade {
 
 sub execute_upgrade {
     my ($current_item_id, $is_recursive, $virtual_inventory, $ledger) = @_;
-    
-    my $test_result = test_upgrade($current_item_id) unless $is_recursive;
-
     if ($is_recursive or ($test_result->{success} && $test_result->{total_cost} <= plugin::get_cmc())) {
 
         my $target_item_id = get_next_upgrade_id($current_item_id);
