@@ -1,7 +1,6 @@
 use Data::Dumper;
 use POSIX;
 
-my $combo_count = 3;
 my @epics    = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
 sub EVENT_ITEM {
@@ -127,7 +126,7 @@ sub EVENT_SAY {
             my $itemlink = quest::varlink($item_id);
             plugin::NPCTell("Greetings, $clientName, would you like to $link_proceed or $link_cancel your work order to upgrade [$itemlink]?");
         } elsif (!$client->GetBucket("CedricVisit")) {
-            plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the 
+            plugin::NPCTell("Greetings, $clientName, I am Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the 
                             properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
         } else {            
             plugin::NPCTell("Ah, it's you again, $clientName. Do you have $link_equipment that needs to be enhanced? Do you need extra $link_concentrated_mana_crystals?");
