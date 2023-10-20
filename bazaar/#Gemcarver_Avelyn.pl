@@ -23,17 +23,76 @@ sub EVENT_SAY {
                      for my services. If you'd like me to evaluate an item, simply hand it to me.");
    }
 
-   elseif ($text eq "link_concentrated_mana_crystals") {
-      plugin::NPCTell("These are stones absolutely brimming with magical energy. I don't carry a supply of them, but my friend Artificer Cedric can help you out.
-                     You may also have luck exploring the world and taking them from various opponents.");
+   elsif ($text eq "link_concentrated_mana_crystals") {
+      plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
+      plugin::NPCTell("These mana crystals can be somewhat hard to locate. If you have trouble finding enough, I have a reasonable supply that I am 
+                     willing to trade for your $link_aa_points or even mere $link_platinum.");        
+   }
+
+   elsif ($text eq "link_platinum") {
+      plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with platinum, simply hand the coins to me. I will credit you with one 
+                     crystal for each 500 coins.");
+   }
+
+   elsif ($text eq "link_aa_points") {
+      plugin::NPCTell("If you want to buy $link_concentrated_mana_crystals with temporal energy, simply say the word. 
+                     I can $link_siphon_10, $link_siphon_100, or $link_siphon_all and credit you with one crystal for each point removed.");
+   }
+
+   elsif ($text eq "link_siphon_10") {
+      if ($client->GetAAPoints() >= 10) {
+         $client->SetAAPoints($client->GetAAPoints() - 10);
+         $client->SetBucket("Artificer_CMC", $CMC_Points + 10);
+         plugin::YellowText("You have LOST 10 Alternate Advancement points!");
+         plugin::NPCTell("Ahh. Excellent. I've added ten crystals under your name to my ledger.");
+      } else {
+         plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
+      }
+   }
+
+   elsif ($text eq "link_siphon_100") {
+      if ($client->GetAAPoints() >= 100) {
+         $client->SetAAPoints($client->GetAAPoints() - 100);
+         $client->SetBucket("Artificer_CMC", $CMC_Points + 100);
+         plugin::YellowText("You have LOST 100 Alternate Advancement points!");
+         plugin::NPCTell("Ahh. Excellent. I've added one hundred crystals under your name to my ledger.");
+      } else {
+         plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
+      }
+   }
+
+   elsif ($text eq "link_siphon_all") {
+      if ($client->GetAAPoints() >= 1) {
+         my $aa_drained = $client->GetAAPoints();
+         $client->SetAAPoints(0);
+         $client->SetBucket("Artificer_CMC", $CMC_Points + $aa_drained);
+         plugin::YellowText("You have LOST $aa_drained Alternate Advancement points!");
+         plugin::NPCTell("Ahh. Excellent. I've added $aa_drained crystals under your name to my ledger.");
+      } else {
+         plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
+      }
    }
 
    elsif ($text eq "link_cancel") {
-      my $item_id = $work_order;
-      if ($work_order and plugin::item_exists_in_db($item_id)) {
+      my $item_id = $client->GetBucket("Artificer-WorkOrder");
+      if (item_exists_in_db($item_id)) {
          $client->SummonItem($item_id);
          $client->DeleteBucket("Gemcarver-WorkOrder");
          plugin::NPCTell("No problem! Here, have this back.");
+      } else {
+         plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
+      }
+   }
+
+   elsif ($text eq "link_proceed") {
+      my $item_id = $client->GetBucket("Artificer-WorkOrder");
+      if (item_exists_in_db($item_id)) {            
+         if ((grep { $_ == $item_id } @epics)) {
+               $client->SummonItem($item_id + 1000000);
+         } else {
+               execute_upgrade($item_id);
+         }
+         $client->DeleteBucket("Gemcarver-WorkOrder");
       } else {
          plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
       }
