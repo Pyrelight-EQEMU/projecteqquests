@@ -454,7 +454,7 @@ sub UPDATE_PET_STATS
             }
 
             if ($stat eq 'ac') {
-                $bucket_value += $pet_hagi;
+                $bucket_value += 5* $pet_hagi;
             }
 
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
