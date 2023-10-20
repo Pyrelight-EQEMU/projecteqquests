@@ -119,6 +119,8 @@ sub EVENT_SAY {
     my $link_siphon_10                  = "[".quest::saylink("link_siphon_10", 1, "siphon 10 points")."]";
     my $link_siphon_100                 = "[".quest::saylink("link_siphon_100", 1, "siphon 100 points")."]";
     my $link_siphon_all                 = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
+    my $link_proceed                    = "[".quest::saylink("link_proceed", 1, "proceed")."]";
+    my $link_cancel                     = "[".quest::saylink("link_cancel", 1, "cancel")."]";
 
     if($text=~/hail/i) {
         if ($item_id) {
