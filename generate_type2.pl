@@ -99,7 +99,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $base_data->{idfile} = 'IT63';
     $base_data->{icon} = $possible_icons[$index];
     $base_data->{lore} = $row->{Name};
-    $base_data->{click_type} = 4;
+    $base_data->{clicktype} = 4;
 
     # Construct dynamic SQL for insertion
     my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
