@@ -395,7 +395,7 @@ sub execute_upgrade {
                 $ledger->{$current_item_id}--;
                 $ledger->{$target_item_id}++;
 
-                subtract_upgrade_points(get_upgrade_cost($target_item_id));
+                plugin::spend_cmc(get_upgrade_cost($target_item_id));
 
                 #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
             }
