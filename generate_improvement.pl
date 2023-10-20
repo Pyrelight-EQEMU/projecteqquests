@@ -103,8 +103,8 @@ for my $tier (1..10) {
 
                 next if $all_zero; # Skip to next iteration if all values are zero or less
 
-                my $modifier 	   = ceil($tier * 0.33);
-                my $modifier_minor = ceil($modifier/2);
+                my $modifier 	   = $tier * 0.33;
+                my $modifier_minor = $modifier/2;
 				
 				# Name & ID
 				$row->{id} = $row->{id} + (1000000 * $tier);
