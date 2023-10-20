@@ -123,12 +123,17 @@ for my $tier (1..10) {
                 $row->{skillmodvalue} = $row->{skillmodvalue} + ($row->{skillmodvalue}*$modifier);
 				
 				# Basic Stats                                
-                if ($row->{damage} > 0) {
-                    if ($row->{itemtype} != 54) {
-                        $row->{damage} = $row->{damage} + max($tier,floor($row->{damage} * $modifier_minor / 2));
-                    } else {
-                        $row->{damage} = $row->{damage} + $tier;
-                    }
+                if ($row->{damage} > 0 && $row->{delay} > 0 && $row->{itemtype} != 54) {
+                    my $current_ratio = $row->{damage} / $row->{delay};  # Calculate the current damage/delay ratio
+                    my $new_ratio = $current_ratio * (1 + $modifier);   # Compute the new ratio
+
+                    # Calculate the additional damage required to achieve the new ratio
+                    my $additional_damage = ($new_ratio * $row->{delay}) - $row->{damage};
+                    
+                    $row->{damage} = max($tier, $row->{damage} + $additional_damage);
+                    
+                } elsif ($row->{itemtype} == 54) {
+                    $row->{damage} = $row->{damage} + $tier;
                 }
 
                 if ($row->{proceffect} > 0) {
