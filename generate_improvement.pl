@@ -118,7 +118,9 @@ for my $tier (1..10) {
 
                 if ($row->{skillmodvalue} > 0 && $row->{skillmodmax} > 0) {
                     $row->{skillmodmax} = $row->{skillmodmax} + ceil($row->{skillmodmax}*$modifier);
+                    
                 }
+                $row->{skillmodvalue} = $row->{skillmodvalue} + ($row->{skillmodvalue}*$modifier);
 				
 				# Basic Stats                                
                 if ($row->{damage} > 0) {
