@@ -35,7 +35,7 @@ sub EVENT_ITEM {
                             if ($CMC_Available >= $epic_cost) {
                                 $message .= "Would you like to $link_proceed or $link_cancel?";
                                 $client->SetBucket("Artificer-WorkOrder", $item_id);
-                                delete $item_counts{$item_id};
+                                return;                                
                             } else {
                                 $message .= "However, you only have $CMC_Available right now. I can help you $link_obtain_more";
                             }
@@ -54,7 +54,7 @@ sub EVENT_ITEM {
                                     plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
                                                         any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
                                     $client->SetBucket("Artificer-WorkOrder", $item_id);
-                                    delete $item_counts{$item_id};
+                                    return; 
                                 } else {                                    
                                     plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
                                 }
