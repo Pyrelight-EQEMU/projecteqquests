@@ -446,7 +446,7 @@ sub UPDATE_PET_STATS
             my $bucket_value = $owner->GetBucket("pet_$stat") || 0;
 
             if ($stat eq 'max_hp') {
-                $bucket_value += 10 * ($owner->GetItemBonuses()->GetHeroicSTA() + $pet_hsta);                            
+                $bucket_value += 20 * ($owner->GetItemBonuses()->GetHeroicSTA() + $pet_hsta);                            
             }
 
             if ($stat eq 'avoidance') {
