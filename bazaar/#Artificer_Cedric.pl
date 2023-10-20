@@ -248,7 +248,7 @@ sub get_upgrade_tier {
 }
 
 sub is_item_upgradable {
-    my $item_id = shift or die;
+    my $item_id = shift or return 0;
 
     #shortcut if we are already an upgraded item
     if ($item_id >= 1000000) {
