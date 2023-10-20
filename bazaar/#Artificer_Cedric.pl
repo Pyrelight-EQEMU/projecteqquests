@@ -201,7 +201,7 @@ sub EVENT_SAY {
         if (item_exists_in_db($item_id) and item_exists_in_db($item_id + 1000000)) {            
             my $base_id     = get_base_id($item_id); 
             my $epic_cost   = (get_upgrade_tier($item_id)+1) * 100;
-            if ((grep { $_ == $base_id } @epics) and plugin::get_cmc() <= $epic_cost) {                
+            if ((grep { $_ == $base_id } @epics) and plugin::get_cmc() >= $epic_cost) {                
                 plugin::spend_cmc($epic_cost);
                 $client->SummonItem($item_id + 1000000);
             } else {
