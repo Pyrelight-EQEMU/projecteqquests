@@ -118,7 +118,7 @@ for my $tier (1..10) {
 				# Basic Stats                                
                 if ($row->{damage} > 0) {
                     if ($row->{itemtype} != 54) {
-                        $row->{damage} = $row->{damage} + ($tier * $row->{damage} * $modifier_half);
+                        $row->{damage} = $row->{damage} + ($tier * $row->{damage} * $modifier_minor);
                     } else {
                         $row->{damage} = $row->{damage} + $tier;
                     }
