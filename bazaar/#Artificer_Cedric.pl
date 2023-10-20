@@ -29,7 +29,7 @@ sub EVENT_ITEM {
                         my $base_id     = get_base_id($item_id);
 
                         if ((grep { $_ == $base_id } @epics)) {
-                            my $epic_cost = get_upgrade_cost($item_id) * get_upgrade_tier($item_id);
+                            my $epic_cost = get_upgrade_cost($item_id) * (get_upgrade_tier($item_id)+1);
 
                             plugin::NPCTell("Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment in
                                             $link_concentrated_mana_crystals - I'll need $epic_cost, in fact. Would you like to $link_proceed or $link_cancel?");
