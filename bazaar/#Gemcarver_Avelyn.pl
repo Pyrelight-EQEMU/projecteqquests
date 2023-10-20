@@ -1,7 +1,7 @@
 sub EVENT_SAY {
    my $response = "";
    my $clientName = $client->GetCleanName();
-   my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;s
+   my $work_order = $client->GetBucket("Gemcarver-WorkOrder") || 0;
    my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
 
    my $link_spellstones_glyphs_bindings = "[".quest::saylink("link_spellstones_glyphs_bindings", 1, "Spellstones, Glyphs, and Bindings")."]";
