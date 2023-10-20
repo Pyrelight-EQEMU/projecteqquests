@@ -103,8 +103,8 @@ for my $tier (1..10) {
 
                 next if $all_zero; # Skip to next iteration if all values are zero or less
 
-                my $modifier 	   = ($tier * 0.33);
-                my $modifier_minor = ($tier * 0.25);
+                my $modifier 	   = ceil($tier * 0.33);
+                my $modifier_minor = ceil($modifier/2);
 				
 				# Name & ID
 				$row->{id} = $row->{id} + (1000000 * $tier);
@@ -125,7 +125,7 @@ for my $tier (1..10) {
 				# Basic Stats                                
                 if ($row->{damage} > 0 && $row->{delay} > 0 && $row->{itemtype} != 54) {
                     my $current_ratio = $row->{damage} / $row->{delay};  # Calculate the current damage/delay ratio
-                    my $new_ratio = $current_ratio * (1 + $modifier);   # Compute the new ratio
+                    my $new_ratio = $current_ratio * (1 + $modifier_minor);   # Compute the new ratio
 
                     # Calculate the additional damage required to achieve the new ratio
                     my $additional_damage = ($new_ratio * $row->{delay}) - $row->{damage};
