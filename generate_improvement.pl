@@ -103,7 +103,7 @@ for my $tier (1..10) {
 
                 next if $all_zero; # Skip to next iteration if all values are zero or less
 
-                my $modifier 	   = ($tier * 0.50);
+                my $modifier 	   = ($tier * 0.33);
                 my $modifier_minor = ($tier * 0.25);
 				
 				# Name & ID
