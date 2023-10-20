@@ -44,7 +44,7 @@ sub EVENT_ITEM {
                      my $aug_count = scalar @augs;
                      my $cost = get_upgrade_cost($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
                      quest::debug("WTF? $aug_count");
-                     if (scalar @augs > 0) {
+                     if (scalar @augs > 1) {
                            my $response = "We have some interesting components here. ";                           
                            if (@augs == 1) {
                               $response .= "I see a " . quest::varlink($augs[0]) . ".";
