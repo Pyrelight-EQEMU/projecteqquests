@@ -42,7 +42,7 @@ sub EVENT_ITEM {
                   } else {
                      my @augs = @{ get_augs($base_id) };
                      my $aug_count = scalar @augs;
-                     my $cost = get_upgrade_cost($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
+                     my $cost = calculate_heroic_stat_sum($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
                      quest::debug("WTF? $aug_count");
                      if (scalar @augs) {
                            my $response = "We have some interesting components here. ";                           
@@ -231,6 +231,7 @@ sub EVENT_SAY {
                plugin::NPCTell("Excellent, lets do it.");
                plugin::spend_cmc($cost);
                foreach my $aug (@augs) {
+                  quest::debug("$aug");
                   $client->SummonItem($aug, 1, 1);                  
                }
             } elsif ($cmc < $cost) {
