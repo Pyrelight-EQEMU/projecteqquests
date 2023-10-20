@@ -147,7 +147,7 @@ sub EVENT_SAY {
       $client->SetBucket("AvelynVisit", 1);
    }
 
-   elsif ($text eq "link_equipment") {
+   elsif ($text eq "link_trade") {
       plugin::NPCTell("If you stumble upon augments out in the world, they may be ones that I want to add to my collection. Bring me an augment, and spend one whole
                      $link_concentrated_mana_crystal and I'll give you a new, random one in return.");
       $client->SetBucket("AvelynVisit", 1);
