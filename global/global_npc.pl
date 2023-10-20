@@ -450,7 +450,11 @@ sub UPDATE_PET_STATS
             }
 
             if ($stat eq 'avoidance') {
-                $bucket_value += 10 * $pet_hagi;
+                $bucket_value += $pet_hagi;
+            }
+
+            if ($stat eq 'ac') {
+                $bucket_value += $pet_hagi;
             }
 
             if ($stat eq 'max_hit' || $stat eq 'min_hit') {                
