@@ -108,7 +108,8 @@ sub EVENT_ITEM {
 
 sub EVENT_SAY {
     my $clientName = $client->GetCleanName();
-    my $CMC_Points = plugin::get_cmc();
+    my $CMC_Points = plugin::get_cmc();    
+    my $item_id = $client->GetBucket("Artificer-WorkOrder");  
 
     my $link_equipment                  = "[".quest::saylink("link_equipment", 1, "equipment")."]";
     my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
@@ -120,7 +121,10 @@ sub EVENT_SAY {
     my $link_siphon_all                 = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
 
     if($text=~/hail/i) {
-        if (!$client->GetBucket("CedricVisit")) {
+        if ($item_id) {
+            my $itemlink = quest::varlink($item_id);
+            plugin::NPCTell("Greetings, $clientName, would you like to $link_proceed or $link_cancel your work order to upgrade [$itemlink]?");
+        } elsif (!$client->GetBucket("CedricVisit")) {
             plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the 
                             properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
         } else {            
@@ -136,7 +140,7 @@ sub EVENT_SAY {
         $client->SetBucket("CedricVisit", 1);
     }
 
-    elsif ($text eq "link_obtain_more") {
+    elsif ($text eq "link_obtain_more" or $text eq "link_concentrated_mana_crystals") {
         plugin::NPCTell("These mana crystals can be somewhat hard to locate. If you have trouble finding enough, I have a reasonable supply that I am 
                         willing to trade for your $link_aa_points or even mere $link_platinum.");        
     }
@@ -196,8 +200,7 @@ sub EVENT_SAY {
         }
     }
 
-    elsif ($text eq "link_proceed") {
-        my $item_id = $client->GetBucket("Artificer-WorkOrder");        
+    elsif ($text eq "link_proceed") {      
         if (item_exists_in_db($item_id) and item_exists_in_db($item_id + 1000000)) {            
             my $base_id     = get_base_id($item_id); 
             my $epic_cost   = (get_upgrade_tier($item_id)+1) * 100;
@@ -211,8 +214,17 @@ sub EVENT_SAY {
                     execute_upgrade($item_id);
                     $client->DeleteBucket("Artificer-WorkOrder");
                 } else {
-                    plugin::NPCTell("I'm sorry, but you don't have the resources on you or in your bank in order to complete 
-                                    that upgrade. Obtain more items or $link_concentrated_mana_crystals.");
+                    my $cost = $test_result->{total_cost};
+                    my $cmc = plugin::get_cmc();
+                    my $response = "I'm sorry, $clientName. "
+                    if ($cmc < $cost) {
+                        $response .= "You do not have sufficient $link_concentrated_mana_crystals to finish this upgrade. You have $cmc, but you need $cost. "
+                    }
+                    if (not $test_result->{success}) {
+                        $response .= "You do not have sufficient materials available to complete the upgrade. Please obtain more similar items. ";
+                    }
+                    $response .= "Would you like to $link_cancel this order?";
+                    plugin::NPCTell($response);                    
                 } 
             }    
         } else {
