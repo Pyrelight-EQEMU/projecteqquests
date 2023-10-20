@@ -133,7 +133,7 @@ for my $tier (1..10) {
                     
                     $row->{damage} = max($tier, $row->{damage} + $additional_damage);
                     
-                } elsif ($row->{itemtype} == 54) {
+                } else {
                     $row->{damage} = $row->{damage} + $tier;
                 }
 
