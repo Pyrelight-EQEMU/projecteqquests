@@ -226,7 +226,7 @@ sub EVENT_SAY {
             my @augs = @{ get_augs($base_id) };
             my $cost = get_upgrade_cost($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
             my $cmc  = plugin::get_cmc();
-            if (@augs && $cmc >= $cost) {
+            if (scalar @augs && $cmc >= $cost) {
                plugin::NPCTell("Excellent, lets do it.");
                plugin::spend_cmc($cost);
                foreach my $aug (@augs) {
@@ -386,13 +386,14 @@ sub is_global_aug {
 }
 
 sub get_global_aug {
-    my $dbh = plugin::LoadMysql();
+   my $dbh = plugin::LoadMysql();
 
-    my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 ORDER BY RAND() LIMIT 1");
-    $sth->execute();
-    
-    my ($random_item_id) = $sth->fetchrow_array;
+   my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 ORDER BY RAND() LIMIT 1");
+   $sth->execute();
+   
+   my ($random_item_id) = $sth->fetchrow_array;
 
-    $dbh->disconnect();
-    return $random_item_id;
+   $sth->finish();
+   $dbh->disconnect();
+   return $random_item_id;   
 }
