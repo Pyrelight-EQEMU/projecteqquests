@@ -2,9 +2,7 @@ use Data::Dumper;
 use POSIX;
 
 my $combo_count = 3;
-my @epics    = (20542, 8495, 8496, 68299, 5532, 20490, 10650, 28034, 10652, 36224, 
-                20544, 10099, 20488, 20487, 11057, 14383, 10651, 14341, 66175, 
-                66177, 66176);
+my @epics    = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
@@ -27,7 +25,7 @@ sub EVENT_ITEM {
                     my $test_result = test_upgrade($item_id);
 
                     if (is_item_upgradable($item_id)) {
-                        if ((grep { $_ == $item_id } @array) or $test_result->{success}) {
+                        if ((grep { $_ == $item_id } @epics) or $test_result->{success}) {
                             my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
                             my $cmc_cost = $test_result->{total_cost};
                             my $cmc_avail = get_upgrade_points();
