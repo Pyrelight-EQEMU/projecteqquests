@@ -233,7 +233,6 @@ sub EVENT_SAY {
                foreach my $aug (@augs) {
                   quest::debug("$aug");
                   $client->SummonItem($aug, 1, 1);
-                  return;                  
                }
             } elsif ($cmc < $cost) {
                plugin::NPCTell("You don't have enough $link_concentrated_mana_crystals.");
