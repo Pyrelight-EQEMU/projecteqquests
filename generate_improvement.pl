@@ -135,7 +135,7 @@ for my $tier (1..10) {
                     if ($row->{proceffect} > 0 && $row->{procrate} == 0) {
                         $row->{procrate} = $row->{procrate} + 5;
                     }
-                    $row->{procrate} = $row->{proceffect} + ($row->{proceffect} * $modifier);
+                    $row->{procrate} = $row->{procrate} + ($row->{procrate} * $modifier);
                 }
 
 
