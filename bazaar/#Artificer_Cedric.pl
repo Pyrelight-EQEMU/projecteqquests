@@ -203,7 +203,7 @@ sub EVENT_SAY {
             my $epic_cost   = (get_upgrade_tier($item_id)+1) * 100;
             if ((grep { $_ == $base_id } @epics) and plugin::get_cmc() >= $epic_cost) {                
                 plugin::spend_cmc($epic_cost);
-                $client->SummonItem($item_id + 1000000);
+                $client->SummonItem($item_id + 1000000, 1,1);
                 $client->DeleteBucket("Artificer-WorkOrder");
             } else {
                 my $test_result = test_upgrade($current_item_id);
