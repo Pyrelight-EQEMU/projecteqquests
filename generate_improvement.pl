@@ -136,13 +136,13 @@ for my $tier (1..10) {
                 $row->{ac} = $row->{ac} + $tier + ceil($row->{ac} * $modifier_minor);
 				
                 # Adjusting Heroic Stats
-                $row->{heroic_str} = $row->{heroic_str} + ceil(($row->{heroic_str} + $row->{astr}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
-                $row->{heroic_sta} = $row->{heroic_sta} + ceil(($row->{heroic_sta} + $row->{asta}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
-                $row->{heroic_dex} = $row->{heroic_dex} + ceil(($row->{heroic_dex} + $row->{adex}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
-                $row->{heroic_agi} = $row->{heroic_agi} + ceil(($row->{heroic_agi} + $row->{aagi}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
-                $row->{heroic_int} = $row->{heroic_int} + ceil(($row->{heroic_int} + $row->{aint}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
-                $row->{heroic_wis} = $row->{heroic_wis} + ceil(($row->{heroic_wis} + $row->{awis}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
-                $row->{heroic_cha} = $row->{heroic_cha} + ceil(($row->{heroic_cha} + $row->{acha}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
+                $row->{heroic_str} = $row->{heroic_str} + ceil(($row->{heroic_str} + $row->{astr} * $modifier));
+                $row->{heroic_sta} = $row->{heroic_sta} + ceil(($row->{heroic_sta} + $row->{asta} * $modifier));
+                $row->{heroic_dex} = $row->{heroic_dex} + ceil(($row->{heroic_dex} + $row->{adex} * $modifier));
+                $row->{heroic_agi} = $row->{heroic_agi} + ceil(($row->{heroic_agi} + $row->{aagi} * $modifier));
+                $row->{heroic_int} = $row->{heroic_int} + ceil(($row->{heroic_int} + $row->{aint} * $modifier));
+                $row->{heroic_wis} = $row->{heroic_wis} + ceil(($row->{heroic_wis} + $row->{awis} * $modifier));
+                $row->{heroic_cha} = $row->{heroic_cha} + ceil(($row->{heroic_cha} + $row->{acha} * $modifier));
 
                 # Adjusting Heroic Resists   
                 $row->{heroic_mr} = $row->{heroic_mr} + ceil($row->{mr} + $row->{heroic_mr} * $modifier);
