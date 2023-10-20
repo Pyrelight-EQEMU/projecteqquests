@@ -6,7 +6,7 @@ my @epics    = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 280
 
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
-    my $CMC_Available = get_cmc();
+    my $CMC_Available = plugin::get_cmc();
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $work_order = $client->GetBucket("Artificer-WorkOrder") || 0;
 
