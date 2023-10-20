@@ -232,7 +232,8 @@ sub EVENT_SAY {
                plugin::spend_cmc($cost);
                foreach my $aug (@augs) {
                   quest::debug("$aug");
-                  $client->SummonItem($aug, 1, 1);                  
+                  $client->SummonItem($aug, 1, 1);
+                  return;                  
                }
             } elsif ($cmc < $cost) {
                plugin::NPCTell("You don't have enough $link_concentrated_mana_crystals.");
@@ -240,7 +241,7 @@ sub EVENT_SAY {
                return;
             } else {
                plugin::RedText("This is impossible. Report to GM that you got this message.");
-               $client->Summon($item_id, 1, 1);               
+               $client->SummonItem($item_id, 1, 1);               
             }
         } else {
             plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
