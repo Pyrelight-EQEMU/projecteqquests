@@ -145,11 +145,11 @@ for my $tier (1..10) {
                 $row->{heroic_cha} = $row->{heroic_cha} + ceil(($row->{heroic_cha} + $row->{acha}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
 
                 # Adjusting Heroic Resists   
-                $row->{heroic_mr} = $row->{heroic_mr} + ceil($row->{mr} + $row->{heroic_mr} * $modifier * $tier) if ($row->{mr} > 0);
-                $row->{heroic_fr} = $row->{heroic_fr} + ceil($row->{fr} + $row->{heroic_fr} * $modifier * $tier) if ($row->{fr} > 0);
-                $row->{heroic_cr} = $row->{heroic_cr} + ceil($row->{cr} + $row->{heroic_cr} * $modifier * $tier) if ($row->{cr} > 0);
-                $row->{heroic_dr} = $row->{heroic_dr} + ceil($row->{dr} + $row->{heroic_dr} * $modifier * $tier) if ($row->{dr} > 0);
-                $row->{heroic_pr} = $row->{heroic_pr} + ceil($row->{pr} + $row->{heroic_pr} * $modifier * $tier) if ($row->{pr} > 0);
+                $row->{heroic_mr} = $row->{heroic_mr} + ceil($row->{mr} + $row->{heroic_mr} * $modifier * $tier);
+                $row->{heroic_fr} = $row->{heroic_fr} + ceil($row->{fr} + $row->{heroic_fr} * $modifier * $tier);
+                $row->{heroic_cr} = $row->{heroic_cr} + ceil($row->{cr} + $row->{heroic_cr} * $modifier * $tier);
+                $row->{heroic_dr} = $row->{heroic_dr} + ceil($row->{dr} + $row->{heroic_dr} * $modifier * $tier);
+                $row->{heroic_pr} = $row->{heroic_pr} + ceil($row->{pr} + $row->{heroic_pr} * $modifier * $tier);
 
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
