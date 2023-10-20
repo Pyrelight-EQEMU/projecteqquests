@@ -13,6 +13,7 @@ sub EVENT_ITEM {
     my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
     my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
     my $link_obtain_more = "[".quest::saylink("link_obtain_more", 1, "obtain more")."]";
+    my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
 
     if ($work_order == 0) {
         if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
