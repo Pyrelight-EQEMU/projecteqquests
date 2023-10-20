@@ -136,20 +136,20 @@ for my $tier (1..10) {
                 $row->{ac} = $row->{ac} + $tier + ceil($row->{ac} * $modifier_minor);
 				
                 # Adjusting Heroic Stats
-                $row->{heroic_str} = $row->{heroic_str} + ceil(($row->{heroic_str} + $row->{astr} * $modifier));
-                $row->{heroic_sta} = $row->{heroic_sta} + ceil(($row->{heroic_sta} + $row->{asta} * $modifier));
-                $row->{heroic_dex} = $row->{heroic_dex} + ceil(($row->{heroic_dex} + $row->{adex} * $modifier));
-                $row->{heroic_agi} = $row->{heroic_agi} + ceil(($row->{heroic_agi} + $row->{aagi} * $modifier));
-                $row->{heroic_int} = $row->{heroic_int} + ceil(($row->{heroic_int} + $row->{aint} * $modifier));
-                $row->{heroic_wis} = $row->{heroic_wis} + ceil(($row->{heroic_wis} + $row->{awis} * $modifier));
-                $row->{heroic_cha} = $row->{heroic_cha} + ceil(($row->{heroic_cha} + $row->{acha} * $modifier));
+                $row->{heroic_str} = $row->{heroic_str} + ceil(($row->{astr} * $modifier));
+                $row->{heroic_sta} = $row->{heroic_sta} + ceil(($row->{asta} * $modifier));
+                $row->{heroic_dex} = $row->{heroic_dex} + ceil(($row->{adex} * $modifier));
+                $row->{heroic_agi} = $row->{heroic_agi} + ceil(($row->{aagi} * $modifier));
+                $row->{heroic_int} = $row->{heroic_int} + ceil(($row->{aint} * $modifier));
+                $row->{heroic_wis} = $row->{heroic_wis} + ceil(($row->{aiws} * $modifier));
+                $row->{heroic_cha} = $row->{heroic_cha} + ceil(($row->{acha} * $modifier));
 
                 # Adjusting Heroic Resists   
-                $row->{heroic_mr} = $row->{heroic_mr} + ceil($row->{mr} + $row->{heroic_mr} * $modifier);
-                $row->{heroic_fr} = $row->{heroic_fr} + ceil($row->{fr} + $row->{heroic_fr} * $modifier);
-                $row->{heroic_cr} = $row->{heroic_cr} + ceil($row->{cr} + $row->{heroic_cr} * $modifier);
-                $row->{heroic_dr} = $row->{heroic_dr} + ceil($row->{dr} + $row->{heroic_dr} * $modifier);
-                $row->{heroic_pr} = $row->{heroic_pr} + ceil($row->{pr} + $row->{heroic_pr} * $modifier);
+                $row->{heroic_mr} = $row->{heroic_mr} + ceil($row->{mr} * $modifier);
+                $row->{heroic_fr} = $row->{heroic_fr} + ceil($row->{fr} * $modifier);
+                $row->{heroic_cr} = $row->{heroic_cr} + ceil($row->{cr} * $modifier);
+                $row->{heroic_dr} = $row->{heroic_dr} + ceil($row->{dr} + $modifier);
+                $row->{heroic_pr} = $row->{heroic_pr} + ceil($row->{pr} * $modifier);
 
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
