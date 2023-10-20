@@ -114,6 +114,7 @@ for my $tier (1..10) {
 				}
 
                 $row->{attuneable} = 1;
+                $row->{attuneable} = 1;
 				
 				# Basic Stats                                
                 if ($row->{damage} > 0) {
@@ -148,7 +149,7 @@ for my $tier (1..10) {
                 $row->{heroic_mr} = $row->{heroic_mr} + ceil($row->{heroic_mr} * $modifier);
                 $row->{heroic_fr} = $row->{heroic_fr} + ceil($row->{heroic_fr} * $modifier);
                 $row->{heroic_cr} = $row->{heroic_cr} + ceil($row->{heroic_cr} * $modifier);
-                $row->{heroic_dr} = $row->{heroic_dr} + ceil($row->{heroic_dr} + $modifier);
+                $row->{heroic_dr} = $row->{heroic_dr} + ceil($row->{heroic_dr} * $modifier);
                 $row->{heroic_pr} = $row->{heroic_pr} + ceil($row->{heroic_pr} * $modifier);
 
                 # Create an INSERT statement dynamically
