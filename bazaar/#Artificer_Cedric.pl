@@ -12,6 +12,7 @@ sub EVENT_ITEM {
 
     my $link_proceed = "[".quest::saylink("link_proceed", 1, "proceed")."]";
     my $link_cancel = "[".quest::saylink("link_cancel", 1, "cancel")."]";
+    my $link_obtain_more = "[".quest::saylink("link_obtain_more", 1, "obtain more")."]";
 
     if ($work_order == 0) {
         if (exists $itemcount{'0'} && $itemcount{'0'} < 4) {
@@ -21,104 +22,99 @@ sub EVENT_ITEM {
                 plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
             } else {
                 foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
-                    my $item_link   = quest::varlink($item_id);
-                    my $test_result = test_upgrade($item_id);
-                    my $base_id     = get_base_id($item_id);
+                    if ($item_id <= 9999999) {
+                        my $item_link   = quest::varlink($item_id);
+                        my $test_result = test_upgrade($item_id);
+                        my $base_id     = get_base_id($item_id);
 
-                    if ((grep { $_ == $base_id } @epics)) {
-                        plugin::NPCTell("Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment in
-                                        Concentrated Mana Crystals.");
-                    } elsif (is_item_upgradable($item_id)) {                        
-                        if ($test_result->{success}) {
-                            my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
-                            my $cmc_cost = $test_result->{total_cost};
-                            my $cmc_avail = get_upgrade_points();
+                        if ((grep { $_ == $base_id } @epics)) {
+                            plugin::NPCTell("Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment in
+                                            $link_concentrated_mana_crystals.");
+                        } elsif (is_item_upgradable($item_id)) {                        
+                            if ($test_result->{success}) {
+                                my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
+                                my $cmc_cost = $test_result->{total_cost};
+                                my $cmc_avail = plugin::get_cmc();
 
-                            plugin::YellowText("You currently have $cmc_avail Concentrated Mana Crystals available.");
-                            my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to a [$next_item_link], it will cost you $cmc_cost ";
+                                my $response = "This is an excellent piece, $clientName. I can upgrade your [$item_link] to a [$next_item_link], it will cost you $cmc_cost ";
 
-                            if ( $cmc_avail >= $cmc_cost) {
-                                plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
-                                plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
-                                                    any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
-                                $client->SetBucket("Artificer-WorkOrder", $item_id);
-                                return;
+                                if ( $cmc_avail >= $cmc_cost) {
+                                    plugin::NPCTell($response . "of your $cmc_avail Concentrated Mana Crystals. Would you like to $link_proceed or $link_cancel this upgrade?");
+                                    plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
+                                                        any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
+                                    $client->SetBucket("Artificer-WorkOrder", $item_id);
+                                    delete $item_counts{$item_id};
+                                } else {                                    
+                                    plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
+                                }
                             } else {
-                                my $link_obtain_more = "[".quest::saylink("link_concentrated_mana_crystals", 1, "obtain more")."]";
-                                plugin::NPCTell($response . "Concentrated Mana Crystals, but you only have $cmc_avail. Would you like to $link_obtain_more?");
+                                plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. 
+                                                Seek them out, and return to me.");
                             }
                         } else {
-                            plugin::NPCTell("You don't have enough similar items for me to concentrate the magic of your $item_link, $clientName. 
-                                            Seek them out, and return to me.");
+                            plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
                         }
                     } else {
-                        plugin::NPCTell("I'm afraid that I can't enhance that [$item_link], $clientName.");
+                        plugin::NPCTell("This item is as strong as I could possibly make it, $cientName");
                     }
                 }
             }
-
         } else {               
             my $earned_points = 0;
-
             while ($total_money >= (500 * 1000)) {
                 $total_money = $total_money - (500 * 1000);
                 $earned_points++;
-                $CMC_Available++;
             }
 
-            if ($earned_points > 0) {
-                plugin::YellowText("You currently have $CMC_Available Concentrated Mana Crystals available.");
-                if ($total_money > 0) {
-                    plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger. Here is your change!");
-                } else {
-                    plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
-                }
-                $client->SetBucket("Artificer_CMC", $CMC_Available);
+            if ($earned_points > 0) {                
+                plugin::NPCTell("Ahh. Excellent. I've added $earned_points crystals under your name to my ledger.");
+                plugin::add_cmc($earned_points);                        
             } else {
                 plugin::NPCTell("That isn't enough to pay for any crystals, unfortunately. Here, have it back.");
             }
-
-            # After processing all items, return any remaining money
-            my $platinum_remainder = int($total_money / 1000);
-            $total_money %= 1000;
-
-            my $gold_remainder = int($total_money / 100);
-            $total_money %= 100;
-
-            my $silver_remainder = int($total_money / 10);
-            $total_money %= 10;
-
-            my $copper_remainder = $total_money;
-
-            $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
         }
     } else {
-      plugin::NPCTell("I'm sorry, $clientName, but I already have a work order in progress for you. Please $link_proceed or $link_cancel it before giving me another item.");
+        plugin::NPCTell("I'm sorry, $clientName, but I already have a work order in progress for you. Please $link_proceed or $link_cancel it before giving me another item.");
+        plugin::YellowText("WARNING: Any augments in items consumed by this process will be DESTROYED without confirmation and 
+                            any possibility of retrieval. Any eligible item of a lower enhancement tier may be consumed. Proceed with caution.");
     }
+
+    # After processing all items, return any remaining money
+    my $platinum_remainder = int($total_money / 1000);
+    $total_money %= 1000;
+
+    my $gold_remainder = int($total_money / 100);
+    $total_money %= 100;
+
+    my $silver_remainder = int($total_money / 10);
+    $total_money %= 10;
+
+    my $copper_remainder = $total_money;
+
+    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
     plugin::return_items_silent(\%itemcount);
 }
 
 sub EVENT_SAY {
     my $clientName = $client->GetCleanName();
+    my $CMC_Points = plugin::get_cmc();
 
-    my $CMC_Points = $client->GetBucket("Artificer_CMC") || 0;
-
-    my $link_equipment = "[".quest::saylink("link_equipment", 1, "equipment")."]";
+    my $link_equipment                  = "[".quest::saylink("link_equipment", 1, "equipment")."]";
     my $link_concentrated_mana_crystals = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
-    my $link_show_me_your_equipment = "[".quest::saylink("link_show_me_your_equipment", 1, "show me your equipment")."]";
-    my $link_aa_points = "[".quest::saylink("link_aa_points", 1, "temporal energy (AA Points)")."]";
-    my $link_platinum = "[".quest::saylink("link_platinum", 1, "platinum")."]";
-    my $link_siphon_10 = "[".quest::saylink("link_siphon_10", 1, "siphon 10 points")."]";
-    my $link_siphon_100 = "[".quest::saylink("link_siphon_100", 1, "siphon 100 points")."]";
-    my $link_siphon_all = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
+    my $link_show_me_your_equipment     = "[".quest::saylink("link_show_me_your_equipment", 1, "show me your equipment")."]";
+    my $link_aa_points                  = "[".quest::saylink("link_aa_points", 1, "temporal energy (AA Points)")."]";
+    my $link_platinum                   = "[".quest::saylink("link_platinum", 1, "platinum")."]";
+    my $link_siphon_10                  = "[".quest::saylink("link_siphon_10", 1, "siphon 10 points")."]";
+    my $link_siphon_100                 = "[".quest::saylink("link_siphon_100", 1, "siphon 100 points")."]";
+    my $link_siphon_all                 = "[".quest::saylink("link_siphon_all", 1, "siphon all remaining points")."]";
 
     if($text=~/hail/i) {
         if (!$client->GetBucket("CedricVisit")) {
             plugin::NPCTell("Greetings, $clientName, I Cedric Sparkswall, an Artificer of some renown. I have developed a process to intensify the 
                             properties of certain $link_equipment, and I have come to this center of commerce in order to offer my services to intrepid adventurers!");
-        } else {
-            plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
+        } else {            
             plugin::NPCTell("Ah, it's you again, $clientName. Do you have $link_equipment that needs to be enhanced? Do you need extra $link_concentrated_mana_crystals?");
+            plugin::display_cmc();
         }    
     }
 
@@ -129,8 +125,7 @@ sub EVENT_SAY {
         $client->SetBucket("CedricVisit", 1);
     }
 
-    elsif ($text eq "link_concentrated_mana_crystals") {
-        plugin::YellowText("You currently have $CMC_Points Concentrated Mana Crystals available.");
+    elsif ($text eq "link_obtain_more") {
         plugin::NPCTell("These mana crystals can be somewhat hard to locate. If you have trouble finding enough, I have a reasonable supply that I am 
                         willing to trade for your $link_aa_points or even mere $link_platinum.");        
     }
@@ -147,9 +142,9 @@ sub EVENT_SAY {
 
     elsif ($text eq "link_siphon_10") {
         if ($client->GetAAPoints() >= 10) {
-            $client->SetAAPoints($client->GetAAPoints() - 10);
-            $client->SetBucket("Artificer_CMC", $CMC_Points + 10);
+            $client->SetAAPoints($client->GetAAPoints() - 10);            
             plugin::YellowText("You have LOST 10 Alternate Advancement points!");
+            plugin::add_cmc(10);
             plugin::NPCTell("Ahh. Excellent. I've added ten crystals under your name to my ledger.");
         } else {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
@@ -159,8 +154,8 @@ sub EVENT_SAY {
     elsif ($text eq "link_siphon_100") {
         if ($client->GetAAPoints() >= 100) {
             $client->SetAAPoints($client->GetAAPoints() - 100);
-            $client->SetBucket("Artificer_CMC", $CMC_Points + 100);
             plugin::YellowText("You have LOST 100 Alternate Advancement points!");
+            plugin::add_cmc(100);
             plugin::NPCTell("Ahh. Excellent. I've added one hundred crystals under your name to my ledger.");
         } else {
             plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
@@ -171,11 +166,11 @@ sub EVENT_SAY {
         if ($client->GetAAPoints() >= 1) {
             my $aa_drained = $client->GetAAPoints();
             $client->SetAAPoints(0);
-            $client->SetBucket("Artificer_CMC", $CMC_Points + $aa_drained);
             plugin::YellowText("You have LOST $aa_drained Alternate Advancement points!");
+            plugin::add_cmc($aa_drained);
             plugin::NPCTell("Ahh. Excellent. I've added $aa_drained crystals under your name to my ledger.");
         } else {
-            plugin::NPCTell("You do not have sufficient accumulated temporal energy for me to siphon that much from you!");
+            plugin::NPCTell("You do not have any accumulated temporal energy for me to siphon that much from you!");
         }
     }
 
@@ -205,73 +200,6 @@ sub EVENT_SAY {
     }
 }
 
-# add_limbo($value)
-# Adds a new value to the "Artificer-Limbo" bucket.
-# Parameters:
-#   $value - The value to be added.
-sub add_limbo {
-    my ($value) = @_;
-
-    # Fetch the current data
-    my $data_string = $client->GetBucket("Artificer-Limbo");
-    my $data_array = eval($data_string) || [];
-
-    # Append the new value
-    push @$data_array, $value;
-
-    # Serialize and store the updated data
-    $client->SetBucket("Artificer-Limbo", Dumper($data_array));
-}
-
-# remove_limbo($value)
-# Removes a value from the "Artificer-Limbo" bucket.
-# Parameters:
-#   $value - The value to be removed.
-# Note: Removes all instances of the value.
-sub remove_limbo {
-    my ($value) = @_;
-
-    # Fetch the current data
-    my $data_string = $client->GetBucket("Artificer-Limbo");
-    my $data_array = eval($data_string) || [];
-
-    # Remove the value
-    @$data_array = grep { $_ ne $value } @$data_array;
-
-    # Serialize and store the updated data
-    $client->SetBucket("Artificer-Limbo", Dumper($data_array));
-}
-
-# get_limbo()
-# Retrieves all values stored in the "Artificer-Limbo" bucket.
-# Returns:
-#   An array containing all the stored values.
-sub get_limbo {
-    # Fetch the current data
-    my $data_string = $client->GetBucket("Artificer-Limbo");
-    my $data_array = eval($data_string) || [];
-
-    # Return the entire array
-    return @$data_array;
-}
-
-# exists_limbo($value)
-# Checks if a value exists in the "Artificer-Limbo" bucket.
-# Parameters:
-#   $value - The value to check for.
-# Returns:
-#   1 if the value exists, 0 otherwise.
-sub exists_limbo {
-    my ($value) = @_;
-
-    # Fetch the current data
-    my $data_string = $client->GetBucket("Artificer-Limbo");
-    my $data_array = eval($data_string) || [];
-
-    # Check and return if the value exists
-    return grep { $_ eq $value } @$data_array ? 1 : 0;
-}
-
 # Returns the base ID of an item
 sub get_base_id {
     my $item_id = shift;
@@ -282,12 +210,6 @@ sub get_base_id {
 sub get_upgrade_tier {
     my $item_id = shift;
     return int($item_id / 1000000); # Assuming item IDs increment by 1000000 per tier
-}
-
-# Wrapper function to return both base ID and upgrade tier
-sub get_base_id_and_tier {
-    my $item_id = shift;
-    return (get_base_id($item_id), get_upgrade_tier($item_id));
 }
 
 sub is_item_upgradable {
@@ -360,13 +282,6 @@ sub get_prev_upgrade_id {
     } else {
         return 0;
     }    
-}
-
-# Deep copy a hash
-sub deep_copy_hash {
-    my $hash_ref = shift;
-    my %new_hash = %{$hash_ref};
-    return \%new_hash;
 }
 
 sub get_upgrade_items {
@@ -531,18 +446,6 @@ sub get_upgrade_cost {
     }    
 
     return $cost;
-}
-
-sub get_upgrade_points {
-    my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
-    return $CMC_Available;
-}
-
-sub subtract_upgrade_points {
-    my $amount = shift;
-    my $CMC_Available = $client->GetBucket("Artificer_CMC") || 0;
-    quest::debug("Subtracting $amount from CMC");
-    $client->SetBucket("Artificer_CMC", $CMC_Available - $amount);
 }
 
 sub calculate_heroic_stat_sum {
