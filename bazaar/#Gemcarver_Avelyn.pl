@@ -352,7 +352,7 @@ sub get_augs {
         AND lore LIKE ?");
     
     # Execute the statement with the desired parameter
-    $sth->execute('%' . quest::getitemname($item_id) . '%');
+    $sth->execute(quest::getitemname($item_id));
 
     # Fetch the results
     my @item_ids;
