@@ -124,16 +124,16 @@ for my $tier (1..10) {
                     }
                 }
 
-                if ($row{proceffect} > 0) {
-                    if ($row{proceffect} > 0 && $row{procrate} == 0) {
-                        $row{procrate} = $row{procrate} + $tier;
+                if ($row->{proceffect} > 0) {
+                    if ($row->{proceffect} > 0 && $row->{procrate} == 0) {
+                        $row->{procrate} = $row->{procrate} + $tier;
                     }
                     $row->{procrate} = $row->{proceffect} + ($row->{proceffect} * $tier * $modifier);
                 }
 
 
-                $row->{hp} = ceil_to_nearest_5($row->{hp} + ($tier * $modifier * $row{hp}));
-                $row->{ac} = $row->{ac} + $tier + ceil($row->{ac} * $modifier_half * $tier);
+                $row->{hp} = ceil_to_nearest_5($row->{hp} + ($tier * $modifier * $row->{hp}));
+                $row->{ac} = $row->{ac} + $tier + ceil($row->{ac} * $modifier_minor * $tier);
 				
                 # Adjusting Heroic Stats
                 $row->{heroic_str} = $row->{heroic_str} + ceil(($row->{heroic_str} + $row->{astr}) * ($row->{itemtype} == 54 ? $modifier_minor : $modifier));
