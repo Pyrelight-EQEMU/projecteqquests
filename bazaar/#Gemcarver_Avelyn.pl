@@ -222,12 +222,11 @@ sub EVENT_SAY {
     }
 
     elsif ($text eq "link_proceed") {      
-        if ($item_id) {            
+        if ($item_id) {
+            my $base_id = get_base_id($item_id);            
             my @augs = @{ get_augs($base_id) };
             my $cost = get_upgrade_cost($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
             my $cmc  = plugin::get_cmc();
-            my $num = scalar @augs;
-            quest::debug("$cost, $cmc, $num");
             if (scalar @augs && $cmc >= $cost) {
                plugin::NPCTell("Excellent, lets do it.");
                plugin::spend_cmc($cost);
