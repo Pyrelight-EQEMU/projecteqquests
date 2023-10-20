@@ -79,7 +79,7 @@ sub EVENT_SAY {
 
    elsif ($text eq "link_cancel") {
       my $item_id = $client->GetBucket("Gemcarver-WorkOrder");
-      if (item_exists_in_db($item_id)) {
+      if (plugin::item_exists_in_db($item_id)) {
          $client->SummonItem($item_id);
          $client->DeleteBucket("Gemcarver-WorkOrder");
          plugin::NPCTell("No problem! Here, have this back.");
@@ -90,12 +90,8 @@ sub EVENT_SAY {
 
    elsif ($text eq "link_proceed") {
       my $item_id = $client->GetBucket("Gemcarver-WorkOrder");
-      if (item_exists_in_db($item_id)) {            
-         if ((grep { $_ == $item_id } @epics)) {
-               $client->SummonItem($item_id + 1000000);
-         } else {
-               execute_upgrade($item_id);
-         }
+      if (plugin::item_exists_in_db($item_id)) {            
+         
          $client->DeleteBucket("Gemcarver-WorkOrder");
       } else {
          plugin::NPCTell("I don't know what you are talking about. I don't have any work orders in progress for you.");
