@@ -239,30 +239,6 @@ sub GetClassListString {
     return $info_string;
 }
 
-sub GetTotalLevelsOfUnlockedClasses {
-    my $client = shift;
-
-    my $current_class = $client->GetClass();
-    my $current_level = $client->GetLevel();
-
-    my $dbh = plugin::LoadMysql();
-    my $sth = $dbh->prepare("SELECT class, level FROM multiclass_data WHERE id = ? AND class NOT IN (1, 7, 8, 9, 12, 16, ?)");
-
-    $sth->execute($client->CharacterID(), $current_class);
-
-    my $total_levels = $current_level; # Start with current level.
-    while (my $row = $sth->fetchrow_hashref()) {
-        my $class_level = $row->{'level'};
-        $total_levels += $class_level;
-    }
-
-    # Finish the statement handle and disconnect
-    $sth->finish();
-    $dbh->disconnect();
-
-    return $total_levels;
-}
-
 sub GetInactiveClasses {
     my $client = shift;
     my %unlocked_classes = GetUnlockedClasses($client);
@@ -410,6 +386,21 @@ sub return_items_silent {
 	return ($items_returned || $returned_money);
 }
 
+# Check if the specified item ID exists
+sub item_exists_in_db {
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
+    my $sth = $dbh->prepare("SELECT count(*) FROM items WHERE id = ?");
+    $sth->execute($item_id);
+
+    my $result = $sth->fetchrow_array();
+
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $result > 0 ? 1 : 0;
+}
+
 sub get_total_attunements {
     my $client = shift;
     my @suffixes = ('A', 'O', 'F', 'K', 'V', 'L'); # Add more suffixes as needed
@@ -441,6 +432,43 @@ sub count_teleport_zones {
     }
     
     return scalar(keys %teleport_zones);
+}
+
+sub is_item_upgradable {
+    my $item_id = shift;
+
+    #shortcut if we are already an upgraded item
+    if ($item_id >= 1000000) {
+        return 1;
+    }
+
+    if ($item_id > 20000000) {
+        return 0;
+    }
+
+    # Calculate the next-tier item ID
+    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+
+    # Check if the next-tier item exists in the database
+    return item_exists_in_db($next_tier_item_id);
+}
+
+# Returns the base ID of an item
+sub get_base_id {
+    my $item_id = shift;
+    return $item_id % 1000000; # Assuming item IDs increment by 1000000 per tier
+}
+
+# Returns the upgrade tier of an item
+sub get_upgrade_tier {
+    my $item_id = shift;
+    return int($item_id / 1000000); # Assuming item IDs increment by 1000000 per tier
+}
+
+# Wrapper function to return both base ID and upgrade tier
+sub get_base_id_and_tier {
+    my $item_id = shift;
+    return (get_base_id($item_id), get_upgrade_tier($item_id));
 }
 
 sub get_continent_fix {
@@ -529,7 +557,6 @@ sub get_continent_fix {
         'tox'           => 'O',
         'warrens'       => 'O',
         'stonebrunt'    => 'O',
-        'erudnext'      => 'O',
 
         # Kunark
         'burningwood'   => 'K',
@@ -816,4 +843,3 @@ sub fix_zone_data {
 
     quest::set_data($charKey, plugin::serialize_zone_data($data_hash));
 }
-
