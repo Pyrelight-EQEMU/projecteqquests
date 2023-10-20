@@ -216,9 +216,9 @@ sub EVENT_SAY {
                 } else {
                     my $cost = $test_result->{total_cost};
                     my $cmc = plugin::get_cmc();
-                    my $response = "I'm sorry, $clientName. "
+                    my $response = "I'm sorry, $clientName. ";
                     if ($cmc < $cost) {
-                        $response .= "You do not have sufficient $link_concentrated_mana_crystals to finish this upgrade. You have $cmc, but you need $cost. "
+                        $response .= "You do not have sufficient $link_concentrated_mana_crystals to finish this upgrade. You have $cmc, but you need $cost. ";
                     }
                     if (not $test_result->{success}) {
                         $response .= "You do not have sufficient materials available to complete the upgrade. Please obtain more similar items. ";
