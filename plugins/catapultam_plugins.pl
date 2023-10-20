@@ -199,6 +199,29 @@ sub GetUnlockedClasses {
     return %unlocked_classes;
 }
 
+sub GetTotalLevels {
+    my $client  = shift or plugin::val('client');
+    my $dbh     = plugin::LoadMysql();
+    
+    # Generate placeholders for the IN clause
+    my @classes_to_exclude = (1, 7, 8, 9, 12, 16);
+    push @classes_to_exclude, $client->GetClass(); # Add the character's class to the exclude list
+    my $placeholders = join(", ", ("?") x @classes_to_exclude);
+
+    my $sth = $dbh->prepare("SELECT level FROM multiclass_data WHERE id = ? AND class NOT IN ($placeholders)");
+
+    # Execute the statement with the character ID and the classes to exclude
+    $sth->execute($client->CharacterID(), @classes_to_exclude);
+
+    my $level_total = $client->GetLevel();
+    while (my $row = $sth->fetchrow_hashref()) {
+        $level_total += $row->{'level'};
+    }
+
+    return $level_total;
+}
+
+
 sub GetLockedClasses {
     my $client = shift;
     my %unlocked_classes = GetUnlockedClasses($client);
