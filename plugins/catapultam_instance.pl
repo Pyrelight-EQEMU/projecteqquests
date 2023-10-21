@@ -24,6 +24,11 @@ sub HandleSay {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
+                    if ($client->GetGM()) {
+                    quest::debug("trying an alt currency!");
+                    $client->AddAlternateCurrencyValue(8, 10);
+                }
+
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         foreach my $task (@task_id) {
@@ -34,10 +39,7 @@ sub HandleSay {
                 my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
                 my $challenge       = 0;
                 
-                if ($client->GetGM()) {
-                    quest::debug("trying an alt currency!");
-                    $client->AddAlternateCurrencyValue(8, 10);
-                }
+
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
