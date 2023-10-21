@@ -346,8 +346,11 @@ sub upgrade_item_tier {
 
         $tier = $current_tier + $tier;
         if (plugin::item_exists_in_db($base_id + ($tier * 1000000))) {
+            my $add_item = $base_id + ($tier * 1000000);
+            quest::debug("Removing: $item_id, Adding: $add_item");
+
             $entity->RemoveItemByID($item_id);
-            $entity->AddItem($base_id + ($tier * 1000000), 1);
+            $entity->AddItem(add_item, 1);
         }
     }
 }
@@ -374,7 +377,7 @@ sub ModifyInstanceLoot {
 
         # Now upgrade items
         for my $upgrade (@to_upgrade) {
-            upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
+            plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }

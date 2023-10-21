@@ -119,22 +119,7 @@ sub EVENT_DEATH_COMPLETE {
 
         # Now upgrade items
         for my $upgrade (@to_upgrade) {
-            upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
-        }
-    }
-}
-
-sub upgrade_item_tier {
-    my ($item_id, $tier, $entity)  = @_;
-
-    if (plugin::is_item_upgradable($item_id)) {
-        my $current_tier = int($item_id / 1000000);
-        my $base_id = $item_id % 1000000;
-
-        $tier = $current_tier + $tier;
-        if (plugin::item_exists_in_db($base_id + ($tier * 1000000))) {
-            $entity->RemoveItemByID($item_id);
-            $entity->AddItem($base_id + ($tier * 1000000), 1);
+            plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }
