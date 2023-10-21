@@ -467,7 +467,7 @@ sub is_item_upgradable {
     quest::debug("checking db for $item_id");
 
     # Calculate the next-tier item ID
-    my $item_id += 1000000;
+    $item_id += 1000000;
 
     # Check if the next-tier item exists in the database
     return item_exists_in_db($item_id);
