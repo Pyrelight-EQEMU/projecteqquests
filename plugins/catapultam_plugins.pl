@@ -460,17 +460,12 @@ sub count_teleport_zones {
 sub is_item_upgradable {
     my $item_id = shift;
 
-    #shortcut if we are already an upgraded item
-    if ($item_id >= 1000000) {
-        return 0;
-    }
-
-    if ($item_id > 20000000) {
+    if ($item_id > 10000000) {
         return 0;
     }
 
     # Calculate the next-tier item ID
-    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+    my $next_tier_item_id = $item_id + 1000000;
 
     # Check if the next-tier item exists in the database
     return item_exists_in_db($next_tier_item_id);
