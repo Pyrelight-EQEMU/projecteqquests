@@ -195,7 +195,7 @@ sub EVENT_SAY {
     elsif ($text eq "link_cancel") {
         my $item_id = $client->GetBucket("Artificer-WorkOrder");
         if (item_exists_in_db($item_id)) {
-            $client->SummonItem($item_id);
+            $client->SummonItem($item_id, 1, 1);
             $client->DeleteBucket("Artificer-WorkOrder");
             plugin::NPCTell("No problem! Here, have this back.");
         } else {
@@ -209,7 +209,7 @@ sub EVENT_SAY {
             my $epic_cost   = (get_upgrade_tier($item_id)+1) * 100;
             if ((grep { $_ == $base_id } @epics) and plugin::get_cmc() >= $epic_cost) {                
                 plugin::spend_cmc($epic_cost);
-                $client->SummonItem($item_id + 1000000, 1,1);
+                $client->SummonItem($item_id + 1000000, 1, 1);
                 $client->DeleteBucket("Artificer-WorkOrder");
             } else {
                 my $test_result = test_upgrade($item_id);
