@@ -311,7 +311,7 @@ sub ModifyInstanceLoot
         for (my $i = 0; $i < $quantity; $i++) {
             my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
             if ($scaled_item != $item_id) {
-                $npc->RemoveItem($item_id, 1);
+                $npc->RemoveItem($item_id);
                 $npc->AddItem($scaled_item);
             }
         }
