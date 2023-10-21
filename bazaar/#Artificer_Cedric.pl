@@ -398,7 +398,7 @@ sub test_upgrade {
 sub execute_upgrade {
     my ($current_item_id, $is_recursive, $virtual_inventory, $ledger) = @_;
     
-    if (!$is_recursive) { test_upgrade($current_item_id); }
+    if (!$is_recursive) { $test_result = test_upgrade($current_item_id); }
     if ($is_recursive or ($test_result->{success} && $test_result->{total_cost} <= plugin::get_cmc())) {
 
         my $target_item_id = get_next_upgrade_id($current_item_id);
