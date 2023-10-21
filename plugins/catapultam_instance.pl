@@ -354,6 +354,8 @@ sub upgrade_item_tier {
             }
             $entity->AddItem($target_item, 1);
         } 
+    } else {
+        quest::debug("item: $item_id was not upgradable");
     }
 }
 
@@ -374,7 +376,7 @@ sub ModifyInstanceLoot {
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
-            quest::debug("Looking to upgrade: $difficulty");
+            quest::debug("Looking to upgrade: $difficulty:$upgrade_base");
             plugin::upgrade_item_tier($item_id, $upgrade_base);
         }
     }
