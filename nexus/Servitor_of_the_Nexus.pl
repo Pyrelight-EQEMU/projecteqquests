@@ -43,7 +43,7 @@ sub POPUP_DISPLAY {
                       the [$purple Summoner's Synchrosatchel</c>], purchased in the Bazaar, offers a unique experience - it serves as a 'proxy inventory' for your pet. Any
                       equipment placed within it will be equipped by your pet! Finally, pets are able to hold aggro over players in melee range so long as their Taunt avility
                       is activated.$break
-                      ";
+                      "; #This appears to be the maximum length.
 
   my $text = quest::popupcentermessage("$red NEW PLAYERS PLEASE READ THIS WINDOW</c><br>") .
              $desc .             
