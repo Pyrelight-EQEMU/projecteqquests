@@ -111,10 +111,6 @@ sub HandleSay {
         plugin::Display_FoS_Heroic_Tokens($client);
     }
 
-    if ($client->GetGM()) {
-        plugin::HandleTaskComplete();
-    }
-
     return; # Return value if needed
 }
 
