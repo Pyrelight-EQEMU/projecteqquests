@@ -374,7 +374,7 @@ sub test_upgrade {
 
             quest::debug($target_item_id);
 
-            $$total_cmc_cost_ref += get_upgrade_cost($target_item_id);
+            $total_cmc_cost_ref += get_upgrade_cost($target_item_id);
 
             #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
@@ -382,7 +382,7 @@ sub test_upgrade {
 
     my $result = {
         success => 0,
-        total_cost => $$total_cmc_cost_ref
+        total_cost => $total_cmc_cost_ref
     };
 
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
