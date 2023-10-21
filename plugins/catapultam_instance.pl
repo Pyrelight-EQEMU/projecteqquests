@@ -346,7 +346,7 @@ sub upgrade_item_tier {
         if (plugin::item_exists_in_db($target_item)) {
             if ($corpse && $corpse->GetCount($item_id)) {            
                 $corpse->RemoveItemByID($item_id);
-            }            
+            } else {quest::debug("The corpse didn't exist?");}            
             $corpse->AddItem($target_item, 1);
         } 
     } else {
@@ -371,6 +371,7 @@ sub ModifyInstanceLoot {
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
+            quest::debug("$item_id, $upgrade_base, $corpse"):
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
