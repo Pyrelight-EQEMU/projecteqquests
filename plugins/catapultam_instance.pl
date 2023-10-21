@@ -336,7 +336,6 @@ sub HandleTaskAccept
 
 sub upgrade_item_tier {
     my ($item_id, $tier, $corpse)  = @_;
-    quest::debug("$item_id, $tier, $corpse");
     if (plugin::is_item_upgradable($item_id)) {
         my $base_id    = plugin::get_base_id($item_id);
         my $curtier    = plugin::get_upgrade_tier($item_id);
@@ -344,11 +343,9 @@ sub upgrade_item_tier {
         my $target_tier = min(10, $tier + $curtier);
         my $target_item = $base_id + (1000000 * $tier);
 
-        if (plugin::item_exists_in_db($target_item)) {
-            if ($entity->CountItem($item_id) > 0) {
-                $entity->RemoveItemByID($item_id);
-            }
-            $entity->AddItem($target_item, 1);
+        if (plugin::item_exists_in_db($target_item)) {            
+            $corpse->RemoveItemByID($item_id);            
+            $corpse->AddItem($target_item, 1);
         } 
     } else {
         quest::debug("item: $item_id was not upgradable");
