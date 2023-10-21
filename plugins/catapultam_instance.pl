@@ -9,6 +9,8 @@ my $modifier        = 0.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
 
+
+
 sub HandleSay {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
