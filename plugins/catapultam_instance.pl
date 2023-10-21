@@ -195,26 +195,26 @@ sub HandleTaskComplete
 
 sub GetLeaderForZone {
     my $zone        = shift or return;
-    my $leader      = quest::get_data("$zone-TopDiff");
+    my $leader      = quest::get_data("$zone-TopDiff");    
 
     if (!$leader || $leader eq '') {
         return ("None", 0);
-    }
+    } 
 
     my %leader_data = plugin::DeserializeHash($leader);
 
-    return ($score_data{'player'}, $score_data{'score'});    
+    return ($leader_data{'player'}, $leader_data{'score'});    
 }
 
 sub SetLeaderForZone {
     my ($zone, $player, $score) = @_;
         
-    my %score_data = (
+    my %leader_data = (
         'player' => $player,
         'score'  => $score
     );
     
-    my $data = plugin::SerializeHash(%score_data);
+    my $data = plugin::SerializeHash(%leader_data);
     
     quest::set_data("$zone-TopDiff", $data);
 }
