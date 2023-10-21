@@ -74,7 +74,7 @@ sub HandleSay {
                 } else {
                     $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                 }
-                
+
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");               
                 return;
             }
@@ -368,6 +368,7 @@ sub ModifyInstanceLoot {
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
+            quest::debug("Looking to upgrade: $difficulty");
             push @to_upgrade, [$item_id, $upgrade_base];
         }
 
