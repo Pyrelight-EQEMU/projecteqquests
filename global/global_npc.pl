@@ -93,6 +93,7 @@ sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();
 
     # Check for FoS Instance
+    quest::debug($instanceversion);
     if ($instanceversion == 10) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
         plugin::ModifyInstanceLoot();     
