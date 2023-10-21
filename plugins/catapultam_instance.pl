@@ -14,7 +14,7 @@ sub HandleSay {
     my $text   = plugin::val('text');
 
     my $details       = quest::saylink("instance_details", 1, "details");
-    my $mana_crystals = quest::saylink("mana_crystals", 1, "Mana Crystals");
+    my $mana_crystals = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
     my $decrease      = quest::saylink("decrease_info", 1, "decrease");
     my $Proceed       = quest::saylink("instance_proceed", 1, "Proceed");
 
@@ -24,15 +24,6 @@ sub HandleSay {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
-                #if ($client->GetGM()) {
-                    quest::debug("trying an alt currency!");
-                    $client->AddAlternateCurrencyValue(79910, 10);
-                    $client->AddAlternateCurrencyValue(9, 10);
-                    my $amtl = $client->GetAlternateCurrencyValue(79910);
-                    my $amts = $client->GetAlternateCurrencyValue(9);
-                    quest::debug("$amtl : $amts");
-               # }
-
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         foreach my $task (@task_id) {
@@ -41,9 +32,7 @@ sub HandleSay {
                 my $task_leader_id  = plugin::GetSharedTaskLeader($client);
                 my $heroic          = 0;
                 my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
-                my $challenge       = 0;
-                
-
+                my $challenge       = 0; 
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
@@ -86,11 +75,7 @@ sub HandleSay {
                     $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                 }
 
-                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
-
-                if ($client->GetGM()) {    
-                    #plugin::HandleTaskComplete($client, $task);
-                }
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");                
                 return;
             }
         }
@@ -100,28 +85,31 @@ sub HandleSay {
         return;
     }
 
-    if ($text eq 'debug') {
+    elsif ($text eq 'debug') {
        $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
     }
 
     # From [details]
-    if ($text eq 'instance_details') {
+    elsif ($text eq 'instance_details') {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
 
-        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] 
-                            only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
+        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$tokens_of_strength] 
+                            only once per difficulty rank. You may also journey into this dungeon without challenging it, at your highest previously completed difficulty level.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
-        plugin::Display_FoS_Tokens($client);
-        plugin::Display_FoS_Heroic_Tokens($client);
-        return;
     }
 
     # From [Proceed]
-    if ($text eq 'instance_proceed') {
+    elsif ($text eq 'instance_proceed') {
         $client->MovePCDynamicZone($zone_name);
-    }  
+    }
+
+    elsif ($text eq 'tokens_of_strength') {
+        plugin::YellowText("These tokens may be exchanged with others among the Brotherhood for a variety of services. They are a scarce commodity and should be carefully guarded.");
+        plugin::Display_FoS_Tokens($client);
+        plugin::Display_FoS_Heroic_Tokens($client);
+    }
 
     return; # Return value if needed
 }
@@ -177,32 +165,33 @@ sub HandleTaskComplete
     }
 }
 
+# Function to Add FoS Tokens
 sub Add_FoS_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
     my $curr    = $client->GetBucket("FoS-points") || 0;
 
     $client->SetBucket("FoS-points", $curr + $amount);
-    plugin::YellowText("You have earned $amount Tokens of Strength. You have a total of " . $curr + $amount . ".");
+    plugin::YellowText("You have earned $amount FoS Tokens. You now have a total of " . ($curr + $amount) . " FoS Tokens.");
     return $curr + $amount;
 }
 
 sub Get_FoS_Tokens {
     my $client  = shift or plugin::val('client');
-    return $client->GetBucket("FoS-points") || 0;;
+    return $client->GetBucket("FoS-points") || 0;
 }
 
 sub Display_FoS_Tokens {
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-points") || 0;;
+    my $curr    = $client->GetBucket("FoS-points") || 0;
 
-    plugin::YellowText("You currently have $curr Tokens of Strength.");
+    plugin::YellowText("You currently have $curr FoS Tokens.");
 }
 
 sub Spend_FoS_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-points") || 0;;
+    my $curr    = $client->GetBucket("FoS-points") || 0;
 
     my $new_total = $curr - $amount;
 
@@ -214,10 +203,10 @@ sub Spend_FoS_Tokens {
 sub Add_FoS_Heroic_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;;
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;
 
     $client->SetBucket("FoS-Heroic-points", $curr + $amount);
-    plugin::YellowText("You have earned $amount Heroic Tokens of Strength. You have a total of " . ($curr + $amount) . " Heroic Tokens.");
+    plugin::YellowText("You have earned $amount FoS-Heroic Tokens. You now have a total of " . ($curr + $amount) . " FoS-Heroic Tokens.");
     return $curr + $amount;
 }
 
@@ -225,7 +214,7 @@ sub Add_FoS_Heroic_Tokens {
 sub Spend_FoS_Heroic_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;;
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;
 
     my $new_total = $curr - $amount;
 
@@ -236,16 +225,15 @@ sub Spend_FoS_Heroic_Tokens {
 # Function to Display FoS-Heroic Tokens
 sub Display_FoS_Heroic_Tokens {
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;;
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;
 
-    plugin::YellowText("You have a total of $curr Heroic Tokens of Strength.");
-    return $curr;
+    plugin::YellowText("You currently have $curr FoS-Heroic Tokens.");
 }
 
 # Function to Get the current amount of FoS-Heroic Tokens
 sub Get_FoS_Heroic_Tokens {
     my $client = shift or plugin::val('client');
-    return $client->GetBucket("FoS-Heroic-points");
+    return $client->GetBucket("FoS-Heroic-points") || 0;
 }
 
 sub HandleTaskAccept
