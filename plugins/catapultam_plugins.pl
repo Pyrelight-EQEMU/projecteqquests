@@ -417,11 +417,12 @@ sub item_exists_in_db {
     $sth->execute($item_id);
 
     my $result = $sth->fetchrow_array();
+    $result = $result > 0 ? 1 : 0
 
     $sth->finish();
     $dbh->disconnect();
 
-    return $result > 0 ? 1 : 0;
+    return $result;
 }
 
 sub get_total_attunements {
