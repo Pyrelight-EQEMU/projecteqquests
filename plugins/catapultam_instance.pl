@@ -75,17 +75,8 @@ sub HandleSay {
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
-                if ($client->GetGM()) {
-                    
-                    my $group = $client->GetGroup();
-                    if($group) {
-                        for ($count = 0; $count < $group->GroupCount(); $count++) {
-                            $player = $group->GetMember($count);
-                            if($player) {
-                                plugin::HandleTaskComplete($player, $task);
-                            }
-                        }
-                    }                    
+                if ($client->GetGM()) {    
+                    plugin::HandleTaskComplete($client, $task);
                 }
                 return;
             }
@@ -106,7 +97,8 @@ sub HandleSay {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
 
-        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
+        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] 
+                            only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
         return;
     }
@@ -153,10 +145,9 @@ sub HandleTaskComplete
         }
 
         if ($heroic) {                        
-            $client->AddCrystals(0, ceil(($reward * ($difficulty_rank + 1)) / plugin::GetSharedTaskMemberCount($client)));            
+                        
         } 
         if ($escalation) {            
-            $client->AddCrystals($reward, 0);
             
         }
         
