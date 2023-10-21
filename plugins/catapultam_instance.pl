@@ -438,9 +438,7 @@ sub ModifyInstanceNPC
     my $reward      = $info_bucket{'reward'};
 
     my $difficulty_modifier = 1 + ($modifier * $difficulty);
-
-    quest::debug("difficulty_modifier: $difficulty_modifier, difficulty: $difficulty, modifier: $modifier");
-
+    
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
     my %npc_stats;
