@@ -377,7 +377,6 @@ sub ModifyInstanceLoot {
 
         # Now upgrade items
         for my $upgrade (@to_upgrade) {
-            quest::debug("Attempting to upgrade $item");
             plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
