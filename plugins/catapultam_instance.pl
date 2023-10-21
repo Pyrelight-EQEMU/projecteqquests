@@ -346,7 +346,8 @@ sub upgrade_item_tier {
         if (plugin::item_exists_in_db($target_item)) {
             if ($corpse && $corpse->GetCount($item_id)) {            
                 $corpse->RemoveItemByID($item_id);
-            } else {quest::debug("The corpse didn't exist?");}            
+            } else {quest::debug("The corpse didn't exist?");} 
+            quest::debug("adding $target_item to $corpse");           
             $corpse->AddItem($target_item, 1);
         } 
     } else {
