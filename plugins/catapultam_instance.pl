@@ -75,10 +75,7 @@ sub HandleSay {
                     $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                 }
 
-                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
-                if ($client->GetGM()) {
-                    plugin::HandleTaskComplete($client, $task);
-                }                
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");               
                 return;
             }
         }
@@ -189,7 +186,7 @@ sub HandleTaskComplete
         }
         
         $client->DeleteBucket("instance-data");
-        $client->EndSharedTask();
+        #$client->EndSharedTask();
     }
 }
 
@@ -337,82 +334,54 @@ sub HandleTaskAccept
     }
 }
 
-sub GetInstanceLoot {
-    my ($item_id, $difficulty) = @_;
-    if ($difficulty > 0) {
-        my $max_points = ceil(3 * ($difficulty - 1)) + 1;
-        my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
-        
-        my $rank = int(log($points) / log(2));
+sub upgrade_item_tier {
+    my ($item_id, $tier, $corpse)  = @_;
+    if (plugin::is_item_upgradable($item_id)) {
+        my $base_id    = plugin::get_base_id($item_id);
+        my $curtier    = plugin::get_upgrade_tier($item_id);
 
-        # 50% chance to downgrade by 1 rank, but not lower than 0
-        if (rand() < 0.25 && $rank > 1) {
-            $rank--;
-        }
-        
-        # 5% chance to upgrade by 1 rank, but not higher than 50
-        elsif (rand() < 0.05 && $rank < 50) {
-            $rank++;
-        }
-
-        if ($rank <= 0) {
-            return $item_id;
-        }
-
-        return GetScaledLoot($item_id, $rank);
+        my $target_tier = min(10, $tier + $curtier);
+        my $target_item = $base_id + (1000000 * $tier);
+        quest::debug("base: $base_id, target: $target_item");
+        if (plugin::item_exists_in_db($target_item)) {
+            if ($corpse && $corpse->CountItem($item_id)) {            
+                $corpse->RemoveItemByID($item_id);
+            } else {quest::debug("The corpse didn't exist?");} 
+            quest::debug("adding $target_item to $corpse");           
+            $corpse->AddItem($target_item, 1);
+        } 
     } else {
-        return $item_id;
+        quest::debug("item: $item_id was not upgradable");
     }
-}
-
-sub GetScaledLoot {
-    my ($item_id, $rank) = @_;
-    
-    my $new_item_id = $item_id + (1000000 * $rank);
-
-    my $new_item_name = quest::getitemname($new_item_id);
-
-    # Check if $new_item_name is 'INVALID ITEM ID IN GETITEMNAME'
-    if ($new_item_name eq 'INVALID ITEM ID IN GETITEMNAME') {
-        return $item_id;
-    }
-
-    return $new_item_id;
 }
 
 sub ModifyInstanceLoot {
-    my $client     = plugin::val('client');
-    my $npc        = plugin::val('npc');
-    my $zonesn     = plugin::val('zonesn');
-    my $instanceid = plugin::val('instanceid');
+    my $corpse      = shift or return;
+    my $client      = plugin::val('client');
+    my $zonesn      = plugin::val('zonesn');
+    my $instanceid  = plugin::val('instanceid');
 
-    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);    
 
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
-    my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
+    my $difficulty   = $info_bucket{'difficulty'};
 
-    my @lootlist = $npc->GetLootList();
-    my %changes;  # This hash will store net changes (how many of each item to add or remove)
+    if ($corpse) {
+        my @lootlist = $corpse->GetLootList();
+        my @to_upgrade;
 
-    foreach my $item_id (@lootlist) {
-        my $quantity = $npc->CountItem($item_id);
-        # do this once per $quantity
-        for (my $i = 0; $i < $quantity; $i++) {
-            my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
-            if ($scaled_item != $item_id) {
-                $changes{$item_id} = (defined $changes{$item_id} ? $changes{$item_id} - 1 : -1);
-                $changes{$scaled_item} = (defined $changes{$scaled_item} ? $changes{$scaled_item} + 1 : 1);
+        $corpse->SetCash(floor($corpse->GetCopper()*$upgrade_base), 
+                         floor($corpse->GetSilver()*$upgrade_base),
+                         floor($corpse->GetGold()*$upgrade_base), 
+                         floor($corpse->GetPlatinum()*$upgrade_base));
+
+        foreach my $item_id (@lootlist) {            
+            my $upgrade_base = floor($difficulty/3);
+            if (quest::getitemstat($item_id, 'itemtype') == 54) {
+                $upgrade_base = int(rand(11));
             }
-        }
-    }
-
-    # Execute changes
-    for my $item (keys %changes) {
-        if ($changes{$item} > 0) {
-            $npc->AddItem($item, $changes{$item});
-        } elsif ($changes{$item} < 0) {
-            $npc->RemoveItem($item, abs($changes{$item}));
+            plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
 }
@@ -434,8 +403,6 @@ sub ModifyInstanceNPC
     my $reward      = $info_bucket{'reward'};
 
     my $difficulty_modifier = 1 + ($modifier * $difficulty);
-
-    quest::debug("difficulty_modifier: $difficulty_modifier, difficulty: $difficulty, modifier: $modifier");
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed

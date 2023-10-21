@@ -418,9 +418,6 @@ sub item_exists_in_db {
 
     my $result = $sth->fetchrow_array();
 
-    $sth->finish();
-    $dbh->disconnect();
-
     return $result > 0 ? 1 : 0;
 }
 
@@ -458,22 +455,17 @@ sub count_teleport_zones {
 }
 
 sub is_item_upgradable {
-    my $item_id = shift;
+    my $item_id = shift or die;
 
-    #shortcut if we are already an upgraded item
-    if ($item_id >= 1000000) {
-        return 1;
-    }
-
-    if ($item_id > 20000000) {
+    if ($item_id > 10000000) {
         return 0;
-    }
+    }    
 
     # Calculate the next-tier item ID
-    my $next_tier_item_id = get_base_id($item_id) + (1000000 * (get_upgrade_tier($item_id) + 1));
+    $item_id += 1000000;
 
     # Check if the next-tier item exists in the database
-    return item_exists_in_db($next_tier_item_id);
+    return item_exists_in_db($item_id);
 }
 
 # Returns the base ID of an item
