@@ -14,7 +14,7 @@ sub HandleSay {
     my $text   = plugin::val('text');
 
     my $details       = quest::saylink("instance_details", 1, "details");
-    my $mana_crystals = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
+    my $tokens_of_strength = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
     my $decrease      = quest::saylink("decrease_info", 1, "decrease");
     my $Proceed       = quest::saylink("instance_proceed", 1, "Proceed");
 
