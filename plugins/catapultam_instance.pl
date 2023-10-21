@@ -346,7 +346,7 @@ sub upgrade_item_tier {
         my $add_item = $base_id + ($tier * 1000000);
 
         $tier = $current_tier + $tier;
-        if (plugin::item_exists_in_db($add_item)) {            
+        if (plugin::item_exists_in_db($add_item) && $add_item != $item_id) {            
             quest::debug("Removing: $item_id, Adding: $add_item");
 
             $entity->RemoveItemByID($item_id);
