@@ -27,8 +27,7 @@ sub EVENT_SPAWN {
     # Check for FoS Instance
     if ($instanceversion == 10) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
-        plugin::ModifyInstanceNPC();        
-        plugin::ModifyInstanceLoot();     
+        plugin::ModifyInstanceNPC(); 
     }
 }
 
@@ -91,7 +90,7 @@ sub EVENT_ITEM
 
 sub EVENT_DEATH_COMPLETE {
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-    
+    quest::debug($corpse);
     CHECK_CHARM_STATUS();
 
     # Check for FoS Instance
