@@ -26,7 +26,7 @@ sub HandleSay {
 
                     if ($client->GetGM()) {
                     quest::debug("trying an alt currency!");
-                    $client->AddAlternateCurrencyValue(8, 10);
+                    $client->AddAlternateCurrencyValue(47900, 10);
                 }
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
