@@ -116,10 +116,6 @@ sub HandleSay {
 sub HandleTaskComplete
 {
     my ($client, $task_id)        = @_;
-
-    my $mana_crystals      = quest::varlink(40903);
-    my $dark_mana_crystals = quest::varlink(40902);
-
     my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
     my $difficulty_rank = $instance_data{'difficulty_rank'};   
     my $reward          = $instance_data{'reward'};
@@ -130,32 +126,113 @@ sub HandleTaskComplete
     my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
     my $escalation      = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
-    if ($task_id == $task_id_stored) {
-        if ($client->CharacterID() == $leader_id) {
-            if ($heroic or $escalation) {
-                my $charname = $client->GetCleanName();
-                plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
-                if ($heroic) {                
-                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
-                    plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);                
-                } 
-                if ($escalation) {
-                    $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
-                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
-                }
-            }            
-        }
+    my $charname = $client->GetCleanName();
 
-        if ($heroic) {                        
-                        
-        } 
-        if ($escalation) {            
-            
+    if ($task_id == $task_id_stored) {
+        if ($client->CharacterID() == $leader_id) {            
+            if ($heroic) {                        
+                my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
+                if ($old_diff < $difficulty_rank) {
+                    plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
+                    plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
+                    plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                    my $group = $client->GetGroup();
+                    if($group) {
+                        for ($count = 0; $count < $group->GroupCount(); $count++) {
+                            $player = $group->GetMember($count);
+                            if($player) {
+                                plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                            }
+                        }
+                    }
+                        $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
+                    }
+                } 
+            if ($escalation) {            
+                my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
+                if ($old_diff < $difficulty_rank) {
+                    plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
+                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
+                    plugin::Add_FoS_Tokens($reward, $client);
+                    $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
+                }
+            }
         }
         
         $client->DeleteBucket("instance-data");
         $client->EndSharedTask();
     }
+}
+
+sub Add_FoS_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-points");
+
+    $client->SetBucket("FoS-points", $curr + $amount);
+    plugin::YellowText("You have earned $amount Tokens of Strength. You have a total of " . $curr + $amount . ".");
+    return $curr + $amount;
+}
+
+sub Get_FoS_Tokens {
+    my $client  = shift or plugin::val('client');
+    return $client->GetBucket("FoS-points");
+}
+
+sub Display_FoS_Tokens {
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-points");
+
+    plugin::YellowText("You currently have $curr Tokens of Strength.");
+}
+
+sub Spend_FoS_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-points");
+
+    my $new_total = $curr - $amount;
+
+    $client->SetBucket("FoS-points", $new_total);
+    return $new_total;
+}
+
+# Function to Add FoS-Heroic Tokens
+sub Add_FoS_Heroic_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-Heroic-points");
+
+    $client->SetBucket("FoS-Heroic-points", $curr + $amount);
+    plugin::YellowText("You have earned $amount Heroic Tokens of Strength. You have a total of " . ($curr + $amount) . " Heroic Tokens.");
+    return $curr + $amount;
+}
+
+# Function to Spend FoS-Heroic Tokens
+sub Spend_FoS_Heroic_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-Heroic-points");
+
+    my $new_total = $curr - $amount;
+
+    $client->SetBucket("FoS-Heroic-points", $new_total);
+    return $new_total;
+}
+
+# Function to Display FoS-Heroic Tokens
+sub Display_FoS_Heroic_Tokens {
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-Heroic-points");
+
+    plugin::YellowText("You have a total of $curr Heroic Tokens of Strength.");
+    return $curr;
+}
+
+# Function to Get the current amount of FoS-Heroic Tokens
+sub Get_FoS_Heroic_Tokens {
+    my $client = shift or plugin::val('client');
+    return $client->GetBucket("FoS-Heroic-points");
 }
 
 sub HandleTaskAccept
@@ -236,7 +313,7 @@ sub ModifyInstanceLoot
         my $quantity = $npc->CountItem($item_id);
         # do this once per $quantity
         for (my $i = 0; $i < $quantity; $i++) {
-            my $scaled_item = GetInstanceLoot($item_id, $difficulty);
+            my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
             if ($scaled_item != $item_id) {
                 $npc->RemoveItem($item_id, 1);
                 $npc->AddItem($scaled_item);
@@ -258,7 +335,7 @@ sub ModifyInstanceNPC
     my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $group_mode  = $info_bucket{'heroic'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0) - 1;    
-    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 4);
+    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
     my $reward      = $info_bucket{'reward'};    
 
     # Get initial mob stat values
@@ -290,6 +367,10 @@ sub ModifyInstanceNPC
     #Recale stats
     if ($difficulty > 0) {
         foreach my $stat (@stat_names) {
+            #otherwise spellscale can get crazy in some cases
+            if ($stat eq 'spellscale' or $stat eq 'healscale') {
+                $stat = min((50 * $difficulty), $stat);
+            }
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
         }
     }
