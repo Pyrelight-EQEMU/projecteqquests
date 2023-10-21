@@ -29,17 +29,19 @@ sub EVENT_ITEM {
 
                         if ((grep { $_ == $base_id } @epics)) {
                             my $epic_cost = 100 * (get_upgrade_tier($item_id)+1);
-                            my $message = "Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment in $link_concentrated_mana_crystals - I'll need $epic_cost, in fact. ";
+                            my $message = "Incredible! This artifact is special, I won't need any duplicates to upgrade this at all, only a substantial investment 
+                                           in $link_concentrated_mana_crystals - I'll need $epic_cost, in fact. ";
 
                             if ($CMC_Available >= $epic_cost) {
                                 $message .= "Would you like to $link_proceed or $link_cancel?";
-                                $client->SetBucket("Artificer-WorkOrder", $item_id);                                                              
+                                $client->SetBucket("Artificer-WorkOrder", $item_id); 
+                                plugin::NPCTell($message);
+                                return;                                                              
                             } else {
                                 $message .= "However, you only have $CMC_Available right now. I can help you $link_obtain_more";
                             }
 
-                            plugin::NPCTell($message);
-                            return;  
+                            plugin::NPCTell($message);                             
                         } elsif (is_item_upgradable($item_id)) {                        
                             if ($test_result->{success}) {
                                 my $next_item_link = quest::varlink(get_next_upgrade_id($item_id));
