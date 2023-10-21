@@ -343,14 +343,14 @@ sub upgrade_item_tier {
     if (plugin::is_item_upgradable($item_id)) {
         my $current_tier = int($item_id / 1000000);
         my $base_id = $item_id % 1000000;
+        my $add_item = $base_id + ($tier * 1000000);
 
         $tier = $current_tier + $tier;
-        if (plugin::item_exists_in_db($base_id + ($tier * 1000000))) {
-            my $add_item = $base_id + ($tier * 1000000);
+        if (plugin::item_exists_in_db($add_item)) {            
             quest::debug("Removing: $item_id, Adding: $add_item");
 
             $entity->RemoveItemByID($item_id);
-            $entity->AddItem(add_item, 1);
+            $entity->AddItem($add_item, 1);
         }
     }
 }
