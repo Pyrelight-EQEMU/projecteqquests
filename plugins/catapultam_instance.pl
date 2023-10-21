@@ -337,47 +337,19 @@ sub HandleTaskAccept
     }
 }
 
-sub GetInstanceLoot {
-    my ($item_id, $difficulty) = @_;
-    if ($difficulty > 0) {
-        my $max_points = ceil(3 * ($difficulty - 1)) + 1;
-        my $points = ceil($difficulty + rand($max_points - $difficulty + 1));
-        
-        my $rank = int(log($points) / log(2));
+sub upgrade_item_tier {
+    my ($item_id, $tier, $entity)  = @_;
 
-        # 50% chance to downgrade by 1 rank, but not lower than 0
-        if (rand() < 0.25 && $rank > 1) {
-            $rank--;
-        }
-        
-        # 5% chance to upgrade by 1 rank, but not higher than 50
-        elsif (rand() < 0.05 && $rank < 50) {
-            $rank++;
-        }
+    if (plugin::is_item_upgradable($item_id)) {
+        my $current_tier = int($item_id / 1000000);
+        my $base_id = $item_id % 1000000;
 
-        if ($rank <= 0) {
-            return $item_id;
+        $tier = $current_tier + $tier;
+        if (plugin::item_exists_in_db($base_id + ($tier * 1000000))) {
+            $entity->RemoveItemByID($item_id);
+            $entity->AddItem($base_id + ($tier * 1000000), 1);
         }
-
-        return GetScaledLoot($item_id, $rank);
-    } else {
-        return $item_id;
     }
-}
-
-sub GetScaledLoot {
-    my ($item_id, $rank) = @_;
-    
-    my $new_item_id = $item_id + (1000000 * $rank);
-
-    my $new_item_name = quest::getitemname($new_item_id);
-
-    # Check if $new_item_name is 'INVALID ITEM ID IN GETITEMNAME'
-    if ($new_item_name eq 'INVALID ITEM ID IN GETITEMNAME') {
-        return $item_id;
-    }
-
-    return $new_item_id;
 }
 
 sub ModifyInstanceLoot {
@@ -388,35 +360,21 @@ sub ModifyInstanceLoot {
 
     my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
 
-    quest::debug("Modifying Instance Loot");
-
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'};
 
-    my @lootlist = $corpse->GetLootList();
-    my %changes;  # This hash will store net changes (how many of each item to add or remove)
-
-    foreach my $item_id (@lootlist) {
-        my $quantity = $corpse->CountItem($item_id);
-        # do this once per $quantity
-        for (my $i = 0; $i < $quantity; $i++) {
-            my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
-            if ($scaled_item != $item_id) {
-                $changes{$item_id} = (defined $changes{$item_id} ? $changes{$item_id} - 1 : -1);
-                $changes{$scaled_item} = (defined $changes{$scaled_item} ? $changes{$scaled_item} + 1 : 1);
-            }
+    if ($corpse) {
+        my $upgrade_base = floor($difficulty/3);
+        my @lootlist = $corpse->GetLootList();
+        my @to_upgrade;
+        foreach my $item_id (@lootlist) {
+            push @to_upgrade, [$item_id, $upgrade_base];
         }
-    }
 
-    # Execute changes
-    for my $item (keys %changes) {
-        if ($changes{$item} > 0) {
-            quest::debug("Adding $item");
-            $corpse->AddItem($item, $changes{$item}, 1);
-        } elsif ($changes{$item} < 0) {
-            quest::debug("Removing $item");
-            $corpse->RemoveItemByID($item, abs($changes{$item}));
+        # Now upgrade items
+        for my $upgrade (@to_upgrade) {
+            upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }

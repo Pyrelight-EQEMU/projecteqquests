@@ -97,19 +97,14 @@ sub EVENT_DEATH_COMPLETE {
     # Check for FoS Instance
     quest::debug($instanceversion);
     if ($instanceversion == 10) {
-        quest::debug("Trying to call ModifyInstanceLoot");
         plugin::ModifyInstanceLoot($corpse);     
-        quest::debug("Done calling ModifyInstanceLoot");
     }    
-    
+
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
-
-        # Collect items to upgrade without modifying the corpse inside loop
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
             my $chance = rand();
-            my $num_items = scalar @lootlist;
 
             if ($chance < 0.03) {
                 push @to_upgrade, [$item_id, 3];
