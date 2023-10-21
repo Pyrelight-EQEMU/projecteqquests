@@ -346,9 +346,11 @@ sub ModifyInstanceNPC
     foreach my $stat (@stat_names) {
         if ($npc->EntityVariableExists($stat)) {
             $npc_stats{$stat} = $npc->GetNPCStat($stat);
-            $npc->SetEntityVariable($stat, $npc->GetNPCStat($stat));
+            $npc->SetEntityVariable($stat, $npc_stats{$stat});
         } else {
             $npc_stats{$stat} = $npc->GetEntityVariable($stat);
+            my $val = $npc_stats{$stat};
+            quest::debug("ev: $stat : val: $val");
         }
     }
 
