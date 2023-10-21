@@ -347,9 +347,6 @@ sub ModifyInstanceNPC
         $npc_stats{$stat} = $npc->GetNPCStat($stat);
     }
 
-    $npc_stats{'spellscale'} = 100 * $difficulty_modifier;
-    $npc_stats{'healscale'}  = 100 * $difficulty_modifier;
-
     foreach my $stat (@stat_names) {
         $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
     }
@@ -367,13 +364,7 @@ sub ModifyInstanceNPC
     #Recale stats
     if ($difficulty > 0) {
         foreach my $stat (@stat_names) {
-            #otherwise spellscale can get crazy in some cases
-            if ($stat eq 'spellscale' or $stat eq 'healscale') {         
-                my $spellscale = min(ceil($npc->GetNPCStat($stat) * $difficulty_modifier), 100+ (50 * $difficulty));
-                $npc->ModifyNPCStat($stat, $spellscale);
-            } else {
-                $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));
-            }
+            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
     }
 
