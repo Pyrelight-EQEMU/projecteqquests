@@ -336,7 +336,7 @@ sub HandleTaskAccept
 
 sub upgrade_item_tier {
     my ($item_id, $tier, $corpse)  = @_;
-
+    quest::debug("$item_id, $tier, $corpse");
     if (plugin::is_item_upgradable($item_id)) {
         quest::debug("The item: $item_id is upgradable.");
 

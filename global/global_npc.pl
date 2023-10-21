@@ -94,7 +94,6 @@ sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();
 
     # Check for FoS Instance
-    quest::debug($instanceversion);
     if ($instanceversion == 10) {
         plugin::ModifyInstanceLoot($corpse);     
     }    
@@ -118,7 +117,7 @@ sub EVENT_DEATH_COMPLETE {
 
         # Now upgrade items
         for my $upgrade (@to_upgrade) {
-           # plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
+           plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }
