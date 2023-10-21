@@ -95,7 +95,6 @@ sub EVENT_DEATH_COMPLETE {
     # Check for FoS Instance
     quest::debug($instanceversion);
     if ($instanceversion == 10) {
-        my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
         plugin::ModifyInstanceLoot();     
     }
 
