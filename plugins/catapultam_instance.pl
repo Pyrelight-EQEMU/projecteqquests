@@ -352,18 +352,7 @@ sub ModifyInstanceNPC
     my %npc_stats;
     my $npc_stats_perlevel;
 
-    foreach my $stat (@stat_names) {
-        if ($npc->EntityVariableExists($stat)) {
-            $npc_stats{$stat} = $npc->GetEntityVariable($stat);
-        } else {
-            $npc_stats{$stat} = $npc->GetNPCStat($stat);
-            $npc->SetEntityVariable($stat, $npc_stats{$stat});
-        }
-    }
 
-    foreach my $stat (@stat_names) {
-        $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
-    }
 
     # Rescale Levels
     if ($npc->GetLevel() < ($min_level - 6)) {
