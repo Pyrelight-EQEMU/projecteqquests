@@ -370,19 +370,21 @@ sub get_augs {
 }
 
 sub is_global_aug {
-   my $item_id = shift;
-   my $dbh = plugin::LoadMysql();
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
 
-   my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 AND lootdrop_entries.item_id = ?");
-   $sth->execute($item_id);
+    my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 AND lootdrop_entries.item_id = ?");
+    $sth->execute($item_id);
+
+    $dbh->disconnect();
    
-   $dbh->disconnect();
-   
-   if ($sth->fetchrow_array) {
-       return 1; # Item ID is present
-   } else {
-       return 0; # Item ID is not present
-   }
+    if ($sth->fetchrow_array) {
+        $sth->finish();
+        return 1; # Item ID is present
+    } else {
+        $sth->finish();
+        return 0; # Item ID is not present
+    }
 }
 
 sub get_global_aug {
