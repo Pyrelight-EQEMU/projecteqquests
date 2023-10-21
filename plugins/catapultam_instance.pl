@@ -35,7 +35,7 @@ sub HandleSay {
                 my $challenge       = 0;
                 
                 if ($client->GetGM()) {    
-                    $client->AddAlternateCurrencyValue(1, 10);
+                    $client->AddAlternateCurrencyValue(43942, 10);
                 }
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
