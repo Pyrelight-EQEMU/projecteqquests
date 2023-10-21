@@ -96,22 +96,27 @@ sub EVENT_DEATH_COMPLETE {
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
 
+        # Collect items to upgrade without modifying the corpse inside loop
+        my @to_upgrade;
         foreach my $item_id (@lootlist) {
             my $chance = rand();
             my $num_items = scalar @lootlist;
             quest::debug("num_items: $num_items");
 
             if ($chance < 0.03) {
-                upgrade_item_tier($item_id, 3, $corpse);
+                push @to_upgrade, [$item_id, 3];
             }
-
             elsif ($chance < 0.11) {
-                upgrade_item_tier($item_id, 2, $corpse);
+                push @to_upgrade, [$item_id, 2];
             }
-
             elsif ($chance < 0.33) {
-                upgrade_item_tier($item_id, 1, $corpse);
+                push @to_upgrade, [$item_id, 1];
             }
+        }
+
+        # Now upgrade items
+        for my $upgrade (@to_upgrade) {
+            upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }
