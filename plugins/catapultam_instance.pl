@@ -5,7 +5,7 @@ use DBI;
 use DBD::mysql;
 use JSON;
 
-my $modifier        = 1.25;
+my $modifier        = 1.1;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
 
