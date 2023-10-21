@@ -27,6 +27,7 @@ sub HandleSay {
                 #if ($client->GetGM()) {
                     quest::debug("trying an alt currency!");
                     $client->AddAlternateCurrencyValue(79910, 10);
+                    $client->AddAlternateCurrencyValue(9, 10);
                     my $amtl = $client->GetAlternateCurrencyValue(79910);
                     my $amts = $client->GetAlternateCurrencyValue(9);
                     quest::debug("$amtl : $amts");
