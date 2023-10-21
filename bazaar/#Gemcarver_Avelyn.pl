@@ -42,7 +42,6 @@ sub EVENT_ITEM {
                      my @augs = @{ get_augs($base_id) };
                      my $aug_count = scalar @augs;
                      my $cost = calculate_heroic_stat_sum($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
-                     quest::debug("WTF? $aug_count");
                      if (scalar @augs) {
                            my $response = "We have some interesting components here. ";                           
                            if (@augs == 1) {
@@ -359,7 +358,6 @@ sub get_augs {
     while (my $row = $sth->fetchrow_hashref()) {
         push @item_ids, $row->{id};
         my $id = $row->{id};
-        quest::debug("id: $id");
     }
 
     # Cleanup
