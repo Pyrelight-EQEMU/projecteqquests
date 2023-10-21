@@ -58,7 +58,8 @@ sub HandleSay {
                                      "zone_name" => $zone_name, 
                                      "difficulty_rank" => $difficulty_rank, 
                                      "task_id" => $task, 
-                                     "leader_id" => $task_leader_id);                
+                                     "leader_id" => $task_leader_id,
+                                     "entered" => 0);                
 
                 my $group = $client->GetGroup();
                 if($group) {
@@ -109,6 +110,30 @@ sub HandleSay {
     }
 
     return; # Return value if needed
+}
+
+sub HandleEnterZone
+{
+    my $client     = plugin::val('client');
+    my $npc        = plugin::val('npc');
+    my $zonesn     = plugin::val('zonesn');
+    my $instanceid = plugin::val('instanceid');
+
+    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+
+    # Get the packed data for the instance
+    my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
+    my $group_mode  = $info_bucket{'heroic'};
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0) - 1;    
+    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
+    my $reward      = $info_bucket{'reward'};
+
+    #omg this is ugly.
+    if (!$info_bucket{'entered'}) {        
+        quest::repopzone();
+        $info_bucket{'entered'} = 1;
+        $client->SetBucket("instance-data", plugin::SerializeHash(%info_bucket), $client->GetBucketRemaining("instance-data"));
+    }
 }
 
 sub HandleTaskComplete
@@ -352,7 +377,38 @@ sub ModifyInstanceNPC
     my %npc_stats;
     my $npc_stats_perlevel;
 
+    foreach my $stat (@stat_names) {
+        if ($npc->EntityVariableExists($stat)) {
+            $npc_stats{$stat} = $npc->GetEntityVariable($stat);
+        } else {
+            $npc_stats{$stat} = $npc->GetNPCStat($stat);
+            $npc->SetEntityVariable($stat, $npc_stats{$stat});
+        }
+    }
 
+    foreach my $stat (@stat_names) {
+        $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
+    }
+
+    # Rescale Levels
+    if ($npc->GetLevel() < ($min_level - 6)) {
+        my $level_diff = $min_level - 6 - $npc->GetLevel();
+
+        $npc->SetLevel($npc->GetLevel() + $level_diff);
+        foreach my $stat (@stat_names) {
+            # Skip processing for 'spellscale' and 'healscale'
+            next if ($stat eq 'spellscale' or $stat eq 'healscale');
+
+            $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
+        }      
+    }
+
+    #Recale stats
+    if ($difficulty > 0) {
+        foreach my $stat (@stat_names) {
+            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
+        }
+    }
 
     $npc->Heal();
 }

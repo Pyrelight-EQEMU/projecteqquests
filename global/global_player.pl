@@ -61,6 +61,13 @@ sub EVENT_CONNECT {
     #quest::debug(plugin::GetClassListString($client));
 }
 
+sub EVENT_ENTER_ZONE {
+    # Check for FoS Instance
+    if ($instanceversion == 10) {
+        plugin::HandleEnterZone($zonesn);
+    }    
+}
+
 sub EVENT_TASKACCEPTED {
     plugin::HandleTaskAccept($task_id);
 }
