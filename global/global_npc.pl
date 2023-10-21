@@ -79,6 +79,10 @@ sub EVENT_COMBAT
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
         quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
     }
+    # Check for FoS Instance
+    if ($instanceversion == 10) {
+        plugin::ModifyInstanceNPC();     
+    }
 }
 
 sub EVENT_ITEM
