@@ -34,8 +34,9 @@ sub HandleSay {
                 my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
                 my $challenge       = 0;
                 
-                if ($client->GetGM()) {    
-                    $client->AddAlternateCurrencyValue(43942, 10);
+                if ($client->GetGM()) {
+                    quest::debug("trying an alt currency!");
+                    $client->AddAlternateCurrencyValue(8, 10);
                 }
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
