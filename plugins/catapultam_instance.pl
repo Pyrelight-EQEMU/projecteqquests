@@ -78,7 +78,7 @@ sub HandleSay {
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
 
                 if ($client->GetGM()) {    
-                    plugin::HandleTaskComplete($client, $task);
+                    #plugin::HandleTaskComplete($client, $task);
                 }
                 return;
             }
