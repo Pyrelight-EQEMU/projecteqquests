@@ -5,21 +5,20 @@ use DBI;
 use DBD::mysql;
 use JSON;
 
-my $modifier        = 1.25;
+my $modifier        = 0.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
+
+
 
 sub HandleSay {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
 
-    my $details       = quest::saylink("instance_details", 1, "details");
-    my $mana_crystals = quest::saylink("mana_crystals", 1, "Mana Crystals");
-    my $decrease      = quest::saylink("decrease_info", 1, "decrease");
-    my $Proceed       = quest::saylink("instance_proceed", 1, "Proceed");
-
-    my $mana_crystals_item       = quest::varlink(40903);
-    my $dark_mana_crystals_item  = quest::varlink(40902);
+    my $details             = quest::saylink("instance_details", 1, "details");
+    my $tokens_of_strength  = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
+    my $decrease            = quest::saylink("decrease_info", 1, "decrease");
+    my $Proceed             = quest::saylink("instance_proceed", 1, "Proceed");
 
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
@@ -32,7 +31,7 @@ sub HandleSay {
                 my $task_leader_id  = plugin::GetSharedTaskLeader($client);
                 my $heroic          = 0;
                 my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
-                my $challenge       = 0;
+                my $challenge       = 0; 
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
@@ -61,7 +60,8 @@ sub HandleSay {
                                      "zone_name" => $zone_name, 
                                      "difficulty_rank" => $difficulty_rank, 
                                      "task_id" => $task, 
-                                     "leader_id" => $task_leader_id);                
+                                     "leader_id" => $task_leader_id,
+                                     "entered" => 0);                
 
                 my $group = $client->GetGroup();
                 if($group) {
@@ -71,22 +71,11 @@ sub HandleSay {
                             $player->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                         }
                     }
+                } else {
+                    $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                 }
 
-                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
-
-                if ($client->GetGM()) {
-                    
-                    my $group = $client->GetGroup();
-                    if($group) {
-                        for ($count = 0; $count < $group->GroupCount(); $count++) {
-                            $player = $group->GetMember($count);
-                            if($player) {
-                                plugin::HandleTaskComplete($player, $task);
-                            }
-                        }
-                    }                    
-                }
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");                
                 return;
             }
         }
@@ -96,36 +85,62 @@ sub HandleSay {
         return;
     }
 
-    if ($text eq 'debug') {
+    elsif ($text eq 'debug') {
        $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
     }
 
     # From [details]
-    if ($text eq 'instance_details') {
+    elsif ($text eq 'instance_details') {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
 
-        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
+        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$tokens_of_strength] 
+                            only once per difficulty rank. You may also journey into this dungeon without challenging it, at your highest previously completed difficulty level.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
-        return;
     }
 
     # From [Proceed]
-    if ($text eq 'instance_proceed') {
+    elsif ($text eq 'instance_proceed') {
         $client->MovePCDynamicZone($zone_name);
-    }  
+    }
+
+    elsif ($text eq 'tokens_of_strength') {
+        plugin::YellowText("These tokens may be exchanged with others among the Brotherhood for a variety of services. They are a scarce commodity and should be carefully guarded.");
+        plugin::Display_FoS_Tokens($client);
+        plugin::Display_FoS_Heroic_Tokens($client);
+    }
 
     return; # Return value if needed
+}
+
+sub HandleEnterZone
+{
+    my $client     = plugin::val('client');
+    my $npc        = plugin::val('npc');
+    my $zonesn     = plugin::val('zonesn');
+    my $instanceid = plugin::val('instanceid');
+
+    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+
+    # Get the packed data for the instance
+    my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
+    my $group_mode  = $info_bucket{'heroic'};
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0) - 1;    
+    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
+    my $reward      = $info_bucket{'reward'};
+
+    #omg this is ugly.
+    if (!$info_bucket{'entered'}) {        
+        quest::repopzone();
+        $info_bucket{'entered'} = 1;
+        $client->SetBucket("instance-data", plugin::SerializeHash(%info_bucket), $client->GetBucketRemaining("instance-data"));
+    }
 }
 
 sub HandleTaskComplete
 {
     my ($client, $task_id)        = @_;
-
-    my $mana_crystals      = quest::varlink(40903);
-    my $dark_mana_crystals = quest::varlink(40902);
-
     my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
     my $difficulty_rank = $instance_data{'difficulty_rank'};   
     my $reward          = $instance_data{'reward'};
@@ -136,28 +151,39 @@ sub HandleTaskComplete
     my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
     my $escalation      = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
-    if ($task_id == $task_id_stored) {
-        if ($client->CharacterID() == $leader_id) {
-            if ($heroic or $escalation) {
-                my $charname = $client->GetCleanName();
-                plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
-                if ($heroic) {                
-                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
-                    plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);                
-                } 
-                if ($escalation) {
-                    $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
-                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
-                }
-            }            
-        }
+    my $charname = $client->GetCleanName();
 
-        if ($heroic) {                        
-            $client->AddCrystals(0, ceil(($reward * ($difficulty_rank + 1)) / plugin::GetSharedTaskMemberCount($client)));            
-        } 
-        if ($escalation) {            
-            $client->AddCrystals($reward, 0);
-            
+    if ($task_id == $task_id_stored) {
+        if ($client->CharacterID() == $leader_id) {            
+            if ($heroic) {                        
+                my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
+                if ($old_diff < $difficulty_rank) {
+                    plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
+                    plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
+                    plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
+                    my $group = $client->GetGroup();
+                    if($group) {
+                        for ($count = 0; $count < $group->GroupCount(); $count++) {
+                            $player = $group->GetMember($count);
+                            if($player) {
+                                plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                                plugin::Add_AA_Reward($reward, $client);
+                            }
+                        }
+                    }                    
+                }
+            } 
+            if ($escalation) {            
+                my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
+                if ($old_diff < $difficulty_rank) {
+                    plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
+                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
+                    plugin::Add_FoS_Tokens($reward, $client);
+                    plugin::Add_AA_Reward($reward);
+                    $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
+                }
+            }
         }
         
         $client->DeleteBucket("instance-data");
@@ -165,17 +191,94 @@ sub HandleTaskComplete
     }
 }
 
+sub Add_AA_Reward {
+    my $amount = shift or return;
+    my $client = shift or plugin::val('client');
+
+    $client->AddAAPoints($amount);
+    $client->Message(334, "You have gained $amount Alternate Experience points as a bonus reward!");    
+}
+
+# Function to Add FoS Tokens
+sub Add_FoS_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-points") || 0;
+
+    $client->SetBucket("FoS-points", $curr + $amount);
+    plugin::YellowText("You have earned $amount FoS Tokens. You now have a total of " . ($curr + $amount) . " FoS Tokens.");
+    return $curr + $amount;
+}
+
+sub Get_FoS_Tokens {
+    my $client  = shift or plugin::val('client');
+    return $client->GetBucket("FoS-points") || 0;
+}
+
+sub Display_FoS_Tokens {
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-points") || 0;
+
+    plugin::YellowText("You currently have $curr FoS Tokens.");
+}
+
+sub Spend_FoS_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-points") || 0;
+
+    my $new_total = $curr - $amount;
+
+    $client->SetBucket("FoS-points", $new_total);
+    return $new_total;
+}
+
+# Function to Add FoS-Heroic Tokens
+sub Add_FoS_Heroic_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;
+
+    $client->SetBucket("FoS-Heroic-points", $curr + $amount);
+    plugin::YellowText("You have earned $amount FoS-Heroic Tokens. You now have a total of " . ($curr + $amount) . " FoS-Heroic Tokens.");
+    return $curr + $amount;
+}
+
+# Function to Spend FoS-Heroic Tokens
+sub Spend_FoS_Heroic_Tokens {
+    my $amount  = shift or return 0;
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;
+
+    my $new_total = $curr - $amount;
+
+    $client->SetBucket("FoS-Heroic-points", $new_total);
+    return $new_total;
+}
+
+# Function to Display FoS-Heroic Tokens
+sub Display_FoS_Heroic_Tokens {
+    my $client  = shift or plugin::val('client');
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;
+
+    plugin::YellowText("You currently have $curr FoS-Heroic Tokens.");
+}
+
+# Function to Get the current amount of FoS-Heroic Tokens
+sub Get_FoS_Heroic_Tokens {
+    my $client = shift or plugin::val('client');
+    return $client->GetBucket("FoS-Heroic-points") || 0;
+}
+
 sub HandleTaskAccept
 {
-    my $task_id            = shift || plugin::val('task_id');
-    my $task_name          = quest::gettaskname($task_id);
-    my $mana_crystals       = quest::varlink(40903);
-    my $dark_mana_crystals  = quest::varlink(40902);
+    my $task_id             = shift || plugin::val('task_id');
+    my $task_name           = quest::gettaskname($task_id);
 
     if ($task_name =~ /\(Escalation\)$/ ) {
-        plugin::YellowText("You have started an Escalation task. You will recieve [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion.");
     } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        plugin::YellowText("You have started a Heroic task. You will recieve [$dark_mana_crystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
     } else {
         plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
     }
@@ -224,8 +327,7 @@ sub GetScaledLoot {
     return $new_item_id;
 }
 
-sub ModifyInstanceLoot 
-{
+sub ModifyInstanceLoot {
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
     my $zonesn     = plugin::val('zonesn');
@@ -238,16 +340,26 @@ sub ModifyInstanceLoot
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
 
     my @lootlist = $npc->GetLootList();
-    my @inventory;
+    my %changes;  # This hash will store net changes (how many of each item to add or remove)
+
     foreach my $item_id (@lootlist) {
         my $quantity = $npc->CountItem($item_id);
         # do this once per $quantity
         for (my $i = 0; $i < $quantity; $i++) {
-            my $scaled_item = GetInstanceLoot($item_id, $difficulty);
+            my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
             if ($scaled_item != $item_id) {
-                $npc->RemoveItem($item_id, 1);
-                $npc->AddItem($scaled_item);
+                $changes{$item_id} = (defined $changes{$item_id} ? $changes{$item_id} - 1 : -1);
+                $changes{$scaled_item} = (defined $changes{$scaled_item} ? $changes{$scaled_item} + 1 : 1);
             }
+        }
+    }
+
+    # Execute changes
+    for my $item (keys %changes) {
+        if ($changes{$item} > 0) {
+            $npc->AddItem($item, $changes{$item});
+        } elsif ($changes{$item} < 0) {
+            $npc->RemoveItem($item, abs($changes{$item}));
         }
     }
 }
@@ -264,9 +376,13 @@ sub ModifyInstanceNPC
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $group_mode  = $info_bucket{'heroic'};
-    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0) - 1;    
-    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 4);
-    my $reward      = $info_bucket{'reward'};    
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0);    
+    my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
+    my $reward      = $info_bucket{'reward'};
+
+    my $difficulty_modifier = 1 + ($modifier * $difficulty);
+
+    quest::debug("difficulty_modifier: $difficulty_modifier, difficulty: $difficulty, modifier: $modifier");
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
@@ -274,30 +390,35 @@ sub ModifyInstanceNPC
     my $npc_stats_perlevel;
 
     foreach my $stat (@stat_names) {
-        $npc_stats{$stat} = $npc->GetNPCStat($stat);
+        if ($npc->EntityVariableExists($stat)) {
+            $npc_stats{$stat} = $npc->GetEntityVariable($stat);
+        } else {
+            $npc_stats{$stat} = $npc->GetNPCStat($stat);
+            $npc->SetEntityVariable($stat, $npc_stats{$stat});
+        }
     }
-
-    $npc_stats{'spellscale'} = 100 + ($difficulty * $modifier);
-    $npc_stats{'healscale'}  = 100 + ($difficulty * $modifier);
 
     foreach my $stat (@stat_names) {
         $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
     }
 
-    #Rescale Levels
+    # Rescale Levels
     if ($npc->GetLevel() < ($min_level - 6)) {
         my $level_diff = $min_level - 6 - $npc->GetLevel();
 
         $npc->SetLevel($npc->GetLevel() + $level_diff);
         foreach my $stat (@stat_names) {
+            # Skip processing for 'spellscale' and 'healscale'
+            next if ($stat eq 'spellscale' or $stat eq 'healscale');
+
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
-        }        
+        }      
     }
 
     #Recale stats
     if ($difficulty > 0) {
         foreach my $stat (@stat_names) {
-            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
+            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
     }
 

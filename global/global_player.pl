@@ -3,7 +3,7 @@ use Time::Seconds; # for ONE_DAY constant
 
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
-    $client->GrantAlternateAdvancementAbility(938, 8, true);
+    $client->GrantAlternateAdvancementAbility(938, 8, 1);
     fix_palshd_horse($client);
 
     plugin::CheckLevelFlags();
@@ -59,6 +59,13 @@ sub EVENT_CONNECT {
 
     #quest::debug($client->CharacterID());
     #quest::debug(plugin::GetClassListString($client));
+}
+
+sub EVENT_ENTER_ZONE {
+    # Check for FoS Instance
+    if ($instanceversion == 10) {
+        plugin::HandleEnterZone($zonesn);
+    }    
 }
 
 sub EVENT_TASKACCEPTED {
