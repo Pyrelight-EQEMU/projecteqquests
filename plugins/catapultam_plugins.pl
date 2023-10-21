@@ -417,7 +417,9 @@ sub item_exists_in_db {
     $sth->execute($item_id);
 
     my $result = $sth->fetchrow_array();
-    
+
+    quest::debug("$result");
+
     return $result > 0 ? 1 : 0;
 }
 
