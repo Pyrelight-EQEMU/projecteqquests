@@ -290,8 +290,7 @@ sub GetScaledLoot {
     return $new_item_id;
 }
 
-sub ModifyInstanceLoot 
-{
+sub ModifyInstanceLoot {
     my $client     = plugin::val('client');
     my $npc        = plugin::val('npc');
     my $zonesn     = plugin::val('zonesn');
@@ -304,16 +303,26 @@ sub ModifyInstanceLoot
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
 
     my @lootlist = $npc->GetLootList();
-    my @inventory;
+    my %changes;  # This hash will store net changes (how many of each item to add or remove)
+
     foreach my $item_id (@lootlist) {
         my $quantity = $npc->CountItem($item_id);
         # do this once per $quantity
         for (my $i = 0; $i < $quantity; $i++) {
             my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
             if ($scaled_item != $item_id) {
-                $npc->RemoveItem($item_id);
-                $npc->AddItem($scaled_item);
+                $changes{$item_id} = (defined $changes{$item_id} ? $changes{$item_id} - 1 : -1);
+                $changes{$scaled_item} = (defined $changes{$scaled_item} ? $changes{$scaled_item} + 1 : 1);
             }
+        }
+    }
+
+    # Execute changes
+    for my $item (keys %changes) {
+        if ($changes{$item} > 0) {
+            $npc->AddItem($item, $changes{$item});
+        } elsif ($changes{$item} < 0) {
+            $npc->RemoveItem($item, abs($changes{$item}));
         }
     }
 }
@@ -352,7 +361,22 @@ sub ModifyInstanceNPC
         }
     }
 
+    foreach my $stat (@stat_names) {
+        $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
+    }
 
+    # Rescale Levels
+    if ($npc->GetLevel() < ($min_level - 6)) {
+        my $level_diff = $min_level - 6 - $npc->GetLevel();
+
+        $npc->SetLevel($npc->GetLevel() + $level_diff);
+        foreach my $stat (@stat_names) {
+            # Skip processing for 'spellscale' and 'healscale'
+            next if ($stat eq 'spellscale' or $stat eq 'healscale');
+
+            $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
+        }      
+    }
 
     #Recale stats
     if ($difficulty > 0) {
