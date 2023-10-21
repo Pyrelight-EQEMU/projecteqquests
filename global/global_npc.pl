@@ -107,7 +107,6 @@ sub EVENT_DEATH_COMPLETE {
         foreach my $item_id (@lootlist) {
             my $chance = rand();
             my $num_items = scalar @lootlist;
-            quest::debug("num_items: $num_items");
 
             if ($chance < 0.03) {
                 push @to_upgrade, [$item_id, 3];

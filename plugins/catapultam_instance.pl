@@ -392,7 +392,7 @@ sub ModifyInstanceLoot {
 
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
-    my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
+    my $difficulty   = $info_bucket{'difficulty'};
 
     my @lootlist = $corpse->GetLootList();
     my %changes;  # This hash will store net changes (how many of each item to add or remove)
@@ -438,7 +438,7 @@ sub ModifyInstanceNPC
     my $reward      = $info_bucket{'reward'};
 
     my $difficulty_modifier = 1 + ($modifier * $difficulty);
-    
+
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
     my %npc_stats;
