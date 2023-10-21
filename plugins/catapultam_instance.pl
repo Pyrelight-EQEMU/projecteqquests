@@ -177,7 +177,7 @@ sub HandleTaskComplete
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
-                    plugin::TrySetLeaderForZone();
+                    plugin::TrySetLeaderForZone($zone, $client, $difficulty_rank);
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward, $client);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
@@ -232,6 +232,8 @@ sub TrySetLeaderForZone {
             plugin::WorldAnnounce("$player has become the undisputed champion of $zone.");
         }
         return 1;  # Return true indicating the top score was updated.
+    } elsif ($score == $current_score) {
+        plugin::WorldAnnounce("$player has tied with $current_leader to be the champion of $zone.");
     }
 
     return 0;  # Return false indicating the top score was not updated.
