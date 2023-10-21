@@ -388,6 +388,8 @@ sub ModifyInstanceLoot {
 
     my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
 
+    quest::debug("Modifying Instance Loot");
+
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
@@ -410,8 +412,10 @@ sub ModifyInstanceLoot {
     # Execute changes
     for my $item (keys %changes) {
         if ($changes{$item} > 0) {
+            quest::debug("Adding $item");
             $corpse->AddItem($item, $changes{$item}, 1);
         } elsif ($changes{$item} < 0) {
+            quest::debug("Removing $item");
             $corpse->RemoveItemByID($item, abs($changes{$item}));
         }
     }
