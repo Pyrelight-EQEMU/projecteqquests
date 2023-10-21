@@ -102,6 +102,8 @@ sub HandleSay {
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$mana_crystals] 
                             only once per difficulty rank. You may [$decrease] your difficulty rank by spending mana crystals equal to the reward.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
+        plugin::Display_FoS_Tokens($client);
+        plugin::Display_FoS_Heroic_Tokens($client);
         return;
     }
 
@@ -167,7 +169,7 @@ sub HandleTaskComplete
 sub Add_FoS_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-points");
+    my $curr    = $client->GetBucket("FoS-points") || 0;
 
     $client->SetBucket("FoS-points", $curr + $amount);
     plugin::YellowText("You have earned $amount Tokens of Strength. You have a total of " . $curr + $amount . ".");
@@ -176,12 +178,12 @@ sub Add_FoS_Tokens {
 
 sub Get_FoS_Tokens {
     my $client  = shift or plugin::val('client');
-    return $client->GetBucket("FoS-points");
+    return $client->GetBucket("FoS-points") || 0;;
 }
 
 sub Display_FoS_Tokens {
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-points");
+    my $curr    = $client->GetBucket("FoS-points") || 0;;
 
     plugin::YellowText("You currently have $curr Tokens of Strength.");
 }
@@ -189,7 +191,7 @@ sub Display_FoS_Tokens {
 sub Spend_FoS_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-points");
+    my $curr    = $client->GetBucket("FoS-points") || 0;;
 
     my $new_total = $curr - $amount;
 
@@ -201,7 +203,7 @@ sub Spend_FoS_Tokens {
 sub Add_FoS_Heroic_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-Heroic-points");
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;;
 
     $client->SetBucket("FoS-Heroic-points", $curr + $amount);
     plugin::YellowText("You have earned $amount Heroic Tokens of Strength. You have a total of " . ($curr + $amount) . " Heroic Tokens.");
@@ -212,7 +214,7 @@ sub Add_FoS_Heroic_Tokens {
 sub Spend_FoS_Heroic_Tokens {
     my $amount  = shift or return 0;
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-Heroic-points");
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;;
 
     my $new_total = $curr - $amount;
 
@@ -223,7 +225,7 @@ sub Spend_FoS_Heroic_Tokens {
 # Function to Display FoS-Heroic Tokens
 sub Display_FoS_Heroic_Tokens {
     my $client  = shift or plugin::val('client');
-    my $curr    = $client->GetBucket("FoS-Heroic-points");
+    my $curr    = $client->GetBucket("FoS-Heroic-points") || 0;;
 
     plugin::YellowText("You have a total of $curr Heroic Tokens of Strength.");
     return $curr;
