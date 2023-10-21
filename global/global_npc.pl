@@ -118,7 +118,7 @@ sub EVENT_DEATH_COMPLETE {
 
         # Now upgrade items
         for my $upgrade (@to_upgrade) {
-            plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
+           # plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }
