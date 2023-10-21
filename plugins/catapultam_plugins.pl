@@ -465,10 +465,10 @@ sub is_item_upgradable {
     }
 
     # Calculate the next-tier item ID
-    my $next_tier_item_id = $item_id + 1000000;
+    my $item_id += 1000000;
 
     # Check if the next-tier item exists in the database
-    return item_exists_in_db($next_tier_item_id);
+    return item_exists_in_db($item_id);
 }
 
 # Returns the base ID of an item
