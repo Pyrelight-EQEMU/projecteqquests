@@ -51,5 +51,5 @@ sub POPUP_DISPLAY {
              $desc .             
              $feature_desc ;  
 
-  quest::popup('Welcome to Pyrelight', $text);
+  quest::popup('Welcome to Pyrelight', "hello?");
 }
