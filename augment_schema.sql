@@ -95,7 +95,27 @@ UPDATE items
             augslot4visible = 1,
             augslot5visible = 1,
             augslot6visible = 1
-WHERE slots = 2097152;
+WHERE slots = 2097152 AND itemtype != 54;
+
+-- Update Epics
+UPDATE items
+   SET items.nodrop = 0,
+   	 items.attuneable = 0,
+   	 items.loregroup = -1,
+   	 items.augslot1visible = 0,   	 
+   	 items.augslot2visible = 0,
+   	 items.augslot3visible = 0,
+   	 items.augslot4visible = 0,
+   	 items.augslot5visible = 0,
+   	 items.augslot6visible = 0,
+   	 items.augslot1type = 0,
+   	 items.augslot2type = 0,
+   	 items.augslot3type = 0,
+   	 items.augslot4type = 0,
+   	 items.augslot5type = 0,
+   	 items.augslot6type = 0,
+   	 items.idfile = 'IT64'
+WHERE items.id % 100000 IN (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
 
 
