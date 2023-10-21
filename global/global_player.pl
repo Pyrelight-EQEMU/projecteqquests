@@ -28,7 +28,7 @@ sub EVENT_CONNECT {
             my $inactive_classes = plugin::GetInactiveClasses($client);
 
             my $announceString = "$name (Level $level $active_class"
-                               . ($inactive_classes ? " , $inactive_classes)" : ")")
+                               . ($inactive_classes ? ", $inactive_classes)" : ")")
                                . " has logged in for the first time today!";
 
             plugin::WorldAnnounce($announceString);
@@ -46,7 +46,7 @@ sub EVENT_CONNECT {
         my $inactive_classes = plugin::GetInactiveClasses($client);
 
         my $announceString = "$name (Level $level $active_class"
-                           . ($inactive_classes ? " , $inactive_classes)" : ")")
+                           . ($inactive_classes ? ", $inactive_classes)" : ")")
                            . " has logged in for the first time!";
 
         plugin::WorldAnnounce($announceString);
