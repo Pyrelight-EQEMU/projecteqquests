@@ -75,7 +75,10 @@ sub HandleSay {
                     $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                 }
 
-                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");                
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
+                if ($client->GetGM()) {
+                    plugin::HandleTaskComplete($client, $task);
+                }                
                 return;
             }
         }
@@ -177,7 +180,7 @@ sub HandleTaskComplete
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
-                    plugin::TrySetLeaderForZone()
+                    plugin::TrySetLeaderForZone($task_name, $charname, $difficulty_rank);
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward, $client);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
@@ -192,26 +195,26 @@ sub HandleTaskComplete
 
 sub GetLeaderForZone {
     my $zone        = shift or return;
-    my $leader      = quest::get_data("$zone-TopDiff");
+    my $leader      = quest::get_data("$zone-TopDiff");    
 
     if (!$leader || $leader eq '') {
         return ("None", 0);
-    }
+    } 
 
     my %leader_data = plugin::DeserializeHash($leader);
 
-    return ($score_data{'player'}, $score_data{'score'});    
+    return ($leader_data{'player'}, $leader_data{'score'});    
 }
 
 sub SetLeaderForZone {
     my ($zone, $player, $score) = @_;
         
-    my %score_data = (
+    my %leader_data = (
         'player' => $player,
         'score'  => $score
     );
     
-    my $data = plugin::SerializeHash(%score_data);
+    my $data = plugin::SerializeHash(%leader_data);
     
     quest::set_data("$zone-TopDiff", $data);
 }
@@ -226,12 +229,16 @@ sub TrySetLeaderForZone {
     if ($score > $current_score) {
         # If so, set the new player and score as the top score.
         SetLeaderForZone($zone, $player, $score);
-        if ($current_leader ne 'None') {
+        if ($current_leader ne 'None' and $current_leader ne $player) {
             plugin::WorldAnnounce("$player surpassed $current_leader as the undisputed champion of $zone.");
+        } elsif ($current_leader eq $player) {
+            plugin::WorldAnnounce("$player has solidified their lead as the undisputed champion of $zone.");
         } else {
             plugin::WorldAnnounce("$player has become the undisputed champion of $zone.");
         }
         return 1;  # Return true indicating the top score was updated.
+    } elsif ($score == $current_score) {
+        plugin::WorldAnnounce("$player has tied with $current_leader to be the champion of $zone.");
     }
 
     return 0;  # Return false indicating the top score was not updated.
