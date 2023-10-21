@@ -95,7 +95,7 @@ sub EVENT_DEATH_COMPLETE {
     # Check for FoS Instance
     quest::debug($instanceversion);
     if ($instanceversion == 10) {
-        plugin::ModifyInstanceLoot();     
+        plugin::ModifyInstanceLoot($corpse);     
     }
 
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
