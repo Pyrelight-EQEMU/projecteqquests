@@ -189,7 +189,7 @@ sub HandleTaskComplete
         }
         
         $client->DeleteBucket("instance-data");
-        $client->EndSharedTask();
+        #$client->EndSharedTask();
     }
 }
 
