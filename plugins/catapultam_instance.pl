@@ -159,24 +159,26 @@ sub HandleTaskComplete
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
                     plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
                     my $group = $client->GetGroup();
                     if($group) {
                         for ($count = 0; $count < $group->GroupCount(); $count++) {
                             $player = $group->GetMember($count);
                             if($player) {
                                 plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                                plugin::Add_AA_Reward($reward, $client);
                             }
                         }
-                    }
-                        $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
-                    }
-                } 
+                    }                    
+                }
+            } 
             if ($escalation) {            
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward, $client);
+                    plugin::Add_AA_Reward($reward);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
                 }
             }
@@ -185,6 +187,14 @@ sub HandleTaskComplete
         $client->DeleteBucket("instance-data");
         $client->EndSharedTask();
     }
+}
+
+sub Add_AA_Reward {
+    my $amount = shift or return;
+    my $client = shift or plugin::val('client');
+
+    $client->AddAAPoints($amount);
+    $client->Message(334, "You have gained $amount Alternate Experience points as a bonus reward!");    
 }
 
 # Function to Add FoS Tokens
