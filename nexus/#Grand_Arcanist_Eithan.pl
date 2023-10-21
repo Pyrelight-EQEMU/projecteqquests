@@ -18,8 +18,10 @@ sub EVENT_SAY {
         } else {
           plugin::NPCTell("I've already unlocked your potential, $clientName. You only need to seize it and [choose your class].");
         }
-      }      
-      else {
+      } elsif ($client->GetLevel() > 45 && plugin::GetTotalLevels($client) >= 60) {
+        plugin::NPCTell("Ah, $clientName, just who I was about to look for. You've grown substantially in power, and it is time for me to call in my marker. My apprentice,
+                        Theralon, has been asking for assistants recently. Go see him in The Bazaar, and learn how you might help him.");
+      } else {
         plugin::NPCTell("It is good to see you again, $clientName. I don't have anything for you right now, but return to me when you've gained 
                          more experience. I will have work for you.");
       }
