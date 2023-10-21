@@ -338,17 +338,12 @@ sub upgrade_item_tier {
     my ($item_id, $tier, $corpse)  = @_;
     quest::debug("$item_id, $tier, $corpse");
     if (plugin::is_item_upgradable($item_id)) {
-        quest::debug("The item: $item_id is upgradable.");
-
         my $base_id    = plugin::get_base_id($item_id);
         my $curtier    = plugin::get_upgrade_tier($item_id);
-
-        quest::debug("We have base_id: $base_id and tier: $curtier");
 
         my $target_tier = min(10, $tier + $curtier);
         my $target_item = $base_id + (1000000 * $tier);
 
-        quest::debug("target:$target_item");
         if (plugin::item_exists_in_db($target_item)) {
             if ($entity->CountItem($item_id) > 0) {
                 $entity->RemoveItemByID($item_id);
@@ -377,7 +372,6 @@ sub ModifyInstanceLoot {
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
-            quest::debug("Looking to upgrade: $item_id:$difficulty:$upgrade_base");
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
