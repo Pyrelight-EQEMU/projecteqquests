@@ -356,14 +356,17 @@ sub ModifyInstanceNPC
         $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
     }
 
-    #Rescale Levels
+    # Rescale Levels
     if ($npc->GetLevel() < ($min_level - 6)) {
         my $level_diff = $min_level - 6 - $npc->GetLevel();
 
         $npc->SetLevel($npc->GetLevel() + $level_diff);
         foreach my $stat (@stat_names) {
+            # Skip processing for 'spellscale' and 'healscale'
+            next if ($stat eq 'spellscale' or $stat eq 'healscale');
+
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
-        }        
+        }      
     }
 
     #Recale stats
