@@ -92,6 +92,12 @@ sub EVENT_ITEM
 sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();
 
+    # Check for FoS Instance
+    if ($instanceversion == 10) {
+        my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
+        plugin::ModifyInstanceLoot();     
+    }
+
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();

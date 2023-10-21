@@ -381,10 +381,10 @@ sub GetScaledLoot {
 }
 
 sub ModifyInstanceLoot {
-    my $client     = plugin::val('client');
-    my $npc        = plugin::val('npc');
-    my $zonesn     = plugin::val('zonesn');
-    my $instanceid = plugin::val('instanceid');
+    my $corpse      = shift or return;
+    my $client      = plugin::val('client');
+    my $zonesn      = plugin::val('zonesn');
+    my $instanceid  = plugin::val('instanceid');
 
     my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
 
@@ -392,11 +392,11 @@ sub ModifyInstanceLoot {
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 5 : 0) - 1;
 
-    my @lootlist = $npc->GetLootList();
+    my @lootlist = $corpse->GetLootList();
     my %changes;  # This hash will store net changes (how many of each item to add or remove)
 
     foreach my $item_id (@lootlist) {
-        my $quantity = $npc->CountItem($item_id);
+        my $quantity = $corpse->CountItem($item_id);
         # do this once per $quantity
         for (my $i = 0; $i < $quantity; $i++) {
             my $scaled_item = GetInstanceLoot($item_id, ($difficulty/3));
@@ -410,9 +410,9 @@ sub ModifyInstanceLoot {
     # Execute changes
     for my $item (keys %changes) {
         if ($changes{$item} > 0) {
-            $npc->AddItem($item, $changes{$item});
+            $corpse->AddItem($item, $changes{$item}, 1);
         } elsif ($changes{$item} < 0) {
-            $npc->RemoveItem($item, abs($changes{$item}));
+            $corpse->RemoveItemByID($item, abs($changes{$item}));
         }
     }
 }
