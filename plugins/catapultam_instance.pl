@@ -168,7 +168,6 @@ sub HandleTaskComplete
                             $player = $group->GetMember($count);
                             if($player) {
                                 plugin::Add_FoS_Heroic_Tokens($reward, $client);
-                                plugin::Add_AA_Reward($reward, $client);
                             }
                         }
                     }                    
@@ -180,7 +179,6 @@ sub HandleTaskComplete
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward, $client);
-                    plugin::Add_AA_Reward($reward, $client);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
                 }
             }
