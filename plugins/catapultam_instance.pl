@@ -361,7 +361,7 @@ sub ModifyInstanceLoot {
     my $zonesn      = plugin::val('zonesn');
     my $instanceid  = plugin::val('instanceid');
 
-    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);
+    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);    
 
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
@@ -371,6 +371,12 @@ sub ModifyInstanceLoot {
         my $upgrade_base = floor($difficulty/3);
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
+
+        $corpse->SetCash(floor($corpse->GetCopper()*$upgrade_base), 
+                         floor($corpse->GetSilver()*$upgrade_base),
+                         floor($corpse->GetGold()*$upgrade_base), 
+                         floor($corpse->GetPlatinum()*$upgrade_base));
+
         foreach my $item_id (@lootlist) {
             quest::debug("$item_id, $upgrade_base, $corpse");
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
