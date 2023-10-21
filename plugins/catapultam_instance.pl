@@ -367,7 +367,7 @@ sub ModifyInstanceNPC
         foreach my $stat (@stat_names) {
             #otherwise spellscale can get crazy in some cases
             if ($stat eq 'spellscale' or $stat eq 'healscale') {         
-                my $spellscale = min(ceil($npc->GetNPCStat($stat) * $difficulty_modifier), 50 * $difficulty);
+                my $spellscale = min(ceil($npc->GetNPCStat($stat) * $difficulty_modifier), 100+ (50 * $difficulty));
                 $npc->ModifyNPCStat($stat, $spellscale);
             } else {
                 $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));
