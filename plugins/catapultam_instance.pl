@@ -71,6 +71,8 @@ sub HandleSay {
                             $player->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                         }
                     }
+                } else {
+                    $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
                 }
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
