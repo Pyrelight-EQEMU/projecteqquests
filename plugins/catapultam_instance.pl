@@ -369,12 +369,7 @@ sub ModifyInstanceLoot {
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
             quest::debug("Looking to upgrade: $difficulty");
-            push @to_upgrade, [$item_id, $upgrade_base];
-        }
-
-        # Now upgrade items
-        for my $upgrade (@to_upgrade) {
-            plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
+            plugin::upgrade_item_tier($item_id, $upgrade_base);
         }
     }
 }
