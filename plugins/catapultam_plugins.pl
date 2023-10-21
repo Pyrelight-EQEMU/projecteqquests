@@ -418,8 +418,6 @@ sub item_exists_in_db {
 
     my $result = $sth->fetchrow_array();
 
-    quest::debug("$result");
-
     return $result > 0 ? 1 : 0;
 }
 
@@ -460,11 +458,8 @@ sub is_item_upgradable {
     my $item_id = shift or die;
 
     if ($item_id > 10000000) {
-        quest::debug("item $item_id was above 10 million");
         return 0;
-    }
-    
-    quest::debug("checking db for $item_id");
+    }    
 
     # Calculate the next-tier item ID
     $item_id += 1000000;

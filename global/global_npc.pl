@@ -90,7 +90,6 @@ sub EVENT_ITEM
 
 sub EVENT_DEATH_COMPLETE {
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-    quest::debug($corpse);
     CHECK_CHARM_STATUS();
 
     # Check for FoS Instance
