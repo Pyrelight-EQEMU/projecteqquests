@@ -371,7 +371,7 @@ sub ModifyInstanceLoot {
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
         foreach my $item_id (@lootlist) {
-            quest::debug("$item_id, $upgrade_base, $corpse"):
+            quest::debug("$item_id, $upgrade_base, $corpse");
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
