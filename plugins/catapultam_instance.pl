@@ -5,7 +5,7 @@ use DBI;
 use DBD::mysql;
 use JSON;
 
-my $modifier        = 1.1;
+my $modifier        = 0.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
 
@@ -332,7 +332,9 @@ sub ModifyInstanceNPC
     my $group_mode  = $info_bucket{'heroic'};
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0) - 1;    
     my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
-    my $reward      = $info_bucket{'reward'};    
+    my $reward      = $info_bucket{'reward'};
+
+    my $difficulty_modifier = 1 + ($modifier * $difficulty);
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
@@ -343,8 +345,8 @@ sub ModifyInstanceNPC
         $npc_stats{$stat} = $npc->GetNPCStat($stat);
     }
 
-    $npc_stats{'spellscale'} = 100 + ($difficulty * $modifier);
-    $npc_stats{'healscale'}  = 100 + ($difficulty * $modifier);
+    $npc_stats{'spellscale'} = 100 * $difficulty_modifier;
+    $npc_stats{'healscale'}  = 100 * $difficulty_modifier;
 
     foreach my $stat (@stat_names) {
         $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
@@ -364,10 +366,11 @@ sub ModifyInstanceNPC
     if ($difficulty > 0) {
         foreach my $stat (@stat_names) {
             #otherwise spellscale can get crazy in some cases
-            if ($stat eq 'spellscale' or $stat eq 'healscale') {
-                $stat = min((50 * $difficulty), $stat);
+            if ($stat eq 'spellscale' or $stat eq 'healscale') {         
+                my $spellscale = min(ceil($npc->GetNPCStat($stat) * $difficulty_modifier), 50 * $difficulty);
+                $npc->ModifyNPCStat($stat, $spellscale);
             } else {
-                $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
+                $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));
             }
         }
     }
