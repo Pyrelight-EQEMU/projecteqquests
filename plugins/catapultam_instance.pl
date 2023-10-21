@@ -24,9 +24,12 @@ sub HandleSay {
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
 
-                    if ($client->GetGM()) {
+                if ($client->GetGM()) {
                     quest::debug("trying an alt currency!");
-                    $client->AddAlternateCurrencyValue(47900, 10);
+                    $client->AddAlternateCurrencyValue(79910, 10);
+                    my $amtl = $client->GetAlternateCurrencyValue(79910);
+                    my $amts = $client->GetAlternateCurrencyValue(9);
+                    quest::debug("$amtl : $amts");
                 }
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
