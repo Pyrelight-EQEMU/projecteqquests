@@ -3,7 +3,7 @@ use Time::Seconds; # for ONE_DAY constant
 
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
-    $client->GrantAlternateAdvancementAbility(938, 8, true);
+    $client->GrantAlternateAdvancementAbility(938, 8, 1);
     fix_palshd_horse($client);
 
     plugin::CheckLevelFlags();
