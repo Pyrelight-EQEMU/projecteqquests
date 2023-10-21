@@ -348,6 +348,7 @@ sub upgrade_item_tier {
         my $target_tier = min(10, $tier + $curtier);
         my $target_item = $base_id + (1000000 * $tier);
 
+        quest::debug("target:$target_item");
         if (plugin::item_exists_in_db($target_item)) {
             if ($entity->CountItem($item_id) > 0) {
                 $entity->RemoveItemByID($item_id);

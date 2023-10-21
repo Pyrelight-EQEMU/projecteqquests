@@ -457,16 +457,17 @@ sub count_teleport_zones {
 }
 
 sub is_item_upgradable {
-    my $item_id = shift;
+    my $item_id = shift or die;
 
     if ($item_id > 10000000) {
         quest::debug("item $item_id was above 10 million");
         return 0;
     }
+    
+    quest::debug("checking db for $item_id");
 
     # Calculate the next-tier item ID
     my $item_id += 1000000;
-    quest::debug("checking db for $item_id");
 
     # Check if the next-tier item exists in the database
     return item_exists_in_db($item_id);
