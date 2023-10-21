@@ -177,6 +177,7 @@ sub HandleTaskComplete
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
+                    plugin::TrySetLeaderForZone()
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward, $client);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
@@ -187,6 +188,53 @@ sub HandleTaskComplete
         $client->DeleteBucket("instance-data");
         $client->EndSharedTask();
     }
+}
+
+sub GetLeaderForZone {
+    my $zone        = shift or return;
+    my $leader      = quest::get_data("$zone-TopDiff");
+
+    if (!$leader || $leader eq '') {
+        return ("None", 0);
+    }
+
+    my %leader_data = plugin::DeserializeHash($leader);
+
+    return ($score_data{'player'}, $score_data{'score'});    
+}
+
+sub SetLeaderForZone {
+    my ($zone, $player, $score) = @_;
+        
+    my %score_data = (
+        'player' => $player,
+        'score'  => $score
+    );
+    
+    my $data = plugin::SerializeHash(%score_data);
+    
+    quest::set_data("$zone-TopDiff", $data);
+}
+
+sub TrySetLeaderForZone {
+    my ($zone, $player, $score) = @_;
+
+    # Get the current top score and player for the zone.
+    my ($current_leader, $current_score) = GetLeaderForZone($zone);
+
+    # Check if the new score is higher than the current top score.
+    if ($score > $current_score) {
+        # If so, set the new player and score as the top score.
+        SetLeaderForZone($zone, $player, $score);
+        if ($current_leader ne 'None') {
+            plugin::WorldAnnounce("$player surpassed $current_leader as the undisputed champion of $zone.");
+        } else {
+            plugin::WorldAnnounce("$player has become the undisputed champion of $zone.");
+        }
+        return 1;  # Return true indicating the top score was updated.
+    }
+
+    return 0;  # Return false indicating the top score was not updated.
 }
 
 sub Add_AA_Reward {
