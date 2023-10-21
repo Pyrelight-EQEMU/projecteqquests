@@ -381,7 +381,7 @@ sub GetScaledLoot {
 }
 
 sub ModifyInstanceLoot {
-    my $corpse      = shift;
+    my $corpse      = shift or return;
     my $client      = plugin::val('client');
     my $zonesn      = plugin::val('zonesn');
     my $instanceid  = plugin::val('instanceid');

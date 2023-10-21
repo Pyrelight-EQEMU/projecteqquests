@@ -90,6 +90,8 @@ sub EVENT_ITEM
 }
 
 sub EVENT_DEATH_COMPLETE {
+    my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
+    
     CHECK_CHARM_STATUS();
 
     # Check for FoS Instance
@@ -98,9 +100,8 @@ sub EVENT_DEATH_COMPLETE {
         quest::debug("Trying to call ModifyInstanceLoot");
         plugin::ModifyInstanceLoot($corpse);     
         quest::debug("Done calling ModifyInstanceLoot");
-    }
-
-    my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
+    }    
+    
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
 
