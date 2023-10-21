@@ -462,7 +462,7 @@ sub is_item_upgradable {
 
     #shortcut if we are already an upgraded item
     if ($item_id >= 1000000) {
-        return 1;
+        return 0;
     }
 
     if ($item_id > 20000000) {

@@ -348,7 +348,7 @@ sub upgrade_item_tier {
         $tier = $current_tier + $tier;
         if (plugin::item_exists_in_db($add_item) && $add_item != $item_id) {            
             quest::debug("Removing: $item_id, Adding: $add_item");
-
+            if ($entity->)
             $entity->RemoveItemByID($item_id);
             $entity->AddItem($add_item, 1);
         }
