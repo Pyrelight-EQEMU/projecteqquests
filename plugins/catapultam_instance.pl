@@ -33,6 +33,10 @@ sub HandleSay {
                 my $heroic          = 0;
                 my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
                 my $challenge       = 0;
+                
+                if ($client->GetGM()) {    
+                    $client->AddAlternateCurrencyValue(1, 10);
+                }
 
                 if (not plugin::HasDynamicZoneAssigned($client)) {
                     if ($task_name =~ /\(Escalation\)$/ ) {
