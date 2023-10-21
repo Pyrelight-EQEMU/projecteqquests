@@ -229,8 +229,10 @@ sub TrySetLeaderForZone {
     if ($score > $current_score) {
         # If so, set the new player and score as the top score.
         SetLeaderForZone($zone, $player, $score);
-        if ($current_leader ne 'None') {
+        if ($current_leader ne 'None' and $current_leader ne $player) {
             plugin::WorldAnnounce("$player surpassed $current_leader as the undisputed champion of $zone.");
+        } elsif ($current_leader eq $player) {
+            plugin::WorldAnnounce("$player has solidified their lead as the undisputed champion of $zone.");
         } else {
             plugin::WorldAnnounce("$player has become the undisputed champion of $zone.");
         }
