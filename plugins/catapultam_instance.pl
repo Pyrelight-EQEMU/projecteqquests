@@ -13,13 +13,10 @@ sub HandleSay {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
 
-    my $details       = quest::saylink("instance_details", 1, "details");
-    my $tokens_of_strength = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
-    my $decrease      = quest::saylink("decrease_info", 1, "decrease");
-    my $Proceed       = quest::saylink("instance_proceed", 1, "Proceed");
-
-    my $mana_crystals_item       = quest::varlink(40903);
-    my $dark_mana_crystals_item  = quest::varlink(40902);
+    my $details             = quest::saylink("instance_details", 1, "details");
+    my $tokens_of_strength  = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
+    my $decrease            = quest::saylink("decrease_info", 1, "decrease");
+    my $Proceed             = quest::saylink("instance_proceed", 1, "Proceed");
 
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
@@ -238,15 +235,13 @@ sub Get_FoS_Heroic_Tokens {
 
 sub HandleTaskAccept
 {
-    my $task_id            = shift || plugin::val('task_id');
-    my $task_name          = quest::gettaskname($task_id);
-    my $mana_crystals       = quest::varlink(40903);
-    my $dark_mana_crystals  = quest::varlink(40902);
+    my $task_id             = shift || plugin::val('task_id');
+    my $task_name           = quest::gettaskname($task_id);
 
     if ($task_name =~ /\(Escalation\)$/ ) {
-        plugin::YellowText("You have started an Escalation task. You will recieve [$mana_crystals] and permanently increase your Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion.");
     } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        plugin::YellowText("You have started a Heroic task. You will recieve [$dark_mana_crystals] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
     } else {
         plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
     }
@@ -371,8 +366,9 @@ sub ModifyInstanceNPC
             #otherwise spellscale can get crazy in some cases
             if ($stat eq 'spellscale' or $stat eq 'healscale') {
                 $stat = min((50 * $difficulty), $stat);
+            } else {
+                $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
             }
-            $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty * $modifier));
         }
     }
 
