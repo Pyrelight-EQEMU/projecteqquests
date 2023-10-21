@@ -368,7 +368,6 @@ sub ModifyInstanceLoot {
     my $difficulty   = $info_bucket{'difficulty'};
 
     if ($corpse) {
-        my $upgrade_base = floor($difficulty/3);
         my @lootlist = $corpse->GetLootList();
         my @to_upgrade;
 
@@ -377,8 +376,11 @@ sub ModifyInstanceLoot {
                          floor($corpse->GetGold()*$upgrade_base), 
                          floor($corpse->GetPlatinum()*$upgrade_base));
 
-        foreach my $item_id (@lootlist) {
-            quest::debug("$item_id, $upgrade_base, $corpse");
+        foreach my $item_id (@lootlist) {            
+            my $upgrade_base = floor($difficulty/3);
+            if (quest::getitemstat($item_id, 'itemtype') == 54) {
+                $upgrade_base = int(rand(11));
+            }
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }

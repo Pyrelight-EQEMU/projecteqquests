@@ -97,26 +97,21 @@ sub EVENT_DEATH_COMPLETE {
         plugin::ModifyInstanceLoot($corpse);     
     }    
 
+    # Global Upgrade Chance
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
-        my @to_upgrade;
         foreach my $item_id (@lootlist) {
             my $chance = rand();
 
             if ($chance < 0.03) {
-                push @to_upgrade, [$item_id, 3];
+                plugin::upgrade_item_tier($item_id, 3, $corpse);
             }
             elsif ($chance < 0.11) {
-                push @to_upgrade, [$item_id, 2];
+                plugin::upgrade_item_tier($item_id, 2, $corpse);
             }
             elsif ($chance < 0.33) {
-                push @to_upgrade, [$item_id, 1];
+                plugin::upgrade_item_tier($item_id, 1, $corpse);
             }
-        }
-
-        # Now upgrade items
-        for my $upgrade (@to_upgrade) {
-           plugin::upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
         }
     }
 }
