@@ -210,7 +210,7 @@ sub EVENT_SAY {
                 $client->SummonItem($item_id + 1000000, 1,1);
                 $client->DeleteBucket("Artificer-WorkOrder");
             } else {
-                my $test_result = test_upgrade($current_item_id);
+                my $test_result = test_upgrade($item_id);
                 if ($test_result->{success} and plugin::get_cmc() >= $test_result->{total_cost}) {
                     execute_upgrade($item_id);
                     $client->DeleteBucket("Artificer-WorkOrder");
@@ -374,7 +374,7 @@ sub test_upgrade {
 
             quest::debug($target_item_id);
 
-            $total_cmc_cost_ref += get_upgrade_cost($target_item_id);
+            $$total_cmc_cost_ref += get_upgrade_cost($target_item_id);
 
             #quest::debug("(After) Current virtual inventory: " . join(", ", map { "$_ -> $virtual_inventory->{$_}" } keys %{$virtual_inventory}));
         }
@@ -382,7 +382,7 @@ sub test_upgrade {
 
     my $result = {
         success => 0,
-        total_cost => $total_cmc_cost_ref
+        total_cost => $$total_cmc_cost_ref
     };
 
     if ($virtual_inventory->{$target_item_id} > $original_target_count) {
