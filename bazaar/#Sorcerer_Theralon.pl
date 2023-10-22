@@ -16,13 +16,14 @@ sub EVENT_SAY
                             Spoken with Master Eithan, have you? 
                             Here to give an old wizard a [hand]?");
             $client->SetBucket("TheralonIntro", 1);
+            $client->SetBucket("MAO-Progress", 4);
         } else {
             plugin::NPCTell("Ah, $charname, good, good! Time is fleeting, you see. 
                             Here for my grand [venture] or to exchange some shiny [tokens]?");
         }
     }
 
-    elsif ($text=~/assist|hand|venture/i) {
+    elsif ($text=~/assist|hand|venture/i && $progress > 3 && $met_befo) {
         plugin::NPCTell("Splendid! Envision with me: A liberated Taelosia, my dear homeland! 
                         But oh, the challenges! The Queen of Thorns, our flagship, 
                         needs shielding from that treacherous magical storm. 
@@ -30,14 +31,14 @@ sub EVENT_SAY
                         distractions abound. Fancy a [task]?");
     }
 
-    elsif ($text=~/gathering materials|task/i) {
+    elsif ($text=~/gathering materials|task/i && $progress > 3 && $met_befo) {
         plugin::NPCTell("Multitasking, my friend! Efficiency! I've dispatched my trusty golems
                         remarkable creations, if I do say so myself to guide you. 
                         Find them, heed their words, and they shall bestow upon you [tokens]. 
                         And I? I can make those tokens work wonders for you.");
     }
 
-    elsif ($text=~/tokens/i) {
+    elsif ($text=~/tokens/i && $progress > 3 && $met_befo) {
         plugin::NPCTell("Ah, tokens! The universal language of favors. 
                         Let me show you the marvels they can bring forth.");
         plugin::PurpleText("- [Class Unlocks] - [Special Abilities] - [Equipment] -");
