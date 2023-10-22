@@ -57,7 +57,7 @@ sub EVENT_SAY
             my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] - I confirm that I understand that I will recieve a permanent XP/AAXP Penalty.";
 
             plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");            
-            plugin::YellowText("You are currently earning $percentage_expRate%% of normal XP.");
+            plugin::PurpleText("You are currently earning $percentage_expRate%% of normal XP, and have $total_classes unlocked.");
             plugin::PurpleText("$link_confirm_unlock");
         } else {
             # Other code or conditions can go here.
