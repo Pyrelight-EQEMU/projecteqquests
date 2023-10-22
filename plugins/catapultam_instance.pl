@@ -422,7 +422,7 @@ sub ModifyInstanceNPC
     my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
     my $reward      = $info_bucket{'reward'};
 
-    my $difficulty_modifier = 1 + ($modifier * $difficulty);
+    
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
@@ -458,6 +458,13 @@ sub ModifyInstanceNPC
     #Recale stats
     if ($difficulty > 0) {
         foreach my $stat (@stat_names) {
+            my $difficulty_modifier = 1 + ($modifier * $difficulty);
+            if      (grep { $_ eq $stat } ('hp')) {
+                $difficulty_modifier *= 2;
+            } elsif (grep { $_ eq $stat } ('fr', 'cr', 'mr', 'dr', 'pr')) {
+                $difficulty_modifier /= 2;
+            }
+            
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
     }
