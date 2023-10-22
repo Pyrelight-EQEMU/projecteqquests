@@ -79,7 +79,7 @@ sub ceil_to_nearest_5 {
     return ceil($value / 5) * 5;
 }
 
-my $max_id = 199999;
+my $max_id = 200000;
 my $chunk_size = 100;
 
 for my $tier (1..10) {
@@ -114,7 +114,7 @@ for my $tier (1..10) {
 				}
 
                 $row->{attuneable} = 1;
-                $row->{nodrop} = 1;
+                $row->{nodrop} = 0;
                 $row->{price} = $row->{price} * $modifier + $tier;
 
                 if ($row->{skillmodvalue} > 0 && $row->{skillmodmax} > 0) {
@@ -133,7 +133,7 @@ for my $tier (1..10) {
                     
                     $row->{damage} = max($tier, $row->{damage} + $additional_damage);
                     
-                } elsif ($row->{damage} > 0) {
+                } elsif ($row->{damage} > 0 && grep { $_ == $row->{itemtype} } (0, 1, 2, 3, 4, 5, 7, 35, 45)) {
                     $row->{damage} = $row->{damage} + $tier;
                 }
 

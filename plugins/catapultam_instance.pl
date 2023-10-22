@@ -379,7 +379,7 @@ sub ModifyInstanceLoot {
         foreach my $item_id (@lootlist) {            
             my $upgrade_base = floor($difficulty/3);
             if (quest::getitemstat($item_id, 'itemtype') == 54) {
-                $upgrade_base = int(rand(11));
+                $upgrade_base = int(rand($upgrade_base+1));
             }
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
