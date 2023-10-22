@@ -59,7 +59,7 @@ sub EVENT_SAY
         foreach my $class (@locked_classes) {
             my $class_cost = $costs[$total_classes];
             my $class_name = quest::getclassname($class);
-            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($class_cost) - $class_name";
+            my $unlock_menu_item = "- [". quest::saylink("$class_name", 1, "unlock_$class") ."] ($class_cost) - $class_name";
             plugin::PurpleText($unlock_menu_item); 
         }
         
