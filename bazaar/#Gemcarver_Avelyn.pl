@@ -14,7 +14,7 @@ sub EVENT_ITEM {
     my $link_cancel                       = "[".quest::saylink("link_cancel", 1, "cancel")."]";
     my $link_obtain_more                  = "[".quest::saylink("link_obtain_more", 1, "obtain more")."]";
     my $link_concentrated_mana_crystals   = "[".quest::saylink("link_concentrated_mana_crystals", 1, "Concentrated Mana Crystals")."]";
-      my $link_bindings_glyphs_and_spells = "[".quest::saylink("link_bindings_glyphs_and_spells", 1, "Bindings, Glyphs, and Spells")."]";
+    my $link_bindings_glyphs_and_spells   = "[".quest::saylink("link_bindings_glyphs_and_spells", 1, "Bindings, Glyphs, and Spells")."]";
     my $link_trade                        = "[".quest::saylink("link_trade", 1, "trade")."]";
 
     if ($work_order == 0) {
@@ -29,15 +29,19 @@ sub EVENT_ITEM {
                   my $itemlink = quest::varlink($item_id);
                   if (grep { $_ == $base_id } @epics) {
                      plugin::NPCTell("I'm sorry, $clientName. This item is far too precious, I'm not going to touch it.");
-                  } elsif (is_global_aug($item_id)) {
-                     if ($CMC_Available > $trade_cost) {
-                        plugin::NPCTell("I'd be happy to take this in trade. Here, try this one on for size!");
-                        plugin::spend_cmc($trade_cost);
-                        $client->SummonItem(get_global_aug(), 1, 1);
-                        return;
-                     } else {
-                         plugin::NPCTell("I'd be happy to take this in trade, but I do require $trade_cost $link_converted_mana_crystals.");
-                     }
+                  } elsif (plugin::is_global_aug($base_id)) {
+                    
+
+
+
+                    if ($CMC_Available > $trade_cost) {
+                       plugin::NPCTell("I'd be happy to take this in trade. Here, try this one on for size!");
+                       plugin::spend_cmc($trade_cost);
+                       $client->SummonItem(plugin::get_global_aug(), 1, 1);
+                       return;
+                    } else {
+                        plugin::NPCTell("I'd be happy to take this in trade, but I do require $trade_cost $link_converted_mana_crystals.");
+                    }
                   } else {
                      my @augs = @{ get_augs($base_id) };
                      my $aug_count = scalar @augs;
@@ -365,35 +369,4 @@ sub get_augs {
     $dbh->disconnect();
 
     return \@item_ids; # Return a reference to the list of item ids
-}
-
-sub is_global_aug {
-    my $item_id = shift;
-    my $dbh = plugin::LoadMysql();
-
-    my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 AND lootdrop_entries.item_id = ?");
-    $sth->execute($item_id);
-
-    $dbh->disconnect();
-   
-    if ($sth->fetchrow_array) {
-        $sth->finish();
-        return 1; # Item ID is present
-    } else {
-        $sth->finish();
-        return 0; # Item ID is not present
-    }
-}
-
-sub get_global_aug {
-   my $dbh = plugin::LoadMysql();
-
-   my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 ORDER BY RAND() LIMIT 1");
-   $sth->execute();
-   
-   my ($random_item_id) = $sth->fetchrow_array;
-
-   $sth->finish();
-   $dbh->disconnect();
-   return $random_item_id;   
 }

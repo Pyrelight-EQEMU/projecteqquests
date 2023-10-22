@@ -858,3 +858,34 @@ sub fix_zone_data {
 
     quest::set_data($charKey, plugin::serialize_zone_data($data_hash));
 }
+
+sub is_global_aug {
+    my $item_id = shift;
+    my $dbh = plugin::LoadMysql();
+
+    my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 AND lootdrop_entries.item_id = ?");
+    $sth->execute($item_id);
+
+    $dbh->disconnect();
+   
+    if ($sth->fetchrow_array) {
+        $sth->finish();
+        return 1; # Item ID is present
+    } else {
+        $sth->finish();
+        return 0; # Item ID is not present
+    }
+}
+
+sub get_global_aug {
+   my $dbh = plugin::LoadMysql();
+
+   my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 ORDER BY RAND() LIMIT 1");
+   $sth->execute();
+   
+   my ($random_item_id) = $sth->fetchrow_array;
+
+   $sth->finish();
+   $dbh->disconnect();
+   return $random_item_id;   
+}

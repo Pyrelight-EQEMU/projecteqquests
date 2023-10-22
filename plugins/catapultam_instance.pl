@@ -334,18 +334,18 @@ sub HandleTaskAccept
     }
 }
 
-sub upgrade_item_tier {
+sub upgrade_item_corpse {
     my ($item_id, $tier, $corpse)  = @_;
     if (plugin::is_item_upgradable($item_id)) {
         my $base_id    = plugin::get_base_id($item_id);
         my $curtier    = plugin::get_upgrade_tier($item_id);
 
         my $target_tier = min(10, $tier + $curtier);
-        my $target_item = $base_id + (1000000 * $tier);
-        quest::debug("base: $base_id, target: $target_item");
+        my $target_item = $base_id + (1000000 * $target_tier);
+        quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
         if (plugin::item_exists_in_db($target_item)) {
             if ($corpse && $corpse->CountItem($item_id)) {            
-                $corpse->RemoveItemByID($item_id);
+                $corpse->RemoveItemByID($item_id,);
             } else {quest::debug("The corpse didn't exist?");} 
             quest::debug("adding $target_item to $corpse");           
             $corpse->AddItem($target_item, 1);
@@ -355,33 +355,53 @@ sub upgrade_item_tier {
     }
 }
 
+sub upgrade_item_npc {
+    my ($item_id, $tier, $npc)  = @_;
+    if (plugin::is_item_upgradable($item_id)) {
+        my $base_id    = plugin::get_base_id($item_id);
+        my $curtier    = plugin::get_upgrade_tier($item_id);
+
+        my $target_tier = min(10, $tier + $curtier);
+        my $target_item = $base_id + (1000000 * $target_tier);
+        quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
+        if (plugin::item_exists_in_db($target_item)) {
+            if ($npc && $npc->CountItem($item_id)) {            
+                $npc->RemoveItem($item_id,);
+            } else {quest::debug("The npc didn't exist?");} 
+            quest::debug("adding $target_item to $npc");           
+            $npc->AddItem($target_item);
+        } 
+    } else {
+        quest::debug("item: $item_id was not upgradable");
+    }
+}
+
 sub ModifyInstanceLoot {
-    my $corpse      = shift or return;
+    my $npc         = shift or return;
     my $client      = plugin::val('client');
     my $zonesn      = plugin::val('zonesn');
     my $instanceid  = plugin::val('instanceid');
 
-    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);    
-
     # Get the packed data for the instance
+    my $owner_id     = GetSharedTaskLeaderByInstance($instanceid);    
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'};
 
-    if ($corpse) {
-        my @lootlist = $corpse->GetLootList();
-        my @to_upgrade;
+    if ($npc) {
+        my @lootlist = $npc->GetLootList();
+        my $upgrade_base = floor($difficulty/3);
 
-        $corpse->SetCash(floor($corpse->GetCopper()*$upgrade_base), 
-                         floor($corpse->GetSilver()*$upgrade_base),
-                         floor($corpse->GetGold()*$upgrade_base), 
-                         floor($corpse->GetPlatinum()*$upgrade_base));
+        foreach my $item_id (@lootlist) {
+            # Get the count of this item ID in the loot
+            my $item_count = $npc->CountItem($item_id);
+            my $item_type  = quest::getitemstat($item_id, 'itemtype') == 54;
 
-        foreach my $item_id (@lootlist) {            
-            my $upgrade_base = floor($difficulty/3);
-            if (quest::getitemstat($item_id, 'itemtype') == 54) {
-                $upgrade_base = int(rand(11));
+            quest::debug("item:$item_id, count:$item_count, difficulty:$difficulty");
+
+            for (my $i = 0; $i < $item_count; $i++) {
+                $upgrade_base = ($item_type) ? int(rand($upgrade_base + 1)) : $upgrade_base;
+                plugin::upgrade_item_npc($item_id, $upgrade_base, $npc);
             }
-            plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
 }

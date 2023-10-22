@@ -27,7 +27,8 @@ sub EVENT_SPAWN {
     # Check for FoS Instance
     if ($instanceversion == 10) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
-        plugin::ModifyInstanceNPC(); 
+        plugin::ModifyInstanceNPC();
+        plugin::ModifyInstanceLoot($npc);  
     }
 }
 
@@ -90,12 +91,7 @@ sub EVENT_ITEM
 
 sub EVENT_DEATH_COMPLETE {
     my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-    CHECK_CHARM_STATUS();
-
-    # Check for FoS Instance
-    if ($instanceversion == 10) {
-        plugin::ModifyInstanceLoot($corpse);     
-    }    
+    CHECK_CHARM_STATUS();  
 
     # Global Upgrade Chance
     if ($corpse) {
@@ -104,13 +100,13 @@ sub EVENT_DEATH_COMPLETE {
             my $chance = rand();
 
             if ($chance < 0.03) {
-                plugin::upgrade_item_tier($item_id, 3, $corpse);
+                plugin::upgrade_item_corpse($item_id, 3, $corpse);
             }
             elsif ($chance < 0.11) {
-                plugin::upgrade_item_tier($item_id, 2, $corpse);
+                plugin::upgrade_item_corpse($item_id, 2, $corpse);
             }
             elsif ($chance < 0.33) {
-                plugin::upgrade_item_tier($item_id, 1, $corpse);
+                plugin::upgrade_item_corpse($item_id, 1, $corpse);
             }
         }
     }
