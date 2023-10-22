@@ -460,11 +460,11 @@ sub ModifyInstanceNPC
         foreach my $stat (@stat_names) {
             my $difficulty_modifier = 1 + ($modifier * $difficulty);
             if      (grep { $_ eq $stat } ('hp')) {
-                $difficulty_modifier *= 2;
+                $difficulty_modifier *= 1.5;
             } elsif (grep { $_ eq $stat } ('fr', 'cr', 'mr', 'dr', 'pr')) {
                 $difficulty_modifier /= 2;
             }
-            
+
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
     }
