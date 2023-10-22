@@ -51,9 +51,8 @@ sub EVENT_SAY
 
         quest::debug("total: $total_classes");
 
-        # Hardcoded costs based on total_classes
-        # Assuming indexes 0 and 9 aren't used, just for alignment with class counts 1 through 8.
-        my @costs = (0, 5000, 4300, 3600, 3000, 2500, 1500, 1000, 50);
+        # Inverted hardcoded costs based on total_classes
+        my @costs = (0, 50, 1000, 1500, 2500, 3000, 3600, 4300, 5000);
 
         # Build the Menu
         foreach my $class (@locked_classes) {
@@ -61,7 +60,6 @@ sub EVENT_SAY
             my $class_name = quest::getclassname($class);
             my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] ($class_cost) - $class_name";
             plugin::PurpleText($unlock_menu_item); 
-        }
-        
+        }        
     }
 }
