@@ -45,21 +45,24 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
-        my @locked_classes = plugin::GetLockedClasses($client); #returns @list of locked class IDs
-        my %unlocked_class = plugin::GetUnlockedClasses($client);
-        my $total_classes  = scalar(keys %unlocked_class);
+        my @locked_classes      = plugin::GetLockedClasses($client); #returns @list of locked class IDs
+        my %unlocked_class      = plugin::GetUnlockedClasses($client);
+        my $total_classes       = scalar(keys %unlocked_class);
+        my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
+        my @costs = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
 
-        quest::debug("total: $total_classes");
-
-        # Inverted hardcoded costs based on total_classes
-        my @costs = (0, 50, 1000, 1500, 2500, 3000, 3600, 4300, 5000);
+        if (!$unlocksAvailable) {
+            plugin::PurpleText("Do you wish to purchase a class unlock?");
+            plugin::PurpleText("WARNING: You will incur a permanent 25% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");
+            plugin::PurpleText("You are currently earning $100% of normal XP.");
+        }
 
         # Build the Menu
-        foreach my $class (@locked_classes) {
-            my $class_cost = $costs[$total_classes];
-            my $class_name = quest::getclassname($class);
-            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] ($class_cost) - $class_name";
-            plugin::PurpleText($unlock_menu_item); 
-        }        
+        #foreach my $class (@locked_classes) {
+        #    my $class_cost = $costs[$total_classes];
+        #    my $class_name = quest::getclassname($class);
+        #    my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] ($class_cost) - $class_name";
+        #    plugin::PurpleText($unlock_menu_item); 
+        #}        
     }
 }
