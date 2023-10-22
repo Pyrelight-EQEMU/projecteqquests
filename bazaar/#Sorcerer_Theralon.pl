@@ -26,9 +26,9 @@ sub EVENT_SAY
                         But oh, the challenges! The Queen of Thorns, our flagship, 
                         needs shielding from that treacherous magical storm. 
                         And monsters, oh the monsters! Running amok in Norrath, 
-                        distractions abound. Fancy a [task]?");                        
-        $client->SetBucket("TheralonIntro", 1);
-        $client->SetBucket("MAO-Progress", 4);
+                        distractions abound. Fancy a [task]?");
+        $client->SetBucket("TheralonIntro", 1) unless $met_befo;
+        $client->SetBucket("MAO-Progress", 4)  unless $progress >= 4;
     }
 
     elsif ($text=~/gathering materials|task/i && $progress > 3 && $met_befo) {
