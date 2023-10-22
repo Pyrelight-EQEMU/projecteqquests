@@ -397,7 +397,7 @@ sub ModifyInstanceLoot {
             # Ensure the item is on the corpse before removal
             if ($item_count > 1) {
                 # Cull the duplicates, leaving only one of this item ID
-                $corpse->DeleteItem($item_id, $item_count - 1);
+                $corpse->RemoveItemByID($item_id, $item_count - 1);
 
                 # Replace duplicates with random augs and upgrade them
                 for (1 .. $item_count - 1) {
