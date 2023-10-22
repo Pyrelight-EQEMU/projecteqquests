@@ -45,16 +45,20 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
-        my @locked_classes      = plugin::GetLockedClasses($client); #returns @list of locked class IDs
+        my @locked_classes      = plugin::GetLockedClasses($client);
         my %unlocked_class      = plugin::GetUnlockedClasses($client);
         my $total_classes       = scalar(keys %unlocked_class);
         my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
         my @costs = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
 
-        if (!$unlocksAvailable) {
-            plugin::PurpleText("Do you wish to purchase a class unlock?");
-            plugin::PurpleText("WARNING: You will incur a permanent 25% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");
+        my $expRate = $client->GetExpModifier(0);
+
+        if (!$unlocksAvailable) {            
+            plugin::PurpleText("WARNING: You will recieve a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");
             plugin::PurpleText("You are currently earning 100%% of normal XP.");
+            quest::debug("expRate:$expRate");
+        } else {
+
         }
 
         # Build the Menu
