@@ -402,8 +402,8 @@ sub ModifyInstanceLoot {
                 # Replace duplicates with random augs and upgrade them
                 for (1 .. $item_count - 1) {
                     my $random_aug_id = get_global_aug();
-                    $corpse->RemoveItemByID($item_id);
-                    $corpse->AddItem($random_aug_id);
+                    $corpse->RemoveItemByID($item_id, 1);
+                    $corpse->AddItem($random_aug_id, 1);
 
                     my $upgrade_base_for_aug = $upgrade_base;
                     if (quest::getitemstat($random_aug_id, 'itemtype') == 54) {
