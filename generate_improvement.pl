@@ -80,7 +80,7 @@ sub ceil_to_nearest_5 {
 }
 
 my $max_id = 200000;
-my $chunk_size = 100;
+my $chunk_size = 200000;
 
 for my $tier (1..10) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
@@ -150,7 +150,7 @@ for my $tier (1..10) {
 				
                 # Adjusting Heroic Stats
                 foreach my $stat (qw(heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_fr heroic_cr heroic_dr heroic_pr)) {
-                    $row->{$stat} += $row->{$stat} + max($row->{$stat} ? $tier : 0, ceil(($row->{$stat} * $modifier)));
+                    $row->{$stat} += max($row->{$stat} ? $tier : 0, ceil($row->{$stat} * $modifier));
                 }
 
                 # Create an INSERT statement dynamically
