@@ -15,20 +15,20 @@ sub EVENT_SAY
             plugin::NPCTell("Aha! $charname! The winds whispered of your coming. 
                             Spoken with Master Eithan, have you? 
                             Here to give an old wizard a [hand]?");
-            $client->SetBucket("TheralonIntro", 1);
-            $client->SetBucket("MAO-Progress", 4);
         } else {
             plugin::NPCTell("Ah, $charname, good, good! Time is fleeting, you see. 
                             Here for my grand [venture] or to exchange some shiny [tokens]?");
         }
     }
 
-    elsif ($text=~/assist|hand|venture/i && $progress > 3 && $met_befo) {
+    elsif ($text=~/assist|hand|venture/i && $progress >= 3) {
         plugin::NPCTell("Splendid! Envision with me: A liberated Taelosia, my dear homeland! 
                         But oh, the challenges! The Queen of Thorns, our flagship, 
                         needs shielding from that treacherous magical storm. 
                         And monsters, oh the monsters! Running amok in Norrath, 
-                        distractions abound. Fancy a [task]?");
+                        distractions abound. Fancy a [task]?");                        
+        $client->SetBucket("TheralonIntro", 1);
+        $client->SetBucket("MAO-Progress", 4);
     }
 
     elsif ($text=~/gathering materials|task/i && $progress > 3 && $met_befo) {
