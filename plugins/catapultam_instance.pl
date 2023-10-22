@@ -462,7 +462,7 @@ sub ModifyInstanceNPC
         $npc->SetLevel($npc->GetLevel() + $level_diff);
         foreach my $stat (@stat_names) {
             # Skip processing for 'spellscale' and 'healscale'
-            next if ($stat eq 'spellscale' or $stat eq 'healscale');
+            next if ($stat eq 'spellscale' or $stat eq 'healscale');           
 
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
         }      
