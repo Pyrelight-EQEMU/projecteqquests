@@ -382,7 +382,9 @@ sub ModifyInstanceLoot {
 
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
+        my @to_upgrade;
 
+        my $upgrade_base = floor($difficulty/3);
         $corpse->SetCash(floor($corpse->GetCopper()*$upgrade_base), 
                          floor($corpse->GetSilver()*$upgrade_base),
                          floor($corpse->GetGold()*$upgrade_base), 
@@ -391,15 +393,11 @@ sub ModifyInstanceLoot {
         foreach my $item_id (@lootlist) {
             # Get the count of this item ID in the loot
             my $item_count = $corpse->CountItem($item_id);
-            
-            my $upgrade_base = floor($difficulty/3);
-            if (quest::getitemstat($item_id, 'itemtype') == 54) {
-                $upgrade_base = int(rand($upgrade_base + 1));
-            }
-            
+
+            # Ensure the item is on the corpse before removal
             if ($item_count > 1) {
                 # Cull the duplicates, leaving only one of this item ID
-                $corpse->RemoveItemByID($item_id, $item_count - 1);
+                $corpse->DeleteItem($item_id, $item_count - 1);
 
                 # Replace duplicates with random augs and upgrade them
                 for (1 .. $item_count - 1) {
@@ -415,12 +413,14 @@ sub ModifyInstanceLoot {
                 }
             }
 
+            if (quest::getitemstat($item_id, 'itemtype') == 54) {
+                $upgrade_base = int(rand($upgrade_base + 1));
+            }
+
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
 }
-
-
 
 sub ModifyInstanceNPC
 {
