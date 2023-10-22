@@ -56,15 +56,13 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
-
         if (!$unlocksAvailable) {
-            my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] ($costs[$total_classes] Feat of Strength Tokens) - I confirm that I understand that I will recieve a permanent XP/AAXP Penalty.";
+            my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] ($costs[$total_classes] Feat of Strength Tokens) - I confirm that I understand that I will recieve an additional permanent XP/AAXP Penalty.";
             plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
             plugin::PurpleText("$link_confirm_unlock");
         } else {
             # Other code or conditions can go here.
         }
-
 
         # Build the Menu
         #foreach my $class (@locked_classes) {
@@ -73,5 +71,9 @@ sub EVENT_SAY
         #    my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] ($class_cost) - $class_name";
         #    plugin::PurpleText($unlock_menu_item); 
         #}        
+    }
+
+    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && $FoS_Token >= $costs[$total_classes]) {
+        quest::debug("Success!");
     }
 }
