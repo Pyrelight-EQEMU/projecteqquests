@@ -45,20 +45,26 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
-        my $cost = 100;
-
         my @locked_classes = plugin::GetLockedClasses($client); #returns @list of locked class IDs
         my %unlocked_class = plugin::GetUnlockedClasses($client);
         my $total_classes  = scalar(keys %unlocked_class);
 
         quest::debug("total: $total_classes");
- 
 
-        #my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($cost) - $class";
+        # Cost calculation based on total_classes
+        my $cost = -707.14 * ($total_classes - 8) + 50;
+        if ($total_classes != 8) {
+            $cost = 500 * int($cost/500 + 0.5);
+        }
 
+        # Build the Menu
+        my $menu = "Class Unlock Menu:\n";
+        foreach my $class (@locked_classes) {
+            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($cost) - $class\n";
+            $menu .= $unlock_menu_item;
+        }
 
-
-
-        #Build the Menu. Format: my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($cost) - $class";
+        quest::say($menu); # Display the menu to the player
     }
+
 }
