@@ -43,7 +43,7 @@ sub EVENT_ITEM {
    foreach my $item_id (keys %itemcount) {
       if ($item_id != 0) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
-
+         
          my $item_id = plugin::get_base_id($item_id);
          my $item_name = quest::getitemname($item_id);
 
