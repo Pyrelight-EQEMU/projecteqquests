@@ -402,6 +402,7 @@ sub ModifyInstanceLoot {
                 # Replace duplicates with random augs and upgrade them
                 for (1 .. $item_count - 1) {
                     my $random_aug_id = get_random_aug();
+                    $corpse->RemoveItemByID($item_id);
                     $corpse->AddItem($random_aug_id);
 
                     my $upgrade_base_for_aug = $upgrade_base;
