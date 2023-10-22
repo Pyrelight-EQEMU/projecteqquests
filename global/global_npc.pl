@@ -27,8 +27,7 @@ sub EVENT_SPAWN {
     # Check for FoS Instance
     if ($instanceversion == 10) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
-        plugin::ModifyInstanceNPC();        
-        plugin::ModifyInstanceLoot();     
+        plugin::ModifyInstanceNPC(); 
     }
 }
 
@@ -90,48 +89,29 @@ sub EVENT_ITEM
 }
 
 sub EVENT_DEATH_COMPLETE {
+    my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
     CHECK_CHARM_STATUS();
 
-    my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
+    # Check for FoS Instance
+    if ($instanceversion == 10) {
+        plugin::ModifyInstanceLoot($corpse);     
+    }    
+
+    # Global Upgrade Chance
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
-
-        # Collect items to upgrade without modifying the corpse inside loop
-        my @to_upgrade;
         foreach my $item_id (@lootlist) {
             my $chance = rand();
-            my $num_items = scalar @lootlist;
-            quest::debug("num_items: $num_items");
 
             if ($chance < 0.03) {
-                push @to_upgrade, [$item_id, 3];
+                plugin::upgrade_item_tier($item_id, 3, $corpse);
             }
             elsif ($chance < 0.11) {
-                push @to_upgrade, [$item_id, 2];
+                plugin::upgrade_item_tier($item_id, 2, $corpse);
             }
             elsif ($chance < 0.33) {
-                push @to_upgrade, [$item_id, 1];
+                plugin::upgrade_item_tier($item_id, 1, $corpse);
             }
-        }
-
-        # Now upgrade items
-        for my $upgrade (@to_upgrade) {
-            upgrade_item_tier($upgrade->[0], $upgrade->[1], $corpse);
-        }
-    }
-}
-
-sub upgrade_item_tier {
-    my ($item_id, $tier, $entity)  = @_;
-
-    if (plugin::is_item_upgradable($item_id)) {
-        my $current_tier = int($item_id / 1000000);
-        my $base_id = $item_id % 1000000;
-
-        $tier = $current_tier + $tier;
-        if (plugin::item_exists_in_db($base_id + ($tier * 1000000))) {
-            $entity->RemoveItemByID($item_id);
-            $entity->AddItem($base_id + ($tier * 1000000), 1);
         }
     }
 }
