@@ -56,13 +56,12 @@ sub EVENT_SAY
         my @costs = (0, 5000, 4300, 3600, 3000, 2500, 1500, 1000, 50);
 
         # Build the Menu
-        my $menu = "Class Unlock Menu:\n";
         foreach my $class (@locked_classes) {
             my $class_cost = $costs[$total_classes];
-            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($class_cost) - $class\n";
-            $menu .= $unlock_menu_item;
+            my $class_name = quest::getclassname($class);
+            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($class_cost) - $class_name";
+            plugin::PurpleText($unlock_menu_item); 
         }
-
-        plugin::PurpleText($menu); # Display the menu to the player
+        
     }
 }
