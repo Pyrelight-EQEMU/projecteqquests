@@ -420,6 +420,8 @@ sub ModifyInstanceLoot {
     }
 }
 
+
+
 sub ModifyInstanceNPC
 {
     my $client     = plugin::val('client');
