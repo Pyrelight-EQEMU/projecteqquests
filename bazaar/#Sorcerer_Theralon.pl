@@ -54,7 +54,7 @@ sub EVENT_SAY
         if (!$unlocksAvailable) {
             plugin::PurpleText("Do you wish to purchase a class unlock?");
             plugin::PurpleText("WARNING: You will incur a permanent 25% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");
-            plugin::PurpleText("You are currently earning 100% of normal XP.");
+            plugin::PurpleText("You are currently earning 100%% of normal XP.");
         }
 
         # Build the Menu
