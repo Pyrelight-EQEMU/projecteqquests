@@ -51,20 +51,18 @@ sub EVENT_SAY
 
         quest::debug("total: $total_classes");
 
-        # Cost calculation based on total_classes
-        my $cost = -707.14 * ($total_classes - 8) + 50;
-        if ($total_classes != 8) {
-            $cost = 500 * int($cost/500 + 0.5);
-        }
+        # Hardcoded costs based on total_classes
+        # Assuming indexes 0 and 9 aren't used, just for alignment with class counts 1 through 8.
+        my @costs = (0, 5000, 4300, 3600, 3000, 2500, 1500, 1000, 50);
 
         # Build the Menu
         my $menu = "Class Unlock Menu:\n";
         foreach my $class (@locked_classes) {
-            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($cost) - $class\n";
+            my $class_cost = $costs[$total_classes];
+            my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($class_cost) - $class\n";
             $menu .= $unlock_menu_item;
         }
 
-        quest::say($menu); # Display the menu to the player
+        plugin::PurpleText($menu); # Display the menu to the player
     }
-
 }
