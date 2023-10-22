@@ -53,16 +53,14 @@ sub EVENT_SAY
                                 classes unlocked.");            
             plugin::PurpleText("$link_confirm_unlock");
         } else {
-            # Other code or conditions can go here.
-        }
-
-        # Build the Menu
-        #foreach my $class (@locked_classes) {
-        #    my $class_cost = $costs[$total_classes];
-        #    my $class_name = quest::getclassname($class);
-        #    my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] ($class_cost) - $class_name";
-        #    plugin::PurpleText($unlock_menu_item); 
-        #}        
+            plugin::PurpleText("You have $unlocksAvailable Class Unlock Point available.");
+            # Build the Menu
+            foreach my $class (@locked_classes) {
+                my $class_name = quest::getclassname($class);
+                my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] - $class_name";
+                plugin::PurpleText($unlock_menu_item); 
+            }  
+        }      
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
@@ -79,8 +77,7 @@ sub EVENT_SAY
             plugin::YellowText("Your EXP rate has been reduced to $percentage_expRate%%.");
             plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
         } else {
-            
-        }
-        
+            plugin::NPCTell("I'm sorry, $charname. You don't have enough [tokens] to afford that.");
+        }        
     }
 }
