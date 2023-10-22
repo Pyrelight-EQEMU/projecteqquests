@@ -9,9 +9,9 @@ sub EVENT_SAY
           
     if ($text=~/hail/i) {
         if ($progress < 3) {
-            plugin::NPCTell("Ah! Apologies, apologies! So much to do, so little...well, 
+            quest::say("Ah! Apologies, apologies! So much to do, so little...well, 
                             you understand. Now's not the time, I'm afraid.");
-        } elsif($met_befo)  {
+        } elsif(!$met_befo)  {
             plugin::NPCTell("Aha! $charname! The winds whispered of your coming. 
                             Spoken with Master Eithan, have you? 
                             Here to give an old wizard a [hand]?");
