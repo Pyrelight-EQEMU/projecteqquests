@@ -53,7 +53,8 @@ sub EVENT_SAY
                                 classes unlocked.");            
             plugin::PurpleText("$link_confirm_unlock");
         } else {
-            plugin::PurpleText("You have $unlocksAvailable Class Unlock Point available.");
+            plugin::PurpleText("You have $unlocksAvailable Class Unlock Point available. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes 
+                                classes unlocked.");
             # Build the Menu
             foreach my $class (@locked_classes) {
                 my $class_name = quest::getclassname($class);
