@@ -379,6 +379,8 @@ sub ModifyInstanceLoot {
             my $item_count = $corpse->CountItem($item_id);
             my $item_type  = quest::getitemstat($item_id, 'itemtype') == 54;
 
+            quest::debug("item: $item_id, count: $item_count");
+
             for (my $i = 0; $i < $item_count; $i++) {
                 $upgrade_base = ($item_type) ? int(rand($upgrade_base + 1)) : $upgrade_base;
                 plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
