@@ -345,7 +345,7 @@ sub upgrade_item_tier {
         quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
         if (plugin::item_exists_in_db($target_item)) {
             if ($corpse && $corpse->CountItem($item_id)) {            
-                $corpse->RemoveItemByID($item_id);
+                $corpse->RemoveItemByID($item_id,);
             } else {quest::debug("The corpse didn't exist?");} 
             quest::debug("adding $target_item to $corpse");           
             $corpse->AddItem($target_item, 1);
@@ -355,13 +355,26 @@ sub upgrade_item_tier {
     }
 }
 
+sub get_global_aug {
+   my $dbh = plugin::LoadMysql();
+
+   my $sth = $dbh->prepare("SELECT lootdrop_entries.item_id FROM peq.lootdrop_entries WHERE lootdrop_entries.lootdrop_id = 1200224 ORDER BY RAND() LIMIT 1");
+   $sth->execute();
+   
+   my ($random_item_id) = $sth->fetchrow_array;
+
+   $sth->finish();
+   $dbh->disconnect();
+   return $random_item_id;   
+}
+
 sub ModifyInstanceLoot {
     my $corpse      = shift or return;
     my $client      = plugin::val('client');
     my $zonesn      = plugin::val('zonesn');
     my $instanceid  = plugin::val('instanceid');
 
-    my $owner_id   = GetSharedTaskLeaderByInstance($instanceid);    
+    my $owner_id    = GetSharedTaskLeaderByInstance($instanceid);    
 
     # Get the packed data for the instance
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
@@ -369,18 +382,39 @@ sub ModifyInstanceLoot {
 
     if ($corpse) {
         my @lootlist = $corpse->GetLootList();
-        my @to_upgrade;
 
         $corpse->SetCash(floor($corpse->GetCopper()*$upgrade_base), 
                          floor($corpse->GetSilver()*$upgrade_base),
                          floor($corpse->GetGold()*$upgrade_base), 
                          floor($corpse->GetPlatinum()*$upgrade_base));
 
-        foreach my $item_id (@lootlist) {            
+        foreach my $item_id (@lootlist) {
+            # Get the count of this item ID in the loot
+            my $item_count = $corpse->CountItem($item_id);
+            
             my $upgrade_base = floor($difficulty/3);
             if (quest::getitemstat($item_id, 'itemtype') == 54) {
-                $upgrade_base = int(rand($upgrade_base+1));
+                $upgrade_base = int(rand($upgrade_base + 1));
             }
+            
+            if ($item_count > 1) {
+                # Cull the duplicates, leaving only one of this item ID
+                $corpse->RemoveItemByID($item_id, $item_count - 1);
+
+                # Replace duplicates with random augs and upgrade them
+                for (1 .. $item_count - 1) {
+                    my $random_aug_id = get_random_aug();
+                    $corpse->AddItem($random_aug_id);
+
+                    my $upgrade_base_for_aug = $upgrade_base;
+                    if (quest::getitemstat($random_aug_id, 'itemtype') == 54) {
+                        $upgrade_base_for_aug = int(rand($upgrade_base_for_aug + 1));
+                    }
+
+                    plugin::upgrade_item_tier($random_aug_id, $upgrade_base_for_aug, $corpse);
+                }
+            }
+
             plugin::upgrade_item_tier($item_id, $upgrade_base, $corpse);
         }
     }
