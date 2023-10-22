@@ -51,7 +51,7 @@ sub EVENT_SAY
         my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
         my @costs = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
 
-        my $expRate = $client->GetExpModifier();
+        my $expRate = $client->GetEXPModifier(0);
 
         if (!$unlocksAvailable) {            
             plugin::PurpleText("WARNING: You will recieve a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");
