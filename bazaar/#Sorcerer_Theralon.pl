@@ -51,15 +51,18 @@ sub EVENT_SAY
         my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
         my @costs = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
 
-        my $expRate = $client->GetEXPModifier(0);
+        my $expRate             = $client->GetEXPModifier(0);
+        my $percentage_expRate  = int($expRate * 100);
+        if (!$unlocksAvailable) {
+            my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] - I confirm that I understand that I will recieve a permanent XP/AAXP Penalty.";
 
-        if (!$unlocksAvailable) {            
-            plugin::PurpleText("WARNING: You will recieve a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");
-            plugin::PurpleText("You are currently earning 100%% of normal XP.");
-            quest::debug("expRate:$expRate");
+            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase.");            
+            plugin::PurpleText("You are currently earning $percentage_expRate%% of normal XP.");
+            plugin::PurpleText("$link_confirm_unlock");
         } else {
-
+            # Other code or conditions can go here.
         }
+
 
         # Build the Menu
         #foreach my $class (@locked_classes) {
