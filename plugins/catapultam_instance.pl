@@ -377,23 +377,19 @@ sub upgrade_item_npc {
 }
 
 sub ModifyInstanceLoot {
-    my $npc      = shift or return;
+    my $npc         = shift or return;
     my $client      = plugin::val('client');
     my $zonesn      = plugin::val('zonesn');
     my $instanceid  = plugin::val('instanceid');
 
     # Get the packed data for the instance
+    my $owner_id     = GetSharedTaskLeaderByInstance($instanceid);    
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'};
 
     if ($npc) {
         my @lootlist = $npc->GetLootList();
         my $upgrade_base = floor($difficulty/3);
-
-        $npc->SetPlatinum($npc->GetPlatinum()*$upgrade_base);
-        $npc->SetGold($npc->SetGold()*$upgrade_base);
-        $npc->SetSilver($npc->SetSilver()*$upgrade_base);
-        $npc->SetCopper($npc->SetCopper()*$upgrade_base);
 
         foreach my $item_id (@lootlist) {
             # Get the count of this item ID in the loot
