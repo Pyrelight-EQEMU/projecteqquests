@@ -279,6 +279,7 @@ sub Spend_FoS_Tokens {
 
     my $new_total = $curr - $amount;
 
+    plugin::YellowText("You have SPENT $amount Feat of Strength tokens. You have $new_total remaining.");    
     $client->SetBucket("FoS-points", $new_total);
     return $new_total;
 }
@@ -302,6 +303,7 @@ sub Spend_FoS_Heroic_Tokens {
 
     my $new_total = $curr - $amount;
 
+    plugin::YellowText("You have SPENT $amount Heroic Feat of Strength tokens. You have $new_total remaining.");    
     $client->SetBucket("FoS-Heroic-points", $new_total);
     return $new_total;
 }

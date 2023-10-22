@@ -18,38 +18,28 @@ sub EVENT_SAY
           
     if ($text=~/hail/i) {
         if ($progress < 3) {
-            quest::say("Ah! Apologies, apologies! So much to do, so little...well, 
-                            you understand. Now's not the time, I'm afraid.");
+            quest::say("Ah! Apologies, apologies! So much to do, so little...well, you understand. Now's not the time, I'm afraid.");
         } elsif(!$met_befo)  {
-            plugin::NPCTell("Aha! $charname! The winds whispered of your coming. 
-                            Spoken with Master Eithan, have you? 
-                            Here to give an old wizard a [hand]?");
+            plugin::NPCTell("Aha! $charname! The winds whispered of your coming. Spoken with Master Eithan, have you? Here to give an old wizard a [hand]?");
         } else {
-            plugin::NPCTell("Ah, $charname, good, good! Time is fleeting, you see. 
-                            Here for my grand [venture] or to exchange some shiny [tokens]?");
+            plugin::NPCTell("Ah, $charname, good, good! Time is fleeting, you see. Here for my grand [venture] or to exchange some shiny [tokens]?");
         }
     }
 
     elsif ($text=~/assist|hand|venture/i && $progress >= 3) {
-        plugin::NPCTell("Splendid! Envision with me: A liberated Taelosia, my dear homeland! 
-                        But oh, the challenges! The Queen of Thorns, our flagship, 
-                        needs shielding from that treacherous magical storm. 
-                        And monsters, oh the monsters! Running amok in Norrath, 
-                        distractions abound. Fancy a [task]?");
+        plugin::NPCTell("Splendid! Envision with me: A liberated Taelosia, my dear homeland! But oh, the challenges! The Queen of Thorns, our flagship, needs shielding from that treacherous magical storm. 
+                        And monsters, oh the monsters! Running amok in Norrath, distractions abound. Fancy a [task]?");
         $client->SetBucket("TheralonIntro", 1) unless $met_befo;
         $client->SetBucket("MAO-Progress", 4)  unless $progress >= 4;
     }
 
     elsif ($text=~/gathering materials|task/i && $progress > 3 && $met_befo) {
-        plugin::NPCTell("Multitasking, my friend! Efficiency! I've dispatched my trusty golems
-                        remarkable creations, if I do say so myself to guide you. 
-                        Find them, heed their words, and they shall bestow upon you [tokens]. 
-                        And I? I can make those tokens work wonders for you.");
+        plugin::NPCTell("Multitasking, my friend! Efficiency! I've dispatched my trusty golems remarkable creations, if I do say so myself to guide you. Find them, heed their words, and they shall bestow 
+                        upon you [tokens]. And I? I can make those tokens work wonders for you.");
     }
 
     elsif ($text=~/tokens/i && $progress > 3 && $met_befo) {
-        plugin::NPCTell("Ah, tokens! The universal language of favors. 
-                        Let me show you the marvels they can bring forth.");
+        plugin::NPCTell("Ah, tokens! The universal language of favors. Let me show you the marvels they can bring forth.");
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
         plugin::PurpleText("- [Class Unlocks] - [Special Abilities] - [Equipment] -");
@@ -57,8 +47,10 @@ sub EVENT_SAY
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
         if (!$unlocksAvailable) {
+            plugin::PurpleText("You have no Class Unlock Points available.");
             my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] ($costs[$total_classes] Feat of Strength Tokens) - I confirm that I understand that I will recieve an additional permanent XP/AAXP Penalty.";
-            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
+            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes 
+                                classes unlocked.");            
             plugin::PurpleText("$link_confirm_unlock");
         } else {
             # Other code or conditions can go here.
@@ -73,7 +65,22 @@ sub EVENT_SAY
         #}        
     }
 
-    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && $FoS_Token >= $costs[$total_classes]) {
-        quest::debug("Success!");
+    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
+        if ($FoS_Token >= $costs[$total_classes]) {
+            plugin::Spend_FoS_Tokens($costs[$total_classes], $client);
+            $client->SetEXPModifier(0, $expRate - ($expRate * 0.25));
+            $client->SetAAEXPModifier(0, $expRate - ($expRate * 0.25));
+            $client->SetBucket("ClassUnlocksAvailable", 1);
+
+            $expRate             = $client->GetEXPModifier(0);
+            $percentage_expRate  = int($expRate * 100);
+
+            plugin::YellowText("You have gained a Class Unlock point.");
+            plugin::YellowText("Your EXP rate has been reduced to $percentage_expRate%%.");
+            plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
+        } else {
+            
+        }
+        
     }
 }

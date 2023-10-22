@@ -30,10 +30,6 @@ sub EVENT_ITEM {
                   if (grep { $_ == $base_id } @epics) {
                      plugin::NPCTell("I'm sorry, $clientName. This item is far too precious, I'm not going to touch it.");
                   } elsif (plugin::is_global_aug($base_id)) {
-                    
-
-
-
                     if ($CMC_Available > $trade_cost) {
                        plugin::NPCTell("I'd be happy to take this in trade. Here, try this one on for size!");
                        plugin::spend_cmc($trade_cost);

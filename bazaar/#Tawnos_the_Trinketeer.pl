@@ -1,6 +1,7 @@
 sub EVENT_SAY {
    my $response = "";
    my $clientName = $client->GetCleanName();
+   my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
    my $link_services = "[".quest::saylink("link_services", 1, "services")."]";
    my $link_services_2 = "[".quest::saylink("link_services", 1, "do for you")."]";
@@ -39,15 +40,11 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $dbh = plugin::LoadMysql();
 
-    my @epics  = (20542, 8495, 8496, 68299, 5532, 20490, 10650, 28034, 10652, 36224, 
-                  20544, 10099, 20488, 20487, 11057, 14383, 10651, 14341, 66175, 
-                  66177, 66176);
-
-
    foreach my $item_id (keys %itemcount) {
       if ($item_id != 0) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
 
+         my $item_id = plugin::get_base_id($item_id);
          my $item_name = quest::getitemname($item_id);
 
          # Strip prefix with possible whitespace
