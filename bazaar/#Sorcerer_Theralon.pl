@@ -48,7 +48,7 @@ sub EVENT_SAY
         my $cost = 100;
 
         my @locked_classes = plugin::GetLockedClasses($client); #returns @list of locked class IDs
-        my $total_classes  = $classes_count = scalar(keys plugin::GetUnlockedClasses($client));
+        my $total_classes  = scalar(keys plugin::GetUnlockedClasses($client));
 
         quest::debug("total: $total_classes");
  
