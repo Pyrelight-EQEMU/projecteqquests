@@ -43,5 +43,21 @@ sub EVENT_SAY
                         Let me show you the marvels they can bring forth.");
         plugin::PurpleText("- [Class Unlocks] - [Special Abilities] - [Equipment] -");
     }
-    
+
+    elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
+        my $cost = 100;
+
+        my @locked_classes = plugin::GetLockedClasses($client); #returns @list of locked class IDs
+        my $total_classes  = $classes_count = scalar(keys plugin::GetUnlockedClasses($client));
+
+        quest::debug("total: $total_classes");
+ 
+
+        #my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($cost) - $class";
+
+
+
+
+        #Build the Menu. Format: my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "") ."] ($cost) - $class";
+    }
 }
