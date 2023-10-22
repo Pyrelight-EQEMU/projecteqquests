@@ -368,6 +368,25 @@ sub get_global_aug {
    return $random_item_id;   
 }
 
+sub hasStats {
+    my $item_id = shift;
+    
+    # List of stat identifiers to check
+    my @stat_identifiers = qw(heroicstr heroicsta heroicagi heroicdex heroicint heroicwis 
+                              heroicint hp mana endur astr adex aint asta awis aagi acha 
+                              heroiccha, proceffect, clickeffect, focuseffect);
+
+    # Iterate over each identifier and check if the item has that stat
+    foreach my $identifier (@stat_identifiers) {
+        my $stat_value = quest::getitemstat($item_id, $identifier);
+        if ($stat_value && $stat_value > 0) {
+            return 1;  # The item has this stat, return true
+        }
+    }
+    
+    return 0;  # If no stats found, return false
+}
+
 sub ModifyInstanceLoot {
     my $corpse      = shift or return;
     my $client      = plugin::val('client');
@@ -400,17 +419,19 @@ sub ModifyInstanceLoot {
                 $corpse->RemoveItemByID($item_id, $item_count - 1);
 
                 # Replace duplicates with random augs and upgrade them
-                for (1 .. $item_count - 1) {
-                    my $random_aug_id = get_global_aug();
-                    $corpse->RemoveItemByID($item_id, 1);
-                    $corpse->AddItem($random_aug_id, 1);
+                if (hasStats($item_id)){
+                    for (1 .. $item_count - 1) {
+                        my $random_aug_id = get_global_aug();
+                        $corpse->RemoveItemByID($item_id, 1);
+                        $corpse->AddItem($random_aug_id, 1);
 
-                    my $upgrade_base_for_aug = $upgrade_base;
-                    if (quest::getitemstat($random_aug_id, 'itemtype') == 54) {
-                        $upgrade_base_for_aug = int(rand($upgrade_base_for_aug + 1));
+                        my $upgrade_base_for_aug = $upgrade_base;
+                        if (quest::getitemstat($random_aug_id, 'itemtype') == 54) {
+                            $upgrade_base_for_aug = int(rand($upgrade_base_for_aug + 1));
+                        }
+
+                        plugin::upgrade_item_tier($random_aug_id, $upgrade_base_for_aug, $corpse);
                     }
-
-                    plugin::upgrade_item_tier($random_aug_id, $upgrade_base_for_aug, $corpse);
                 }
             }
 
