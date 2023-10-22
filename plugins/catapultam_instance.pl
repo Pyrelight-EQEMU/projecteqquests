@@ -341,7 +341,7 @@ sub upgrade_item_tier {
         my $curtier    = plugin::get_upgrade_tier($item_id);
 
         my $target_tier = min(10, $tier + $curtier);
-        my $target_item = $base_id + (1000000 * $tier);
+        my $target_item = $base_id + (1000000 * $target_tier);
         quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
         if (plugin::item_exists_in_db($target_item)) {
             if ($corpse && $corpse->CountItem($item_id)) {            
