@@ -147,32 +147,49 @@ sub EVENT_SAY
     }
 
     elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
-        my $item_id    = $1;
-        my $item_cost  = find_item_in_equipment($item_id);
+        my $item_id     = $1;
 
-        if (defined $item_cost) {
-            my $item_link       = quest::varlink($item_id);
-            my $link_FoS_points = quest::saylink("link_equipbuyconfirm_fos_'$item_id'", 1, "FoS Points");
-            my $link_hFoS_points= quest::saylink("link_equipbuyconfirm_hfos_'$item_id'", 1, "Heroic FoS Points");
+        # Loop through all equipment categories
+        for my $equipment (keys %equipment_index) {
+            if (exists $equipment_index{$equipment}{$item_id}) {
+                my $item_link  = quest::varlink($item_id);
+                my $item_cost  = $equipment_index{$equipment}{$item_id};
 
-            plugin::Display_FoS_Tokens($client);
-            plugin::Display_FoS_Heroic_Tokens($client);
-            plugin::PurpleText("Would you like to purchase [$item_link] using $item_cost [$link_FoS_points] or [$link_hFoS_points]?");
-            return;
-        } else {
+                my $link_FoS_points     = quest::saylink("link_equipbuyconfirm_fos_'$item_id'", 1, "FoS Points");
+                my $link_hFoS_points    = quest::saylink("link_equipbuyconfirm_hfos_'$item_id'", 1, "Heroic FoS Points");
+
+                plugin::Display_FoS_Tokens($client);
+                plugin::Display_FoS_Heroic_Tokens($client);
+                plugin::PurpleText("Would you like to purchase [$item_link] using $item_cost [$link_FoS_points] or [$link_hFoS_points]?");
+                return;
+            }
+        }
+
+        # If the item wasn't found in any category
+        if (!$item_found) {
             plugin::RedText("Invalid item selection!");
         }
     }
 
     elsif ($text =~ /^link_equipbuyconfirm_(hfos|fos)_'(.+)'$/) {
-        my $token_type = $1;
-        my $item_id    = $2;
+        my $token_type = $1;  # This will capture either "hfos" or "fos"
+        my $item_id    = $2;  # This will capture the item ID
 
-        my $item_cost = find_item_in_equipment($item_id);
+        # Sanity check to make sure the item_id is in our equipment lists
+        my $item_found = 0;
+        my $item_cost;
+        
+        for my $equipment (keys %equipment_index) {
+            if (exists $equipment_index{$equipment}{$item_id}) {
+                $item_found = 1;
+                $item_cost = $equipment_index{$equipment}{$item_id};
+                last;  # Exit the loop once the item is found
+            }
+        }
 
-        if (!defined $item_cost) {
+        if (!$item_found) {
             plugin::RedText("Invalid item selection!");
-            return;
+            return;  # Exit early if the item isn't found
         }
 
         # Continue with the purchase logic based on the token type
