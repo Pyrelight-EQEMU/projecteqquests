@@ -40,7 +40,9 @@ sub EVENT_SAY
                             '33434' => '5'
                            ); 
 
-    my %equipment_index = ( 'Chronal Seals' => \%chronal_seals );
+    my %equipment_index = ( 'Class Emblems' => '',
+                            'Chronal Seals' => \%chronal_seals,
+                          );
                     
     if ($text=~/hail/i) {
         if ($progress < 3) {
@@ -87,6 +89,8 @@ sub EVENT_SAY
 
         #Pyrelight TO-DO: implement these other options.
 
+        plugin::PurpleText("- Passive Abilities and Enhancements");
+
         if($exp_bonus_index <= $#costs) {
             plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d FoS Tokens) - Permanent Bonus: Experience", min($costs[$exp_bonus_index] * 2, 9999)));
         }
@@ -108,6 +112,7 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
+        plugin::PurpleText("- Available Equipment Categories");
         for my $equipment (keys %equipment_index) {
             plugin::PurpleText("$equipment");
 
