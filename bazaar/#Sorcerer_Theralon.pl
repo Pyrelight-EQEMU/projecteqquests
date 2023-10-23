@@ -3,6 +3,32 @@ use DBD::mysql;
 use List::Util qw(max);
 use List::Util qw(min);
 
+
+my %chronal_seals =   ( '33407' => '5',
+                        '33408' => '5',
+                        '33409' => '5',
+                        '33410' => '5',
+                        '33411' => '5',
+                        '33416' => '5',
+                        '33417' => '5',
+                        '33418' => '5',
+                        '33419' => '5',
+                        '33420' => '5',
+                        '33421' => '5',
+                        '33424' => '5',
+                        '33425' => '5',
+                        '33428' => '5',
+                        '33429' => '5',
+                        '33430' => '5',
+                        '33431' => '5',
+                        '33432' => '5',
+                        '33434' => '5'
+                        ); 
+
+my %equipment_index = ( 'Class Emblems' => '',
+                        'Chronal Seals' => \%chronal_seals,
+                        );
+
 sub EVENT_ITEM { 
     my $copper = plugin::val('copper');
     my $silver = plugin::val('silver');
@@ -55,31 +81,6 @@ sub EVENT_SAY
     my $FoS_Token           = plugin::Get_FoS_Tokens($client);
     my $FoS_Heroic_Token    = plugin::Get_FoS_Heroic_Tokens($client);
     my @costs               = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);    
-
-    my %chronal_seals =   ( '33407' => '5',
-                            '33408' => '5',
-                            '33409' => '5',
-                            '33410' => '5',
-                            '33411' => '5',
-                            '33416' => '5',
-                            '33417' => '5',
-                            '33418' => '5',
-                            '33419' => '5',
-                            '33420' => '5',
-                            '33421' => '5',
-                            '33424' => '5',
-                            '33425' => '5',
-                            '33428' => '5',
-                            '33429' => '5',
-                            '33430' => '5',
-                            '33431' => '5',
-                            '33432' => '5',
-                            '33434' => '5'
-                           ); 
-
-    my %equipment_index = ( 'Class Emblems' => '',
-                            'Chronal Seals' => \%chronal_seals,
-                          );
 
     if ($text eq 'debug' && $client->GetGM()) {
         plugin::Add_Tokens(0, 1000, $client);
