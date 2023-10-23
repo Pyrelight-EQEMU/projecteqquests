@@ -230,7 +230,6 @@ sub EVENT_SAY
                 plugin::PurpleText("- Select Upgrade Target");
                 for my $tier ($item_tier..$max_tier) {
                     my $item_link = quest::varlink($base_id + ($tier * 1000000));
-                    plugin::PurpleText($item_link);
 
                     # Calculate the difference in quantity required for upgrade
                     my $required_qty = 2**$tier;
@@ -240,13 +239,50 @@ sub EVENT_SAY
                     my $base_cost = $item_details->{value};
                     my $total_cost = $base_cost + ($diff_qty - 1) * int($base_cost / 2);
 
-                    plugin::PurpleText(sprintf("- [".quest::saylink("link_upg_\'$item_id\'_\'$tier\'", 1, "UPGRADE")."] - (%04d FoS Tokens) - [$item_link]", min($total_cost, 9999)));
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_upg_\'$base_id\'_\'$tier\'", 1, "UPGRADE")."] - (%04d FoS Tokens) - [$item_link]", min($total_cost, 9999)));
                 }
             } else {
                 plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
                 $client->SummonItem($item_id);                
                 $client->DeleteBucket("Theralon-Upgrade-Queue");
             }
+        }
+    }
+
+    elsif ($text=~/link_upg_'(\d+)'_'(\d+)'/i) {
+        my $current_item_id = $1;
+        my $target_tier = $2;
+
+        # Validate item ID and tier
+        if ($current_item_id && $target_tier) {
+            # Retrieve item details
+            my $base_id         = plugin::get_base_id($current_item_id);
+            my $item_details    = find_item_details($client, $base_id);
+            my $base_cost       = $item_details->{value};
+            my $equipment       = $item_details->{equipment};
+            my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
+            my $target_item     = $base_id + (1000000 * $target_tier);
+
+            # Need to make sure we are allowed to upgrade this item and have enough data to do it
+            if ($item_details && $base_id == $equip_entitl && plugin::item_exists_in_db($target_item)) {
+                # Calculate effective quantity and difference in required quantity
+                my $eff_qty         = 2**plugin::get_upgrade_tier($current_item_id);
+                my $required_qty    = 2**$target_tier;
+                my $diff_qty        = $required_qty - $eff_qty;
+
+                # Calculate the total upgrade cost
+                my $total_cost = $base_cost + ($diff_qty - 1) * int($base_cost / 2);
+
+                if (plugin::Get_FoS_Tokens($client) >= $total_cost) {
+                    plugin::NPCTell("Excellent! Here you go!");
+                    plugin::Spend_FoS_Tokens($client, $total_cost);  # Assuming you pass the client and cost to this function
+                    $client->SummonItem($target_item);
+                } else {
+                    RejectBuy();
+                }
+            }
+        } else {
+            # Invalid Link or player shenanigans
         }
     }
 
