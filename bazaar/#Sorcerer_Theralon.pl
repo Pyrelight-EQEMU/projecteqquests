@@ -275,7 +275,7 @@ sub EVENT_SAY
 
                 if (plugin::Get_FoS_Tokens($client) >= $total_cost) {
                     plugin::NPCTell("Excellent! Here you go!");
-                    plugin::Spend_FoS_Tokens($client, $total_cost);  # Assuming you pass the client and cost to this function
+                    plugin::Spend_FoS_Tokens($total_cost, $client);  # Assuming you pass the client and cost to this function
                     $client->SummonItem($target_item);
                 } else {
                     RejectBuy();
