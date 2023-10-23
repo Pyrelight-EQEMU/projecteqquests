@@ -221,7 +221,7 @@ sub EVENT_SAY
             plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
             ApplyExpPenalty($client);
 
-            $client->SetBucket("ClassUnlocksAvailable", $unlocks_available++);
+            $client->SetBucket("ClassUnlocksAvailable", $unlocksAvailable++);
             plugin::YellowText("You have gained a Class Unlock point.");            
             plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
         } else {
