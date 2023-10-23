@@ -133,7 +133,7 @@ sub EVENT_SAY
         }      
     }
 
-    elsif ($text =~ /^link_equi_'(.+)'$/) {
+    elsif ($text =~ /^link_equi_'(.+)'$/ && $progress > 3 && $met_befo) {
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
             plugin::PurpleText("- Equipment Category: $selected_equipment");
@@ -146,6 +146,20 @@ sub EVENT_SAY
         }
     }
 
+    elsif ($text =~ /^link_equipbuy_'(.+)'$/ && $progress > 3 && $met_befo) {
+        my $selected_item_id = $1;
+        
+        # Assuming you want to execute an action when a specific item is clicked for purchase:
+        if (exists $equipment_index{$selected_equipment} && exists $equipment_index{$selected_equipment}{$selected_item_id}) {
+            # Here you can add the logic to handle the item purchase or any other action
+
+            plugin::PurpleText("You have selected item with ID: $selected_item_id for purchase.");
+            # Implement any additional action logic here, like removing currency, updating inventory, etc.
+            
+        } else {
+            plugin::RedText("Invalid item selection!");
+        }
+    }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
