@@ -43,6 +43,11 @@ sub EVENT_SAY
     my %equipment_index = ( 'Class Emblems' => '',
                             'Chronal Seals' => \%chronal_seals,
                           );
+
+    if ($text eq 'debug' && $client->GetGM()) {
+        plugin::Add_Tokens(0, 1000, $client);
+        plugin::Add_tokens(1, 1000, $client);
+    } 
                     
     if ($text=~/hail/i) {
         if ($progress < 3) {
