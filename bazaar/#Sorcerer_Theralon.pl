@@ -44,7 +44,12 @@ sub EVENT_SAY
         plugin::NPCTell("Ah, tokens! The universal language of favors. Let me show you the marvels they can bring forth.");
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
-        plugin::PurpleText("- [Class Unlocks] - [Special Abilities] - [Equipment] - [Passive Boosts]");
+        plugin::PurpleText("- [Class Unlocks] - Unlock Additional Classes! XP Penalties Apply.");
+        plugin::PurpleText("- [Special Abilities] - Abilities available nowhere else!");
+        plugin::PurpleText("- [Equipment] - Unique Gear and Augments");
+        plugin::PurpleText("- [Passive Boosts] - Permanent hidden, passive boosts");
+        plugin::PurpleText("- [Consumables] - If you want to spend a finite resource on consumable items, I guess.");
+
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
@@ -64,21 +69,21 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Passive Boosts/i && $progress > 3 && $met_befo) {
-        my $exp_bonus_index     = $client->GetBucket("exp-bonus-count") || 3;
-        my $fac_bonus_index     = $client->GetBucket("fac_bonus_index") || 3;
-        my $cur_bonus_index     = $client->GetBucket("cur_bonus_index") || 3;
-        my $pot_bonus_index     = $client->GetBucket("pot_bonus_index") || 3;
-        my $aug_bonus_index     = $client->GetBucket("aug_bonus_index") || 3;
-        my $cmc_bonus_index     = $client->GetBucket("cmc_bonus_index") || 3;
+        my $exp_bonus_index     = $client->GetBucket("exp-bonus-count") || 2;
+        my $fac_bonus_index     = $client->GetBucket("fac_bonus_index") || 2;
+        my $cur_bonus_index     = $client->GetBucket("cur_bonus_index") || 2;
+        my $pot_bonus_index     = $client->GetBucket("pot_bonus_index") || 2;
+        my $aug_bonus_index     = $client->GetBucket("aug_bonus_index") || 2;
+        my $cmc_bonus_index     = $client->GetBucket("cmc_bonus_index") || 2;
 
         #Pyrelight TO-DO: implement these other options.
 
-        plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d Feat of Strength Tokens) - permanent experience bonus", min($costs[$exp_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent faction gain bonus", min($costs[$fac_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent currency drop rate", min($costs[$cur_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent potion drop rate bonus", min($costs[$pot_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent global augment drop rate bonus", min($costs[$aug_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Concentrated Mana Crystal drop rate bonus", min($costs[$cmc_bonus_index] * 2, 9999)));         
+        plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d FoS Tokens) - Permanent Bonus: Experience", min($costs[$exp_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain", min($costs[$fac_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate", min($costs[$cur_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Potions", min($costs[$pot_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments", min($costs[$aug_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal drop rate", min($costs[$cmc_bonus_index] * 2, 9999)));         
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
