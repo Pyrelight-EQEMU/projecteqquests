@@ -238,7 +238,7 @@ sub EVENT_SAY
 
                     # Calculate the cost
                     my $base_cost = $item_details->{value};
-                    my $total_cost = $base_cost + ($diff_qty - 1) * floor($base_cost / 2);
+                    my $total_cost = $base_cost + ($diff_qty - 1) * ($base_cost / 2);
 
                     # Display the difference in quantity and total cost
                     plugin::PurpleText("To upgrade to tier $tier, you need an additional $diff_qty items of tier 0 equivalent, costing a total of $total_cost.");
