@@ -74,11 +74,11 @@ sub EVENT_SAY
         #Pyrelight TO-DO: implement these other options.
 
         plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d Feat of Strength Tokens) - permanent experience bonus", min($costs[$exp_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - permanent faction gain bonus", min($costs[$fac_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - permanent currency drop rate", min($costs[$cur_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - permanent potion drop rate bonus", min($costs[$pot_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - permanent global augment drop rate bonus", min($costs[$aug_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - permanent Concentrated Mana Crystal drop rate bonus", min($costs[$cmc_bonus_index] * 2, 9999)));         
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent faction gain bonus", min($costs[$fac_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent currency drop rate", min($costs[$cur_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent potion drop rate bonus", min($costs[$pot_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent global augment drop rate bonus", min($costs[$aug_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Concentrated Mana Crystal drop rate bonus", min($costs[$cmc_bonus_index] * 2, 9999)));         
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
