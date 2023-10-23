@@ -159,7 +159,7 @@ sub UnlockClass {
         } else { 
             $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
             plugin::YellowText("You have spent a Class Unlock point.");            
-            plugin::YellowText("You are now " . (in_array(lc($class_name[0]), ['a', 'e', 'i', 'o', 'u']) ? "an" : "a") . " $class_name.");
+            plugin::YellowText("You are now " . (grep { $_ eq lc(substr($class_name, 0, 1)) } ('a', 'e', 'i', 'o', 'u') ? "an" : "a") . " $class_name.");
             quest::ding();
 
             # Insert data into multiclass_data table for the new class
@@ -179,6 +179,7 @@ sub UnlockClass {
         return 0;
     }
 }
+
 
 sub GetUnlockedClasses {
     my $client = shift;

@@ -323,6 +323,41 @@ sub Get_FoS_Heroic_Tokens {
     return $client->GetBucket("FoS-Heroic-points") || 0;
 }
 
+sub Add_Tokens {
+    my $token_type  = shift;
+    my $amount      = shift;
+    my $client      = shift or plugin::val('client');
+    
+    return ($token_type) 
+        ? Add_FoS_Heroic_Tokens($amount, $client) 
+        : Add_FoS_Tokens($amount, $client);
+}
+
+sub Get_Tokens {
+    my $token_type  = shift;
+    my $client      = shift or plugin::val('client');
+    
+    return ($token_type) 
+        ? Get_FoS_Heroic_Tokens($client) 
+        : Get_FoS_Tokens($client);
+}
+
+sub Spend_Tokens {
+    my $token_type  = shift;
+    my $amount      = shift;
+    my $client      = shift or plugin::val('client');
+    
+    return ($token_type) 
+        ? Spend_FoS_Heroic_Tokens($amount, $client) 
+        : Spend_FoS_Tokens($amount, $client);
+}
+
+sub Display_Tokens {
+    my $client  = shift or plugin::val('client');
+    Display_FoS_Tokens($client);
+    Display_FoS_Heroic_Tokens($client);
+}
+
 sub HandleTaskAccept
 {
     my $task_id             = shift || plugin::val('task_id');

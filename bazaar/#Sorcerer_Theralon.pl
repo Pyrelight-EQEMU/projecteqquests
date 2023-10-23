@@ -193,24 +193,14 @@ sub EVENT_SAY
         }
 
         # Continue with the purchase logic based on the token type
-        if ($token_type eq "hfos") {
-            if (plugin::Get_FoS_Heroic_Tokens($client) >= $item_cost) {
-                plugin::Spend_FoS_Heroic_Tokens($item_cost, $client);
-            } else {
-               RejectBuy();
-               return;
-            }          
-        } elsif ($token_type eq "fos") {
-            if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
-                plugin::Spend_FoS_Tokens($item_cost, $client);
-            } else {
-               RejectBuy();
-               return;
-            }
+        $token_type = $token_type eq "hfos" ? 1 : 0;
+        if (plugin::Get_Tokens($token_type, $client) > $item_cost) {
+            plugin::Spend_Tokens($token_type, $cost, $client);
         } else {
-            plugin::RedText("Invalid token selection!");
+            RejectBuy();
             return;
         }
+        
         $client->SummonItem($item_id);
         plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
     }
