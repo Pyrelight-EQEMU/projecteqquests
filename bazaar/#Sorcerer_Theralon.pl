@@ -45,9 +45,13 @@ sub EVENT_ITEM {
          my $item_cost = find_item_cost($base_id);
          
          if ($base_id && $item_cost) {
-            my $tier = plugin::get_upgrade_tier($item_id); # Assuming you get tier using base_id
+            my $tier = plugin::get_upgrade_tier($item_id);
             my $value = $item_cost ** ($tier + 1);
-            quest::debug("That is refundable, tier: $tier value: $value");
+
+            plugin::Add_FoS_Tokens($value);
+            delete $itemcount{$item_id};
+
+            plugin::NPCTell("No problem, I can take that back. I'll credit you with the tokens."); 
          }
       }
    }
