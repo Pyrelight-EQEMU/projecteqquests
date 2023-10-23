@@ -172,24 +172,14 @@ sub EVENT_SAY
     }
 
     elsif ($text =~ /^link_equipbuyconfirm_(hfos|fos)_'(.+)'$/) {
-        my $token_type = $1;  # This will capture either "hfos" or "fos"
-        my $item_id    = $2;  # This will capture the item ID
+        my $token_type = $1;
+        my $item_id    = $2;
 
-        # Sanity check to make sure the item_id is in our equipment lists
-        my $item_found = 0;
-        my $item_cost;
-        
-        for my $equipment (keys %equipment_index) {
-            if (exists $equipment_index{$equipment}{$item_id}) {
-                $item_found = 1;
-                $item_cost = $equipment_index{$equipment}{$item_id};
-                last;  # Exit the loop once the item is found
-            }
-        }
+        my $item_cost = find_item_in_equipment($item_id);
 
-        if (!$item_found) {
+        if (!defined $item_cost) {
             plugin::RedText("Invalid item selection!");
-            return;  # Exit early if the item isn't found
+            return;
         }
 
         # Continue with the purchase logic based on the token type
@@ -276,4 +266,19 @@ sub DisplayExpRate {
 
     my $percentage_expRate  = int($expRate * 100);
     plugin::YellowText("Your current experience rate is $percentage_expRate%%.");
+}
+
+sub find_item_in_equipment {
+    my ($item_id) = @_;
+
+    # Search through the equipment_index for the item_id
+    for my $equipment (keys %equipment_index) {
+        if (exists $equipment_index{$equipment}{$item_id}) {
+            # Return the cost of the item if found
+            return $equipment_index{$equipment}{$item_id};
+        }
+    }
+
+    # Return undef if item not found
+    return undef;
 }
