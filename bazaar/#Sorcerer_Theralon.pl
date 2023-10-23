@@ -225,7 +225,7 @@ sub EVENT_SAY
         }
     }
 
-    elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo &&) {
+    elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo) {
         my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 3;
         if ($exp_bonus_index <= $#costs) {
             if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
