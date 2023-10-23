@@ -72,7 +72,7 @@ sub EVENT_SAY
         plugin::Display_FoS_Heroic_Tokens($client);
         plugin::display_cmc();
         plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");
-        plugin::PurpleText("- [Class Unlocks]");
+        plugin::PurpleText("- [".quest::saylink("Class Unlocks", 1)."]") if @locked_classes;
         plugin::PurpleText("- [Special Abilities]");
         plugin::PurpleText("- [Equipment]");
         plugin::PurpleText("- [Passive Boosts]");
@@ -118,19 +118,21 @@ sub EVENT_SAY
         }
     }
 
-    elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
-        if (!$unlocksAvailable) {
+    elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo && @locked_classes) {
+        if (!$unlocksAvailable && $total_classes <= $#costs) {
             plugin::YellowText("You have no Class Unlock Points available.");
             plugin::YellowText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
             plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - Additional Class Slot", min($costs[$total_classes], 9999)));
-        } else {
+        } elsif ($unlocksAvailable && @locked_classes) {
             plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");            
             my @formatted_classes;
             foreach my $class (@locked_classes) {
                 my $class_name = quest::getclassname($class);
                 plugin::PurpleText("- [". quest::saylink("$class_name", 1, "UNLOCK") ."] - $class_name");
             }            
-        }      
+        } else {
+            plugin::NPCTell("Unlocked all classes, you have!");
+        }
     }
 
     elsif ($text =~ /^link_equi_'(.+)'$/ && $progress > 3 && $met_befo) {
