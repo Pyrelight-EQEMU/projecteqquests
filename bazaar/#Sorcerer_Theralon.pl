@@ -60,8 +60,7 @@ sub EVENT_ITEM {
 
                 # Update the data bucket to reflect the refund
                 my $current_qty = $client->GetData("equip-category-$equipment-quantity") || 0;
-                my $new_qty = $current_qty - $qty;
-                $client->SetBucket("equip-category-$equipment-quantity", $new_qty);
+                my $new_qty = $current_qty - $qty;               
 
                 # Check if the updated quantity in the bucket is 0
                 if ($new_qty <= 0) {
@@ -71,6 +70,8 @@ sub EVENT_ITEM {
                     # Delete the data buckets
                     $client->DeleteBucket("equip-category-$equipment-quantity");
                     $client->DeleteBucket("equip-category-$equipment");
+                } else {
+                    $client->SetBucket("equip-category-$equipment-quantity", $new_qty);
                 }
 
                 # Remove the item from the itemcount hash
