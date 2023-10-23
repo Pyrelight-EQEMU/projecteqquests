@@ -42,10 +42,12 @@ sub EVENT_ITEM {
    foreach my $item_id (keys %itemcount) {
       if ($item_id != 0) {
          my $base_id = plugin::get_base_id($item_id) || 0;
-         if ($base_id && find_item_in_equipment($base_id)) {
-            quest::debug("That is refundable");
-         } else {
-            quest::debug("I can't find $base_id");
+         my $item_cost = find_item_cost($base_id);
+         
+         if ($base_id && $item_cost) {
+            my $tier = plugin::get_upgrade_tier($base_id); # Assuming you get tier using base_id
+            my $value = ($item_cost * 5) ** $tier;
+            quest::debug("That is refundable, value: $value");
          }
       }
    }
@@ -65,6 +67,7 @@ sub EVENT_ITEM {
     $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
     plugin::return_items(\%itemcount); 
 }
+
 
 sub EVENT_SAY
 {
@@ -338,6 +341,23 @@ sub find_item_in_equipment {
         if (exists $equipment_index{$equipment}{$item_id}) {
             # Return the cost of the item if found
             return $equipment_index{$equipment}{$item_id};
+        }
+    }
+
+    # Return undef if item not found
+    return undef;
+}
+
+sub find_item_cost {
+    my ($item_id) = @_;
+
+    # Loop through the main equipment categories
+    for my $category (keys %equipment_index) {
+        my $subhash = $equipment_index{$category};
+        
+        # If the item_id exists in the subhash, return its cost
+        if (exists $subhash->{$item_id}) {
+            return $subhash->{$item_id};
         }
     }
 
