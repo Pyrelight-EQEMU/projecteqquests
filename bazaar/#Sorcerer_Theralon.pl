@@ -252,7 +252,7 @@ sub EVENT_SAY
 
     elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
         my $item_id     = $1;
-        my %item_details = find_item_details($client, $item_id);
+        my $item_details = find_item_details($client, $item_id);
         if ($item_details) {
             my $item_cost   = $item_details->{value};
             my $equipment   = $item_details->{equipment};
