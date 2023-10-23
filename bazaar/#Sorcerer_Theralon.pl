@@ -108,12 +108,16 @@ sub EVENT_SAY
     } 
                     
     if ($text=~/hail/i) {
-        if ($progress < 3) {
-            quest::say("Ah! Apologies, apologies! So much to do, so little...well, you understand. Now's not the time, I'm afraid.");
-        } elsif(!$met_befo)  {
-            plugin::NPCTell("Aha! $charname! The winds whispered of your coming. Spoken with Master Eithan, have you? Here to give an old wizard a [hand]?");
+        if ($client->GetBucket("Theralon-Upgrade-Queue")) {
+            plugin::NPCTell("I'm holding an item for you. Would you like to [Upgrade] or [Return] this?");
         } else {
-            plugin::NPCTell("Ah, $charname, good, good! Time is fleeting, you see. Here for my grand [venture] or to exchange some shiny [tokens]?");
+            if ($progress < 3) {
+                quest::say("Ah! Apologies, apologies! So much to do, so little...well, you understand. Now's not the time, I'm afraid.");
+            } elsif(!$met_befo)  {
+                plugin::NPCTell("Aha! $charname! The winds whispered of your coming. Spoken with Master Eithan, have you? Here to give an old wizard a [hand]?");
+            } else {
+                plugin::NPCTell("Ah, $charname, good, good! Time is fleeting, you see. Here for my grand [venture] or to exchange some shiny [tokens]?");
+            }
         }
     }
 
