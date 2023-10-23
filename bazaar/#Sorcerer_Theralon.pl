@@ -3,6 +3,41 @@ use DBD::mysql;
 use List::Util qw(max);
 use List::Util qw(min);
 
+sub EVENT_ITEM { 
+    my $copper = plugin::val('copper');
+    my $silver = plugin::val('silver');
+    my $gold = plugin::val('gold');
+    my $platinum = plugin::val('platinum');
+    my $clientName = $client->GetCleanName();
+
+    my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
+    my $dbh = plugin::LoadMysql();
+
+   foreach my $item_id (keys %itemcount) {
+      if ($item_id != 0) {
+         my $base_id = plugin::get_base_id($item_id) || 0;
+         if ($base_id && find_item_in_equipment($base_id)) {
+            quest::debug("That is refundable");
+         }
+      }
+   }
+
+    # After processing all items, return any remaining money
+    my $platinum_remainder = int($total_money / 1000);
+    $total_money %= 1000;
+
+    my $gold_remainder = int($total_money / 100);
+    $total_money %= 100;
+
+    my $silver_remainder = int($total_money / 10);
+    $total_money %= 10;
+
+    my $copper_remainder = $total_money;
+
+    $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
+    plugin::return_items(\%itemcount); 
+}
+
 sub EVENT_SAY
 {
     my $charname            = $client->GetCleanName();
@@ -150,7 +185,7 @@ sub EVENT_SAY
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
                 my $item_link = quest::varlink($item);
-                plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - (Cost: %04d Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
+                plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
             }
         } else {
             plugin::RedText("Invalid equipment selection!");
@@ -163,16 +198,14 @@ sub EVENT_SAY
         # Loop through all equipment categories
         for my $equipment (keys %equipment_index) {
             if (exists $equipment_index{$equipment}{$item_id}) {
-                my $item_link  = quest::varlink($item_id);
                 my $item_cost  = $equipment_index{$equipment}{$item_id};
-
-                my $link_FoS_points     = quest::saylink("link_equipbuyconfirm_fos_'$item_id'", 1, "FoS Points");
-                my $link_hFoS_points    = quest::saylink("link_equipbuyconfirm_hfos_'$item_id'", 1, "Heroic FoS Points");
-
-                plugin::Display_FoS_Tokens($client);
-                plugin::Display_FoS_Heroic_Tokens($client);
-                plugin::PurpleText("Would you like to purchase [$item_link] using $item_cost [$link_FoS_points] or [$link_hFoS_points]?");
-                return;
+                if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
+                    plugin::Spend_FoS_Tokens($item_cost, $client);
+                    $client->SummonItem($item_id);
+                    plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
+                } else {
+                    RejectBuy();
+                }
             }
         }
 
@@ -212,8 +245,7 @@ sub EVENT_SAY
             return;
         }
         
-        $client->SummonItem($item_id);
-        plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
+        
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && ($total_classes + $unlocksAvailable) <= $#costs) {
