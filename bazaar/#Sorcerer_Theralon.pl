@@ -136,9 +136,10 @@ sub EVENT_SAY
     elsif ($text =~ /^link_equi_'(.+)'$/) {
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
-            plugin::PurpleText("- Selected Equipment: $selected_equipment");
+            plugin::PurpleText("- Equipment Category: $selected_equipment");
             for my $item (keys %{ $equipment_index{$selected_equipment} }) {
-                plugin::PurpleText("- Item ID: $item, Value: $equipment_index{$selected_equipment}{$item}");
+                my $item_link = quest::varlink($item);
+                plugin::PurpleText("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - [$item_link]");
             }
         } else {
             plugin::RedText("Invalid equipment selection!");
