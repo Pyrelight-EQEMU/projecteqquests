@@ -194,14 +194,14 @@ sub EVENT_SAY
 
         # Continue with the purchase logic based on the token type
         if ($token_type eq "hfos") {
-            if (plugin::Get_FoS_Tokens() >= $item_cost) {
-                plugin::Spend_FoS_Heroic_Tokens($item_cost);
+            if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
+                plugin::Spend_FoS_Heroic_Tokens($item_cost, $client);
             } else {
                RejectBuy(); 
             }          
         } elsif ($token_type eq "fos") {
-            if (plugin::Get_FoS_Heroic_Tokens() >= $item_cost) {
-                plugin::Spend_FoS_Heroic_Tokens($item_cost);
+            if (plugin::Get_FoS_Heroic_Tokens($client) >= $item_cost) {
+                plugin::Spend_FoS_Heroic_Tokens($item_cost, $client);
             } else {
                RejectBuy(); 
             }
