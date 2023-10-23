@@ -255,8 +255,8 @@ sub EVENT_SAY
                     plugin::Spend_FoS_Tokens($item_cost, $client);
 
                     $client->SummonItem($item_id);                    
-                    $client->SetData("equip-category-$equipment", $item_id);
-                    $client->SetData("equip-category-$equipment-quantity", $prev_quantity + $quantity);
+                    $client->SetBucket("equip-category-$equipment", $item_id);
+                    $client->SetBucket("equip-category-$equipment-quantity", $prev_quantity + $quantity);
 
                     plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for all of your tokens back, even if you have it upgraded in the meantime.");
                 } else {
