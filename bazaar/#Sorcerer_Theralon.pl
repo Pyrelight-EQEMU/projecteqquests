@@ -195,7 +195,7 @@ sub EVENT_SAY
         # Continue with the purchase logic based on the token type
         $token_type = $token_type eq "hfos" ? 1 : 0;
         if (plugin::Get_Tokens($token_type, $client) > $item_cost) {
-            plugin::Spend_Tokens($token_type, $cost, $client);
+            plugin::Spend_Tokens($token_type, $item_cost, $client);
         } else {
             RejectBuy();
             return;
@@ -225,16 +225,18 @@ sub EVENT_SAY
         }
     }
 
-    elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo) {
+    elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo &&) {
         my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 3;
-        if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
-            plugin::Spend_FoS_Tokens(min($costs[$exp_bonus_index],9999), $client);
+        if ($exp_bonus_index <= $#costs) {
+            if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
+                plugin::Spend_FoS_Tokens(min($costs[$exp_bonus_index],9999), $client);
 
-            ApplyExpBonus($client);
+                ApplyExpBonus($client);
 
-            $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
-        } else {
-            RejectBuy();
+                $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
+            } else {
+                RejectBuy();
+            }
         }        
     }
 }
