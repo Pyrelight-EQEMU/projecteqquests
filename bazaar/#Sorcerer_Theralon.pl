@@ -221,8 +221,8 @@ sub EVENT_SAY
     elsif ($text =~ /^link_equi_'(.+)'$/ && $progress > 3 && $met_befo) {
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
-            my $equip_prebuy = $client->GetData("equip-category-$selected_equipment");
-            my $equip_qty    = $client->GetData("equip-category-$selected_equipment-quantity") || 1;
+            my $equip_prebuy = $client->GetBucket("equip-category-$selected_equipment");
+            my $equip_qty    = $client->GetBucket("equip-category-$selected_equipment-quantity") || 1;
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             if ($equip_prebuy) {
                 my $item_link = quest::varlink($equip_prebuy);
@@ -251,7 +251,7 @@ sub EVENT_SAY
             if (exists $equipment_index{$equipment}{$item_id}) {
                 my $item_cost  = $equipment_index{$equipment}{$item_id};
                 if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
-                    my $prev_quantity = $client->GetData("equip-category-$equipment-quantity") || 0;
+                    my $prev_quantity = $client->GetBucket("equip-category-$equipment-quantity") || 0;
                     plugin::Spend_FoS_Tokens($item_cost, $client);
 
                     $client->SummonItem($item_id);                    
@@ -395,7 +395,7 @@ sub find_item_details {
         if (exists $subhash->{$item_id}) {
             $result{'equipment'} = $category;
             $result{'value'} = $subhash->{$item_id};
-            $result{'num_purchased'} = $client->GetData("equip-category-$category-quantity") || 0;
+            $result{'num_purchased'} = $client->GetBucket("equip-category-$category-quantity") || 0;
             return \%result;  # Return a reference to the hash
         }
     }
