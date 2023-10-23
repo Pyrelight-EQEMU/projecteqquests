@@ -114,7 +114,7 @@ sub EVENT_SAY
     elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
         plugin::PurpleText("- Available Equipment Categories");
         for my $equipment (keys %equipment_index) {
-            plugin::PurpleText("- [".quest::saylink("link_equipment_'$equipment'", 1, "$equipment")."]");
+            plugin::PurpleText("- [".quest::saylink("link_equi_'$equipment'", 1, "$equipment")."]");
         }
     }
 
@@ -132,6 +132,19 @@ sub EVENT_SAY
             }            
         }      
     }
+
+    elsif ($text =~ /^link_equi_'(.+)'$/) {
+        my $selected_equipment = $1;
+        if (exists $equipment_index{$selected_equipment}) {
+            plugin::PurpleText("- Selected Equipment: $selected_equipment");
+            for my $item (keys %{ $equipment_index{$selected_equipment} }) {
+                plugin::PurpleText("- Item ID: $item, Value: $equipment_index{$selected_equipment}{$item}");
+            }
+        } else {
+            plugin::RedText("Invalid equipment selection!");
+        }
+    }
+
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
