@@ -48,7 +48,7 @@ sub EVENT_ITEM {
             my $tier = plugin::get_upgrade_tier($item_id);
             my $value = $item_cost ** ($tier + 1);
 
-            plugin::Add_FoS_Tokens($value);
+            plugin::Add_FoS_Tokens($value, $client);
             delete $itemcount{$item_id};
 
             plugin::NPCTell("No problem, I can take that back. I'll credit you with the tokens."); 
@@ -69,7 +69,7 @@ sub EVENT_ITEM {
     my $copper_remainder = $total_money;
 
     $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
-    
+
     if (keys %itemcount) {
         plugin::return_items(\%itemcount);
     }
