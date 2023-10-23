@@ -64,7 +64,7 @@ sub EVENT_CONNECT {
 sub EVENT_ENTER_ZONE {
     # Check for FoS Instance
     if ($instanceversion == 10) {
-        plugin::HandleEnterZone($zonesn);
+        #plugin::HandleEnterZone($zonesn);
     }    
 }
 
