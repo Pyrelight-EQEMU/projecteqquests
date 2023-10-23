@@ -207,7 +207,7 @@ sub EVENT_SAY
         plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
     }
 
-    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
+    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && $total_classes <= $#costs) {
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
             ApplyExpPenalty($client);
@@ -220,7 +220,7 @@ sub EVENT_SAY
         }        
     }
 
-    elsif (exists $class{$text} and $unlocksAvailable >= 1 && $progress > 3 && $met_befo) {
+    elsif (exists $class{$text} and $unlocksAvailable >= 1 && $progress > 3 && $met_befo) { #invalid-state rejection is handled inside UnlockClass
         if (plugin::UnlockClass($client, $class{$text})) {
             $client->Message(263, "The Sorcerer closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
             plugin::NPCTell("Ah, marvelous! The arcane energies stir within you, revealing a newfound prowess. Embrace this identity and, as your might expands, return to me. The cosmos has much more in store for you.");
