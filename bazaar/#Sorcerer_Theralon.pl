@@ -59,7 +59,7 @@ sub EVENT_ITEM {
                 plugin::Add_FoS_Tokens($tokens_to_refund, $client);
 
                 # Update the data bucket to reflect the refund
-                my $current_qty = $client->GetData("equip-category-$equipment-quantity") || 0;
+                my $current_qty = $client->GetBucket("equip-category-$equipment-quantity") || 0;
                 my $new_qty = $current_qty - $qty;               
 
                 # Check if the updated quantity in the bucket is 0
