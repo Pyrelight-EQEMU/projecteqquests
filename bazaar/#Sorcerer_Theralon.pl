@@ -222,7 +222,7 @@ sub EVENT_SAY
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
             my $equip_prebuy = $client->GetData("equip-category-$selected_equipment");
-            my $equip_qty    = $client->GetData("equip-category-$selected_equipment-quantity") || 1;{
+            my $equip_qty    = $client->GetData("equip-category-$selected_equipment-quantity") || 1;
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             if ($equip_prebuy) {
                 plugin::YellowText("NOTICE: You have an outstanding purchase in this category. Select a quantity of duplicates to purchase below");
