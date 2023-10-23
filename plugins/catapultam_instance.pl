@@ -154,7 +154,9 @@ sub HandleTaskComplete
     my $charname = $client->GetCleanName();
 
     if ($task_id == $task_id_stored) {
-        if ($client->CharacterID() == $leader_id) {            
+        quest::debug("checkpoint 1");
+        if ($client->CharacterID() == $leader_id) {
+             quest::debug("checkpoint 2");            
             if ($heroic) {                        
                 my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
@@ -173,9 +175,11 @@ sub HandleTaskComplete
                     }                    
                 }
             } 
-            if ($escalation) {            
+            if ($escalation) { 
+                quest::debug("checkpoint 3");           
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
+                    quest::debug("checkpoint 4");
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
                     plugin::TrySetLeaderForZone($task_name, $charname, $difficulty_rank);
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);

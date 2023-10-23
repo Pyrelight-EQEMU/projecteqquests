@@ -10,7 +10,7 @@ sub EVENT_SAY
     my %unlocked_class      = plugin::GetUnlockedClasses($client);
     my $total_classes       = scalar(keys %unlocked_class);
     my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
-    my @costs = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
+    my @class_costs         = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
     my $expRate             = $client->GetEXPModifier(0);
     my $percentage_expRate  = int($expRate * 100);
     my $FoS_Token           = plugin::Get_FoS_Tokens($client);
@@ -48,7 +48,7 @@ sub EVENT_SAY
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
         if (!$unlocksAvailable) {
             plugin::PurpleText("You have no Class Unlock Points available.");
-            my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] ($costs[$total_classes] Feat of Strength Tokens) - I confirm that I understand that I will recieve an additional permanent XP/AAXP Penalty.";
+            my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] ($class_[$total_classes] Feat of Strength Tokens) - I confirm that I understand that I will recieve an additional permanent XP/AAXP Penalty.";
             plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes 
                                 classes unlocked.");            
             plugin::PurpleText("$link_confirm_unlock");
@@ -65,8 +65,8 @@ sub EVENT_SAY
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
-        if ($FoS_Token >= $costs[$total_classes]) {
-            plugin::Spend_FoS_Tokens($costs[$total_classes], $client);
+        if ($FoS_Token >= $class_[$total_classes]) {
+            plugin::Spend_FoS_Tokens($class_[$total_classes], $client);
             $client->SetEXPModifier(0, $expRate - ($expRate * 0.25));
             $client->SetAAEXPModifier(0, $expRate - ($expRate * 0.25));
             $client->SetBucket("ClassUnlocksAvailable", 1);
