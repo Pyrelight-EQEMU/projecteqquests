@@ -13,7 +13,8 @@ my $zone_version    = 10;
 
 sub HandleSay {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
-    my $text   = plugin::val('text');
+    my $text   = plugin::val('text');    
+    my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
 
     my $details             = quest::saylink("instance_details", 1, "details");
     my $tokens_of_strength  = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
@@ -27,13 +28,12 @@ sub HandleSay {
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
-                my $task_name       = quest::gettaskname($task);
-                my $task_leader_id  = plugin::GetSharedTaskLeader($client);
-                my $heroic          = 0;
-                my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
-                my $challenge       = 0; 
-
                 if (not plugin::HasDynamicZoneAssigned($client)) {
+                    my $task_name       = quest::gettaskname($task);
+                    my $task_leader_id  = plugin::GetSharedTaskLeader($client);
+                    my $heroic          = 0;
+                    my $challenge       = 0; 
+
                     if ($task_name =~ /\(Escalation\)$/ ) {
                         $difficulty_rank++;
                     } 
