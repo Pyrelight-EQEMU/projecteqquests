@@ -45,7 +45,7 @@ sub EVENT_SAY
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
         plugin::display_cmc();
-        plugin::YellowText("You currentlyhave $unlocksAvailable Class Unlock Point available.");
+        plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");
         plugin::PurpleText("- [Class Unlocks]");
         plugin::PurpleText("- [Special Abilities]");
         plugin::PurpleText("- [Equipment]");
