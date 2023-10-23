@@ -228,7 +228,7 @@ sub EVENT_SAY
                 my $item_link = quest::varlink($equip_prebuy);
                 plugin::YellowText("NOTICE: You have an outstanding purchase in this category. Select a quantity of duplicates to purchase below");
                 for my $qty (1, 5, 10, 50, 100, 500) {
-                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$equip_prebuy\'_qty_$qty", 1, "BUY")."] -(x%04 QTY)- (Cost: %04d FoS Tokens) - [$item_link] ",$qty,min($qty, 9999)));
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$equip_prebuy\'_qty_$qty", 1, "BUY")."] -(x%04d QTY)- (Cost: %04d FoS Tokens) - [$item_link] ",$qty,min($qty, 9999)));
                 }
             } else {
                 plugin::YellowText("WARNING: You will only be allowed to buy one unique item from this category. After you have selected your item, additional copies will be discounted.");                
