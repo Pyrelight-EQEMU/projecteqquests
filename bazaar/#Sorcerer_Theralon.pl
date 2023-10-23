@@ -230,10 +230,14 @@ sub EVENT_SAY
         }        
     }
 
-    elsif (exists $class{$text} and $unlocksAvailable >= 1 && $progress > 3 && $met_befo) { #invalid-state rejection is handled inside UnlockClass
-        if (plugin::UnlockClass($client, $class{$text})) {
-            $client->Message(263, "The Sorcerer closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
-            plugin::NPCTell("Ah, marvelous! The arcane energies stir within you, revealing a newfound prowess. Embrace this identity and, as your might expands, return to me. The cosmos has much more in store for you.");
+    elsif (exists $class{$text} and $unlocksAvailable >= 1 && $progress > 3 && $met_befo) {
+        if (plugin::IsClassUnlocked($client, $text)) {
+            plugin::YellowText("You are already " . ( (grep { $_ eq lc(substr($text, 0, 1)) } ('a', 'e', 'i', 'o', 'u')) ? "an" : "a") . " $text.");
+        } else {
+            if (plugin::UnlockClass($client, $class{$text})) {
+                $client->Message(263, "The Sorcerer closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
+                plugin::NPCTell("Ah, marvelous! The arcane energies stir within you, revealing a newfound prowess. Embrace this identity and, as your might expands, return to me. The cosmos has much more in store for you.");
+            }
         }
     }
 

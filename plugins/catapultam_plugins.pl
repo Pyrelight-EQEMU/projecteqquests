@@ -181,6 +181,7 @@ sub UnlockClass {
 }
 
 
+
 sub GetUnlockedClasses {
     my $client = shift;
     my $dbh    = plugin::LoadMysql();
@@ -237,6 +238,48 @@ sub GetLockedClasses {
     my @locked_classes = grep { not exists $unlocked_classes{$_} } @all_classes;
 
     return @locked_classes;
+}
+
+sub GetClassID {
+    my $class_name = shift;
+
+    # Mapping from the provided table
+    my %class_name_to_id = (
+        'Warrior'       => 1,
+        'Cleric'        => 2,
+        'Paladin'       => 3,
+        'Ranger'        => 4,
+        'Shadow Knight' => 5,
+        'Druid'         => 6,
+        'Monk'          => 7,
+        'Bard'          => 8,
+        'Rogue'         => 9,
+        'Shaman'        => 10,
+        'Necromancer'   => 11,
+        'Wizard'        => 12,
+        'Magician'      => 13,
+        'Enchanter'     => 14,
+        'Beastlord'     => 15,
+        'Berserker'     => 16,
+    );
+
+    return $class_name_to_id{$class_name};
+}
+
+sub IsClassUnlocked {
+    my ($client, $class_name) = @_;
+    
+    # Convert class name to class ID
+    my $class_id = GetClassID($class_name);
+    
+    # Return undef if we can't find the class ID
+    return unless defined $class_id;
+
+    # Fetch all unlocked classes
+    my %unlocked_classes = GetUnlockedClasses($client);
+
+    # Check if the class_id exists in unlocked_classes
+    return exists $unlocked_classes{$class_id};
 }
 
 sub GetClassListString {
