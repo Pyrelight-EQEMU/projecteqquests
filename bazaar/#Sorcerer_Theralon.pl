@@ -44,6 +44,8 @@ sub EVENT_SAY
         plugin::NPCTell("Ah, tokens! The universal language of favors. Let me show you the marvels they can bring forth.");
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
+        plugin::display_cmc();
+        plugin::YellowText("You currentlyhave $unlocksAvailable Class Unlock Point available.");
         plugin::PurpleText("- [Class Unlocks]");
         plugin::PurpleText("- [Special Abilities]");
         plugin::PurpleText("- [Equipment]");
@@ -57,7 +59,7 @@ sub EVENT_SAY
             plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
             plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - I confirm that I understand that I will receive an additional permanent XP/AAXP Penalty.", min($costs[$total_classes], 9999)));
         } else {
-            plugin::PurpleText("You have $unlocksAvailable Class Unlock Point available.");
+            plugin::PurpleText("You currently have $unlocksAvailable Class Unlock Point available.");
             # Build the Menu
             foreach my $class (@locked_classes) {
                 my $class_name = quest::getclassname($class);
