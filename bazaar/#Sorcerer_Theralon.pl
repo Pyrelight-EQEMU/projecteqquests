@@ -139,7 +139,7 @@ sub EVENT_SAY
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
                 my $item_link = quest::varlink($item);
-                plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - [$item_link] (Cost: %04d FoS or HFoS Tokens)", min($equipment_index{$selected_equipment}{$item}, 9999)));
+                plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - (Cost: %04d FoS or HFoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
             }
         } else {
             plugin::RedText("Invalid equipment selection!");
