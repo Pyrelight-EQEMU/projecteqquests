@@ -9,7 +9,6 @@ sub EVENT_SAY
     my $progress            = $client->GetBucket("MAO-Progress") || 0;
     my $met_befo            = $client->GetBucket("TheralonIntro") || 0;
     my @locked_classes      = plugin::GetLockedClasses($client);
-    my %class               = map { quest::getclassname($_) => $_ } @locked_classes;
     my %unlocked_class      = plugin::GetUnlockedClasses($client);
     my $total_classes       = scalar(keys %unlocked_class);
     my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
@@ -91,9 +90,9 @@ sub EVENT_SAY
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
         if (!$unlocksAvailable) {
-            plugin::YellowText("You have no Class Unlock Points available.");
-            plugin::YellowText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
-            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - Additional Class Slot", min($costs[$total_classes], 9999)));
+            plugin::PurpleText("You have no Class Unlock Points available.");
+            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
+            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - I confirm that I understand that I will receive an additional permanent XP/AAXP Penalty.", min($costs[$total_classes], 9999)));
         } else {
             plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");            
             my @formatted_classes;
@@ -114,7 +113,7 @@ sub EVENT_SAY
             plugin::YellowText("You have gained a Class Unlock point.");            
             plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
         } else {
-             plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
+            plugin::NPCTell("I'm sorry, $charname. You don't have enough [tokens] to afford that.");
         }        
     }
 
@@ -133,7 +132,7 @@ sub EVENT_SAY
 
             $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
         } else {
-            plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
+            plugin::NPCTell("I'm sorry, $charname. You don't have enough [tokens] to afford that.");
         }        
     }
 }
