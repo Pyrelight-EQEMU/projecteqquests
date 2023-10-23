@@ -240,7 +240,7 @@ sub EVENT_SAY
                     my $base_cost = $item_details->{value};
                     my $total_cost = $base_cost + ($diff_qty - 1) * int($base_cost / 2);
 
-                    plugin::PurpleText("- [".quest::saylink("link_upgrade_\'$item_id\'_\'$tier\'", 1, "UPGRADE")."] - ()" );
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_upg_\'$item_id\'_\'$tier\'", 1, "UPGRADE")."] - (%04d FoS Tokens) - [$itemlink]", min($total_cost, 9999)));
                 }
             } else {
                 plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
