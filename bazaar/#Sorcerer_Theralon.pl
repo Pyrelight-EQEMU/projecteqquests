@@ -216,7 +216,7 @@ sub EVENT_SAY
         plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
     }
 
-    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && $total_classes <= $#costs) {
+    elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && ($total_classes + $unlocksAvailable) <= $#costs) {
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
             ApplyExpPenalty($client);
