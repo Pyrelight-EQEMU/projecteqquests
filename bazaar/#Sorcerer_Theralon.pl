@@ -108,7 +108,7 @@ sub EVENT_SAY
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
 
-            plugin::ApplyExpPenalty($client);
+            ApplyExpPenalty($client);
 
             $client->SetBucket("ClassUnlocksAvailable", 1);
             plugin::YellowText("You have gained a Class Unlock point.");            
@@ -129,7 +129,8 @@ sub EVENT_SAY
         my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 3;
         if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$exp_bonus_index],9999), $client);
-            plugin::ApplyExpBonus($client);
+            
+            ApplyExpBonus($client);
 
             $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
         } else {
