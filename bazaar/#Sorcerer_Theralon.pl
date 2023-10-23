@@ -40,11 +40,11 @@ sub EVENT_ITEM {
     my $dbh = plugin::LoadMysql();
 
     if ($total_money > 0) {
-                plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
-            } elsif ($itemcount{'0'} < 3) {             
-                plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
-            } else {
-                foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
+        plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
+    } elsif ($itemcount{'0'} < 3) {             
+        plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
+    } else {
+        foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
             my $base_id = plugin::get_base_id($item_id) || 0;
 
             # Use find_item_details to retrieve item details
