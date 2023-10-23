@@ -45,9 +45,9 @@ sub EVENT_ITEM {
          my $item_cost = find_item_cost($base_id);
          
          if ($base_id && $item_cost) {
-            my $tier = plugin::get_upgrade_tier($base_id) + 1; # Assuming you get tier using base_id
+            my $tier = plugin::get_upgrade_tier($base_id); # Assuming you get tier using base_id
             my $value = ($item_cost * 5) ** $tier;
-            quest::debug("That is refundable, value: $value");
+            quest::debug("That is refundable, tier: $tier value: $value");
          }
       }
    }
