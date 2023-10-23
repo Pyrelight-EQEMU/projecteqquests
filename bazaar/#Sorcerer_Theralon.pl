@@ -39,8 +39,12 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $dbh = plugin::LoadMysql();
 
-    foreach my $item_id (keys %itemcount) {
-        if ($item_id != 0) {
+    if ($total_money > 0) {
+                plugin::NPCTell("You gave me both an item to look at and money at the same time. I'm confused about what you want me to do.");
+            } elsif ($itemcount{'0'} < 3) {             
+                plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
+            } else {
+                foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
             my $base_id = plugin::get_base_id($item_id) || 0;
 
             # Use find_item_details to retrieve item details
@@ -226,6 +230,13 @@ sub EVENT_SAY
                 for my $tier ($item_tier..$max_tier) {
                     my $item_link = quest::varlink($base_id + ($tier * 1000000));
                     plugin::PurpleText($item_link);
+
+                    # Calculate the difference in quantity required for upgrade
+                    my $required_qty = 2**$tier;  # The required quantity for the target tier
+                    my $diff_qty = $required_qty - $eff_qty;  # The difference in quantity from the current item's effective quantity
+
+                    # Display the difference in quantity
+                    plugin::PurpleText("To upgrade to tier $tier, you need an additional $diff_qty items of tier 0 equivalent.");
                 }
             } else {
                 plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
