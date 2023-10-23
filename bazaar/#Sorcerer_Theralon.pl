@@ -53,24 +53,8 @@ sub EVENT_SAY
         plugin::PurpleText("- [Consumables]");
     }
 
-    elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
-        if (!$unlocksAvailable) {
-            plugin::PurpleText("You have no Class Unlock Points available.");
-            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
-            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - I confirm that I understand that I will receive an additional permanent XP/AAXP Penalty.", min($costs[$total_classes], 9999)));
-        } else {
-            plugin::PurpleText("You currently have $unlocksAvailable Class Unlock Point available.");
-            # Build the Menu
-            foreach my $class (@locked_classes) {
-                my $class_name = quest::getclassname($class);
-                my $unlock_menu_item = "- [". quest::saylink("unlock_$class", 1, "UNLOCK") ."] - $class_name";
-                plugin::PurpleText($unlock_menu_item); 
-            }  
-        }      
-    }
-
     elsif ($text=~/Passive Boosts/i && $progress > 3 && $met_befo) {
-        my $exp_bonus_index     = $client->GetBucket("exp-bonus-count") || 2;
+        my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 2;
         my $fac_bonus_index     = $client->GetBucket("fac_bonus_index") || 2;
         my $cur_bonus_index     = $client->GetBucket("cur_bonus_index") || 2;
         my $pot_bonus_index     = $client->GetBucket("pot_bonus_index") || 2;
@@ -79,12 +63,44 @@ sub EVENT_SAY
 
         #Pyrelight TO-DO: implement these other options.
 
-        plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d FoS Tokens) - Permanent Bonus: Experience", min($costs[$exp_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain", min($costs[$fac_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate", min($costs[$cur_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Potion Drop Rate", min($costs[$pot_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments Drop Rate", min($costs[$aug_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal Drop Rate", min($costs[$cmc_bonus_index] * 2, 9999)));         
+        if($exp_bonus_index <= $#costs) {
+            plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d FoS Tokens) - Permanent Bonus: Experience", min($costs[$exp_bonus_index] * 2, 9999)));
+        }
+        if($fac_bonus_index <= $#costs) {
+            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain", min($costs[$fac_bonus_index] * 2, 9999)));
+        }
+        if($cur_bonus_index <= $#costs) {
+            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate", min($costs[$cur_bonus_index] * 2, 9999)));
+        }
+        if($pot_bonus_index <= $#costs) {
+            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Potion Drop Rate", min($costs[$pot_bonus_index] * 2, 9999)));
+        }
+        if($aug_bonus_index <= $#costs) {
+            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments Drop Rate", min($costs[$aug_bonus_index] * 2, 9999)));
+        }
+        if($cmc_bonus_index <= $#costs) {
+            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal Drop Rate", min($costs[$cmc_bonus_index] * 2, 9999)));         
+        }
+    }
+
+    elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
+        # %equipment is defined above which is an hash where keys are item_ids that can be purchased and value is the hash.
+        # complete this so that the hash is iterated over and formatted like  the other given example elsif block above
+    }
+
+    elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
+        if (!$unlocksAvailable) {
+            plugin::PurpleText("You have no Class Unlock Points available.");
+            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
+            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - I confirm that I understand that I will receive an additional permanent XP/AAXP Penalty.", min($costs[$total_classes], 9999)));
+        } else {
+            plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");            
+            my @formatted_classes;
+            foreach my $class (@locked_classes) {
+                my $class_name = quest::getclassname($class);
+                plugin::PurpleText("- [". quest::saylink("$class_name", 1, "UNLOCK") ."] - $class_name");
+            }            
+        }      
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
@@ -101,13 +117,20 @@ sub EVENT_SAY
         }        
     }
 
+    elsif (exists $class{$text} and $unlocksAvailable >= 1 && $progress > 3 && $met_befo) {
+        if (plugin::UnlockClass($client, $class{$text})) {
+            $client->Message(263, "The Sorcerer closes his eyes in meditation before suddenly striking your forehead with the heel of his open palm.");
+            plugin::NPCTell("Ah, marvelous! The arcane energies stir within you, revealing a newfound prowess. Embrace this identity and, as your might expands, return to me. The cosmos has much more in store for you.");
+        }
+    }
+
     elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo) {
-        my $exp_bonus_index     = $client->GetBucket("exp-bonus-count") || 3;
+        my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 3;
         if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$exp_bonus_index],9999), $client);
             plugin::ApplyExpBonus($client);
 
-            $client->SetBucket("exp-bonus-count", $exp_bonus_index + 1);
+            $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
         } else {
             plugin::NPCTell("I'm sorry, $charname. You don't have enough [tokens] to afford that.");
         }        
