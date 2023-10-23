@@ -109,7 +109,7 @@ sub EVENT_SAY
                     
     if ($text=~/hail/i) {
         if ($client->GetBucket("Theralon-Upgrade-Queue")) {
-            plugin::NPCTell("I'm holding an item for you. Would you like to [Upgrade] or [Return] this?");
+            plugin::NPCTell("I'm holding an item for you. Do you want to [Upgrade] or [Return] it?");
         } else {
             if ($progress < 3) {
                 quest::say("Ah! Apologies, apologies! So much to do, so little...well, you understand. Now's not the time, I'm afraid.");
