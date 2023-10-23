@@ -44,12 +44,11 @@ sub EVENT_SAY
         plugin::NPCTell("Ah, tokens! The universal language of favors. Let me show you the marvels they can bring forth.");
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
-        plugin::PurpleText("- [Class Unlocks] - Unlock Additional Classes! XP Penalties Apply.");
-        plugin::PurpleText("- [Special Abilities] - Abilities available nowhere else!");
-        plugin::PurpleText("- [Equipment] - Unique Gear and Augments");
-        plugin::PurpleText("- [Passive Boosts] - Permanent hidden, passive boosts");
-        plugin::PurpleText("- [Consumables] - If you want to spend a finite resource on consumable items, I guess.");
-
+        plugin::PurpleText("- [Class Unlocks]");
+        plugin::PurpleText("- [Special Abilities]");
+        plugin::PurpleText("- [Equipment]");
+        plugin::PurpleText("- [Passive Boosts]");
+        plugin::PurpleText("- [Consumables]");
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
