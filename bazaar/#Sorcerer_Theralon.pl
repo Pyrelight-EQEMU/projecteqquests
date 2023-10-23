@@ -73,12 +73,12 @@ sub EVENT_SAY
 
         #Pyrelight TO-DO: implement these other options.
 
-        plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost:%04d Feat of Strength Tokens) - 25%%  experience bonus", min($costs[$exp_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% faction gain bonus", min($costs[$fac_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% currency drop rate", min($costs[$cur_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% potion drop rate bonus", min($costs[$pot_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% global augment drop rate bonus", min($costs[$aug_bonus_index] * 2, 9999)));
-        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% Concentrated Mana Crystal drop rate bonus", min($costs[$cmc_bonus_index] * 2, 9999)));         
+        plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d Feat of Strength Tokens) - 25%  experience bonus", min($costs[$exp_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - 25% faction gain bonus", min($costs[$fac_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - 25% currency drop rate", min($costs[$cur_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - 25% potion drop rate bonus", min($costs[$pot_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - 25% global augment drop rate bonus", min($costs[$aug_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d Feat of Strength Tokens) - 25% Concentrated Mana Crystal drop rate bonus", min($costs[$cmc_bonus_index] * 2, 9999)));         
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
