@@ -39,22 +39,47 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my $dbh = plugin::LoadMysql();
 
-   foreach my $item_id (keys %itemcount) {
-      if ($item_id != 0) {
-         my $base_id = plugin::get_base_id($item_id) || 0;
-         my $item_cost = find_item_cost($base_id);
-         
-         if ($base_id && $item_cost) {
-            my $tier = plugin::get_upgrade_tier($item_id);
-            my $value = $item_cost ** ($tier + 1);
+    foreach my $item_id (keys %itemcount) {
+        if ($item_id != 0) {
+            my $base_id = plugin::get_base_id($item_id) || 0;
 
-            plugin::Add_FoS_Tokens($value, $client);
-            delete $itemcount{$item_id};
+            # Use find_item_details to retrieve item details
+            my $item_details = find_item_details($base_id);
 
-            plugin::NPCTell("No problem, I can take that back. I'll credit you with the tokens."); 
-         }
-      }
-   }
+            # Check if the details are valid
+            if ($item_details) {
+                my $item_cost = $item_details->{value};
+                my $equipment = $item_details->{equipment};
+                
+                my $tier = plugin::get_upgrade_tier($item_id);
+                my $qty  = $item_cost ** ($tier + 1);
+
+                # Adjust the tokens given to the player based on the quantity
+                my $tokens_to_refund = $qty * $item_cost;
+                plugin::Add_FoS_Tokens($tokens_to_refund, $client);
+
+                # Update the data bucket to reflect the refund
+                my $current_qty = $client->GetData("equip-category-$equipment-quantity") || 0;
+                my $new_qty = $current_qty - $qty;
+                $client->SetBucket("equip-category-$equipment-quantity", $new_qty);
+
+                # Check if the updated quantity in the bucket is 0
+                if ($new_qty <= 0) {
+                    # Refund an additional amount of tokens equal to $item_cost - 1
+                    plugin::Add_FoS_Tokens($item_cost - 1, $client);
+
+                    # Delete the data buckets
+                    $client->DeleteBucket("equip-category-$equipment-quantity");
+                    $client->DeleteBucket("equip-category-$equipment");
+                }
+
+                # Remove the item from the itemcount hash
+                delete $itemcount{$item_id};
+
+                plugin::NPCTell("No problem, I can take that back. I'll credit you with the tokens."); 
+            }
+        }
+    }
 
     # After processing all items, return any remaining money
     my $platinum_remainder = int($total_money / 1000);
@@ -195,27 +220,43 @@ sub EVENT_SAY
     elsif ($text =~ /^link_equi_'(.+)'$/ && $progress > 3 && $met_befo) {
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
+            my $equip_prebuy = $client->GetData("equip-category-$selected_equipment");
+            my $equip_qty    = $client->GetData("equip-category-$selected_equipment-quantity") || 1;{
             plugin::PurpleText("- Equipment Category: $selected_equipment");
-            for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
-                my $item_link = quest::varlink($item);
-                plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
+            if ($equip_prebuy) {
+                plugin::YellowText("NOTICE: You have an outstanding purchase in this category. Select a quantity of duplicates to purchase below");
+                for $qty (1, 5, 10, 50, 100, 500) {
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'_qty_$qty", 1, "BUY")."] -(x%04 QTY)- (Cost: %04d FoS Tokens) - [$item_link] ",$qty,min($qty, 9999)));
+                }
+            } else {
+                plugin::YellowText("WARNING: You will only be allowed to buy one unique item from this category. After you have selected your item, additional copies will be discounted.");                
+                for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
+                    my $item_link = quest::varlink($item);
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'_qty_1", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
+                }
             }
         } else {
             plugin::RedText("Invalid equipment selection!");
         }
     }
 
-    elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
+    elsif ($text =~ /^link_equipbuy_'(.+)'_qty_(\d+)$/) {
         my $item_id     = $1;
+        my $quantity    = $2;
 
         # Loop through all equipment categories
         for my $equipment (keys %equipment_index) {
             if (exists $equipment_index{$equipment}{$item_id}) {
                 my $item_cost  = $equipment_index{$equipment}{$item_id};
                 if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
+                    my $prev_quantity = $client->GetData("equip-category-$equipment-quantity") || 0;
                     plugin::Spend_FoS_Tokens($item_cost, $client);
-                    $client->SummonItem($item_id);
-                    plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
+
+                    $client->SummonItem($item_id);                    
+                    $client->SetData("equip-category-$equipment", $item_id);
+                    $client->SetData("equip-category-$equipment-quantity", $prev_quantity + $quantity);
+
+                    plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for all of your tokens back, even if you have it upgraded in the meantime.");
                 } else {
                     RejectBuy();
                 }
@@ -340,31 +381,20 @@ sub DisplayExpRate {
     plugin::YellowText("Your current experience rate is $percentage_expRate%%.");
 }
 
-sub find_item_in_equipment {
-    my ($item_id) = @_;
-
-    # Search through the equipment_index for the item_id
-    for my $equipment (keys %equipment_index) {
-        if (exists $equipment_index{$equipment}{$item_id}) {
-            # Return the cost of the item if found
-            return $equipment_index{$equipment}{$item_id};
-        }
-    }
-
-    # Return undef if item not found
-    return undef;
-}
-
-sub find_item_cost {
-    my ($item_id) = @_;
+sub find_item_details {
+    my ($client, $item_id) = @_;
+    my %result;
 
     # Loop through the main equipment categories
     for my $category (keys %equipment_index) {
         my $subhash = $equipment_index{$category};
-        
-        # If the item_id exists in the subhash, return its cost
+
+        # If the item_id exists in the subhash
         if (exists $subhash->{$item_id}) {
-            return $subhash->{$item_id};
+            $result{'equipment'} = $category;
+            $result{'value'} = $subhash->{$item_id};
+            $result{'num_purchased'} = $client->GetData("equip-category-$category-quantity") || 0;
+            return \%result;  # Return a reference to the hash
         }
     }
 
