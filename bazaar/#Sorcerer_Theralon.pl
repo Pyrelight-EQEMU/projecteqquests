@@ -194,16 +194,18 @@ sub EVENT_SAY
 
         # Continue with the purchase logic based on the token type
         if ($token_type eq "hfos") {
-            if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
-                plugin::Spend_FoS_Heroic_Tokens($item_cost, $client);
-            } else {
-               RejectBuy(); 
-            }          
-        } elsif ($token_type eq "fos") {
             if (plugin::Get_FoS_Heroic_Tokens($client) >= $item_cost) {
                 plugin::Spend_FoS_Heroic_Tokens($item_cost, $client);
             } else {
-               RejectBuy(); 
+               RejectBuy();
+               return;
+            }          
+        } elsif ($token_type eq "fos") {
+            if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
+                plugin::Spend_FoS_Tokens($item_cost, $client);
+            } else {
+               RejectBuy();
+               return;
             }
         } else {
             plugin::RedText("Invalid token selection!");
@@ -248,6 +250,9 @@ sub EVENT_SAY
 }
 
 sub RejectBuy {
+    my $client      = plugin::val('client');
+    my $charname    = $client->GetCleanName(); 
+
     plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
 }
 
