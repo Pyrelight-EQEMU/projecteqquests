@@ -147,26 +147,19 @@ sub EVENT_SAY
     }
 
     elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
-        my $item_id     = $1;
+        my $item_id    = $1;
+        my $item_cost  = find_item_in_equipment($item_id);
 
-        # Loop through all equipment categories
-        for my $equipment (keys %equipment_index) {
-            if (exists $equipment_index{$equipment}{$item_id}) {
-                my $item_link  = quest::varlink($item_id);
-                my $item_cost  = $equipment_index{$equipment}{$item_id};
+        if (defined $item_cost) {
+            my $item_link       = quest::varlink($item_id);
+            my $link_FoS_points = quest::saylink("link_equipbuyconfirm_fos_'$item_id'", 1, "FoS Points");
+            my $link_hFoS_points= quest::saylink("link_equipbuyconfirm_hfos_'$item_id'", 1, "Heroic FoS Points");
 
-                my $link_FoS_points     = quest::saylink("link_equipbuyconfirm_fos_'$item_id'", 1, "FoS Points");
-                my $link_hFoS_points    = quest::saylink("link_equipbuyconfirm_hfos_'$item_id'", 1, "Heroic FoS Points");
-
-                plugin::Display_FoS_Tokens($client);
-                plugin::Display_FoS_Heroic_Tokens($client);
-                plugin::PurpleText("Would you like to purchase [$item_link] using $item_cost [$link_FoS_points] or [$link_hFoS_points]?");
-                return;
-            }
-        }
-
-        # If the item wasn't found in any category
-        if (!$item_found) {
+            plugin::Display_FoS_Tokens($client);
+            plugin::Display_FoS_Heroic_Tokens($client);
+            plugin::PurpleText("Would you like to purchase [$item_link] using $item_cost [$link_FoS_points] or [$link_hFoS_points]?");
+            return;
+        } else {
             plugin::RedText("Invalid item selection!");
         }
     }
