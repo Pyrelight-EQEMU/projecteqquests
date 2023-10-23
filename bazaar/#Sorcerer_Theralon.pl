@@ -1,4 +1,4 @@
-use DBI;db5
+use DBI;db
 use DBD::mysql;
 use List::Util qw(max);
 use List::Util qw(min);
@@ -16,7 +16,7 @@ my %chronal_seals =   ( '33407' => '5',
                         '33420' => '5',
                         '33421' => '5',
                         '33424' => '5',
-                        '33425' => '5',
+                        '33425' => '20',
                         '33428' => '5',
                         '33429' => '5',
                         '33430' => '5',
