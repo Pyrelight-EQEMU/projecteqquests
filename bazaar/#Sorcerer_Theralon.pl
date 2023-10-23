@@ -214,6 +214,7 @@ sub EVENT_SAY
         my $item_details    = find_item_details($client, $base_id);
         my $equipment       = $item_details->{equipment};
         my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
+        
         if ($item_id && $base_id == $equip_entitl) {
             my $eff_qty     = 2**$item_tier;
             
@@ -232,11 +233,15 @@ sub EVENT_SAY
                     plugin::PurpleText($item_link);
 
                     # Calculate the difference in quantity required for upgrade
-                    my $required_qty = 2**$tier;  # The required quantity for the target tier
-                    my $diff_qty = $required_qty - $eff_qty;  # The difference in quantity from the current item's effective quantity
+                    my $required_qty = 2**$tier;
+                    my $diff_qty = $required_qty - $eff_qty;
 
-                    # Display the difference in quantity
-                    plugin::PurpleText("To upgrade to tier $tier, you need an additional $diff_qty items of tier 0 equivalent.");
+                    # Calculate the cost
+                    my $base_cost = $item_details->{value};
+                    my $total_cost = $base_cost + ($diff_qty - 1) * ($base_cost / 2);
+
+                    # Display the difference in quantity and total cost
+                    plugin::PurpleText("To upgrade to tier $tier, you need an additional $diff_qty items of tier 0 equivalent, costing a total of $total_cost.");
                 }
             } else {
                 plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
