@@ -48,24 +48,16 @@ sub EVENT_ITEM {
 
             # Check if the details are valid
             if ($item_details) {
-                my $item_cost = $item_details->{value};
-                my $equipment = $item_details->{equipment};
-                
-                my $tier = plugin::get_upgrade_tier($item_id);
-                my $qty  = $item_cost ** ($tier + 1);
+                my $item_cost   = $item_details->{value};
+                my $equipment   = $item_details->{equipment};                
+                my $tier        = plugin::get_upgrade_tier($item_id);
+                my $qty         = $item_cost ** ($tier + 1);
 
-                quest::debug("$tier");
+                quest::debug("$item_id, $base_id, $tier");
+                $client->SetBucket("Theralon-Upgrade-Queue", $item_id);
+                delete %itemcount{$item_id};
 
-                # Adjust the tokens given to the player based on the quantity
-                my $tokens_to_refund = $qty + $item_cost - 1;
-                plugin::Add_FoS_Tokens($tokens_to_refund, $client);
-
-                $client->DeleteBucket("equip-category-$equipment"); 
-
-                # Remove the item from the itemcount hash
-                delete $itemcount{$item_id};
-
-                plugin::NPCTell("No problem, I can take that back. I'll credit you with the tokens."); 
+                plugin::NPCTell("This looks like one of mine. Would you like to [Upgrade] or [Return] this?");
             }
         }
     }
@@ -182,13 +174,6 @@ sub EVENT_SAY
         }
     }
 
-    elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
-        plugin::PurpleText("- Available Equipment Categories");
-        for my $equipment (sort keys %equipment_index) {
-            plugin::PurpleText("- [".quest::saylink("link_equi_'$equipment'", 1, "$equipment")."]");
-        }
-    }
-
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo && @locked_classes) {
         if (!$unlocksAvailable && $total_classes <= $#costs) {
             plugin::YellowText("You have no Class Unlock Points available.");
@@ -206,18 +191,58 @@ sub EVENT_SAY
         }
     }
 
+    elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
+        plugin::PurpleText("- Available Equipment Categories");
+        for my $equipment (sort keys %equipment_index) {
+            my $equip_mask = $client->GetBucket("equip-category-$equipment") || 0;
+            plugin::PurpleText("- [".quest::saylink("link_equi_'$equipment'", 1, "$equipment")."]") unless $equip_mask;
+        }
+    }
+
+    elsif ($text=~/Upgrade/i) {
+        my $item_id         = $client->GetBucket("Theralon-Upgrade-Queue") || 0;
+        my $base_id         = plugin::get_base_id($item_id);
+        my $item_tier       = plugin::get_upgrade_tier($item_id);
+        my $item_details    = find_item_details($client, $base_id);
+        my $equipment       = $item_details->{equipment};
+        my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
+        if ($item_id && $base_id == $equip_entitl) {
+            my $eff_qty     = 2**$item_tier;
+            
+            # Calculating max tier
+            my $potential_id = $item_id + 1000000;  # Start by adding 1 million to the base_id
+            my $max_tier     = $item_tier;  # Initialize max_tier to the current tier
+            while (plugin::item_exists_in_db($potential_id)) {
+                $max_tier++;
+                $potential_id += 1000000;  # Add 1 million for the next potential tier
+            }
+
+            if ($max_tier > $item_tier) {
+                plugin::PurpleText("- Select Upgrade Target");
+                for my $tier ($item_tier..$max_tier) {
+                    my $item_link = quest::varlink($base_id + ($tier * 1000000));
+                    plugin::PurpleText($item_link);
+                }
+            } else {
+                plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
+                $client->SummonItem($item_id);                
+                $client->DeleteBucket("Theralon-Upgrade-Queue");
+            }
+        }
+    }
+
     elsif ($text =~ /^link_equi_'(.+)'$/ && $progress > 3 && $met_befo) {
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
             my $equip_prebuy = $client->GetBucket("equip-category-$selected_equipment");
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             if ($equip_prebuy) {                
-                plugin::YellowText("NOTICE: You have an outstanding purchase in this category.");
+                plugin::YellowText("WARNING: You have an outstanding purchase in this category. Nice try.");
             } else {
                 plugin::YellowText("WARNING: You will only be allowed to buy one unique item from this category. After you have selected your item, additional copies will be discounted.");                
                 for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
                     my $item_link = quest::varlink($item);
-                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$item\'_qty_1", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$item\'", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
                 }
             }
         } else {
@@ -227,27 +252,22 @@ sub EVENT_SAY
 
     elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
         my $item_id     = $1;
-
-        # Loop through all equipment categories
-        for my $equipment (keys %equipment_index) {
-            if (exists $equipment_index{$equipment}{$item_id}) {
-                my $item_cost  = $equipment_index{$equipment}{$item_id};
-                if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
-                    if (!$client->GetBucket("equip-category-$equipment")) {                    
-                        $client->SummonItem($item_id);
-                        $client->SetBucket("equip-category-$equipment", $item_id);
-                        plugin::Spend_FoS_Tokens($item_cost, $client);
-                        plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for all of your tokens back, even if you have it upgraded in the meantime.");
-                    }
+        my %item_details = find_item_details($client, $item_id);
+        if ($item_details) {
+            my $item_cost   = $item_details->{value};
+            my $equipment   = $item_details->{equipment};
+            if (plugin::Get_FoS_Tokens($client) >= $item_cost) {
+                if (!$client->GetBucket("equip-category-$equipment")) {
+                    $client->SummonItem($item_id);
+                    $client->SetBucket("equip-category-$equipment", $item_id);
+                    plugin::Spend_FoS_Tokens($item_cost, $client);
+                    plugin::NPCTell("Absolutely, I can give that to you. If you decide that you want that upgraded or you want to return it for your tokens back, just hand it to me.");
                 } else {
-                    RejectBuy();
+                    plugin::YellowText("WARNING: You have an outstanding purchase in this category. Nice try.");
                 }
+            } else {
+                BuyReject();
             }
-        }
-
-        # If the item wasn't found in any category
-        if (!$item_found) {
-            plugin::RedText("Invalid item selection!");
         }
     }
 
