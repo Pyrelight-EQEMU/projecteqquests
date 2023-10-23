@@ -114,12 +114,7 @@ sub EVENT_SAY
     elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
         plugin::PurpleText("- Available Equipment Categories");
         for my $equipment (keys %equipment_index) {
-            plugin::PurpleText("$equipment");
-
-
-
-            my $items_ref = $equipment_index{$equipment};
-            # Now $items_ref is a reference to a hash (in this case %chronal_seals)
+            plugin::PurpleText("- [".quest::saylink("link_equipment_'$equipment'", 1, "$equipment")."]");
         }
     }
 
