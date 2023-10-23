@@ -139,24 +139,32 @@ sub EVENT_SAY
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
                 my $item_link = quest::varlink($item);
-                plugin::PurpleText("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - [$item_link]");
+                plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - [$item_link]", min($equipment_index{$selected_equipment}{$item}, 9999)));
             }
         } else {
             plugin::RedText("Invalid equipment selection!");
         }
     }
 
-    elsif ($text =~ /^link_equipbuy_'(.+)'$/ && $progress > 3 && $met_befo) {
+    elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
         my $selected_item_id = $1;
-        
-        # Assuming you want to execute an action when a specific item is clicked for purchase:
-        if (exists $equipment_index{$selected_equipment} && exists $equipment_index{$selected_equipment}{$selected_item_id}) {
-            # Here you can add the logic to handle the item purchase or any other action
+        my $item_found = 0;  # A flag to check if the item was found in any category
 
-            plugin::PurpleText("You have selected item with ID: $selected_item_id for purchase.");
-            # Implement any additional action logic here, like removing currency, updating inventory, etc.
-            
-        } else {
+        # Loop through all equipment categories
+        for my $equipment (keys %equipment_index) {
+            if (exists $equipment_index{$equipment}{$selected_item_id}) {
+                # Here you can add the logic to handle the item purchase or any other action
+
+                plugin::PurpleText("You have selected item with ID: $selected_item_id from category: $equipment for purchase.");
+                # Implement any additional action logic here, like removing currency, updating inventory, etc.
+
+                $item_found = 1;  # Set the flag to true indicating the item was found
+                last;  # Exit the loop since we found the item
+            }
+        }
+
+        # If the item wasn't found in any category
+        if (!$item_found) {
             plugin::RedText("Invalid item selection!");
         }
     }
