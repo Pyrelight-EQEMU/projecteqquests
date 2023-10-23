@@ -12,7 +12,7 @@ sub NPCTell {
 sub YellowText {
 	my $message     = shift;
     my $client      = shift || plugin::val('client');
-    my $tellColor   = 15;
+    my $tellColor   = 335;
 	
     $client->Message($tellColor, $message);
 }
@@ -20,7 +20,7 @@ sub YellowText {
 sub RedText {
 	my $message     = shift;
     my $client      = shift || plugin::val('client');
-    my $tellColor   = 13;
+    my $tellColor   = 287;
 	
     $client->Message($tellColor, $message);
 }
@@ -36,7 +36,7 @@ sub PurpleText {
 sub WorldAnnounce {
 	my $message = shift;
 	quest::discordsend("ooc", $message);
-	quest::we(15, $message);
+	quest::we(335, $message);
 }
 
 # Usage: WorldAnnounceItem($message, $item_id)
@@ -67,7 +67,7 @@ sub WorldAnnounceItem {
     $message =~ s/\{item\}/$eqgitem_link/g;
 
     # Send the message with the game link to the EQ world
-    quest::we(15, $message);
+    quest::we(335, $message);
 
     # Replace the game link with the Discord link
     $message =~ s/\Q$eqgitem_link\E/$discord_link/g;
@@ -137,9 +137,10 @@ sub GetPotName {
 
 sub UnlockClass {
     my ($client, $class_id) = @_;
-    my $class_ability_base = 20000;
-    my $character_id = $client->CharacterID();
-    my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;
+    my $class_name          = quest::getclassname($class_id);
+    my $class_ability_base  = 20000;
+    my $character_id        = $client->CharacterID();
+    my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
 
     if ($unlocksAvailable >= 1) {
 
@@ -157,7 +158,8 @@ sub UnlockClass {
             return 0;
         } else { 
             $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
-            plugin::YellowText("You have spent a Class Unlock point.");
+            plugin::YellowText("You have spent a Class Unlock point.");            
+            plugin::YellowText("You are now also a $class_name.");
 
             # Insert data into multiclass_data table for the new class
             $sth = $dbh->prepare("INSERT INTO multiclass_data (id, class) VALUES (?, ?)");
