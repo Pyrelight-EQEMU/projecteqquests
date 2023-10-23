@@ -95,19 +95,19 @@ sub EVENT_SAY
             plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d FoS Tokens) - Permanent Bonus: Experience", min($costs[$exp_bonus_index] * 2, 9999)));
         }
         if($fac_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain", min($costs[$fac_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain", min($costs[$fac_bonus_index] * 2, 9999)));
         }
         if($cur_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate", min($costs[$cur_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate", min($costs[$cur_bonus_index] * 2, 9999)));
         }
         if($pot_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Potion Drop Rate", min($costs[$pot_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Potion Drop Rate", min($costs[$pot_bonus_index] * 2, 9999)));
         }
         if($aug_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments Drop Rate", min($costs[$aug_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments Drop Rate", min($costs[$aug_bonus_index] * 2, 9999)));
         }
         if($cmc_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- [UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal Drop Rate", min($costs[$cmc_bonus_index] * 2, 9999)));         
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal Drop Rate", min($costs[$cmc_bonus_index] * 2, 9999)));         
         }
     }
 
