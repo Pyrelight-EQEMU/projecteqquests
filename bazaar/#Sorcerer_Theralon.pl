@@ -147,25 +147,46 @@ sub EVENT_SAY
     }
 
     elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
-        my $selected_item_id = $1;
-        my $item_found = 0;  # A flag to check if the item was found in any category
+        my $item_id     = $1;
 
         # Loop through all equipment categories
         for my $equipment (keys %equipment_index) {
-            if (exists $equipment_index{$equipment}{$selected_item_id}) {
-                # Here you can add the logic to handle the item purchase or any other action
+            if (exists $equipment_index{$equipment}{$item_id}) {
+                my $item_link  = quest::varlink($item_id);
+                my $item_cost  = $equipment_index{$equipment}{$item_id};
 
-                plugin::PurpleText("You have selected item with ID: $selected_item_id from category: $equipment for purchase.");
-                # Implement any additional action logic here, like removing currency, updating inventory, etc.
+                my $link_FoS_points = quest::saylink("link_equipbuyconfirm_fos_'$item_id'", 1, "FoS Points");
+                my $link_FoS_points = quest::saylink("link_equipbuyconfirm_hfos_'$item_id'", 1, "Heroic FoS Points");
 
-                $item_found = 1;  # Set the flag to true indicating the item was found
-                last;  # Exit the loop since we found the item
+                plugin::Display_FoS_Tokens($client);
+                plugin::Display_FoS_Heroic_Tokens($client);
+                plugin::PurpleText("Would you like to purchase [$item_link] using $item_cost [$link_FoS_points] or [$link_hFoS_points]?");
+                return;
             }
         }
 
         # If the item wasn't found in any category
         if (!$item_found) {
             plugin::RedText("Invalid item selection!");
+        }
+    }
+
+    elsif ($text =~ /^link_equipbuyconfirm_(hfos|fos)_'(.+)'$/) {
+        my $token_type = $1;  # This will capture either "hfos" or "fos"
+        my $item_id    = $2;  # This will capture the item ID
+
+        if ($token_type eq "hfos") {
+            # Code for Heroic FoS Points
+            plugin::PurpleText("You chose to purchase $item_id with Heroic FoS Points.");
+            # ... additional purchase logic ...
+
+        } elsif ($token_type eq "fos") {
+            # Code for FoS Points
+            plugin::PurpleText("You chose to purchase $item_id with FoS Points.");
+            # ... additional purchase logic ...
+
+        } else {
+            plugin::RedText("Invalid token selection!");
         }
     }
 
