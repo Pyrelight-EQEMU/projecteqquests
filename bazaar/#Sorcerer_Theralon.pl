@@ -260,7 +260,7 @@ sub EVENT_SAY
 
             # Calculate the refund amount
             my $eff_qty = 2**$item_tier;
-            my $refund_amount = $base_cost + (int($base_cost / 2) * (2**$tier));
+            my $refund_amount = $base_cost + (int($base_cost / 2) * (2**$item_tier));
 
             # Refund the player
             plugin::Add_FoS_Tokens($refund_amount, $client);
