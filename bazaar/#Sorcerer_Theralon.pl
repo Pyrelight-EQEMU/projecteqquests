@@ -6,19 +6,42 @@ use List::Util qw(min);
 sub EVENT_SAY
 {
     my $charname            = $client->GetCleanName();
+    my $expRate             = $client->GetEXPModifier(0);
     my $progress            = $client->GetBucket("MAO-Progress") || 0;
     my $met_befo            = $client->GetBucket("TheralonIntro") || 0;
+    my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
     my @locked_classes      = plugin::GetLockedClasses($client);
     my %class               = map { quest::getclassname($_) => $_ } @locked_classes;
     my %unlocked_class      = plugin::GetUnlockedClasses($client);
-    my $total_classes       = scalar(keys %unlocked_class);
-    my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
-    my @costs         = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
-    my $expRate             = $client->GetEXPModifier(0);
+    my $total_classes       = scalar(keys %unlocked_class);        
     my $percentage_expRate  = int($expRate * 100);
     my $FoS_Token           = plugin::Get_FoS_Tokens($client);
     my $FoS_Heroic_Token    = plugin::Get_FoS_Heroic_Tokens($client);
-          
+    my @costs               = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);    
+
+    my %chronal_seals =   ( '33407' => '5',
+                            '33408' => '5',
+                            '33409' => '5',
+                            '33410' => '5',
+                            '33411' => '5',
+                            '33416' => '5',
+                            '33417' => '5',
+                            '33418' => '5',
+                            '33419' => '5',
+                            '33420' => '5',
+                            '33421' => '5',
+                            '33424' => '5',
+                            '33425' => '5',
+                            '33428' => '5',
+                            '33429' => '5',
+                            '33430' => '5',
+                            '33431' => '5',
+                            '33432' => '5',
+                            '33434' => '5'
+                           ); 
+
+    my %equipment_index = ( 'Chronal Seals' => \%chronal_seals );
+                    
     if ($text=~/hail/i) {
         if ($progress < 3) {
             quest::say("Ah! Apologies, apologies! So much to do, so little...well, you understand. Now's not the time, I'm afraid.");
@@ -85,8 +108,14 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
-        # %equipment is defined above which is an hash where keys are item_ids that can be purchased and value is the hash.
-        # complete this so that the hash is iterated over and formatted like  the other given example elsif block above
+        for my $equipment (keys %equipment_index) {
+            plugin::PurpleText("$equipment");
+
+
+
+            my $items_ref = $equipment_index{$equipment};
+            # Now $items_ref is a reference to a hash (in this case %chronal_seals)
+        }
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
@@ -107,14 +136,13 @@ sub EVENT_SAY
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
-
             ApplyExpPenalty($client);
 
             $client->SetBucket("ClassUnlocksAvailable", 1);
             plugin::YellowText("You have gained a Class Unlock point.");            
             plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
         } else {
-             plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
+            RejectBuy();
         }        
     }
 
@@ -129,14 +157,18 @@ sub EVENT_SAY
         my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 3;
         if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$exp_bonus_index],9999), $client);
-            
+
             ApplyExpBonus($client);
 
             $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
         } else {
-            plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
+            RejectBuy();
         }        
     }
+}
+
+sub RejectBuy {
+    plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
 }
 
 sub ApplyExpPenalty {
@@ -168,4 +200,3 @@ sub DisplayExpRate {
     my $percentage_expRate  = int($expRate * 100);
     plugin::YellowText("Your current experience rate is $percentage_expRate%%.");
 }
-
