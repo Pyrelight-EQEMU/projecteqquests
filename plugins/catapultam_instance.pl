@@ -27,52 +27,54 @@ sub HandleSay {
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
-                my $task_name       = quest::gettaskname($task);
-                my $task_leader_id  = plugin::GetSharedTaskLeader($client);
-                my $heroic          = 0;
-                my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
-                my $challenge       = 0; 
+                if (!plugin::HasDynamicZoneAssigned($client)) {
+                    my $task_name       = quest::gettaskname($task);
+                    my $task_leader_id  = plugin::GetSharedTaskLeader($client);
+                    my $heroic          = 0;
+                    my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
+                    my $challenge       = 0; 
 
-                if (not plugin::HasDynamicZoneAssigned($client)) {
-                    if ($task_name =~ /\(Escalation\)$/ ) {
-                        $difficulty_rank++;
-                    } 
-                    
-                    if ($task_name =~ /\(Heroic\)$/ ) {                        
-                        $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
-                        $difficulty_rank++;
-                        $heroic++;
-                    }
-                    
-                    my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
-                    quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info), $zone_duration);
-
-                    my %dz = (
-                        "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
-                        "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
-                        "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
-                    );
-                    
-                    $client->CreateTaskDynamicZone($task, \%dz);
-                }
-
-                my %instance_data = ("reward" => $reward, 
-                                     "zone_name" => $zone_name, 
-                                     "difficulty_rank" => $difficulty_rank, 
-                                     "task_id" => $task, 
-                                     "leader_id" => $task_leader_id,
-                                     "entered" => 0);                
-
-                my $group = $client->GetGroup();
-                if($group) {
-                    for ($count = 0; $count < $group->GroupCount(); $count++) {
-                        $player = $group->GetMember($count);
-                        if($player) {
-                            $player->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
+                    if (not plugin::HasDynamicZoneAssigned($client)) {
+                        if ($task_name =~ /\(Escalation\)$/ ) {
+                            $difficulty_rank++;
+                        } 
+                        
+                        if ($task_name =~ /\(Heroic\)$/ ) {                        
+                            $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
+                            $difficulty_rank++;
+                            $heroic++;
                         }
+                        
+                        my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
+                        quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info), $zone_duration);
+
+                        my %dz = (
+                            "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
+                            "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
+                            "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
+                        );
+                        
+                        $client->CreateTaskDynamicZone($task, \%dz);
                     }
-                } else {
-                    $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
+
+                    my %instance_data = ("reward" => $reward, 
+                                        "zone_name" => $zone_name, 
+                                        "difficulty_rank" => $difficulty_rank, 
+                                        "task_id" => $task, 
+                                        "leader_id" => $task_leader_id,
+                                        "entered" => 0);                
+
+                    my $group = $client->GetGroup();
+                    if($group) {
+                        for ($count = 0; $count < $group->GroupCount(); $count++) {
+                            $player = $group->GetMember($count);
+                            if($player) {
+                                $player->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
+                            }
+                        }
+                    } else {
+                        $client->SetBucket("instance-data", plugin::SerializeHash(%instance_data), $zone_duration);
+                    }
                 }
 
                 plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");               
