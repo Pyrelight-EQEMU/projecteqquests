@@ -152,6 +152,7 @@ sub HandleTaskComplete
     my $escalation      = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
     my $charname = $client->GetCleanName();
+    quest::debug("checkpoint 0; $difficulty_rank $reward $zone_name $task_id_stored $leader_id $task_name $heroic $escalation");
 
     if ($task_id == $task_id_stored) {
         quest::debug("checkpoint 1");
