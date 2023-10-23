@@ -1,5 +1,6 @@
 use DBI;
 use DBD::mysql;
+use List::Util;
 
 sub EVENT_SAY
 {
@@ -10,7 +11,7 @@ sub EVENT_SAY
     my %unlocked_class      = plugin::GetUnlockedClasses($client);
     my $total_classes       = scalar(keys %unlocked_class);
     my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
-    my @class_costs         = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
+    my @costs         = (0, 0, 50, 200, 500, 1000, 2000, 3000, 4000, 5000);
     my $expRate             = $client->GetEXPModifier(0);
     my $percentage_expRate  = int($expRate * 100);
     my $FoS_Token           = plugin::Get_FoS_Tokens($client);
@@ -42,19 +43,16 @@ sub EVENT_SAY
         plugin::NPCTell("Ah, tokens! The universal language of favors. Let me show you the marvels they can bring forth.");
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
-        plugin::PurpleText("- [Class Unlocks] - [Special Abilities] - [Equipment] -");
+        plugin::PurpleText("- [Class Unlocks] - [Special Abilities] - [Equipment] - [Passive Boosts]");
     }
 
     elsif ($text=~/Class Unlocks/i && $progress > 3 && $met_befo) {
         if (!$unlocksAvailable) {
             plugin::PurpleText("You have no Class Unlock Points available.");
-            my $link_confirm_unlock = "- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] ($class_[$total_classes] Feat of Strength Tokens) - I confirm that I understand that I will recieve an additional permanent XP/AAXP Penalty.";
-            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP/AAXP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes 
-                                classes unlocked.");            
-            plugin::PurpleText("$link_confirm_unlock");
+            plugin::PurpleText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
+            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - I confirm that I understand that I will receive an additional permanent XP/AAXP Penalty.", min($costs[$total_classes], 9999));
         } else {
-            plugin::PurpleText("You have $unlocksAvailable Class Unlock Point available. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes 
-                                classes unlocked.");
+            plugin::PurpleText("You have $unlocksAvailable Class Unlock Point available.");
             # Build the Menu
             foreach my $class (@locked_classes) {
                 my $class_name = quest::getclassname($class);
@@ -64,21 +62,78 @@ sub EVENT_SAY
         }      
     }
 
+    elsif ($text=~/Passive Boosts/i && $progress > 3 && $met_befo) {
+        my $exp_bonus_index     = $client->GetBucket("exp-bonus-count") || 3;
+        my $fac_bonus_index     = $client->GetBucket("fac_bonus_index") || 3;
+        my $cur_bonus_index     = $client->GetBucket("cur_bonus_index") || 3;
+        my $pot_bonus_index     = $client->GetBucket("pot_bonus_index") || 3;
+        my $aug_bonus_index     = $client->GetBucket("aug_bonus_index") || 3;
+        my $cmc_bonus_index     = $client->GetBucket("cmc_bonus_index") || 3;
+
+        #Pyrelight TO-DO: implement these other options.
+
+        plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost:%04d Feat of Strength Tokens) - 25%%  experience bonus", min($costs[$exp_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% faction gain bonus", min($costs[$fac_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% currency drop rate", min($costs[$cur_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% potion drop rate bonus", min($costs[$pot_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% global augment drop rate bonus", min($costs[$aug_bonus_index] * 2, 9999)));
+        plugin::PurpleText(sprintf("- [UNLOCK] - (Cost:%04d Feat of Strength Tokens) - 25%% Concentrated Mana Crystal drop rate bonus", min($costs[$cmc_bonus_index] * 2, 9999)));         
+    }
+
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
-        if ($FoS_Token >= $class_[$total_classes]) {
-            plugin::Spend_FoS_Tokens($class_[$total_classes], $client);
-            $client->SetEXPModifier(0, $expRate - ($expRate * 0.25));
-            $client->SetAAEXPModifier(0, $expRate - ($expRate * 0.25));
+        if ($FoS_Token >= min($costs[$total_classes],9999)) {
+            plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
+
+            plugin::ApplyExpPenalty($client);
+
             $client->SetBucket("ClassUnlocksAvailable", 1);
-
-            $expRate             = $client->GetEXPModifier(0);
-            $percentage_expRate  = int($expRate * 100);
-
-            plugin::YellowText("You have gained a Class Unlock point.");
-            plugin::YellowText("Your EXP rate has been reduced to $percentage_expRate%%.");
+            plugin::YellowText("You have gained a Class Unlock point.");            
             plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
         } else {
             plugin::NPCTell("I'm sorry, $charname. You don't have enough [tokens] to afford that.");
         }        
     }
+
+    elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo) {
+        my $exp_bonus_index     = $client->GetBucket("exp-bonus-count") || 3;
+        if ($FoS_Token >= min($costs[$exp_bonus_index],9999)) {
+            plugin::Spend_FoS_Tokens(min($costs[$exp_bonus_index],9999), $client);
+            plugin::ApplyExpBonus($client);
+
+            $client->SetBucket("exp-bonus-count", $exp_bonus_index + 1);
+        } else {
+            plugin::NPCTell("I'm sorry, $charname. You don't have enough [tokens] to afford that.");
+        }        
+    }
 }
+
+sub ApplyExpPenalty {
+    my $client  = shift or plugin::val('client');
+    my $expRate = $client->GetEXPModifier(0) * 0.75;
+
+    $client->SetEXPModifier(0, $expRate);
+    $client->SetAAEXPModifier(0, $expRate);
+
+    my $percentage_expRate  = int($expRate * 100);
+    plugin::YellowText("Your experience rate has decreased to $percentage_expRate%%.");
+}
+
+sub ApplyExpBonus {
+    my $client  = shift or plugin::val('client');
+    my $expRate = $client->GetEXPModifier(0) / 0.75;
+
+    $client->SetEXPModifier(0, $expRate);
+    $client->SetAAEXPModifier(0, $expRate);
+
+    my $percentage_expRate  = int($expRate * 100);
+    plugin::YellowText("Your experience rate has increased to $percentage_expRate%%.");
+}
+
+sub DisplayExpRate {
+    my $client  = shift or plugin::val('client');
+    my $expRate = $client->GetEXPModifier(0);
+
+    my $percentage_expRate  = int($expRate * 100);
+    plugin::YellowText("Your current experience rate is $percentage_expRate%%.");
+}
+
