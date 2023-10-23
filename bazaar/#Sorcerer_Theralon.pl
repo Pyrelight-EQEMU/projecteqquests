@@ -194,18 +194,23 @@ sub EVENT_SAY
 
         # Continue with the purchase logic based on the token type
         if ($token_type eq "hfos") {
-            # Code for Heroic FoS Points
-            plugin::PurpleText("You chose to purchase [$item_id] for $item_cost using Heroic FoS Points.");
-            # ... additional purchase logic ...
-
+            if (plugin::Get_FoS_Tokens() >= $item_cost) {
+                plugin::Spend_FoS_Heroic_Tokens($item_cost);
+            } else {
+               RejectBuy(); 
+            }          
         } elsif ($token_type eq "fos") {
-            # Code for FoS Points
-            plugin::PurpleText("You chose to purchase [$item_id] for $item_cost using FoS Points.");
-            # ... additional purchase logic ...
-
+            if (plugin::Get_FoS_Heroic_Tokens() >= $item_cost) {
+                plugin::Spend_FoS_Heroic_Tokens($item_cost);
+            } else {
+               RejectBuy(); 
+            }
         } else {
             plugin::RedText("Invalid token selection!");
+            return;
         }
+        $client->SummonItem($item_id);
+        plugin::NPCTell("Absolutely, I can give that to you. If you ever decide that you don't need it anymore, feel free to return it to me for a portion of your tokens back, even if you have it upgraded in the meantime.");
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo) {
