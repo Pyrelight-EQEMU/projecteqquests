@@ -113,7 +113,7 @@ sub EVENT_SAY
 
     elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
         plugin::PurpleText("- Available Equipment Categories");
-        for my $equipment (keys %equipment_index) {
+        for my $equipment (sort keys %equipment_index) {
             plugin::PurpleText("- [".quest::saylink("link_equi_'$equipment'", 1, "$equipment")."]");
         }
     }
@@ -137,7 +137,7 @@ sub EVENT_SAY
         my $selected_equipment = $1;
         if (exists $equipment_index{$selected_equipment}) {
             plugin::PurpleText("- Equipment Category: $selected_equipment");
-            for my $item (keys %{ $equipment_index{$selected_equipment} }) {
+            for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
                 my $item_link = quest::varlink($item);
                 plugin::PurpleText("- [".quest::saylink("link_equipbuy_'$item'", 1, "BUY")."] - [$item_link]");
             }
