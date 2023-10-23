@@ -61,7 +61,7 @@ sub EVENT_ITEM {
                 $client->SetBucket("Theralon-Upgrade-Queue", $item_id);
                 delete %itemcount{$item_id};
 
-                plugin::NPCTell("This looks like one of mine. Would you like to [Upgrade] or [Return] this?");
+                plugin::NPCTell("This looks like one of mine. Would you like to [Upgrade], [Refund] or [Return] this?");
             }
         }
     }
@@ -113,7 +113,7 @@ sub EVENT_SAY
                     
     if ($text=~/hail/i) {
         if ($client->GetBucket("Theralon-Upgrade-Queue")) {
-            plugin::NPCTell("I'm holding an item for you. Do you want to [Upgrade] or [Return] it?");
+            plugin::NPCTell("I'm holding an item for you. Do you want to [Upgrade], [Refund] or [Return] it?");
         } else {
             if ($progress < 3) {
                 quest::say("Ah! Apologies, apologies! So much to do, so little...well, you understand. Now's not the time, I'm afraid.");
@@ -246,6 +246,30 @@ sub EVENT_SAY
                 $client->SummonItem($item_id);                
                 $client->DeleteBucket("Theralon-Upgrade-Queue");
             }
+        }
+    }
+
+    elsif ($text=~/Refund/i) {
+        my $item_id = $client->GetBucket("Theralon-Upgrade-Queue") || 0;
+        if ($item_id) {
+            # Fetch details for the item
+            my $base_id = plugin::get_base_id($item_id);
+            my $item_tier = plugin::get_upgrade_tier($item_id);
+            my $item_details = find_item_details($client, $base_id);
+            my $base_cost = $item_details->{value};
+
+            # Calculate the refund amount
+            my $eff_qty = 2**$item_tier;
+            my $refund_amount = $base_cost + (int($base_cost / 2) * (2**$tier));
+
+            # Refund the player
+            plugin::Add_FoS_Tokens($refund_amount, $client);
+            plugin::NPCTell("Your refund of $refund_amount FoS Tokens has been processed.");
+
+            # Clear the upgrade queue bucket
+            $client->DeleteBucket("Theralon-Upgrade-Queue");
+        } else {
+            plugin::NPCTell("You don't have any items in the upgrade queue to refund.");
         }
     }
 
