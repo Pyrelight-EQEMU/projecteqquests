@@ -18,6 +18,8 @@ sub EVENT_ITEM {
          my $base_id = plugin::get_base_id($item_id) || 0;
          if ($base_id && find_item_in_equipment($base_id)) {
             quest::debug("That is refundable");
+         } else {
+            quest::debug("I can't find $base_id");
          }
       }
    }
