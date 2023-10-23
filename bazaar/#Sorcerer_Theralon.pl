@@ -175,14 +175,32 @@ sub EVENT_SAY
         my $token_type = $1;  # This will capture either "hfos" or "fos"
         my $item_id    = $2;  # This will capture the item ID
 
+        # Sanity check to make sure the item_id is in our equipment lists
+        my $item_found = 0;
+        my $item_cost;
+        
+        for my $equipment (keys %equipment_index) {
+            if (exists $equipment_index{$equipment}{$item_id}) {
+                $item_found = 1;
+                $item_cost = $equipment_index{$equipment}{$item_id};
+                last;  # Exit the loop once the item is found
+            }
+        }
+
+        if (!$item_found) {
+            plugin::RedText("Invalid item selection!");
+            return;  # Exit early if the item isn't found
+        }
+
+        # Continue with the purchase logic based on the token type
         if ($token_type eq "hfos") {
             # Code for Heroic FoS Points
-            plugin::PurpleText("You chose to purchase $item_id with Heroic FoS Points.");
+            plugin::PurpleText("You chose to purchase [$item_id] for $item_cost using Heroic FoS Points.");
             # ... additional purchase logic ...
 
         } elsif ($token_type eq "fos") {
             # Code for FoS Points
-            plugin::PurpleText("You chose to purchase $item_id with FoS Points.");
+            plugin::PurpleText("You chose to purchase [$item_id] for $item_cost using FoS Points.");
             # ... additional purchase logic ...
 
         } else {
