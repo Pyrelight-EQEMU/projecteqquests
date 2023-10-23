@@ -228,7 +228,7 @@ sub EVENT_SAY
 
             if ($max_tier > $item_tier) {
                 plugin::PurpleText("- Select Upgrade Target");
-                for my $tier ($item_tier..$max_tier) {
+                for my $tier (($item_tier+1)..$max_tier) {
                     my $item_link = quest::varlink($base_id + ($tier * 1000000));
 
                     # Calculate the difference in quantity required for upgrade
@@ -246,6 +246,21 @@ sub EVENT_SAY
                 $client->SummonItem($item_id);                
                 $client->DeleteBucket("Theralon-Upgrade-Queue");
             }
+        }
+    }
+
+    elsif ($text=~/Return/i) {
+        my $item_id = $client->GetBucket("Theralon-Upgrade-Queue") || 0;
+        
+        if ($item_id) {
+            # Return the item to the player
+            $client->SummonItem($item_id);
+            plugin::NPCTell("Here's your item back.");
+
+            # Clear the upgrade queue bucket
+            $client->DeleteBucket("Theralon-Upgrade-Queue");
+        } else {
+            plugin::NPCTell("You don't have any items in the upgrade queue.");
         }
     }
 
