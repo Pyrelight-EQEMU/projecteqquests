@@ -16,7 +16,7 @@ my %chronal_seals =   ( '33407' => '5',
                         '33420' => '5',
                         '33421' => '5',
                         '33424' => '5',
-                        '33425' => '20',
+                        '33425' => '16',
                         '33428' => '5',
                         '33429' => '5',
                         '33430' => '5',
@@ -240,8 +240,7 @@ sub EVENT_SAY
                     my $base_cost = $item_details->{value};
                     my $total_cost = $base_cost + ($diff_qty - 1) * int($base_cost / 2);
 
-                    # Display the difference in quantity and total cost
-                    plugin::PurpleText("To upgrade to tier $tier, you need an additional $diff_qty items of tier 0 equivalent, costing a total of $total_cost.");
+                    plugin::PurpleText("- [".quest::saylink("link_upgrade_\'$item_id\'_\'$tier\'", 1, "UPGRADE")."] - ()" );
                 }
             } else {
                 plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
