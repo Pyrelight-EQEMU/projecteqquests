@@ -216,10 +216,7 @@ sub EVENT_SAY
                     my $base_cost = $item_details->{value};                    
                     my $total_cost = $diff_qty * int($base_cost / 2);
 
-                    #calculate CMC cost
-                    my $cmc_cost = plugin::calc_upgrade_cost($item_id, $tier);
-
-                    plugin::PurpleText(sprintf("- [".quest::saylink("link_upg_\'$base_id\'_\'$tier\'", 1, "UPGRADE")."] - (%04d FoS Tokens, %04d CMC) - [$item_link]", min($total_cost, 9999), $cmc_cost));
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_upg_\'$base_id\'_\'$tier\'", 1, "UPGRADE")."] - (%04d FoS Tokens, %04d CMC) - [$item_link]", min($total_cost, 9999)));
                 }
             } else {
                 plugin::NPCTell("I'm afraid that item cannot be upgraded any further.");
