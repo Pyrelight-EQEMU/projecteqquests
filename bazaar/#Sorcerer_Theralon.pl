@@ -292,13 +292,13 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/link_upg_'(\d+)'_'(\d+)'/i) {
-        my $current_item_id = $1;
         my $target_tier = $2;
+        my $item_id = $client->GetBucket("Theralon-Upgrade-Queue") || 0;
 
         # Validate item ID and tier
-        if ($current_item_id && $target_tier) {
+        if ($item_id && $target_tier) {
             # Retrieve item details
-            my $base_id         = plugin::get_base_id($current_item_id);
+            my $base_id         = plugin::get_base_id($item_id);
             my $item_details    = find_item_details($client, $base_id);
             my $base_cost       = $item_details->{value};
             my $equipment       = $item_details->{equipment};
@@ -308,8 +308,9 @@ sub EVENT_SAY
             # Need to make sure we are allowed to upgrade this item and have enough data to do it
             if ($item_details && $base_id == $equip_entitl && plugin::item_exists_in_db($target_item)) {
                 # Calculate the difference in quantity required for upgrade
-                my $required_qty = 2**$tier;
-                my $diff_qty = $required_qty - $eff_qty;
+                my $eff_qty         = 2**plugin::get_upgrade_tier($item_id);
+                my $required_qty    = 2**$target_tier;
+                my $diff_qty        = $required_qty - $eff_qty;
 
                 # Calculate the cost
                 my $base_cost = $item_details->{value};                    
