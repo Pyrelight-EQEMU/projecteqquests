@@ -87,10 +87,9 @@ sub EVENT_COMBAT
         my $owner = $npc->GetOwner()->CastToClient();
         if ($combat_state == 1) {            
                 $npc->SetTimer("Pet_Abilities", 18);
-            } else {
-                $npc->StopTimer("Pet_Abilities");
-            }
-        }
+        } else {
+            $npc->StopTimer("Pet_Abilities");
+        }        
     }
 }
 
