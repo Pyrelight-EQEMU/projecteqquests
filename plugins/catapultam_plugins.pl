@@ -970,19 +970,26 @@ sub spend_cmc {
     plugin::YellowText("You have lost $val Concentrated Mana Crystals. You now have " . ($cmc - $val) . " available.");
 }
 
-sub IsFocusEquipped {
-    my $client      = shift or return;
-    my $focus_id    = shift or return;
+sub is_focus_equipped {
+    my ($client, $desired_focus_id) = @_;
 
-    for my $slot (1..22) {
-        return 1 if ($client->GetItemStat($client->GetItemIDAt($slot), 'focuseffect') == $focus_id);
-        for my $aug (1..6) {
-            return 1 if ($client->GetItemStat($client->GetAugmentIDAt($slot, $aug), 'focuseffect') == $focus_id);           
+    # Return immediately if necessary parameters aren't provided
+    return unless ($client && defined $desired_focus_id);
+
+    # Check if any of the equipped augments in the items have the desired focus effect
+    for my $slot_index (1..22) {
+        my $item_focus = $client->GetItemStat($client->GetItemIDAt($slot_index), 'focuseffect');
+        return 1 if ($item_focus == $desired_focus_id);
+        for my $aug_index (1..6) {
+            my $augment_focus = $client->GetItemStat($client->GetAugmentIDAt($slot_index, $aug_index), 'focuseffect');
+            return 1 if ($augment_focus == $desired_focus_id);
         }
     }
 
+    # If neither items nor augments have the focus, return 0
     return 0;
 }
+
 
 
 return 1;
