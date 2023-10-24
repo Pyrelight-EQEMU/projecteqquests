@@ -127,7 +127,7 @@ sub EVENT_TIMER {
         if (plugin::is_focus_equipped($owner, $servant_of_water)) {
             $AoE_Spell = "15618"; # Healing Waters
         }
-        if (plugin::is_focus_equipped($owner, $servant_of_water)) {
+        if (plugin::is_focus_equipped($owner, $servant_of_air)) { }
 
         $npc->CastSpell($AoE_Spell, $npc->GetID());
     }   
