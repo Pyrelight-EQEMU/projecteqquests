@@ -92,12 +92,31 @@ sub EVENT_DAMAGE_GIVEN
 
 sub EVENT_COMBAT 
 {
+    my $ID = $npc->GetID();
     CHECK_CHARM_STATUS();
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
         quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
     }
 
-    	quest::debug("combat_state " . $combat_state);
+    # Pet Stuff
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
+        #Servant of Earth Focus Ability
+        my $servant_of_earth = 4403;
+        if (plugin::is_focus_equipped($servant_of_earth)) {
+            quest::debug("servant of earth is equipped");
+            if ($combat_state == 1) {            
+                $npc->SetTimer("$ID-AoE-Taunt", 18);
+            } else {
+                $npc->StopTimer("$ID-AoE-Taunt");
+            }
+        }   
+    }
+}
+
+sub EVENT_TIMER {
+	# NPC-EVENT_TIMER
+	# Exported event variables
+	quest::debug("timer " . $timer);
 }
 
 sub EVENT_ITEM
