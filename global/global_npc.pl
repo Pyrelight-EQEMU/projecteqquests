@@ -414,6 +414,7 @@ sub APPLY_FOCUS {
         if (!$npc->FindBuff($darkness_buff)) {
             $npc->CastSpell($darkness_buff, $npc->GetID(), 0, 0);
         }
+        $total_focus_scale += 0.05;
     } else {
         if ($npc->FindBuff($darkness_buff)) {
             $npc->BuffFadeBySpellID($darkness_buff);
@@ -431,7 +432,6 @@ sub APPLY_FOCUS {
     if (plugin::is_focus_equipped($owner, $servant_of_air)) {
         $total_focus_scale += 0.50;
     }
-
 
     return $total_focus_scale;
 }
