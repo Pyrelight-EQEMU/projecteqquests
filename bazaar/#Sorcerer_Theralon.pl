@@ -309,10 +309,8 @@ sub EVENT_SAY
                 # Calculate effective quantity and difference in required quantity
                 my $eff_qty         = 2**plugin::get_upgrade_tier($current_item_id);
                 my $required_qty    = 2**$target_tier;
-                my $diff_qty        = $required_qty - $eff_qty;
-
-                # Calculate the total upgrade cost
-                my $total_cost = $base_cost + ($diff_qty - 1) * int($base_cost / 2);
+                my $diff_qty        = $required_qty - $eff_qty;            
+                my $total_cost = $diff_qty * int($base_cost / 2);
 
                 if (plugin::Get_FoS_Tokens($client) >= $total_cost) {
                     plugin::NPCTell("Excellent! Here you go!");
