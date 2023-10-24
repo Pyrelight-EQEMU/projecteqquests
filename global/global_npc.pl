@@ -18,8 +18,11 @@ sub EVENT_TICK
     my @close_list = $entity_list->GetCloseMobList($npc, 25);
     foreach $mob (@close_list) {
         my $name = $mob->GetName();
-        my $target = $mob->GetHateTop()->GetName();
-        quest::debug("mob: $name, $target");
+        my $target = $mob->GetHateTop();
+        if ($target) {
+            quest::debug("mob: $name, $target");
+        }
+        
     }
 }
 
