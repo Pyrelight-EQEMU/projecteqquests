@@ -25,7 +25,7 @@ sub EVENT_SPAWN {
     }
     
     # Check for FoS Instance
-    if ($instanceversion == 10) {
+    if ($instanceversion == 10 && !($npc->IsPet() and $npc->GetOwner()->IsClient())) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
         plugin::ModifyInstanceNPC();
         plugin::ModifyInstanceLoot($npc);  
