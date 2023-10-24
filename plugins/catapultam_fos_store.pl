@@ -1,3 +1,10 @@
+use List::Util qw(max);
+use List::Util qw(min);
+use POSIX;
+use DBI;
+use DBD::mysql;
+use JSON;
+
 sub get_equipment_index {
     my %chronal_seals = (
         '33407' => '5',
@@ -244,4 +251,21 @@ sub calculate_heroic_stat_sum {
 
     # Return the total sum of primary and halved resistance stats
     return $primary_stat_total + $resistance_stat_total;
+}
+
+sub get_inventory_DB {
+    my $item_id = shift or return;
+    my $client = shift or return;
+
+    my $dbh = plugin::LoadMysql();
+    my $sth = $dbh->prepare("SELECT count(*) FROM inventory WHERE itemid = ? AND charid = ?");
+    
+    $sth->execute($item_id, $client->CharacterID());
+
+    my result = $sth->fetchrow_array() > 0 ? 1 : 0;
+
+    $sth->finish();
+    $dbh->disconnect();
+
+    return result;
 }

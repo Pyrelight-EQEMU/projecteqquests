@@ -15,16 +15,21 @@ sub EVENT_TICK
         UPDATE_PET($npc);
 
        
-        my @close_list = $entity_list->GetCloseMobList($npc, 100);
-        quest::debug("AoE Taunt firing");
-        foreach $mob (@close_list) {
-            if ($mob && $mob->GetTarget()) {
-                my $target = $mob->GetTarget();
-                if ($target->GetCleanName() eq $npc->GetOwner()->GetCleanName()) {
-                    $mob->AddToHateList($npc, 100);
-                }
+    my @close_list  = $entity_list->GetCloseMobList($npc, 100);
+    my $owner       = $npc->GetOwner();
+
+    quest::debug("AoE Taunt firing");
+    foreach $mob (@close_list) {
+        if ($mob && $mob->GetTarget()) {
+            my $target = $mob->GetTarget();
+            if ($mob->IsOnHateList($owner)) {
+                my $tar_name = $target->GetCleanName();
+                my $own_name = $owner->GetCleanName();
+                quest::debug("$tar_name is attacking my owner ($own_name)");
+                $mob->AddToHateList($npc, $mob->GetHateAmount($mob->GetHateTop()) + 1000);
             }
         }
+    }
         
         
     }
@@ -363,15 +368,19 @@ sub APPLY_FOCUS {
         }
     }
 
+    my $mag_epic_buff = 847
+    my $buff2 = 15616;
     if ($mage_epic) {
-        if (!$npc->FindBuff(847)) {
-            $npc->CastSpell(847, $npc->GetID());
+        
+        if (!$npc->FindBuff($mag_epic_buff) && npc->CanBuffStack($mag_epic_buff, $npc->GetLevel())) {
+            $npc->CastSpell($mag_epic_buff, $npc->GetID());
+            $npc->CastSpell($buff2, $npc->GetID());
         }
         $total_focus_scale += 0.30;
     } else {
-        if ($npc->FindBuff(847)) {
-            $npc->BuffFadeBySpellID(847);
-            $owner->BuffFadeBySpellID(847);
+        if ($npc->FindBuff($mag_epic_buff)) {
+            $npc->BuffFadeBySpellID($mag_epic_buff);
+            $owner->BuffFadeBySpellID($mag_epic_buff);
         }
     }
 
