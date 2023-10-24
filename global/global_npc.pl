@@ -373,7 +373,7 @@ sub APPLY_FOCUS {
         quest::debug("Mage Epic Equipped");
         my $stack = $npc->CanBuffStack($mag_epic_buff, $owner->GetLevel());
         quest::debug("stack:$stack");
-        if ($npc->CanBuffStack($mag_epic_buff, $owner->GetLevel()) && !$npc->FindBuff($mag_epic_buff)) {
+        if (!$npc->CanBuffStack($mag_epic_buff, $owner->GetLevel()) && !$npc->FindBuff($mag_epic_buff)) {
             $npc->CastSpell($mag_epic_buff, $npc->GetID());
         }
         $total_focus_scale += 0.30;
