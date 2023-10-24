@@ -70,15 +70,17 @@ sub find_item_details {
     my ($client, $item_id) = @_;
     my %result;
 
+    # Get equipment index reference from the plugin
+    my $equipment_ref = plugin::get_equipment_index();
+
     # Loop through the main equipment categories
-    for my $category (keys %equipment_index) {
-        my $subhash = $equipment_index{$category};
+    for my $category (keys %{$equipment_ref}) {
+        my $subhash = $equipment_ref->{$category};
 
         # If the item_id exists in the subhash
         if (exists $subhash->{$item_id}) {
             $result{'equipment'} = $category;
-            $result{'value'} = $subhash->{$item_id};
-            $result{'num_purchased'} = $client->GetBucket("equip-category-$category-quantity") || 0;
+            $result{'value'} = $subhash->{$item_id};           
             return \%result;  # Return a reference to the hash
         }
     }
