@@ -977,12 +977,12 @@ sub is_focus_equipped {
     return unless ($client && defined $desired_focus_id);
 
     # Check if any of the equipped augments in the items have the desired focus effect
-    for my $slot_index (1..22) {
+    for my $slot_index (0..22) {
         my $item_id    = $client->GetItemIDAt($slot_index);
         my $item_focus = $client->GetItemStat($item_id, 'focuseffect');
         quest::debug("$slot_index:$item_id - $item_focus") if ($item_id > 0);
         return 1 if ($item_focus == $desired_focus_id);
-        for my $aug_index (1..6) {
+        for my $aug_index (0..6) {
             my $augment_id      = $client->GetAugmentIDAt($slot_index, $aug_index);
             my $augment_focus   = $client->GetItemStat($augment_id, 'focuseffect');
             quest::debug("$aug_index:$augment_id - $augment_focus") if ($augment_id > 0);
