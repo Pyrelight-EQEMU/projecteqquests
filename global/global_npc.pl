@@ -29,10 +29,6 @@ sub EVENT_TICK
             }
         }
     }
-
-    my $output = plugin::is_focus_equipped($npc->GetOwner()->CastToClient(), "4403");
-    quest::debug("output: $output");
-        
         
     }
 }
@@ -369,14 +365,10 @@ sub APPLY_FOCUS {
             last; # Exit the loop if we found the item
         }
     }
-
-    my $mag_epic_buff = 847;
-    my $buff2 = 15616;
-    if ($mage_epic) {
-        
+    
+    if (plugin::is_focus_equipped($npc->GetOwner()->CastToClient(), $mage_epic_focus_id)) {        
         if (!$npc->FindBuff($mag_epic_buff) && $npc->CanBuffStack($mag_epic_buff, $npc->GetLevel())) {
             $npc->CastSpell($mag_epic_buff, $npc->GetID());
-            $npc->CastSpell($buff2, $npc->GetID());
         }
         $total_focus_scale += 0.30;
     } else {
