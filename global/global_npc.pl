@@ -91,6 +91,7 @@ sub EVENT_COMBAT
 
     # Pet Stuff
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
+        quest::debug("I'm a pet!");
         #Servant of Earth Focus Ability
         my $servant_of_earth = "4403";
         if (plugin::is_focus_equipped($servant_of_earth)) {
