@@ -127,7 +127,6 @@ sub EVENT_TIMER {
         if (plugin::is_focus_equipped($owner, $servant_of_water)) {
             $AoE_Spell = "15618"; # Healing Waters
         }
-        if (plugin::is_focus_equipped($owner, $servant_of_air)) { }
 
         $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
     }   
@@ -427,6 +426,10 @@ sub APPLY_FOCUS {
 
     if (plugin::is_focus_equipped($owner, $ritual_summoning)) {
         $total_focus_scale += 0.25;
+    }
+    
+    if (plugin::is_focus_equipped($owner, $servant_of_air)) {
+        $total_focus_scale += 0.50;
     }
 
 
