@@ -14,7 +14,7 @@ sub EVENT_TICK
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
         UPDATE_PET($npc);
 
-        if ($npc->GetEntityVariable("taunt_timer") % 3 == 0) {
+        if ((npc->GetEntityVariable("taunt_timer") || 0) % 3 == 0) {
             my @close_list = $entity_list->GetCloseMobList($npc, 100);
             quest::debug("AoE Taunt firing");
             foreach $mob (@close_list) {
@@ -26,7 +26,7 @@ sub EVENT_TICK
                 }
             }
         }
-        $npc->SetEntityVariable("taunt_timer", npc->GetEntityVariable("taunt_timer") + 1);        
+        $npc->SetEntityVariable("taunt_timer", (npc->GetEntityVariable("taunt_timer") || 0) + 1);        
     }
 }
 
