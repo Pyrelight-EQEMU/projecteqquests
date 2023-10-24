@@ -185,7 +185,7 @@ sub EVENT_SAY
             quest::debug("$equipment, $equip_mask, $item_found");
 
             if ($equip_mask && !$item_found) {
-                $client->SummonItem($item_id);
+                $client->SummonItem($equip_mask);
                 plugin::RedText("ERROR: Lost item detected. Restoring...");
             }
 
