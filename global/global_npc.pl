@@ -356,6 +356,8 @@ sub APPLY_FOCUS {
     my $total_focus_scale = 1.0;
     my $true_race = $owner->GetBucket("pet_race");
 
+    my $mage_epic_focus_id = 1936;
+
     #Mage Epic 1.0 - Orb of Mastery
     my $mage_epic = 0;
 
