@@ -413,7 +413,7 @@ sub APPLY_FOCUS {
 
     if (plugin::is_focus_equipped($owner, $minion_of_darkness)) { 
         if (!$npc->FindBuff($darkness_buff)) {
-            $npc->CastSpell($darkness_buff, $npc->GetID());
+            $npc->CastSpell($darkness_buff, $npc->GetID(), 0, 0);
         }
     } else {
         if ($npc->FindBuff($darkness_buff)) {
