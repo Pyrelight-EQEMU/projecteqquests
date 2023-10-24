@@ -14,19 +14,19 @@ sub EVENT_TICK
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
         UPDATE_PET($npc);
 
-        if ((npc->CastToMob()->GetEntityVariable("taunt_timer") || 0) % 3 == 0) {
-            my @close_list = $entity_list->GetCloseMobList($npc, 100);
-            quest::debug("AoE Taunt firing");
-            foreach $mob (@close_list) {
-                if ($mob && $mob->GetTarget()) {
-                    my $target = $mob->GetTarget();
-                    if ($target->GetCleanName() eq $npc->GetOwner()->GetCleanName()) {
-                        $mob->AddToHateList($npc, 100);
-                    }
+       
+        my @close_list = $entity_list->GetCloseMobList($npc, 100);
+        quest::debug("AoE Taunt firing");
+        foreach $mob (@close_list) {
+            if ($mob && $mob->GetTarget()) {
+                my $target = $mob->GetTarget();
+                if ($target->GetCleanName() eq $npc->GetOwner()->GetCleanName()) {
+                    $mob->AddToHateList($npc, 100);
                 }
             }
         }
-        $npc->SetEntityVariable("taunt_timer", (npc->CastToMob()->GetEntityVariable("taunt_timer") || 0) + 1);        
+        
+        
     }
 }
 
