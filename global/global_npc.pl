@@ -90,7 +90,7 @@ sub EVENT_COMBAT
         if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
             quest::debug("servant of earth is equipped");
             if ($combat_state == 1) {            
-                $npc->SetTimer("Servant-of-Earth-Taunt", 12);
+                $npc->SetTimer("Servant-of-Earth-Taunt", 1);
             } else {
                 $npc->StopTimer("Servant-of-Earth-Taunt");
             }
