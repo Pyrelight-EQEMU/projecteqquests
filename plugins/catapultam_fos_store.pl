@@ -196,3 +196,51 @@ sub Display_Tokens {
     Display_FoS_Tokens($client);
     Display_FoS_Heroic_Tokens($client);
 }
+
+sub calc_upgrade_cost {
+    my ($item_id, $target_tier) = @_;
+    return 0 unless $item_id;
+
+    # Ensure the target tier is greater than the current tier
+    my $current_tier = get_upgrade_tier($item_id);
+    return 0 if $target_tier <= $current_tier;
+
+    my $total_cost = 0;
+    for (my $tier = $current_tier + 1; $tier <= $target_tier; $tier++) {
+        my $stat_sum = calculate_heroic_stat_sum($item_id);
+        $total_cost += int(0.25 * ($stat_sum * $tier) + $tier);
+    }
+
+    return $total_cost;
+}
+
+sub calculate_heroic_stat_sum {
+    my $item_id = get_base_id(shift);
+
+    # Define the primary stats we want to sum up
+    my @primary_stats = qw(
+        heroicstr heroicsta heroicdex heroicagi 
+        heroicint heroicwis heroiccha
+    );
+
+    # Define the resistance stats we want to sum up and then halve
+    my @resistance_stats = qw(
+        heroicfr heroicmr heroic_r heroicpr heroicdr
+    );
+
+    # Fetch and sum the primary stats
+    my $primary_stat_total = 0;
+    foreach my $stat (@primary_stats) {
+        $primary_stat_total += $client->GetItemStat($item_id, $stat);
+    }
+
+    # Fetch the resistance stats, sum them up, and then halve the total
+    my $resistance_stat_total = 0;
+    foreach my $stat (@resistance_stats) {
+        $resistance_stat_total += $client->GetItemStat($item_id, $stat);
+    }
+    $resistance_stat_total /= 2;
+
+    # Return the total sum of primary and halved resistance stats
+    return $primary_stat_total + $resistance_stat_total;
+}
