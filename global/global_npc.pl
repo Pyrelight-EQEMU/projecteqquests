@@ -91,10 +91,10 @@ sub EVENT_COMBAT
 
     # Pet Stuff
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
-        quest::debug("I'm a pet!");
+        my $owner = $npc->GetOwner()->CastToClient();
         #Servant of Earth Focus Ability
         my $servant_of_earth = "4403";
-        if (plugin::is_focus_equipped($servant_of_earth)) {
+        if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
             quest::debug("servant of earth is equipped");
             if ($combat_state == 1) {            
                 $npc->SetTimer("$ID-AoE-Taunt", 18);
