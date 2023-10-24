@@ -370,7 +370,9 @@ sub APPLY_FOCUS {
     }
     
     if (plugin::is_focus_equipped($owner, $mage_epic_focus_id)) { 
-        quest::debug("Mage Epic Equipped");      
+        quest::debug("Mage Epic Equipped");
+        my $stack = $npc->CanBuffStack($mag_epic_buff, $owner->GetLevel());
+        quest::debug("stack:$stack");
         if (!$npc->FindBuff($mag_epic_buff)) {
             $npc->CastSpell($mag_epic_buff, $npc->GetID());
         }
