@@ -97,9 +97,9 @@ sub EVENT_COMBAT
         if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
             quest::debug("servant of earth is equipped");
             if ($combat_state == 1) {            
-                $npc->SetTimer("$ID-AoE-Taunt", 18);
+                $npc->SetTimer("AoE-Taunt", 1);
             } else {
-                $npc->StopTimer("$ID-AoE-Taunt");
+                $npc->StopTimer("AoE-Taunt");
             }
         }   
     }
@@ -109,6 +109,11 @@ sub EVENT_TIMER {
 	# NPC-EVENT_TIMER
 	# Exported event variables
 	quest::debug("timer " . $timer);
+
+    if ($timer eq "AoE-Taunt") {
+        $npc->SetTimer("AoE-Taunt", 1);
+    }
+
 }
 
 sub EVENT_ITEM
