@@ -372,7 +372,7 @@ sub APPLY_FOCUS {
     my $buff2 = 15616;
     if ($mage_epic) {
         
-        if (!$npc->FindBuff($mag_epic_buff) && npc->CanBuffStack($mag_epic_buff, $npc->GetLevel())) {
+        if (!$npc->FindBuff($mag_epic_buff) && $npc->CanBuffStack($mag_epic_buff, $npc->GetLevel())) {
             $npc->CastSpell($mag_epic_buff, $npc->GetID());
             $npc->CastSpell($buff2, $npc->GetID());
         }
