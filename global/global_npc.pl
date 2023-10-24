@@ -12,14 +12,7 @@ sub EVENT_TICK
 {
     CHECK_CHARM_STATUS();
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
-        UPDATE_PET($npc);
-
-       
-    my @close_list  = $entity_list->GetCloseMobList($npc, 100);
-    my $owner       = $npc->GetOwner();
-
-    
-        
+        UPDATE_PET($npc);        
     }
 }
 
@@ -97,9 +90,9 @@ sub EVENT_COMBAT
         if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
             quest::debug("servant of earth is equipped");
             if ($combat_state == 1) {            
-                $npc->SetTimer("AoE-Taunt", 1);
+                $npc->SetTimer("Servant-of-Earth-Taunt", 12);
             } else {
-                $npc->StopTimer("AoE-Taunt");
+                $npc->StopTimer("Servant-of-Earth-Taunt");
             }
         }   
     }
@@ -110,10 +103,19 @@ sub EVENT_TIMER {
 	# Exported event variables
 	quest::debug("timer " . $timer);
 
-    if ($timer eq "AoE-Taunt") {
-        #$npc->SetTimer("AoE-Taunt", 1);
-    }
+    if ($timer eq "Servant-of-Earth-Taunt" && $npc->IsTaunting()) {
+        my @close_list  = $entity_list->GetCloseMobList($npc, 100);
+        my $owner       = $npc->GetOwner()->CastToClient();
 
+        for $m (@close_list) {
+            if ($m) {
+                my $m_target = $m->GetTarget();
+                if ($m_target->GetID() == $owner->GetID()) {
+                    $m->AddToHateList($npc, 10000);
+                }
+            }
+        }
+    }
 }
 
 sub EVENT_ITEM
