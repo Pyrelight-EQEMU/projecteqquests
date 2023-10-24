@@ -3,32 +3,6 @@ use DBD::mysql;
 use List::Util qw(max);
 use List::Util qw(min);
 
-
-my %chronal_seals =   ( '33407' => '5',
-                        '33408' => '5',
-                        '33409' => '5',
-                        '33410' => '5',
-                        '33411' => '5',
-                        '33416' => '5',
-                        '33417' => '5',
-                        '33418' => '5',
-                        '33419' => '5',
-                        '33420' => '5',
-                        '33421' => '5',
-                        '33424' => '5',
-                        '33425' => '5',
-                        '33428' => '5',
-                        '33429' => '5',
-                        '33430' => '5',
-                        '33431' => '5',
-                        '33432' => '5',
-                        '33434' => '5'
-                        ); 
-
-my %equipment_index = ( 'Class Emblems' => '',
-                        'Chronal Seals' => \%chronal_seals,
-                        );
-
 sub EVENT_ITEM { 
     my $copper = plugin::val('copper');
     my $silver = plugin::val('silver');
@@ -47,8 +21,8 @@ sub EVENT_ITEM {
         foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
             my $base_id = plugin::get_base_id($item_id) || 0;
 
-            # Use find_item_details to retrieve item details
-            my $item_details = find_item_details($client, $base_id);
+            # Use plugin::find_item_details to retrieve item details
+            my $item_details = plugin::find_item_details($client, $base_id);
 
             # Check if the details are valid
             if ($item_details) {
@@ -142,6 +116,7 @@ sub EVENT_SAY
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
         plugin::display_cmc();
+        plugin::DisplayExpRate();
         plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");
         plugin::PurpleText("- [".quest::saylink("Class Unlocks", 1)."]") if @locked_classes;
         plugin::PurpleText("- [Special Abilities]");
@@ -200,8 +175,10 @@ sub EVENT_SAY
     }
 
     elsif ($text=~/Equipment/i && $progress > 3 && $met_befo) {
+        my $equipment_ref = plugin::get_equipment_index();
+
         plugin::PurpleText("- Available Equipment Categories");
-        for my $equipment (sort keys %equipment_index) {
+        for my $equipment (sort keys %{$equipment_ref}) {
             my $equip_mask = $client->GetBucket("equip-category-$equipment") || 0;
             plugin::PurpleText("- [".quest::saylink("link_equi_'$equipment'", 1, "$equipment")."]") unless $equip_mask;
         }
@@ -211,7 +188,7 @@ sub EVENT_SAY
         my $item_id         = $client->GetBucket("Theralon-Upgrade-Queue") || 0;
         my $base_id         = plugin::get_base_id($item_id);
         my $item_tier       = plugin::get_upgrade_tier($item_id);
-        my $item_details    = find_item_details($client, $base_id);
+        my $item_details    = plugin::find_item_details($client, $base_id);
         my $equipment       = $item_details->{equipment};
         my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
         
@@ -255,7 +232,7 @@ sub EVENT_SAY
             # Fetch details for the item
             my $base_id      = plugin::get_base_id($item_id);
             my $item_tier    = plugin::get_upgrade_tier($item_id);
-            my $item_details = find_item_details($client, $base_id);
+            my $item_details = plugin::find_item_details($client, $base_id);
             my $base_cost    = $item_details->{value};
             my $equipment    = $item_details->{equipment};
 
@@ -299,7 +276,7 @@ sub EVENT_SAY
         if ($item_id && $target_tier) {
             # Retrieve item details
             my $base_id         = plugin::get_base_id($item_id);
-            my $item_details    = find_item_details($client, $base_id);
+            my $item_details    = plugin::find_item_details($client, $base_id);
             my $base_cost       = $item_details->{value};
             my $equipment       = $item_details->{equipment};
             my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
@@ -322,7 +299,7 @@ sub EVENT_SAY
                     $client->SummonItem($target_item);
                     $client->DeleteBucket("Theralon-Upgrade-Queue");
                 } else {
-                    RejectBuy();
+                    plugin::RejectBuy();
                 }
             }
         } else {
@@ -332,16 +309,18 @@ sub EVENT_SAY
 
     elsif ($text =~ /^link_equi_'(.+)'$/ && $progress > 3 && $met_befo) {
         my $selected_equipment = $1;
-        if (exists $equipment_index{$selected_equipment}) {
+        my $equipment_ref = plugin::get_equipment_index();
+
+        if (exists $equipment_ref->{$selected_equipment}) {
             my $equip_prebuy = $client->GetBucket("equip-category-$selected_equipment");
             plugin::PurpleText("- Equipment Category: $selected_equipment");
             if ($equip_prebuy) {                
                 plugin::YellowText("WARNING: You have an outstanding purchase in this category. Nice try.");
             } else {
                 plugin::YellowText("WARNING: You will only be allowed to buy one unique item from this category. After you have selected your item, additional copies will be discounted.");                
-                for my $item (sort keys %{ $equipment_index{$selected_equipment} }) {
+                for my $item (sort keys %{ $equipment_ref->{$selected_equipment} }) {
                     my $item_link = quest::varlink($item);
-                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$item\'", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_index{$selected_equipment}{$item}, 9999)));
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$item\'", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_ref->{$selected_equipment}{$item}, 9999)));
                 }
             }
         } else {
@@ -351,7 +330,7 @@ sub EVENT_SAY
 
     elsif ($text =~ /^link_equipbuy_'(.+)'$/) {
         my $item_id     = $1;
-        my $item_details = find_item_details($client, $item_id);
+        my $item_details = plugin::find_item_details($client, $item_id);
         if ($item_details) {
             my $item_cost   = $item_details->{value};
             my $equipment   = $item_details->{equipment};
@@ -365,55 +344,22 @@ sub EVENT_SAY
                     plugin::YellowText("WARNING: You have an outstanding purchase in this category. Nice try.");
                 }
             } else {
-                BuyReject();
+                plugin::RejectBuy();
             }
         }
-    }
-
-    elsif ($text =~ /^link_equipbuyconfirm_(hfos|fos)_'(.+)'$/) {
-        my $token_type = $1;  # This will capture either "hfos" or "fos"
-        my $item_id    = $2;  # This will capture the item ID
-
-        # Sanity check to make sure the item_id is in our equipment lists
-        my $item_found = 0;
-        my $item_cost;
-        
-        for my $equipment (keys %equipment_index) {
-            if (exists $equipment_index{$equipment}{$item_id}) {
-                $item_found = 1;
-                $item_cost = $equipment_index{$equipment}{$item_id};
-                last;  # Exit the loop once the item is found
-            }
-        }
-
-        if (!$item_found) {
-            plugin::RedText("Invalid item selection!");
-            return;  # Exit early if the item isn't found
-        }
-
-        # Continue with the purchase logic based on the token type
-        $token_type = $token_type eq "hfos" ? 1 : 0;
-        if (plugin::Get_Tokens($token_type, $client) > $item_cost) {
-            plugin::Spend_Tokens($token_type, $item_cost, $client);
-        } else {
-            RejectBuy();
-            return;
-        }
-        
-        
     }
 
     elsif ($text eq 'link_confirm_unlock' && $progress > 3 && $met_befo && ($total_classes + $unlocksAvailable) <= $#costs) {
         if ($FoS_Token >= min($costs[$total_classes],9999)) {
             plugin::Spend_FoS_Tokens(min($costs[$total_classes],9999), $client);
-            ApplyExpPenalty($client);
+            plugin::ApplyExpPenalty($client);
             $unlocksAvailable++;
 
             $client->SetBucket("ClassUnlocksAvailable", $unlocksAvailable);
             plugin::YellowText("You have gained a Class Unlock point.");            
             plugin::PurpleText("Would you like to [" . quest::saylink("Class Unlocks", 1, "Unlock a class") . "] now?");
         } else {
-            RejectBuy();
+            plugin::RejectBuy();
         }        
     }
 
@@ -435,70 +381,12 @@ sub EVENT_SAY
             if ($FoS_Token >= $exp_bonus_cost) {
                 plugin::Spend_FoS_Tokens($exp_bonus_cost, $client);
 
-                ApplyExpBonus($client);
+                plugin::ApplyExpBonus($client);
 
                 $client->SetBucket("exp_bonus_index", $exp_bonus_index + 1);
             } else {
-                RejectBuy();
+                plugin::RejectBuy();
             }
         }        
     }
-}
-
-sub RejectBuy {
-    my $client      = plugin::val('client');
-    my $charname    = $client->GetCleanName(); 
-
-    plugin::NPCTell("I'm sorry, $charname. You don't have enough [". quest::saylink("task", 1, "Tokens") ."] to afford that.");
-}
-
-sub ApplyExpPenalty {
-    my $client  = shift or plugin::val('client');
-    my $expRate = $client->GetEXPModifier(0) * 0.75;
-
-    $client->SetEXPModifier(0, $expRate);
-    $client->SetAAEXPModifier(0, $expRate);
-
-    my $percentage_expRate  = int($expRate * 100);
-    plugin::YellowText("Your experience rate has decreased to $percentage_expRate%%.");
-}
-
-sub ApplyExpBonus {
-    my $client  = shift or plugin::val('client');
-    my $expRate = $client->GetEXPModifier(0) / 0.75;
-
-    $client->SetEXPModifier(0, $expRate);
-    $client->SetAAEXPModifier(0, $expRate);
-
-    my $percentage_expRate  = int($expRate * 100);
-    plugin::YellowText("Your experience rate has increased to $percentage_expRate%%.");
-}
-
-sub DisplayExpRate {
-    my $client  = shift or plugin::val('client');
-    my $expRate = $client->GetEXPModifier(0);
-
-    my $percentage_expRate  = int($expRate * 100);
-    plugin::YellowText("Your current experience rate is $percentage_expRate%%.");
-}
-
-sub find_item_details {
-    my ($client, $item_id) = @_;
-    my %result;
-
-    # Loop through the main equipment categories
-    for my $category (keys %equipment_index) {
-        my $subhash = $equipment_index{$category};
-
-        # If the item_id exists in the subhash
-        if (exists $subhash->{$item_id}) {
-            $result{'equipment'} = $category;
-            $result{'value'} = $subhash->{$item_id};
-            $result{'num_purchased'} = $client->GetBucket("equip-category-$category-quantity") || 0;
-            return \%result;  # Return a reference to the hash
-        }
-    }
-
-    # Return undef if item not found
-    return undef;
 }
