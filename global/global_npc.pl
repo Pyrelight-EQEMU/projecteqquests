@@ -129,7 +129,7 @@ sub EVENT_TIMER {
         }
         if (plugin::is_focus_equipped($owner, $servant_of_air)) { }
 
-        $npc->CastSpell($AoE_Spell, $npc->GetID());
+        $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
     }   
 }
 
