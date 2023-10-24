@@ -19,7 +19,9 @@ sub EVENT_TICK
     foreach $mob (@close_list) {
         if ($mob && $mob->GetTarget()) {
             my $target = $mob->GetTarget();
-            quest::debug("$mob, $target");
+            if ($target == $npc->GetOwner()) {
+                $mob->AddToHateList($npc, 1000000);
+            }
         }
     }
 }
