@@ -32,7 +32,7 @@ sub EVENT_ITEM {
                 my $qty         = $item_cost ** ($tier + 1);
                 my $entitlement = $client->GetBucket("equip-category-$equipment") || 0
                 
-                if (get_base_id($entitlement) == $base_id) {
+                if (plugin::get_base_id($entitlement) == $base_id) {
                     $client->SetBucket("Theralon-Upgrade-Queue", $item_id);
                     plugin::NPCTell("This looks like one of mine. Would you like to [Upgrade], [Refund] or [Return] this?");
                     delete %itemcount{$item_id};
@@ -205,7 +205,7 @@ sub EVENT_SAY
         my $equipment       = $item_details->{equipment};
         my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
         
-        if ($item_id && $base_id == get_base_id($equip_entitl)) {
+        if ($item_id && $base_id == plugin::get_base_id($equip_entitl)) {
             my $eff_qty = (2**$item_tier) || 1;
                         
             # Calculating max tier
@@ -295,7 +295,7 @@ sub EVENT_SAY
             my $target_item     = $base_id + (1000000 * $target_tier);
 
             # Need to make sure we are allowed to upgrade this item and have enough data to do it
-            if ($item_details && $base_id == get_base_id($equip_entitl) && plugin::item_exists_in_db($target_item)) {
+            if ($item_details && $base_id == plugin::get_base_id($equip_entitl) && plugin::item_exists_in_db($target_item)) {
                 # Calculate the difference in quantity required for upgrade
                 my $eff_qty         = 2**plugin::get_upgrade_tier($item_id);
                 my $required_qty    = 2**$target_tier;
