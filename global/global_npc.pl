@@ -13,14 +13,13 @@ sub EVENT_TICK
     CHECK_CHARM_STATUS();
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
         UPDATE_PET($npc);
-    }
-
-    my @close_list = $entity_list->GetCloseMobList($npc, 100);
-    foreach $mob (@close_list) {
-        if ($mob && $mob->GetTarget()) {
-            my $target = $mob->GetTarget();
-            if ($target == $npc->GetOwner()) {
-                $mob->AddToHateList($npc, 1000000);
+        my @close_list = $entity_list->GetCloseMobList($npc, 100);
+        foreach $mob (@close_list) {
+            if ($mob && $mob->GetTarget()) {
+                my $target = $mob->GetTarget();
+                if ($target->GetCleanName() eq $npc->GetOwner()->GetCleanName()) {
+                    $mob->AddToHateList($npc, 1000000);
+                }
             }
         }
     }
