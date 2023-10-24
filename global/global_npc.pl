@@ -376,6 +376,7 @@ sub APPLY_FOCUS {
         }
         $total_focus_scale += 0.30;
     } else {
+        quest::debug("Mage Epic Not Equipped"); 
         if ($npc->FindBuff($mag_epic_buff)) {
             $npc->BuffFadeBySpellID($mag_epic_buff);
             $owner->BuffFadeBySpellID($mag_epic_buff);
