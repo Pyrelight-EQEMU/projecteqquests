@@ -258,9 +258,14 @@ sub get_inventory_DB {
     my $client = shift or return;
 
     my $dbh = plugin::LoadMysql();
-    my $sth = $dbh->prepare("SELECT count(*) FROM inventory WHERE itemid = ? AND charid = ?");
+    my $sth = $dbh->prepare("SELECT count(*) 
+                               FROM inventory 
+                              WHERE (itemid % 1000000 = ? OR augslot1 % 1000000 = ? OR augslot2 % 1000000 = ? 
+                                  OR augslot3 % 1000000 = ? OR augslot4 % 1000000 = ? OR augslot5 % 1000000 = ? 
+                                  OR augslot6 % 1000000 = ?)
+                                AND charid = ?");
     
-    $sth->execute($item_id, $client->CharacterID());
+    $sth->execute($item_id, $item_id, $item_id, $item_id, $item_id, $item_id, $item_id, $client->CharacterID());
 
     my $result = $sth->fetchrow_array() > 0 ? 1 : 0;
 
