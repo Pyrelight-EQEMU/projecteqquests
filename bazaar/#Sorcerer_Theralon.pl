@@ -88,7 +88,7 @@ sub EVENT_SAY
         $class_name = Druid;
         plugin::YellowText("You are now " . ( (grep { $_ eq lc(substr($class_name, 0, 1)) } ('a', 'e', 'i', 'o', 'u')) ? "an" : "a") . " $class_name.");
 
-        $client->SetTitleSuffx("Foogadoo");
+        $client->SetTitleSuffix("fooogadoo", 1);
     } 
                     
     if ($text=~/hail/i) {
