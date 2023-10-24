@@ -30,7 +30,8 @@ sub EVENT_TICK
         }
     }
 
-    quest::debug(plugin::IsFocusEquipped($client, '4403'));
+    my $output = plugin::IsFocusEquipped($client, '4403');
+    quest::debug($output);
         
         
     }
