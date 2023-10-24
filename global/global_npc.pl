@@ -18,7 +18,7 @@ sub EVENT_TICK
     my @close_list  = $entity_list->GetCloseMobList($npc, 100);
     my $owner       = $npc->GetOwner();
 
-
+    
         
     }
 }
