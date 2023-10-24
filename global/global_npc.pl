@@ -18,17 +18,7 @@ sub EVENT_TICK
     my @close_list  = $entity_list->GetCloseMobList($npc, 100);
     my $owner       = $npc->GetOwner();
 
-    foreach $mob (@close_list) {
-        if ($mob && $mob->GetTarget()) {
-            my $target = $mob->GetTarget();
-            if ($mob->IsOnHateList($owner)) {
-                my $tar_name = $target->GetCleanName();
-                my $own_name = $owner->GetCleanName();
-                quest::debug("$tar_name is attacking my owner ($own_name)");
-                $mob->AddToHateList($npc, $mob->GetHateAmount($mob->GetHateTop()) + 1000);
-            }
-        }
-    }
+
         
     }
 }
