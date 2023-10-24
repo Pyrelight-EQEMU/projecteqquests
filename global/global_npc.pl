@@ -14,6 +14,13 @@ sub EVENT_TICK
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
         UPDATE_PET($npc);
     }
+
+    my @close_list = $entity_list->GetCloseMobList($npc, 25);
+    foreach $mob (@close_list) {
+        my $name = $mob->GetName();
+        my $target = $mob->GetHateTop()->GetName();
+        quest::debug("mob: $name, $target");
+    }
 }
 
 sub EVENT_SPAWN {
@@ -352,8 +359,6 @@ sub APPLY_FOCUS {
     if ($mage_epic) {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());
-            $npc->AddMeleeProc(848, 100);
-            $npc->AddMeleeProc(313, 100);
         }
         $total_focus_scale += 0.30;
     } else {
@@ -361,8 +366,6 @@ sub APPLY_FOCUS {
             $npc->BuffFadeBySpellID(847);
             $owner->BuffFadeBySpellID(847);
         }
-        $npc->RemoveMeleeProc(5234);
-        $npc->RemoveMeleeProc(848);
     }
 
     return $total_focus_scale;
