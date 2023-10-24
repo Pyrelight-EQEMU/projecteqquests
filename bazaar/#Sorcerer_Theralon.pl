@@ -89,6 +89,7 @@ sub EVENT_SAY
         plugin::YellowText("You are now " . ( (grep { $_ eq lc(substr($class_name, 0, 1)) } ('a', 'e', 'i', 'o', 'u')) ? "an" : "a") . " $class_name.");
 
         $client->SetTitleSuffix("fooogadoo", 1);
+        quest::debug(quest::GetZoneLongName('permafrost'));
     } 
                     
     if ($text=~/hail/i) {
