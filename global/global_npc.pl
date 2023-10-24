@@ -111,7 +111,7 @@ sub EVENT_TIMER {
 	quest::debug("timer " . $timer);
 
     if ($timer eq "AoE-Taunt") {
-        $npc->SetTimer("AoE-Taunt", 1);
+        #$npc->SetTimer("AoE-Taunt", 1);
     }
 
 }
