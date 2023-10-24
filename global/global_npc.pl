@@ -31,7 +31,7 @@ sub EVENT_TICK
     }
 
     my $output = plugin::is_focus_equipped($client->GetOwner(), "4403");
-    quest::debug('output: $output');
+    quest::debug("output: $output");
         
         
     }
