@@ -216,6 +216,7 @@ sub calc_upgrade_cost {
 
 sub calculate_heroic_stat_sum {
     my $item_id = get_base_id(shift);
+    my $clinet = plugin::val('client');
 
     # Define the primary stats we want to sum up
     my @primary_stats = qw(
