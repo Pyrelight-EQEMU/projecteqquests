@@ -116,7 +116,7 @@ sub EVENT_SAY
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
         plugin::display_cmc();
-        plugin::DisplayExpRate();
+        plugin::DisplayExpRate($client);
         plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");
         plugin::PurpleText("- [".quest::saylink("Class Unlocks", 1)."]") if @locked_classes;
         plugin::PurpleText("- [Special Abilities]");
