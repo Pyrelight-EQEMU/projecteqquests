@@ -216,8 +216,8 @@ sub EVENT_SAY
         my $equip_entitl    = $client->GetBucket("equip-category-$equipment") || 0;
         
         if ($item_id && $base_id == $equip_entitl) {
-            my $eff_qty     = 2**$item_tier;
-            
+            my $eff_qty = (2**$item_tier) || 1;
+                        
             # Calculating max tier
             my $potential_id = $item_id + 1000000;  # Start by adding 1 million to the base_id
             my $max_tier     = $item_tier;  # Initialize max_tier to the current tier
@@ -253,22 +253,22 @@ sub EVENT_SAY
         my $item_id = $client->GetBucket("Theralon-Upgrade-Queue") || 0;
         if ($item_id) {
             # Fetch details for the item
-            my $base_id = plugin::get_base_id($item_id);
-            my $item_tier = plugin::get_upgrade_tier($item_id);
+            my $base_id      = plugin::get_base_id($item_id);
+            my $item_tier    = plugin::get_upgrade_tier($item_id);
             my $item_details = find_item_details($client, $base_id);
-            my $base_cost = $item_details->{value};
-            my $equipment = $item_details->{equipment};
+            my $base_cost    = $item_details->{value};
+            my $equipment    = $item_details->{equipment};
 
             # Calculate the refund amount
-            my $eff_qty = 2**$item_tier;
-            my $refund_amount = $base_cost + (int($base_cost / 2) * (2**$item_tier));
+            my $eff_qty      = 2**$item_tier;
+            my $refund_amount= $base_cost + (int($base_cost / 2) * $eff_qty);
 
             # Refund the player
             plugin::Add_FoS_Tokens($refund_amount, $client);
             plugin::NPCTell("Your refund of $refund_amount FoS Tokens has been processed.");
 
-            # Clear the upgrade queue bucket
-            $client->DeleteBucket("Theralon-Upgrade-Queue");\
+            # Clear the upgrade queue bucket and equipment category
+            $client->DeleteBucket("Theralon-Upgrade-Queue");
             $client->DeleteBucket("equip-category-$equipment");
         } else {
             plugin::NPCTell("You don't have any items in the upgrade queue to refund.");
