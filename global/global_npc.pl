@@ -18,7 +18,6 @@ sub EVENT_TICK
     my @close_list  = $entity_list->GetCloseMobList($npc, 100);
     my $owner       = $npc->GetOwner();
 
-    quest::debug("AoE Taunt firing");
     foreach $mob (@close_list) {
         if ($mob && $mob->GetTarget()) {
             my $target = $mob->GetTarget();
@@ -30,6 +29,8 @@ sub EVENT_TICK
             }
         }
     }
+
+    quest::debug(plugin::IsFocusEquipped($client, '4403'));
         
         
     }

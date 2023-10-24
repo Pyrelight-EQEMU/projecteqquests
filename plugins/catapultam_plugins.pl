@@ -970,4 +970,19 @@ sub spend_cmc {
     plugin::YellowText("You have lost $val Concentrated Mana Crystals. You now have " . ($cmc - $val) . " available.");
 }
 
+sub IsFocusEquipped {
+    my $client      = shift or return;
+    my $focus_id    = shift or return;
+
+    for my $slot (1..22) {
+        return 1 if ($client->GetItemStat($client->GetItemIDAt($slot), 'focuseffect') == $focus_id);
+        for my $aug (1..6) {
+            return 1 if ($client->GetItemStat($client->GetAugmentIDAt($slot, $aug), 'focuseffect') == $focus_id);           
+        }
+    }
+
+    return 0;
+}
+
+
 return 1;
