@@ -184,7 +184,7 @@ sub EVENT_SAY
         plugin::PurpleText("- Available Equipment Categories");
         for my $equipment (sort keys %{$equipment_ref}) {
             my $equip_mask = $client->GetBucket("equip-category-$equipment") || 0;
-            my $item_found = plugin::get_inventory_DB($equip_mask, $client) || 0;
+            my $item_found = plugin::get_inventory_DB(plugin::get_base_id($equip_mask), $client) || 0;
             
             quest::debug("$equipment, $equip_mask, $item_found");
 
