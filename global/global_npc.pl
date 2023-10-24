@@ -353,7 +353,7 @@ sub APPLY_FOCUS {
         if (!$npc->FindBuff(847)) {
             $npc->CastSpell(847, $npc->GetID());
             $npc->AddMeleeProc(848, 100);
-            $npc->AddMeleeProc(17188, 100);
+            $npc->AddMeleeProc(313, 100);
         }
         $total_focus_scale += 0.30;
     } else {
