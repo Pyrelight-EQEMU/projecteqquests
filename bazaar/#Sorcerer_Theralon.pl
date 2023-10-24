@@ -180,8 +180,11 @@ sub EVENT_SAY
         plugin::PurpleText("- Available Equipment Categories");
         for my $equipment (sort keys %{$equipment_ref}) {
             my $equip_mask = $client->GetBucket("equip-category-$equipment") || 0;
+            my $item_found = plugin::check_hasitem($client, $equip_mask);
+            
+            quest::debug("$equipment, $equip_mask, $item_found");
 
-            if ($equip_mask && !plugin::check_hasitem($client, $equip_mask)) {
+            if ($equip_mask && !$item_found) {
                 $client->SummonItem($item_id);
                 plugin::RedText("ERROR: Lost item detected. Restoring...");
             }
