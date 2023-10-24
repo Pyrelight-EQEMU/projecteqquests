@@ -983,7 +983,7 @@ sub is_focus_equipped {
         return 1 if ($item_focus == $desired_focus_id);
         for my $aug_index (1..6) {
             my $augment_focus = $client->GetItemStat($client->GetAugmentIDAt($slot_index, $aug_index), 'focuseffect');
-            quest::debug("$slot_index:$aug_index: $augment_focus");
+            quest::debug("$slot_index:$aug_index: $augment_focus") if ($augment_focus > 0 || $item_focus > 0);
             return 1 if ($augment_focus == $desired_focus_id);
         }
     }
