@@ -92,6 +92,7 @@ sub EVENT_DAMAGE_GIVEN
 
 sub EVENT_COMBAT 
 {
+    quest::debug("combat_state " . $combat_state);
     my $ID = $npc->GetID();
     CHECK_CHARM_STATUS();
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
