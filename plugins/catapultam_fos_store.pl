@@ -262,10 +262,10 @@ sub get_inventory_DB {
     
     $sth->execute($item_id, $client->CharacterID());
 
-    my result = $sth->fetchrow_array() > 0 ? 1 : 0;
+    my $result = $sth->fetchrow_array() > 0 ? 1 : 0;
 
     $sth->finish();
     $dbh->disconnect();
 
-    return result;
+    return $result;
 }
