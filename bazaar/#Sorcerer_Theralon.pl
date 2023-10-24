@@ -180,6 +180,12 @@ sub EVENT_SAY
         plugin::PurpleText("- Available Equipment Categories");
         for my $equipment (sort keys %{$equipment_ref}) {
             my $equip_mask = $client->GetBucket("equip-category-$equipment") || 0;
+
+            if ($equip_mask && !plugin::check_hasitem($client, $equip_mask)) {
+                $client->SummonItem($item_id);
+                plugin::RedText("ERROR: Lost item detected. Restoring...");
+            }
+
             plugin::PurpleText("- [".quest::saylink("link_equi_'$equipment'", 1, "$equipment")."]") unless $equip_mask;
         }
     }
