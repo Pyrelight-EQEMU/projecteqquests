@@ -30,7 +30,7 @@ sub EVENT_ITEM {
                 my $equipment   = $item_details->{equipment};                
                 my $tier        = plugin::get_upgrade_tier($item_id);
                 my $qty         = $item_cost ** ($tier + 1);
-                my $entitlement = $client->GetBucket("equip-category-$equipment") || 0
+                my $entitlement = $client->GetBucket("equip-category-$equipment") || 0;
                 
                 if (plugin::get_base_id($entitlement) == $base_id) {
                     $client->SetBucket("Theralon-Upgrade-Queue", $item_id);
