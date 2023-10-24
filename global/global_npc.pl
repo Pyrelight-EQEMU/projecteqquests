@@ -33,12 +33,6 @@ sub EVENT_TICK
     }
 }
 
-sub EVENT_COMBAT {
-	# NPC-EVENT_COMBAT
-	# Exported event variables
-	quest::debug("combat_state " . $combat_state);
-}
-
 sub EVENT_SPAWN {
     #Pet Scaling
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
@@ -102,6 +96,8 @@ sub EVENT_COMBAT
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
         quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
     }
+
+    	quest::debug("combat_state " . $combat_state);
 }
 
 sub EVENT_ITEM
