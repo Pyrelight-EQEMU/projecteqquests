@@ -116,7 +116,7 @@ sub EVENT_TIMER {
             }
         }
 
-        $npc->CastSpell("5234", $npc->GetID());
+        $npc->CastSpell("21691", $npc->GetID());
     }
 }
 
