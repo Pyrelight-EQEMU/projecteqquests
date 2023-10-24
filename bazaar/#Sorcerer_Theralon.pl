@@ -260,8 +260,9 @@ sub EVENT_SAY
             my $equipment    = $item_details->{equipment};
 
             # Calculate the refund amount
-            my $eff_qty      = 2**$item_tier;
-            my $refund_amount= ($base_cost - int($base_cost / 2)) + (int($base_cost / 2) * $eff_qty);
+            my $eff_qty         = 2**$item_tier;
+            my $refund_amount   = $base_cost + int($base_cost / 2) * ($eff_qty - 1);
+
 
             # Refund the player
             plugin::Add_FoS_Tokens($refund_amount, $client);
@@ -306,10 +307,12 @@ sub EVENT_SAY
 
             # Need to make sure we are allowed to upgrade this item and have enough data to do it
             if ($item_details && $base_id == $equip_entitl && plugin::item_exists_in_db($target_item)) {
-                # Calculate effective quantity and difference in required quantity
-                my $eff_qty         = 2**plugin::get_upgrade_tier($current_item_id);
-                my $required_qty    = 2**$target_tier;
-                my $diff_qty        = $required_qty - $eff_qty;            
+                # Calculate the difference in quantity required for upgrade
+                my $required_qty = 2**$tier;
+                my $diff_qty = $required_qty - $eff_qty;
+
+                # Calculate the cost
+                my $base_cost = $item_details->{value};                    
                 my $total_cost = $diff_qty * int($base_cost / 2);
 
                 if (plugin::Get_FoS_Tokens($client) >= $total_cost) {
