@@ -111,11 +111,12 @@ sub EVENT_TIMER {
             if ($m) {
                 my $m_target = $m->GetTarget();
                 if ($m_target->GetID() == $owner->GetID()) {
-                    $m->AddToHateList($npc, 10);
-                    $npc->CastSpell("5336", $m->GetID());
+                    $m->AddToHateList($npc, 1000);
                 }
             }
         }
+
+        $npc->CastSpell("21691", $npc->GetID());
     }
 }
 
