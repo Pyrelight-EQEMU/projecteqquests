@@ -257,6 +257,7 @@ sub EVENT_SAY
             my $item_tier = plugin::get_upgrade_tier($item_id);
             my $item_details = find_item_details($client, $base_id);
             my $base_cost = $item_details->{value};
+            my $equipment = $item_details->{equipment};
 
             # Calculate the refund amount
             my $eff_qty = 2**$item_tier;
@@ -267,7 +268,8 @@ sub EVENT_SAY
             plugin::NPCTell("Your refund of $refund_amount FoS Tokens has been processed.");
 
             # Clear the upgrade queue bucket
-            $client->DeleteBucket("Theralon-Upgrade-Queue");
+            $client->DeleteBucket("Theralon-Upgrade-Queue");\
+            $client->DeleteBucket("equip-category-$equipment");
         } else {
             plugin::NPCTell("You don't have any items in the upgrade queue to refund.");
         }
