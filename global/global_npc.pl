@@ -366,7 +366,7 @@ sub APPLY_FOCUS {
         }
     }
     
-    if (plugin::is_focus_equipped($npc->GetOwner()->CastToClient(), $mage_epic_focus_id)) {        
+    if (plugin::is_focus_equipped($owner, $mage_epic_focus_id)) {        
         if (!$npc->FindBuff($mag_epic_buff) && $npc->CanBuffStack($mag_epic_buff, $npc->GetLevel())) {
             $npc->CastSpell($mag_epic_buff, $npc->GetID());
         }
