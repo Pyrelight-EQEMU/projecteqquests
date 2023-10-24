@@ -236,9 +236,8 @@ sub EVENT_SAY
                     my $diff_qty = $required_qty - $eff_qty;
 
                     # Calculate the cost
-                    my $base_cost = $item_details->{value};
-                    my $diff_qty = $required_qty - $eff_qty;
-                    $total_cost = $diff_qty * int($base_cost / 2);
+                    my $base_cost = $item_details->{value};                    
+                    my $total_cost = $diff_qty * int($base_cost / 2);
 
                     plugin::PurpleText(sprintf("- [".quest::saylink("link_upg_\'$base_id\'_\'$tier\'", 1, "UPGRADE")."] - (%04d FoS Tokens) - [$item_link]", min($total_cost, 9999)));
                 }
