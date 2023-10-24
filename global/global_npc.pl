@@ -85,16 +85,12 @@ sub EVENT_COMBAT
     # Pet Stuff
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
         my $owner = $npc->GetOwner()->CastToClient();
-        #Servant of Earth Focus Ability
-        my $servant_of_earth = "4403";
-        if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
-            quest::debug("servant of earth is equipped");
-            if ($combat_state == 1) {            
-                $npc->SetTimer("Servant-of-Earth-Taunt", 18);
+        if ($combat_state == 1) {            
+                $npc->SetTimer("Pet_Abilities", 18);
             } else {
-                $npc->StopTimer("Servant-of-Earth-Taunt");
+                $npc->StopTimer("Pet_Abilities");
             }
-        }   
+        }
     }
 }
 
@@ -103,21 +99,39 @@ sub EVENT_TIMER {
 	# Exported event variables
 	quest::debug("timer " . $timer);
 
-    if ($timer eq "Servant-of-Earth-Taunt" && $npc->IsTaunting()) {
-        my @close_list  = $entity_list->GetCloseMobList($npc, 100);
+
+    if ($timer eq "Pet_Abilities") {
         my $owner       = $npc->GetOwner()->CastToClient();
+        my $target      = $npc->GetTarget();
+        my @close_list  = $entity_list->GetCloseMobList($npc, 100);
 
-        for $m (@close_list) {
-            if ($m) {
-                my $m_target = $m->GetTarget();
-                if ($m_target->GetID() == $owner->GetID()) {
-                    $m->AddToHateList($npc, 1000);
+        my $servant_of_earth    = "4403";
+        my $servant_of_fire     = "4401";
+        my $servant_of_water    = "4402";
+        my $servant_of_air      = "4400";
+
+        my $AoE_Spell;
+        if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
+            $AoE_Spell = "15617"; #Earthen Menance
+            for $m (@close_list) {
+                if ($m) {
+                    my $m_target = $m->GetTarget();
+                    if ($m_target->GetID() == $owner->GetID()) {
+                        $m->AddToHateList($npc, 1000);
+                    }
                 }
-            }
+            }        
         }
+        if (plugin::is_focus_equipped($owner, $servant_of_fire)) {
+            $AoE_Spell = "1655"; # Jyll's Wave of Heat
+        }
+        if (plugin::is_focus_equipped($owner, $servant_of_water)) {
+            $AoE_Spell = "15618"; # Healing Waters
+        }
+        if (plugin::is_focus_equipped($owner, $servant_of_water)) {
 
-        $npc->CastSpell("21691", $npc->GetID());
-    }
+        $npc->CastSpell($AoE_Spell, $npc->GetID());
+    }   
 }
 
 sub EVENT_ITEM
@@ -378,21 +392,16 @@ sub APPLY_FOCUS {
     my $total_focus_scale = 1.0;
     my $true_race = $owner->GetBucket("pet_race");
 
-    my $mage_epic_focus_id = "1936";
-    my $mag_epic_buff      = "847";
+    my $mage_epic_focus_id  = "1936";
+    my $mag_epic_buff       = "847";
 
-    #Mage Epic 1.0 - Orb of Mastery
-    my $mage_epic = 0;
+    my $minion_of_darkness  = "4407";
+    my $darkness_buff       = "359";
 
-    foreach my $i (0..10) {
-        if ($inventory->HasAugmentEquippedByID(28034 + ($i * 1000000))) {
-            $mage_epic = 1;
-            last; # Exit the loop if we found the item
-        }
-    }
+    my $summoners_boon      = "4409";
+    my $ritual_summoning    = "4410";
     
     if (plugin::is_focus_equipped($owner, $mage_epic_focus_id)) { 
-        my $stack = $npc->CanBuffStack($mag_epic_buff, $owner->GetLevel());
         if (!$npc->FindBuff($mag_epic_buff)) {
             $npc->CastSpell($mag_epic_buff, $npc->GetID());
         }
@@ -400,9 +409,27 @@ sub APPLY_FOCUS {
     } else {
         if ($npc->FindBuff($mag_epic_buff)) {
             $npc->BuffFadeBySpellID($mag_epic_buff);
-            $owner->BuffFadeBySpellID($mag_epic_buff);
         }
     }
+
+    if (plugin::is_focus_equipped($owner, $minion_of_darkness)) { 
+        if (!$npc->FindBuff($darkness_buff)) {
+            $npc->CastSpell($darkness_buff, $npc->GetID());
+        }
+    } else {
+        if ($npc->FindBuff($darkness_buff)) {
+            $npc->BuffFadeBySpellID($darkness_buff);
+        }
+    }
+
+    if (plugin::is_focus_equipped($owner, $summoners_boon)) {
+        $total_focus_scale += 0.10;
+    }
+
+    if (plugin::is_focus_equipped($owner, $ritual_summoning)) {
+        $total_focus_scale += 0.25;
+    }
+
 
     return $total_focus_scale;
 }
