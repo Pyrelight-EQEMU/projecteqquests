@@ -15,14 +15,12 @@ sub EVENT_TICK
         UPDATE_PET($npc);
     }
 
-    my @close_list = $entity_list->GetCloseMobList($npc, 25);
+    my @close_list = $entity_list->GetCloseMobList($npc, 100);
     foreach $mob (@close_list) {
-        my $name = $mob->GetName();
-        my $target = $mob->GetHateTop();
-        if ($target) {
-            quest::debug("mob: $name, $target");
+        if ($mob && $mob->GetTarget()) {
+            my $target = $mob->GetTarget();
+            quest::debug("$mob, $target");
         }
-        
     }
 }
 
