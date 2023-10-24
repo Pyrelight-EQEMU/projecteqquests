@@ -368,7 +368,7 @@ sub APPLY_FOCUS {
         }
     }
 
-    my $mag_epic_buff = 847
+    my $mag_epic_buff = 847;
     my $buff2 = 15616;
     if ($mage_epic) {
         
