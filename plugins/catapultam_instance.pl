@@ -15,6 +15,7 @@ sub HandleTaskAccept
     my $task_name           = quest::gettaskname($task_id);
     my $type                = 0;
     my $target_difficulty   = 0;
+    my $client              = shift || plugin::val('client');
     
 
     if ($task_name =~ /\(Escalation\)$/ ) {
