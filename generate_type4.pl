@@ -75,7 +75,7 @@ $select_query->execute() or die;
 # Create an array of the possible icon values based on the ranges
 my @possible_icons = (5776..5901);
 
-my $id_offset = 300000000;
+my $id_offset = 140000000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
