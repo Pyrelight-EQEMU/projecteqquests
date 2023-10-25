@@ -1,26 +1,26 @@
 -- Apply Augment Schema
-UPDATE db_str SET value = "1 (General)" 			        WHERE id = 1  AND type = 16;
-UPDATE db_str SET value = "2 (Activated Effect)" 	        WHERE id = 2  AND type = 16;
-UPDATE db_str SET value = "3 (Worn Effect)" 		        WHERE id = 3  AND type = 16;
-UPDATE db_str SET value = "4 (Combat Effect)"		        WHERE id = 4  AND type = 16;
+UPDATE db_str SET value = "1  (General)" 			            WHERE id = 1  AND type = 16;
+UPDATE db_str SET value = "2  (Activated Effect)" 	         WHERE id = 2  AND type = 16;
+UPDATE db_str SET value = "3  (Worn Effect)" 		         WHERE id = 3  AND type = 16;
+UPDATE db_str SET value = "4  (Combat Effect)"		         WHERE id = 4  AND type = 16;
 UPDATE db_str SET value = "10 (Deprecated Slot)"            WHERE id = 10 AND type = 16;
 UPDATE db_str SET value = "20 (Weapon Ornamentation)"       WHERE id = 20 AND type = 16;
 UPDATE db_str SET value = "21 (Armor Ornamentation)"        WHERE id = 21 AND type = 16;
-UPDATE db_str SET VALUE = "30 (Relic)"  					WHERE id = 30 AND type = 16;
+UPDATE db_str SET VALUE = "5  (Relic)"  					      WHERE id = 5  AND type = 16;
 
 UPDATE items
    SET augslot1type     = 0, 
-	    augslot2type    = 0, 
-	    augslot3type    = 0, 
-	    augslot4type    = 0, 
-	    augslot5type    = 0,
-	    augslot6type    = 0, 	   
-	    augslot1visible = 0,
-	    augslot2visible = 0,
-	    augslot3visible = 0,
-	    augslot4visible = 0,
-	    augslot5visible = 0,
-	    augslot6visible = 0
+	    augslot2type     = 0, 
+	    augslot3type     = 0, 
+	    augslot4type     = 0, 
+	    augslot5type     = 0,
+	    augslot6type     = 0, 	   
+	    augslot1visible  = 0,
+	    augslot2visible  = 0,
+	    augslot3visible  = 0,
+	    augslot4visible  = 0,
+	    augslot5visible  = 0,
+	    augslot6visible  = 0
 	WHERE items.id > 0;
 
 -- Type 21 on Vis Slots
@@ -41,12 +41,12 @@ UPDATE items
 
 -- All Items
 UPDATE items
-SET     augslot1type    = 1, -- Type 1
-	    augslot2type    = 2, -- Type 2
-	    augslot3type    = 3, -- Type 3
-	    augslot1visible = 1,
-	    augslot2visible = 1,
-	    augslot3visible = 1
+SET      augslot1type      = 1, -- Type 1
+	      augslot2type      = 2, -- Type 2
+	      augslot3type      = 3, -- Type 3
+	      augslot1visible   = 1,
+	      augslot2visible   = 1,
+	      augslot3visible   = 1
  WHERE itemtype != 54
    AND slots > 0
    AND races > 0
@@ -56,10 +56,10 @@ SET     augslot1type    = 1, -- Type 1
    
 -- Pri\Sec\Ranged Weapons
 UPDATE items
-   SET  augslot4type    = 4,
-        augslot5type    = 10,
-        augslot4visible = 1,
-	    augslot5visible = 1
+   SET   augslot4type    = 4, -- Type 4
+         augslot5type    = 5, -- Type 5
+         augslot4visible = 1,
+	      augslot5visible = 1
  WHERE itemtype != 54
    AND slots & (8192|16384|2048) 
    AND races > 0
@@ -71,52 +71,40 @@ UPDATE items
    SET augslot2type = 0,
        augslot2visible = 0
  WHERE itemtype != 54
-   AND clickeffect > 0;
-   
--- Remove First Type 3 from items with Focus or Worn effects
-UPDATE items
-   SET augslot3type    = 0,
-       augslot3visible = 0
- WHERE itemtype != 54
-   AND ( focuseffect > 0
-    OR   worneffect  > 0 );
+   AND clickeffect > 0;   
 
 -- Power Sources
 UPDATE items
-    SET     augslot1type = 3,
-		    augslot2type = 3,
-            augslot3type = 3,
-            augslot4type = 0,
-            augslot5type = 0,
-            augslot6type = 0,
-            augslot1visible = 1,
-            augslot2visible = 1,
-            augslot3visible = 1,
-            augslot4visible = 1,
-            augslot5visible = 1,
-            augslot6visible = 1
+    SET     augslot1type      = 3,
+		      augslot2type      = 3,
+            augslot3type      = 3,
+            augslot4type      = 0,
+            augslot5type      = 0,
+            augslot6type      = 0,
+            augslot1visible   = 1,
+            augslot2visible   = 1,
+            augslot3visible   = 1,
+            augslot4visible   = 1,
+            augslot5visible   = 1,
+            augslot6visible   = 1
 WHERE slots = 2097152 AND itemtype != 54;
 
 -- Update Epics
 UPDATE items
-   SET items.nodrop = 0,
-   	 items.attuneable = 0,
-   	 items.loregroup = -1,
-   	 items.augslot1visible = 0,   	 
-   	 items.augslot2visible = 0,
-   	 items.augslot3visible = 0,
-   	 items.augslot4visible = 0,
-   	 items.augslot5visible = 0,
-   	 items.augslot6visible = 0,
-   	 items.augslot1type = 0,
-   	 items.augslot2type = 0,
-   	 items.augslot3type = 0,
-   	 items.augslot4type = 0,
-   	 items.augslot5type = 0,
-   	 items.augslot6type = 0,
+   SET items.nodrop           = 0,
+   	 items.attuneable       = 0,
+   	 items.loregroup        = -1,
+   	 items.augslot1visible  = 0,   	 
+   	 items.augslot2visible  = 0,
+   	 items.augslot3visible  = 0,
+   	 items.augslot4visible  = 0,
+   	 items.augslot5visible  = 0,
+   	 items.augslot6visible  = 0,
+   	 items.augslot1type     = 0,
+   	 items.augslot2type     = 0,
+   	 items.augslot3type     = 0,
+   	 items.augslot4type     = 0,
+   	 items.augslot5type     = 0,
+   	 items.augslot6type     = 0,
    	 items.idfile = 'IT64'
 WHERE items.id % 100000 IN (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
-
-
-
- 
