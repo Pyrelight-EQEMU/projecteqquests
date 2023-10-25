@@ -143,7 +143,8 @@ for my $tier (1..30) {
 
 
                 $row->{hp} = ceil_to_nearest_5($row->{hp} + abs($modifier * $row->{hp}));
-                $row->{ac} = $row->{ac} + $tier + ceil(abs($row->{ac} * $modifier_minor));
+                $row->{ac} += max($row->{ac} ? $tier : 0, ceil(abs($row->{ac} * $modifier_minor)));
+
 				
                 # Adjusting Heroic Stats
                 foreach my $stat (qw(heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_fr heroic_cr heroic_dr heroic_pr
