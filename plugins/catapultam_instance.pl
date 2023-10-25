@@ -224,16 +224,18 @@ sub HandleTaskComplete
             if ($heroic) {                        
                 my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
+                    my $reward_total = ($old_diff - $difficulty_rank) * $reward;
+
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
                     plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
-                    plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                    plugin::Add_FoS_Tokens($reward_total, $client);
                     $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
                     my $group = $client->GetGroup();
                     if($group) {
                         for ($count = 0; $count < $group->GroupCount(); $count++) {
                             $player = $group->GetMember($count);
                             if($player) {
-                                plugin::Add_FoS_Heroic_Tokens($reward, $client);
+                                plugin::Add_FoS_Heroic_Tokens($reward_total, $client);
                             }
                         }
                     }                    
@@ -243,18 +245,19 @@ sub HandleTaskComplete
                 quest::debug("checkpoint 3");           
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
-                    quest::debug("checkpoint 4");
+                    my $reward_total = ($old_diff - $difficulty_rank) * $reward;
+
+
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
                     plugin::TrySetLeaderForZone($task_name, $charname, $difficulty_rank);
                     plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
-                    plugin::Add_FoS_Tokens($reward, $client);
+                    plugin::Add_FoS_Tokens($reward_total, $client);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
                 }
             }
         }
         
         $client->DeleteBucket("instance-data");
-        #$client->EndSharedTask();
     }
 }
 
