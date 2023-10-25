@@ -42,12 +42,10 @@ sub HandleTaskAccept
         my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
 
         foreach my $difficulty (@difficulties) {
-            if ($difficulty < $target_difficulty) {
-                $menu_string .= "[(-) ".sprintf("%02d", $difficulty)."] ";
-            } elsif ($difficulty == $target_difficulty) {
+            if ($difficulty == $target_difficulty) {
                 $menu_string .= "[ X ] ";
             } else {
-                $menu_string .= "[(+) ".sprintf("%02d", $difficulty)."] ";
+                $menu_string .= "[".sprintf("%02d", $difficulty)."] ";
             }
         }
 
