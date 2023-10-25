@@ -76,7 +76,7 @@ $select_query->execute() or die;
 my @possible_icons = (1940..2002, 6464..6473, 944..965, 1429..1443);
 
 # Start inserting with ID 901000
-my $new_id = 910000;
+my $id_offset = 200000000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
@@ -84,7 +84,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 
     # Set New Attributes
-    $base_data->{id} = $new_id;
+    $base_data->{id} = $base_data->{id} + $id_offset;
     $base_data->{Name} = "Spellstone: " . $row->{spell_name};
     $base_data->{clickeffect} = $row->{clickeffect};
     $base_data->{casttime} = $row->{casttime};

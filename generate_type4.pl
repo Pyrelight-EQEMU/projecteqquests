@@ -74,8 +74,7 @@ $select_query->execute() or die;
 # Create an array of the possible icon values based on the ranges
 my @possible_icons = (5776..5901);
 
-# Start inserting with ID 901000
-my $new_id = 930000;
+my $id_offset = 300000000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
@@ -83,7 +82,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 
     # Set New Attributes
-    $base_data->{id} = $new_id;
+    $base_data->{id} = $base_data->{id} + $id_offset;
     $base_data->{Name} = "Eldritch Binding: " . $row->{spell_name};
     $base_data->{proceffect} = $row->{proceffect};
     $base_data->{procrate} = ${row}->{procrate};

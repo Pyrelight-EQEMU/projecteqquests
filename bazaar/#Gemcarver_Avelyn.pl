@@ -3,6 +3,7 @@ use POSIX;
 
 my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 my $trade_cost = 1;
+my $id_offset  = 200000000;
 
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
@@ -348,7 +349,8 @@ sub get_augs {
         WHERE id > 900000 
         AND id < 999999 
         AND (name LIKE 'Eldritch Binding:%' OR name LIKE 'Spellstone:%' OR name LIKE 'Arcane Glyph:%')
-        AND lore LIKE ?");
+        AND lore LIKE ?
+        AND id >= 200000000");
     
     # Execute the statement with the desired parameter
     $sth->execute(quest::getitemname($item_id));
