@@ -38,7 +38,10 @@ sub HandleTaskAccept
     }
 
     if ($target_difficulty > 0) {
-        
+        my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
+        foreach my $difficulty (@difficulties) {
+                plugin::YellowText("- [".quest::saylink("select_difficulty_$difficulty", 1, sprintf("%02d",$difficulty))."]");
+        }
 
         plugin::YellowText($menu_string);
         plugin::YellowText($zone_name);
