@@ -282,24 +282,6 @@ sub item_exists_in_db {
     return $result > 0 ? 1 : 0;
 }
 
-sub auto_upgrade_item {
-    my ($item_id_to_upgrade, $target_upgrade) = @_;
-
-    # Create a clone of the player's inventory for simulation purposes
-    my %simulated_inventory = %{ get_all_items_in_inventory($client) };
-    
-    # Check if upgrade is possible in simulation
-    if (simulate_upgrade(\%simulated_inventory, $item_id_to_upgrade, $target_upgrade)) {
-        
-        # Perform actual inventory operations since simulation succeeded
-        execute_upgrade($client, $item_id_to_upgrade, $target_upgrade);
-        
-        return 1; # Upgrade successful
-    }
-    
-    return 0; # Upgrade failed
-}
-
 sub get_next_upgrade_id {
     my $item_id = shift;
 
@@ -354,6 +336,12 @@ sub test_upgrade {
             $virtual_inventory = get_upgrade_items($current_item_id, 1);
             my $total_cmc_cost = 0;
             $total_cmc_cost_ref = \$total_cmc_cost;
+        } else {
+            if ($is_recursive >= 10) {
+                return 0;
+            } else {
+                $is_recursive++;
+            }
         }
         
         $original_target_count = $virtual_inventory->{$target_item_id};
@@ -410,6 +398,12 @@ sub execute_upgrade {
             if (!$is_recursive) {
                 $virtual_inventory = get_upgrade_items($current_item_id, 1);
                 $ledger = {};
+            }  else {
+                if ($is_recursive >= 10) {
+                    return 0;
+                } else {
+                    $is_recursive++;
+                }
             }
 
             my $count = $client->CountItem($current_item_id);
