@@ -9,6 +9,37 @@ my $modifier        = 0.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
 
+sub HandleTaskAccept
+{
+    my $task_id             = shift || plugin::val('task_id');
+    my $task_name           = quest::gettaskname($task_id);
+    my $type                = 0;
+    my $target_difficulty   = 0;
+    
+
+    if ($task_name =~ /\(Escalation\)$/ ) {
+        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion."); 
+        $type = 1
+    } elsif ($task_name =~ /\(Heroic\)$/ ) {
+        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
+        $type = 2;
+    } else {
+        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
+    }
+
+    if ($type == 1) {
+        $target_difficulty = $client->GetBucket("$zone_name-solo-escalation")   || 1;
+    }
+
+    if ($type == 2) {
+        $target_difficulty = $client->GetBucket("$zone_name-group-escalation")  || 1;
+    }
+
+    if ($target_difficulty > 0) {       
+        plugin::YellowText("Selected Difficulty: $target_difficulty");
+    }
+}
+
 sub HandleSay {
     my ($client, $npc, $zone_name, $explain_details, $reward, @task_id) = @_;
     my $text   = plugin::val('text');
@@ -20,6 +51,8 @@ sub HandleSay {
 
     my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
+
+    my $escalation_target      = $client->GetBucket("Escalation-Target") || 0;
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
@@ -55,12 +88,12 @@ sub HandleSay {
                         $client->CreateTaskDynamicZone($task, \%dz);
                     }
 
-                    my %instance_data = ("reward" => $reward, 
-                                        "zone_name" => $zone_name, 
-                                        "difficulty_rank" => $difficulty_rank, 
-                                        "task_id" => $task, 
-                                        "leader_id" => $task_leader_id,
-                                        "entered" => 0);                
+                    my %instance_data = ("reward"           => $reward, 
+                                        "zone_name"         => $zone_name, 
+                                        "difficulty_rank"   => $difficulty_rank, 
+                                        "task_id"           => $task, 
+                                        "leader_id"         => $task_leader_id,
+                                        "entered"           => 0);                
 
                     my $group = $client->GetGroup();
                     if($group) {
@@ -248,20 +281,6 @@ sub Add_AA_Reward {
 
     $client->AddAAPoints($amount);
     $client->Message(334, "You have gained $amount Alternate Experience points as a bonus reward!");    
-}
-
-sub HandleTaskAccept
-{
-    my $task_id             = shift || plugin::val('task_id');
-    my $task_name           = quest::gettaskname($task_id);
-
-    if ($task_name =~ /\(Escalation\)$/ ) {
-        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion.");
-    } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
-    } else {
-        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
-    }
 }
 
 sub upgrade_item_corpse {
