@@ -221,6 +221,7 @@ sub EVENT_SAY
 
             if ($max_tier > $item_tier) {
                 plugin::PurpleText("- Select Upgrade Target");
+                $max_tier = max($max_tier, $item_tier + 9);
                 for my $tier (($item_tier+1)..$max_tier) {
                     my $item_link = quest::varlink($base_id + ($tier * 1000000));
 
