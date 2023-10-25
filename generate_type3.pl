@@ -83,7 +83,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 
     # Set New Attributes
-    $base_data->{id} = $base_data->{id} + $id_offset;
+    $base_data->{id} = $row->{id} + $id_offset;
     $base_data->{Name} = "Arcane Glyph: " . $row->{spell_name};
     $base_data->{focuseffect} = $row->{focuseffect};
     $base_data->{slots} = $row->{slots};

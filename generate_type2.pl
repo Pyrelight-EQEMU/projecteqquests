@@ -86,7 +86,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 
     # Set New Attributes
-    $base_data->{id} = $base_data->{id} + $id_offset;
+    $base_data->{id} = $row->{id} + $id_offset;
     $base_data->{Name} = "Spellstone: " . $row->{spell_name};
     $base_data->{clickeffect} = $row->{clickeffect};
     $base_data->{casttime} = $row->{casttime};
