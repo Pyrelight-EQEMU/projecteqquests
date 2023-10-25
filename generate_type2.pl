@@ -67,6 +67,8 @@ my $select_query = $dbh->prepare(<<SQL);
       AND items.maxcharges = -1
       AND items.itemtype != 54
       AND items.id <= 999999
+      AND items.norent != 0
+      AND NOT items.clicktype = 3
       ORDER BY items.id;
 SQL
 

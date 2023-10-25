@@ -65,6 +65,7 @@ my $select_query = $dbh->prepare(<<SQL);
       AND items.classes > 0 
       AND items.races > 0
       AND items.itemtype != 54
+      AND items.norent != 0
       AND items.id <= 999999
       ORDER BY items.id;
 SQL
