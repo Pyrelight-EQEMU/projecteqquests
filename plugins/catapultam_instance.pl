@@ -218,14 +218,13 @@ sub HandleTaskComplete
     my $escalation          = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
     my $charname = $client->GetCleanName();
-    quest::debug("checkpoint 0; $difficulty_rank $reward $zone_name $task_id_stored $leader_id $task_name $heroic $escalation");
 
     if ($task_id == $task_id_stored) {
         if ($client->CharacterID() == $leader_id) {         
             if ($heroic) {                        
                 my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
-                    my $reward_total = ($old_diff - $difficulty_rank) * $reward;
+                    my $reward_total = ($difficulty_rank - $old_diff) * $reward;
 
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
                     plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
@@ -246,7 +245,6 @@ sub HandleTaskComplete
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
                     my $reward_total = ($difficulty_rank - $old_diff) * $reward;
-                    quest::debug("$old_diff, $difficulty_rank");
 
 
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
