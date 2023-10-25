@@ -71,7 +71,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
 
     my $new_name = "'" . $row->{Name} . "' Glamour-Stone";
 
-    $base_data->{id}            = $base_data->{id} + $id_offset;
+    $base_data->{id}            = $row->{id} + $id_offset;
     $base_data->{Name}          = $new_name;
     $base_data->{idfile}        = $row->{idfile};
     $base_data->{icon}          = $row->{icon};
