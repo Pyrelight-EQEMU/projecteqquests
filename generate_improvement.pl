@@ -147,7 +147,7 @@ for my $tier (1..10) {
 				
                 # Adjusting Heroic Stats
                 foreach my $stat (qw(heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_fr heroic_cr heroic_dr heroic_pr
-                                     avoidance accuracy spellshield dotshield shielding strikethrough manaregen regen stunresist)) {
+                                     avoidance accuracy spellshield dotshielding shielding strikethrough manaregen regen stunresist)) {
                     $row->{$stat} += max($row->{$stat} ? $tier : 0, ceil(abs($row->{$stat} * $modifier)));
                 }
 
