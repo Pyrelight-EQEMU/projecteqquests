@@ -38,14 +38,23 @@ sub HandleTaskAccept
     }
 
     if ($target_difficulty > 0) {
+        my $menu_string;
         my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
+
         foreach my $difficulty (@difficulties) {
-                plugin::YellowText("- [".quest::saylink("select_difficulty_$difficulty", 1, sprintf("%02d",$difficulty))."]");
+            if ($difficulty < $target_difficulty) {
+                $menu_string .= "[(-) ".sprintf("%02d", $difficulty)."] ";
+            } elsif ($difficulty == $target_difficulty) {
+                $menu_string .= "[ X ] ";
+            } else {
+                $menu_string .= "[(+) ".sprintf("%02d", $difficulty)."] ";
+            }
         }
 
         plugin::YellowText($menu_string);
         plugin::YellowText($zone_name);
     }
+
 
 }
 
