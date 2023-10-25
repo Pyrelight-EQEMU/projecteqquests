@@ -30,11 +30,11 @@ sub HandleTaskAccept
     }
 
     if ($type == 1) {
-        $target_difficulty = $client->GetBucket("$zone_name-solo-escalation")   || 1;
+        $target_difficulty = ($client->GetBucket("$zone_name-solo-escalation")   || 0)++;
     }
 
     if ($type == 2) {
-        $target_difficulty = $client->GetBucket("$zone_name-group-escalation")  || 1;
+        $target_difficulty = ($client->GetBucket("$zone_name-group-escalation")  || 0)++;
     }
 
     if ($target_difficulty > 0) {
@@ -45,7 +45,7 @@ sub HandleTaskAccept
             $menu_string .= " [" . quest::saylink("select_diff_$difficulty", 1, " $difficulty ") . "] ";
         }
 
-        plugin::YellowText("Would you like to adjust your difficulty? $menu_string")
+        plugin::YellowText("Would you like to adjust your difficulty? $menu_string");
     }
 
 
@@ -66,7 +66,11 @@ sub HandleSay {
     my $escalation_target      = $client->GetBucket("Escalation-Target") || 0;
 
     # TO-DO Handle this differently based on introductory flag from Theralon.
-    if ($text =~ /hail/i && $npc->GetLevel() <= 70) {
+    if ($text =~ /hail/i || $text =~ /^select_diff_(\d+)$/) {
+        if ($text =~ /^select_diff_(\d+)$/) {
+            my $selected_difficulty = $1;
+            plugin::YellowText("You have selected Difficulty: $selected_difficulty");
+        }
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
                 if (!plugin::HasDynamicZoneAssigned($client)) {
@@ -99,6 +103,7 @@ sub HandleSay {
                         $client->CreateTaskDynamicZone($task, \%dz);
                     }
 
+                    $difficulty_rank = $selected_difficulty;
                     my %instance_data = ("reward"           => $reward, 
                                         "zone_name"         => $zone_name, 
                                         "difficulty_rank"   => $difficulty_rank, 
@@ -139,6 +144,7 @@ sub HandleSay {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
         $client->SetBucket("temp-zone-cache", $zone_name);
+        $client->DeleteBucket("$zone_name-override-escalation");
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$tokens_of_strength] 
                             only once per difficulty rank. You may also journey into this dungeon without challenging it, at your highest previously completed difficulty level.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
