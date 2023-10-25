@@ -47,7 +47,7 @@ sub HandleTaskAccept
     }
 
     foreach my $difficulty (@difficulties) {
-        $menu_string .= "[ ".quest::saylink("select_difficulty_$difficulty", 1, "$difficulty")." ]";
+        $menu_string .= "[ ".quest::saylink("select_diff_$difficulty", 1, "$difficulty")." ]";
     }
 
     plugin::YellowText("Select: " . $menu_string);
