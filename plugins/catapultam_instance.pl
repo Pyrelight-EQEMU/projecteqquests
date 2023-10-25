@@ -133,7 +133,7 @@ sub HandleSay {
     elsif ($text eq 'instance_details') {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
-        $cliemt->SetBucket("temp-zone-cache", $zone_name);
+        $client->SetBucket("temp-zone-cache", $zone_name);
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$tokens_of_strength] 
                             only once per difficulty rank. You may also journey into this dungeon without challenging it, at your highest previously completed difficulty level.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
