@@ -203,24 +203,22 @@ sub HandleEnterZone
 
 sub HandleTaskComplete
 {
-    my ($client, $task_id)        = @_;
-    my %instance_data   = plugin::DeserializeHash($client->GetBucket("instance-data"));
-    my $difficulty_rank = $instance_data{'difficulty_rank'};   
-    my $reward          = $instance_data{'reward'};
-    my $zone_name       = $instance_data{'zone_name'};
-    my $task_id_stored  = $instance_data{'task_id'};
-    my $leader_id       = $instance_data{'leader_id'};
-    my $task_name       = quest::gettaskname($task_id);  
-    my $heroic          = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
-    my $escalation      = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
+    my ($client, $task_id)  = @_;
+    my %instance_data       = plugin::DeserializeHash($client->GetBucket("instance-data"));
+    my $difficulty_rank     = $instance_data{'difficulty_rank'};   
+    my $reward              = $instance_data{'reward'};
+    my $zone_name           = $instance_data{'zone_name'};
+    my $task_id_stored      = $instance_data{'task_id'};
+    my $leader_id           = $instance_data{'leader_id'};
+    my $task_name           = quest::gettaskname($task_id);  
+    my $heroic              = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
+    my $escalation          = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
     my $charname = $client->GetCleanName();
     quest::debug("checkpoint 0; $difficulty_rank $reward $zone_name $task_id_stored $leader_id $task_name $heroic $escalation");
 
     if ($task_id == $task_id_stored) {
-        quest::debug("checkpoint 1");
-        if ($client->CharacterID() == $leader_id) {
-             quest::debug("checkpoint 2");            
+        if ($client->CharacterID() == $leader_id) {         
             if ($heroic) {                        
                 my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
@@ -241,8 +239,7 @@ sub HandleTaskComplete
                     }                    
                 }
             } 
-            if ($escalation) { 
-                quest::debug("checkpoint 3");           
+            if ($escalation) {    
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
                     my $reward_total = ($old_diff - $difficulty_rank) * $reward;
