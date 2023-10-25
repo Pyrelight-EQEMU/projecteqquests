@@ -64,7 +64,7 @@ SQL
 
 $select_query->execute();
 
-my $id_offset = 1000000;
+my $id_offset = 11000000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
