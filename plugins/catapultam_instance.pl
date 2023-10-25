@@ -36,9 +36,17 @@ sub HandleTaskAccept
         $target_difficulty = $client->GetBucket("$zone_name-group-escalation")  || 1;
     }
 
-    if ($target_difficulty > 0) {       
-        plugin::YellowText("Selected Difficulty: $target_difficulty");
+    if ($target_difficulty > 0) {
+        my @difficulties    = ($target_difficulty - 5 .. $target_difficulty + 5);
+        my $menu_string;
+
+        foreach my $difficulty (@difficulties) {
+            $menu_string .= " [".quest::saylink("select_difficulty_$difficulty", 1, "$difficulty")."] ";
+            
+            plugin::YellowText($menu_string);
+        }
     }
+
 }
 
 sub HandleSay {
