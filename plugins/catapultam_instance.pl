@@ -41,7 +41,7 @@ sub HandleTaskAccept
         my $menu_string;
 
         foreach my $difficulty (@difficulties) {
-            if )
+            
             $menu_string .= " [".quest::saylink("select_difficulty_$difficulty", 1, "$difficulty")."] ";
             
             
