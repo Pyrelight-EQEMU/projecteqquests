@@ -22,7 +22,7 @@ sub HandleTaskAccept
     
 
     if ($task_name =~ /\(Escalation\)$/ ) {
-        $type = 1
+        $type = 1;
         $target_difficulty  = $client->GetBucket("$zone_name-solo-escalation") || 0;
         $target_difficulty++;
 
