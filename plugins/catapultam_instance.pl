@@ -42,15 +42,10 @@ sub HandleTaskAccept
         my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
 
         foreach my $difficulty (@difficulties) {
-            if ($difficulty == $target_difficulty) {
-                $menu_string .= "[ X ] ";
-            } else {
-                $menu_string .= "[".sprintf("%02d", $difficulty)."] ";
-            }
+            $menu_string .= "[".sprintf("%02d", $difficulty)."] ";
         }
 
-        plugin::YellowText($menu_string);
-        plugin::YellowText($zone_name);
+        plugin::YellowText("Would you like to adjust your difficulty? $menu_string")
     }
 
 
