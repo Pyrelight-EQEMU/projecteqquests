@@ -37,14 +37,17 @@ sub HandleTaskAccept
     }
 
     if ($target_difficulty > 0) {
-        my @difficulties    = ($target_difficulty - 5 .. $target_difficulty + 5);
+        my @difficulties = grep { $_ > 0 } ($target_difficulty - 5 .. $target_difficulty + 5);
         my $menu_string;
 
         foreach my $difficulty (@difficulties) {
+            if )
             $menu_string .= " [".quest::saylink("select_difficulty_$difficulty", 1, "$difficulty")."] ";
             
-            plugin::YellowText($menu_string);
+            
         }
+
+        plugin::YellowText($menu_string);
     }
 
 }
