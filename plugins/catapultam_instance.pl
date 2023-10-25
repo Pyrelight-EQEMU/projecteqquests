@@ -67,10 +67,12 @@ sub HandleSay {
 
     my $escalation_target      = $client->GetBucket("Escalation-Target") || 0;
 
+    my $selected_difficulty;
+
     # TO-DO Handle this differently based on introductory flag from Theralon.
     if ($text =~ /hail/i || $text =~ /^select_diff_(\d+)$/) {
         if ($text =~ /^select_diff_(\d+)$/) {
-            my $selected_difficulty = $1;
+            $selected_difficulty = $1;
             plugin::YellowText("You have selected Difficulty: $selected_difficulty");
         }
         foreach my $task (@task_id) {
