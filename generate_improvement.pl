@@ -82,7 +82,7 @@ sub ceil_to_nearest_5 {
 my $max_id = 200000;
 my $chunk_size = 200000;
 
-for my $tier (1..50) {
+for my $tier (1..100) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
         # Fetch data from the table
         my $sth = $dbh->prepare("SELECT * FROM items WHERE items.id BETWEEN ? AND ?");
