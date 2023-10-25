@@ -16,7 +16,7 @@ sub HandleTaskAccept
     my $type                = 0;
     my $target_difficulty   = 0;
     my $client              = shift || plugin::val('client');
-    my $zone_name           = shift || plugin::val('zonesn');
+    my $zone_name           = $client->GetBucket("temp-zone-cache");
     
 
     if ($task_name =~ /\(Escalation\)$/ ) {
@@ -38,12 +38,7 @@ sub HandleTaskAccept
     }
 
     if ($target_difficulty > 0) {
-        my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
-        my $menu_string;
-
-        foreach my $difficulty (@difficulties) {            
-            $menu_string .= " [".quest::saylink("select_difficulty_$difficulty", 1, "$difficulty")."] ";
-        }
+        
 
         plugin::YellowText($menu_string);
         plugin::YellowText($zone_name);
@@ -138,7 +133,7 @@ sub HandleSay {
     elsif ($text eq 'instance_details') {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
-
+        $cliemt->SetBucket("temp-zone-cache", $zone_name);
         plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$tokens_of_strength] 
                             only once per difficulty rank. You may also journey into this dungeon without challenging it, at your highest previously completed difficulty level.");
         plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
