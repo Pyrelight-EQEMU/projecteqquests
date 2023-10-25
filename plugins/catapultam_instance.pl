@@ -46,6 +46,7 @@ sub HandleTaskAccept
         }
 
         plugin::YellowText($menu_string);
+        plugin::YellowText($zone_name);
     }
 
 }
