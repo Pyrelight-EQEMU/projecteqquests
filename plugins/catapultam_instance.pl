@@ -17,38 +17,38 @@ sub HandleTaskAccept
     my $target_difficulty   = 0;
     my $client              = shift || plugin::val('client');
     my $zone_name           = $client->GetBucket("temp-zone-cache");
+    my $menu_string;
+    my @difficulties;
     
 
     if ($task_name =~ /\(Escalation\)$/ ) {
-        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion."); 
         $type = 1
+        $target_difficulty  = ($client->GetBucket("$zone_name-solo-escalation") || 0)++;        
+
+        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion.");
+        
     } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");
         $type = 2;
+        $target_difficulty  = ($client->GetBucket("$zone_name-group-escalation") || 0)++;
+
+        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");        
     } else {
         plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
     }
 
-    if ($type == 1) {
-        $target_difficulty = ($client->GetBucket("$zone_name-solo-escalation")   || 0)++;
+    if ($type > 0) {
+        @difficulties       = grep { $_ > 0 } ($target_difficulty .. $target_difficulty + 4);
+
+        plugin::YellowText("Would you like to adjust your difficulty? You must select an option below before any further action.");
+    } else {
+        @difficulties       = grep { $_ > 0 } ($target_difficulty - 4 .. $target_difficulty);
     }
 
-    if ($type == 2) {
-        $target_difficulty = ($client->GetBucket("$zone_name-group-escalation")  || 0)++;
+    foreach my $difficulty (@difficulties) {
+        $menu_string .= "[ ".quest::saylink("select_difficulty_$difficulty", 1, "$difficulty")." ]";
     }
 
-    if ($target_difficulty > 0) {
-        my $menu_string;
-        my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
-
-        foreach my $difficulty (@difficulties) {
-            $menu_string .= " [" . quest::saylink("select_diff_$difficulty", 1, " $difficulty ") . "] ";
-        }
-
-        plugin::YellowText("Would you like to adjust your difficulty? $menu_string");
-    }
-
-
+    plugin::YellowText("Select: " . $menu_string);
 }
 
 sub HandleSay {
@@ -83,12 +83,26 @@ sub HandleSay {
                     if (not plugin::HasDynamicZoneAssigned($client)) {
                         if ($task_name =~ /\(Escalation\)$/ ) {
                             $difficulty_rank++;
+
+                            if ($selected_difficulty > $difficulty_rank) {
+                                $difficulty_rank = $selected_difficulty;
+                            }
                         } 
                         
-                        if ($task_name =~ /\(Heroic\)$/ ) {                        
+                        elsif ($task_name =~ /\(Heroic\)$/ ) {                        
                             $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
                             $difficulty_rank++;
                             $heroic++;
+
+                            if ($selected_difficulty > $difficulty_rank) {
+                                $difficulty_rank = $selected_difficulty;
+                            }
+                        }
+
+                        else {
+                            if ($selected_difficulty < $difficulty_rank) {
+                                $difficulty_rank = $selected_difficulty;
+                            }
                         }
                         
                         my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
@@ -101,9 +115,8 @@ sub HandleSay {
                         );
                         
                         $client->CreateTaskDynamicZone($task, \%dz);
-                    }
+                    }                   
 
-                    $difficulty_rank = $selected_difficulty;
                     my %instance_data = ("reward"           => $reward, 
                                         "zone_name"         => $zone_name, 
                                         "difficulty_rank"   => $difficulty_rank, 
