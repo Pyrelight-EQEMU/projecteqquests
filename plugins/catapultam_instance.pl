@@ -23,13 +23,15 @@ sub HandleTaskAccept
 
     if ($task_name =~ /\(Escalation\)$/ ) {
         $type = 1
-        $target_difficulty  = ($client->GetBucket("$zone_name-solo-escalation") || 0)++;        
+        $target_difficulty  = $client->GetBucket("$zone_name-solo-escalation") || 0;
+        $target_difficulty++;
 
         plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion.");
         
     } elsif ($task_name =~ /\(Heroic\)$/ ) {
         $type = 2;
-        $target_difficulty  = ($client->GetBucket("$zone_name-group-escalation") || 0)++;
+        $target_difficulty  = $client->GetBucket("$zone_name-group-escalation") || 0;
+        $target_difficulty++;
 
         plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");        
     } else {
