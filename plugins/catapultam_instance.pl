@@ -42,7 +42,7 @@ sub HandleTaskAccept
         my @difficulties = grep { $_ > 0 } ($target_difficulty - 6 .. $target_difficulty + 4);
 
         foreach my $difficulty (@difficulties) {
-            $menu_string .= "[" . quest::saylink("select_diff_$difficulty", 1, "-$difficulty-") . "]";
+            $menu_string .= "[" . quest::saylink("select_diff_$difficulty", 1, "- $difficulty -") . "]";
         }
 
         plugin::YellowText("Would you like to adjust your difficulty? $menu_string")
