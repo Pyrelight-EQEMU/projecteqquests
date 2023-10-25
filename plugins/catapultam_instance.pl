@@ -242,7 +242,7 @@ sub HandleTaskComplete
             if ($escalation) {    
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
-                    my $reward_total = ($old_diff - $difficulty_rank) * $reward;
+                    my $reward_total = ($difficulty_rank - $old_diff) * $reward;
 
 
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
