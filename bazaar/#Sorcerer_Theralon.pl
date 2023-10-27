@@ -136,7 +136,7 @@ sub EVENT_SAY
     elsif ($text=~/Class Epics/i && $progress > 3 && $met_befo) {
         my @epic_list = plugin::BuildEpicList($client);
 
-        Plugin:YellowText("You may choose to obtain additional copies of Epics or Class Emblems. These are not refundable.");
+        plugin:YellowText("You may choose to obtain additional copies of Epics or Class Emblems. These are not refundable.");
 
         foreach my $epic (@epic_list) {
             my $epic_link = quest::varlink($epic);
