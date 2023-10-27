@@ -312,7 +312,7 @@ sub BuildEpicList {
     foreach my $epic (@epics) {
         # Get class associated with this epic
         my $class_for_epic = GetClassForEpic($epic);
-        quest::debug($epic);
+        quest::debug($class_for_epic);
 
         # Check if class is unlocked
         if ($class_for_epic && $unlocked_classes{$class_for_epic}) {
