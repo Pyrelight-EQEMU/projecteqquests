@@ -264,3 +264,64 @@ sub get_inventory_DB {
 
     return $result;
 }
+
+sub GetClassForEpic {
+    my $item_id  = shift;
+    my $class_id = 0;
+    
+    # Return early if the item_id is out of expected range
+    return 0 if $item_id >= 100000000;
+
+    my $item_name = quest::getitemname($item_id % 1000000);
+
+    # Mapping of epic item names to their class names
+    my %epic_to_class = (
+        'Claws of the Savage Spirit'    => 'Beastlord',
+        'Water Sprinkler of Nem Ankh'   => 'Cleric',
+        'Nature Walker\'s Scimitar'     => 'Druid',
+        'Staff of the Serpent'          => 'Enchanter',
+        'Orb of Mastery'                => 'Magician',
+        'Scythe of Shadowed Soul'       => 'Necromancer',
+        'Fiery Defender'                => 'Paladin',
+        'Earthcaller'                   => 'Ranger',
+        'Innoruuk\'s Curse'             => 'Shadowknight',
+        'Spear of Fate'                 => 'Shaman'
+    );
+
+    # Get the class name based on the item name
+    my $class_name = $epic_to_class{$item_name};
+
+    # If we found a valid class name, get its ID
+    $class_id = plugin::GetClassID($class_name) if $class_name;
+
+    return $class_id; 
+}
+
+
+sub BuildEpicList {
+    my $client              = shift;
+    my @epics               = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
+    my @return_list         = ();
+    my $epic_emblem_offset  = 190000;
+
+    # Get unlocked classes for the client
+    my %unlocked_classes = plugin::GetUnlockedClasses($client);
+
+    foreach my $epic (@epics) {
+        # Get class associated with this epic
+        my $class_for_epic = GetClassForEpic($epic);
+
+        # Check if class is unlocked
+        if ($unlocked_classes{$class_for_epic}) {
+            if (get_inventory_DB($epic, $client)) {
+                push @return_list, $epic;
+            } else {
+                push @return_list, $epic + $epic_emblem_offset;
+            }
+        }
+    }
+
+    return @return_list;
+}
+
+return 1;

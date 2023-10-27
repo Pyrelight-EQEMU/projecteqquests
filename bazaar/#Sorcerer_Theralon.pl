@@ -126,10 +126,18 @@ sub EVENT_SAY
         plugin::DisplayExpRate($client);
         plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");
         plugin::PurpleText("- [".quest::saylink("Class Unlocks", 1)."]") if @locked_classes;
+        plugin::PurpleText("- [".quest::saylink("Class Epics", 1)."]");
         plugin::PurpleText("- [Special Abilities]");
         plugin::PurpleText("- [Equipment]");
         plugin::PurpleText("- [Passive Boosts]");
         plugin::PurpleText("- [Consumables]");
+    }
+
+    elsif ($text=~/Class Epics/i && $progress > 3 && $met_befo) {
+        my @epic_list = plugin::BuildEpicList($client);
+        foreach my $epic (@epic_list) {
+            quest::debug($epic);
+        }
     }
 
     elsif ($text=~/Passive Boosts/i && $progress > 3 && $met_befo) {

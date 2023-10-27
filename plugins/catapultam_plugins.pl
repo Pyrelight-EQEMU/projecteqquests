@@ -180,8 +180,6 @@ sub UnlockClass {
     }
 }
 
-
-
 sub GetUnlockedClasses {
     my $client = shift;
     my $dbh    = plugin::LoadMysql();
