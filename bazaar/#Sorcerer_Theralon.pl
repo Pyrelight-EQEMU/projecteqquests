@@ -406,7 +406,7 @@ sub EVENT_SAY
         if (plugin::IsClassUnlocked($client, $class_name)) {
             if (!$client->GetBucket("Extra-$base_item_id-Purchased")) {
                 if (plugin::Get_FoS_Tokens(5, $client) >= 5) {
-                    plugin::Spend_FoS_Tokens(5);
+                    plugin::Spend_FoS_Tokens(5, $client);
                 } else {
                     plugin::PurpleText("You do not have enough FoS tokens.");
                     return;
