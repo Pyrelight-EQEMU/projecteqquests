@@ -276,12 +276,12 @@ sub GetClassForEpic {
 
     # Mapping of epic item names to their class names
     my %epic_to_class = (
-        'Claws of the Savage Spirit'    => 'Beastlord',
+        'Claw of the Savage Spirit'     => 'Beastlord',
         'Water Sprinkler of Nem Ankh'   => 'Cleric',
         'Nature Walker\'s Scimitar'     => 'Druid',
         'Staff of the Serpent'          => 'Enchanter',
         'Orb of Mastery'                => 'Magician',
-        'Scythe of Shadowed Soul'       => 'Necromancer',
+        'Scythe of the Shadowed Soul'   => 'Necromancer',
         'Fiery Defender'                => 'Paladin',
         'Earthcaller'                   => 'Ranger',
         'Innoruuk\'s Curse'             => 'Shadowknight',
