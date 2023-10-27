@@ -390,7 +390,7 @@ sub EVENT_SAY
         quest::debug($class_name);
 
         # Check if this class is unlocked
-        if (plugin::IsClassUnlocked($client, $class_name)) {
+        if (plugin::IsClassUnlocked($client, quest::getclassname($class_name))) {
             # The class associated with this epic is unlocked
             # You can proceed with your buy logic or any other actions here
             quest::debug("Enabled");
