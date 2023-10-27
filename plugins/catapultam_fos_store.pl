@@ -273,7 +273,7 @@ sub GetClassForEpic {
     return 0 if $item_id >= 100000000;
 
     my $item_name = quest::getitemname($item_id % 1000000);
-    quest::debug($item_id);
+    quest::debug($item_name);
 
     # Mapping of epic item names to their class names
     my %epic_to_class = (
