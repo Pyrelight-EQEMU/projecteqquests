@@ -143,7 +143,8 @@ sub EVENT_SAY
             my $epic_link = quest::varlink($epic);
             my $base_id   = $epic % 1000000;
 
-            if ($epic <= 110000000) {
+            quest::debug($epic);
+            if ($epic < 110000000) {
                 $client->SetBucket("Extra-$base_id-Purchased", 1);
             }
             
