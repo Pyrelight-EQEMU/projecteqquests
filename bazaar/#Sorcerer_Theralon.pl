@@ -387,6 +387,7 @@ sub EVENT_SAY
 
         # Fetch the class associated with this epic item ID
         my $class_name = plugin::GetClassForEpic($base_item_id);
+        quest::debug($class_name);
 
         # Check if this class is unlocked
         if (plugin::IsClassUnlocked($client, $class_name)) {
