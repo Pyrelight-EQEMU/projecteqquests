@@ -270,23 +270,23 @@ sub GetClassForEpic {
     my $class_id = 0;
     
     # Return early if the item_id is out of expected range
-    return 0 if $item_id >= 100000000;
+    return 0 if $item_id >= 110000000;
 
     my $item_name = substr(quest::getitemname($item_id % 1000000), 0, 2);
     quest::debug($item_name);
 
     # Mapping of epic item names to their class names
     my %epic_to_class = (
-        'Cl'     => 'Beastlord',
-        'Wa'   => 'Cleric',
-        'Na'     => 'Druid',
-        'St'          => 'Enchanter',
-        'Or'                => 'Magician',
-        'Sc'   => 'Necromancer',
-        'Fi'                => 'Paladin',
-        'Ea'                   => 'Ranger',
-        'In'             => 'Shadow Knight',
-        'Sp'                 => 'Shaman'
+        'Cl'    => 'Beastlord',
+        'Wa'    => 'Cleric',
+        'Na'    => 'Druid',
+        'St'    => 'Enchanter',
+        'Or'    => 'Magician',
+        'Sc'    => 'Necromancer',
+        'Fi'    => 'Paladin',
+        'Ea'    => 'Ranger',
+        'In'    => 'Shadow Knight',
+        'Sp'    => 'Shaman'
     );
 
     # Get the class name based on the item name
@@ -303,7 +303,7 @@ sub BuildEpicList {
     my $client              = shift;
     my @epics               = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
     my @return_list         = ();
-    my $epic_emblem_offset  = 190000;
+    my $epic_emblem_offset  = 110000000;
 
     # Get unlocked classes for the client
     my %unlocked_classes = plugin::GetUnlockedClasses($client);
