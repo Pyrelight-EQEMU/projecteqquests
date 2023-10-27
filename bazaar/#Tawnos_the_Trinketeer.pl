@@ -41,7 +41,7 @@ sub EVENT_ITEM {
     my $dbh = plugin::LoadMysql();
 
    foreach my $item_id (keys %itemcount) {
-      if ($item_id != 0) {
+      if ($item_id != 0 && $item_id <= 110000000) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
          
          my $item_id = plugin::get_base_id($item_id);
