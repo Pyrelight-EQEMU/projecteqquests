@@ -396,7 +396,9 @@ sub EVENT_SAY
         my $class_id    = plugin::GetClassForEpic($base_item_id);
         my $class_name  = quest::getclassname($class_id);
 
-        
+        #stupid bugfix too lazy to do correctly
+        $class_name = "Shadow Knight" if ($class_name eq "Shadowknight");
+
         quest::debug($class_name);
 
         # Check if this class is unlocked
