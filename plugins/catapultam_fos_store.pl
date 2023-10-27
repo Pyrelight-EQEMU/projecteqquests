@@ -272,21 +272,21 @@ sub GetClassForEpic {
     # Return early if the item_id is out of expected range
     return 0 if $item_id >= 100000000;
 
-    my $item_name = quest::getitemname($item_id % 1000000);
+    my $item_name = substr(quest::getitemname($item_id % 1000000), 0, 2);
     quest::debug($item_name);
 
     # Mapping of epic item names to their class names
     my %epic_to_class = (
-        'Claw of the Savage Spirit'     => 'Beastlord',
-        'Water Sprinkler of Nem Ankh'   => 'Cleric',
-        'Nature Walker\'s Scimitar'     => 'Druid',
-        'Staff of the Serpent'          => 'Enchanter',
-        'Orb of Mastery'                => 'Magician',
-        'Scythe of the Shadowed Soul'   => 'Necromancer',
-        'Fiery Defender'                => 'Paladin',
-        'Earthcaller'                   => 'Ranger',
-        'Innoruuk\'s Curse'             => 'Shadowknight',
-        'Spear of Fate'                 => 'Shaman'
+        'Cl'     => 'Beastlord',
+        'Wa'   => 'Cleric',
+        'Na'     => 'Druid',
+        'St'          => 'Enchanter',
+        'Or'                => 'Magician',
+        'Scl'   => 'Necromancer',
+        'Fi'                => 'Paladin',
+        'Ea'                   => 'Ranger',
+        'In'             => 'Shadowknight',
+        'Sp'                 => 'Shaman'
     );
 
     # Get the class name based on the item name
