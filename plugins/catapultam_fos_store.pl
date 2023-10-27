@@ -316,7 +316,7 @@ sub BuildEpicList {
             if (get_inventory_DB($epic, $client)) {
                 push @return_list, $epic;
             } else {
-                push @return_list, $epic + $epic_emblem_offset;
+                push @return_list, 0;
             }
         }
     }
