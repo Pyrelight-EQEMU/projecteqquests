@@ -246,7 +246,7 @@ sub calculate_heroic_stat_sum {
 sub get_inventory_DB {
     my $item_id = shift or return;
     my $client = shift or return;
-
+    
     return 0 if $item_id > 110000000;
 
     my $dbh = plugin::LoadMysql();
