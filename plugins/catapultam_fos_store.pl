@@ -285,7 +285,7 @@ sub GetClassForEpic {
         'Sc'   => 'Necromancer',
         'Fi'                => 'Paladin',
         'Ea'                   => 'Ranger',
-        'In'             => 'Shadowknight',
+        'In'             => 'Shadow Knight',
         'Sp'                 => 'Shaman'
     );
 
