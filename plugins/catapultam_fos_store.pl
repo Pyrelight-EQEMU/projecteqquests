@@ -288,11 +288,9 @@ sub GetClassForEpic {
         'Spear of Fate'                 => 'Shaman'
     );
 
-    quest::debug($item_name);
     # Get the class name based on the item name
     my $class_name = $epic_to_class{$item_name};
 
-    quest::debug($class_name);
     # If we found a valid class name, get its ID
     $class_id = plugin::GetClassID($class_name) if $class_name;
 
@@ -312,12 +310,10 @@ sub BuildEpicList {
     foreach my $epic (@epics) {
         # Get class associated with this epic
         my $class_for_epic = GetClassForEpic($epic);
-        quest::debug($class_for_epic);
 
         # Check if class is unlocked
         if ($class_for_epic && $unlocked_classes{$class_for_epic}) {
             if (get_inventory_DB($epic, $client)) {
-                quest::debug($epic);
                 push @return_list, $epic;
             } else {
                 push @return_list, 0;
