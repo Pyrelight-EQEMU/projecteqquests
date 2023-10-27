@@ -393,11 +393,14 @@ sub EVENT_SAY
         my $base_item_id = $item_id % 1000000; # Mod it by 1 million to get the base ID
 
         # Fetch the class associated with this epic item ID
-        my $class_name = plugin::GetClassForEpic($base_item_id);
+        my $class_id    = plugin::GetClassForEpic($base_item_id);
+        my $class_name  = quest::getclassname($class_id);
+
+        
         quest::debug($class_name);
 
         # Check if this class is unlocked
-        if (plugin::IsClassUnlocked($client, quest::getclassname($class_name))) {
+        if (plugin::IsClassUnlocked($client, )) {
             if (!$client->GetBucket("Extra-$base_item_id-Purchased")) {
                 $client->SetBucket("Extra-$base_id-Purchased", 1);
                 plugin::Spend_FoS_Tokens(5);
