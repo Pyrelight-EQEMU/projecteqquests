@@ -337,7 +337,7 @@ sub EVENT_SAY
                 plugin::YellowText("WARNING: You will only be allowed to buy one unique item from this category. After you have selected your item, additional copies will be discounted.");                
                 for my $item (sort keys %{ $equipment_ref->{$selected_equipment} }) {
                     my $item_link = quest::varlink($item);
-                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$item\'", 1, "BUY")."] - (Cost: %04d FoS Tokens) - [$item_link] ", min($equipment_ref->{$selected_equipment}{$item}, 9999)));
+                    plugin::PurpleText(sprintf("- [".quest::saylink("link_equipbuy_\'$item\'", 1, "BUY")."] - (Cost: %0d FoS Tokens) - [$item_link] ", min($equipment_ref->{$selected_equipment}{$item}, 9999)));
                 }
             }
         } else {

@@ -5,8 +5,7 @@ use DBI;
 use DBD::mysql;
 use JSON;
 
-sub get_equipment_index {
-    my %chronal_seals = (
+sub get_equipment_index {umbral = (
         '33407' => '5',
         '33408' => '5',
         '33409' => '5',
@@ -16,13 +15,11 @@ sub get_equipment_index {
         '33428' => '5',
         '33429' => '5',
         '33430' => '5',
-        '33431' => '5',
         '33434' => '5'
     );
 
     my %equipment_index = (
-        'Class Emblems' => '',
-        'Chronal Seals' => \%chronal_seals
+        'Umbral Seals' => \%umbral_seals,
     );
 
     return \%equipment_index;
