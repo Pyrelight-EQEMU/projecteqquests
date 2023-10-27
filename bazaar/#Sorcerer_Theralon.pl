@@ -168,7 +168,7 @@ sub EVENT_SAY
         if (!$unlocksAvailable && $total_classes <= $#costs) {
             plugin::YellowText("You have no Class Unlock Points available.");
             plugin::YellowText("WARNING: You will receive a permanent 25%% multiplicative XP penalty for each additional unlock that you purchase. You are currently earning $percentage_expRate%% of normal XP, and have $total_classes classes unlocked.");            
-            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %04d Feat of Strength Tokens) - Additional Class Slot", min($costs[$total_classes], 9999)));
+            plugin::PurpleText(sprintf("- [".quest::saylink("link_confirm_unlock", 1, "UNLOCK")."] (Cost: %0d Feat of Strength Tokens) - Additional Class Slot", min($costs[$total_classes], 9999)));
         } elsif ($unlocksAvailable && @locked_classes) {
             plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");            
             my @formatted_classes;
