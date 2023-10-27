@@ -5,7 +5,8 @@ use DBI;
 use DBD::mysql;
 use JSON;
 
-sub get_equipment_index {umbral = (
+sub get_equipment_index {
+    %umbral_seals = (
         '33407' => '5',
         '33408' => '5',
         '33409' => '5',
