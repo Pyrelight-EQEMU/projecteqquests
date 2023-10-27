@@ -381,7 +381,7 @@ sub EVENT_SAY
         }
     }
 
-    elsif ($text =~ /^link_epicpbuy_'(\d+)'$/) { # Ensure the captured group is a number
+    elsif ($text =~ /^link_epicbuy_'(\d+)'$/) { # Ensure the captured group is a number
         my $item_id = $1; # Extract the captured item ID
         my $base_item_id = $item_id % 1000000; # Mod it by 1 million to get the base ID
 
