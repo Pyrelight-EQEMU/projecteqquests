@@ -271,6 +271,7 @@ sub GetClassForEpic {
     my $item_id  = shift;
     my $class_id = 0;
     
+    quest::debug($item_id);
     # Return early if the item_id is out of expected range
     return 0 if $item_id >= 110000000;
 
