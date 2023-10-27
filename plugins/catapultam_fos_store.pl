@@ -282,7 +282,7 @@ sub GetClassForEpic {
         'Na'     => 'Druid',
         'St'          => 'Enchanter',
         'Or'                => 'Magician',
-        'Scl'   => 'Necromancer',
+        'Sc'   => 'Necromancer',
         'Fi'                => 'Paladin',
         'Ea'                   => 'Ranger',
         'In'             => 'Shadowknight',
