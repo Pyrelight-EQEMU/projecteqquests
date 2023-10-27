@@ -312,9 +312,10 @@ sub BuildEpicList {
     foreach my $epic (@epics) {
         # Get class associated with this epic
         my $class_for_epic = GetClassForEpic($epic);
+        quest::debug($epic);
 
         # Check if class is unlocked
-        if ($unlocked_classes{$class_for_epic}) {
+        if ($class_for_epic && $unlocked_classes{$class_for_epic}) {
             if (get_inventory_DB($epic, $client)) {
                 quest::debug($epic);
                 push @return_list, $epic;
