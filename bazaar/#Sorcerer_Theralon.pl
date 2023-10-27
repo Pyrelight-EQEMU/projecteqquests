@@ -398,9 +398,9 @@ sub EVENT_SAY
 
         # Check if this class is unlocked
         if (plugin::IsClassUnlocked($client, quest::getclassname($class_name))) {
-            $client->SummonItem($item_id);
             if (!$client->GetBucket("Extra-$base_item_id-Purchased")) {
                 $client->SetBucket("Extra-$base_id-Purchased", 1);
+                plugin::Spend_FoS_Tokens(5);
                 plugin::YellowText("You may obtain additional instances of this Emblem for free going forward."); 
             }
             
