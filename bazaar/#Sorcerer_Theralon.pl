@@ -386,10 +386,10 @@ sub EVENT_SAY
         my $base_item_id = $item_id % 1000000; # Mod it by 1 million to get the base ID
 
         # Fetch the class associated with this epic item ID
-        my $class_name = GetClassForEpic($base_item_id);
+        my $class_name = plugin::GetClassForEpic($base_item_id);
 
         # Check if this class is unlocked
-        if (IsClassUnlocked($client, $class_name)) {
+        if (plugin::IsClassUnlocked($client, $class_name)) {
             # The class associated with this epic is unlocked
             # You can proceed with your buy logic or any other actions here
             quest::debug("Enabled");
