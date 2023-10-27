@@ -314,6 +314,7 @@ sub BuildEpicList {
         # Check if class is unlocked
         if ($unlocked_classes{$class_for_epic}) {
             if (get_inventory_DB($epic, $client)) {
+                quest::debug($epic);
                 push @return_list, $epic;
             } else {
                 push @return_list, 0;
