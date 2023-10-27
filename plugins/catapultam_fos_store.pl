@@ -19,7 +19,7 @@ sub get_equipment_index {umbral = (
     );
 
     my %equipment_index = (
-        'Umbral Seals' => \%umbral_seals,
+        'Umbral Seals' => \%umbral_seals
     );
 
     return \%equipment_index;
