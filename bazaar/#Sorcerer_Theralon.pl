@@ -137,7 +137,7 @@ sub EVENT_SAY
         my @epic_list = plugin::BuildEpicList($client);
         foreach my $epic (@epic_list) {
             my $epic_link == quest::varlink($epic);
-            plugin::PurpleText("- [".quest::saylink("link_epicbuy_\'$epic\'", 1, "BUY")."] - (Cost: %0d FoS Tokens) - [$epic_link] ");
+            plugin::PurpleText("- [".quest::saylink("link_epicbuy_\'$epic\'", 1, "BUY")."] - (Cost: 5 FoS Tokens) - [$epic_link]");
         }
     }
 
