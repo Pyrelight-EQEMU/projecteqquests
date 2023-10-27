@@ -126,11 +126,11 @@ sub EVENT_SAY
         plugin::DisplayExpRate($client);
         plugin::YellowText("You currently have $unlocksAvailable Class Unlock Point available.");
         plugin::PurpleText("- [".quest::saylink("Class Unlocks", 1)."]") if @locked_classes;
-        plugin::PurpleText("- [".quest::saylink("Class Epics", 1)."]");
-        plugin::PurpleText("- [Special Abilities]");
+        plugin::PurpleText("- [".quest::saylink("Class Epics", 1)."]") if $total_classes > 1;
+        plugin::PurpleText("- [Special Abilities] (Not yet implemented)");
         plugin::PurpleText("- [Equipment]");
         plugin::PurpleText("- [Passive Boosts]");
-        plugin::PurpleText("- [Consumables]");
+        plugin::PurpleText("- [Consumables] (Not yet implemented)");
     }
 
     elsif ($text=~/Class Epics/i && $progress > 3 && $met_befo) {
@@ -138,9 +138,11 @@ sub EVENT_SAY
 
         plugin::YellowText("You may choose to obtain additional copies of Epics or Class Emblems. These are not refundable.");
 
+
         foreach my $epic (@epic_list) {
             my $epic_link = quest::varlink($epic);
-            plugin::PurpleText("- [".quest::saylink("link_epicbuy_\'$epic\'", 1, "BUY")."] - (Cost: 5 FoS Tokens) - [$epic_link]");
+            my $epic_cost = $client->GetBucket("Extra-$epic-Purchased") ? 0 : 5;
+            plugin::PurpleText("- [".quest::saylink("link_epicbuy_\'$epic\'", 1, "BUY")."] - (Cost: $epic_cost FoS Tokens) - [$epic_link]");
         }
     }
 
@@ -160,19 +162,19 @@ sub EVENT_SAY
             plugin::PurpleText(sprintf("- [". quest::saylink("link_unlock_expBonus", 1, "UNLOCK") . "] - (Cost: %04d FoS Tokens) - Permanent Bonus: Experience", min($costs[$exp_bonus_index] * 2, 9999)));
         }
         if($fac_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- (UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain", min($costs[$fac_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK] - (Cost: %04d FoS Tokens) - Permanent Bonus: Faction Gain (Not yet implemented)", min($costs[$fac_bonus_index] * 2, 9999)));
         }
         if($cur_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate", min($costs[$cur_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Standard Currency Drop Rate (Not yet implemented)", min($costs[$cur_bonus_index] * 2, 9999)));
         }
         if($pot_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Potion Drop Rate", min($costs[$pot_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Potion Drop Rate (Not yet implemented)", min($costs[$pot_bonus_index] * 2, 9999)));
         }
         if($aug_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments Drop Rate", min($costs[$aug_bonus_index] * 2, 9999)));
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: World Augments Drop Rate (Not yet implemented)", min($costs[$aug_bonus_index] * 2, 9999)));
         }
         if($cmc_bonus_index <= $#costs) {
-            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal Drop Rate", min($costs[$cmc_bonus_index] * 2, 9999)));         
+            plugin::PurpleText(sprintf("- (UNLOCK) - (Cost: %04d FoS Tokens) - Permanent Bonus: Converted Mana Crystal Drop Rate (Not yet implemented)", min($costs[$cmc_bonus_index] * 2, 9999)));         
         }
     }
 
@@ -376,6 +378,27 @@ sub EVENT_SAY
             } else {
                 plugin::RejectBuy();
             }
+        }
+    }
+
+    elsif ($text =~ /^link_epicpbuy_'(\d+)'$/) { # Ensure the captured group is a number
+        my $item_id = $1; # Extract the captured item ID
+        my $base_item_id = $item_id % 1000000; # Mod it by 1 million to get the base ID
+
+        # Fetch the class associated with this epic item ID
+        my $class_name = GetClassForEpic($base_item_id);
+
+        # Check if this class is unlocked
+        if (IsClassUnlocked($client, $class_name)) {
+            # The class associated with this epic is unlocked
+            # You can proceed with your buy logic or any other actions here
+            quest::debug("Enabled");
+
+        } else {
+            # The class associated with this epic is NOT unlocked
+            # Handle accordingly, maybe send a message to the client or simply ignore
+            quest::debug("Disabled");
+
         }
     }
 
