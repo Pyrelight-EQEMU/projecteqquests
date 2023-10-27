@@ -252,9 +252,13 @@ sub get_inventory_DB {
     my $dbh = plugin::LoadMysql();
     my $sth = $dbh->prepare("SELECT count(*) 
                                FROM inventory 
-                              WHERE (itemid % 1000000 = ? OR augslot1 % 1000000 = ? OR augslot2 % 1000000 = ? 
-                                  OR augslot3 % 1000000 = ? OR augslot4 % 1000000 = ? OR augslot5 % 1000000 = ? 
-                                  OR augslot6 % 1000000 = ?)
+                              WHERE ((itemid % 1000000 = ?   AND itemid < 110000000)
+                                  OR (augslot1 % 1000000 = ? AND augslot1 < 110000000)
+                                  OR (augslot2 % 1000000 = ? AND augslot2 < 110000000)
+                                  OR (augslot3 % 1000000 = ? AND augslot3 < 110000000)
+                                  OR (augslot4 % 1000000 = ? AND augslot4 < 110000000)
+                                  OR (augslot5 % 1000000 = ? AND augslot5 < 110000000)
+                                  OR (augslot6 % 1000000 = ? AND augslot6 < 110000000))
                                 AND charid = ?");
     
     $sth->execute($item_id, $item_id, $item_id, $item_id, $item_id, $item_id, $item_id, $client->CharacterID());
@@ -271,7 +275,6 @@ sub GetClassForEpic {
     my $item_id  = shift;
     my $class_id = 0;
     
-    quest::debug($item_id);
     # Return early if the item_id is out of expected range
     return 0 if $item_id >= 110000000;
 
