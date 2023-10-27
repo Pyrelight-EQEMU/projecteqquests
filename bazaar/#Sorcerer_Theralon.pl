@@ -136,12 +136,18 @@ sub EVENT_SAY
     elsif ($text=~/Class Epics/i && $progress > 3 && $met_befo) {
         my @epic_list = plugin::BuildEpicList($client);
 
-        plugin::YellowText("You may choose to obtain additional copies of Epics or Class Emblems. These are not refundable.");
+        plugin::YellowText("You may choose to obtain additional copies of Epics or Class Emblems. Emblems are not refundable.");
 
 
         foreach my $epic (@epic_list) {
             my $epic_link = quest::varlink($epic);
-            my $epic_cost = $client->GetBucket("Extra-$epic-Purchased") ? 0 : 5;
+            my $base_id   = $epic % 1000000;
+
+            if ($epic <= 120000000) {
+                $client->SetBucket("Extra-$base_id-Purchased", 1);
+            }
+            
+            my $epic_cost = $client->GetBucket("Extra-$base_id-Purchased") ? 0 : 5;
             plugin::PurpleText("- [".quest::saylink("link_epicbuy_\'$epic\'", 1, "BUY")."] - (Cost: $epic_cost FoS Tokens) - [$epic_link]");
         }
     }
@@ -383,6 +389,7 @@ sub EVENT_SAY
 
     elsif ($text =~ /^link_epicbuy_'(\d+)'$/) { # Ensure the captured group is a number
         my $item_id = $1; # Extract the captured item ID
+        return if ($item_id > 999999 && $item_id < 110000000);
         my $base_item_id = $item_id % 1000000; # Mod it by 1 million to get the base ID
 
         # Fetch the class associated with this epic item ID
@@ -391,15 +398,18 @@ sub EVENT_SAY
 
         # Check if this class is unlocked
         if (plugin::IsClassUnlocked($client, quest::getclassname($class_name))) {
-            # The class associated with this epic is unlocked
-            # You can proceed with your buy logic or any other actions here
-            quest::debug("Enabled");
-
+            $client->SummonItem($item_id);
+            if (!$client->GetBucket("Extra-$base_item_id-Purchased")) {
+                $client->SetBucket("Extra-$base_id-Purchased", 1);
+                plugin::YellowText("You may obtain additional instances of this Emblem for free going forward."); 
+            }
+            
+            $client->SummonItem($item_id);
+            
         } else {
             # The class associated with this epic is NOT unlocked
             # Handle accordingly, maybe send a message to the client or simply ignore
-            quest::debug("Disabled");
-
+            plugin::YellowText("You do not have that class unlocked.");
         }
     }
 
