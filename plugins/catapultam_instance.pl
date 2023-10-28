@@ -349,8 +349,8 @@ sub upgrade_item_corpse {
         my $target_item = $base_id + (1000000 * $target_tier);
         quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
         if (plugin::item_exists_in_db($target_item)) {
-            if ($corpse && $corpse->CountItem($item_id)) {            
-                $corpse->RemoveItemByID($item_id,);
+            if ($corpse && $corpse->CountItem($item_id) > 1) {            
+                $corpse->RemoveItemByID($item_id);
             } else {quest::debug("The corpse didn't exist?");} 
             quest::debug("adding $target_item to $corpse");           
             $corpse->AddItem($target_item, 1);
