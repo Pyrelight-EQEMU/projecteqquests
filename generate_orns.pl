@@ -71,7 +71,7 @@ my $id_offset = 200000000;
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
 
-    my $suffix = "' Glamour-Stone";
+    my $suffix = " Glamour-Stone";
     my $ellipsis = '...';
     my $max_original_length = 64 - length($suffix) - length($ellipsis);
 
