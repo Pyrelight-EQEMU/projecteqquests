@@ -468,6 +468,8 @@ sub ModifyInstanceNPC
                 $difficulty_modifier *= 1.5;
             } elsif (grep { $_ eq $stat } ('fr', 'cr', 'mr', 'dr', 'pr')) {
                 $difficulty_modifier /= 2;
+            } elsif (grep { $_ eq $stat } ('spellscale')) {
+                $difficulty_modifier /= 4;
             }
 
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
