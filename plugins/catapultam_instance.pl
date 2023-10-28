@@ -149,7 +149,7 @@ sub HandleSay {
 
         my $say_string = "Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?";
 
-        if ($solo_escalation_level > 0 || $group_escalation_level) {
+        if ($solo_escalation_level > 0 || $group_escalation_level > 0) {
             $say_string .= " You have previously completed this task. Would you like to [attune] to this location?";
         }
 
@@ -163,19 +163,21 @@ sub HandleSay {
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
     }
 
-    } elsif($text=~/attune/i && ($solo_escalation_level > 0 || $group_escalation_level)) {
-        my $client     = plugin::val('client');
-        my $npc        = plugin::val('npc');
-        my $npcName    = $npc->GetCleanName();
+    } elsif($text=~/attune/i) {
+        if ($solo_escalation_level > 0 || $group_escalation_level > 0) {
+            my $client     = plugin::val('client');
+            my $npc        = plugin::val('npc');
+            my $npcName    = $npc->GetCleanName();
 
-        my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . " ($npcName)";
-        my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
-        my $suffix = get_continent_fix(quest::GetZoneShortName($npc->GetZoneID()));
+            my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . " ($npcName)";
+            my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
+            my $suffix = get_continent_fix(quest::GetZoneShortName($npc->GetZoneID()));
 
 
-        quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
-        plugin::add_zone_entry($client->CharacterID(), $descData, $locData, $suffix);
-        quest::say("I have attuned you. You may now teleport here from the nexus.");
+            quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
+            plugin::add_zone_entry($client->CharacterID(), $descData, $locData, $suffix);
+            quest::say("I have attuned you. You may now teleport here from the nexus.");
+        }
     }
 
     # From [details]
