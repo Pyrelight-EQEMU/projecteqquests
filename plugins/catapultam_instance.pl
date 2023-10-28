@@ -163,10 +163,8 @@ sub HandleSay {
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
     }
 
-    } elsif($text=~/attune/i) {
+    elsif($text=~/attune/i) {
         if ($solo_escalation_level > 0 || $group_escalation_level > 0) {
-            my $client     = plugin::val('client');
-            my $npc        = plugin::val('npc');
             my $npcName    = $npc->GetCleanName();
 
             my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . " ($npcName)";
@@ -176,7 +174,7 @@ sub HandleSay {
 
             quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
             plugin::add_zone_entry($client->CharacterID(), $descData, $locData, $suffix);
-            quest::say("I have attuned you. You may now teleport here from the nexus.");
+            quest::say("I have attuned you. You may now teleport here from the Nexus.");
         }
     }
 
