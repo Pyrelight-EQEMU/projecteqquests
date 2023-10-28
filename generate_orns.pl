@@ -56,9 +56,10 @@ my $select_query = $dbh->prepare(<<SQL);
     SELECT *
     FROM items
     WHERE (slots & 2048 OR slots & 8192 OR slots & 16384)
-    AND (itemtype IN (0,1,2,3,4,5,7,8,10,35,36,45,10,23,24,25,26))
+    AND (itemtype IN (0,1,2,3,4,5,7,8,10,35,36,45,23,24,25,26))
     AND NOT (name LIKE 'Apocryphal %' OR name LIKE 'Rose-Colored %' OR name LIKE 'Fabled %')
     AND NOT clicktype = 3
+    OR (id IN (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034))
     AND id < 999999 ORDER BY id;
 SQL
 
