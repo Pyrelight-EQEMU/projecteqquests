@@ -24,7 +24,7 @@ sub LoadMysql {
 
         #::: Set MySQL Connection vars
         $db   = $config->{"server"}{"database"}{"db"};
-        $host = "10.10.20.220";
+        $host = $config->{"server"}{"database"}{"host"};
         $user = $config->{"server"}{"database"}{"username"};
         $pass = $config->{"server"}{"database"}{"password"};
 
@@ -80,7 +80,7 @@ sub ceil_to_nearest_5 {
 }
 
 my $max_id = 200000;
-my $chunk_size = 200000;
+my $chunk_size = 1000;
 
 for my $tier (1..10) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
