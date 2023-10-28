@@ -21,14 +21,14 @@ function event_say(e)
 		elseif(qglobals["sirran"] == "7") then 	--island7
 			e.self:Say("Nyah! The tears are welling up in my eyes! I am so proud. I think of you as if I were your father! Sniff. Sniff. Give me Veeshan, and I give you death");
 		end
-	elseif(e.message:findi("citanul eht narris, liah") and qglobals["sirran"] == "6") then 	--island6
+	elseif(e.message:findi("citanul eht narris, liah")) then 	--island6
 		e.self:Say("Lortap llaw taerg eht fo lahsram, Narris lahsram ma I. Flesym ecudortni ot em wolla. Sgniteerg");
-	elseif(e.message:findi("llaw eht htiw eno I ma") and qglobals["sirran"] == "6") then 		--island6
+	elseif(e.message:findi("llaw eht htiw eno I ma")) then 		--island6
 		e.self:Say("Kcul doog! Ouy rof ydaer si erips eht fo retsis eht won, sdik boj doog.");
 		if(eq.get_entity_list():IsMobSpawnedByNpcTypeID(71076) == false) then
 			eq.spawn2(71076,0,0,-929,-1035,1093,128); 							--used Magelo to get the closest loc as possible.
 		end
-	elseif(e.message:findi("traverse this plane") and qglobals["sirran"] == "1") then
+	elseif(e.message:findi("traverse this plane")) then
 		e.self:Say("Ahah! Wise you are and tell you I will. Hrm? Don't have wings, do you? Fairies have swords! Fairies stole my lucky feet! Hand me them, one by one, and be in for a treat! Haha!");
 	end
 end

@@ -35,6 +35,8 @@ sub EVENT_CONNECT {
 
             # Update the stored time with the current time
             $client->SetBucket("LastLoginTime", $today_6am);
+            $client->SummonItem(40605, 1);
+            plugin::YellowText("You have been granted a daily log-in reward!");
         }
     }
     else {
@@ -52,13 +54,8 @@ sub EVENT_CONNECT {
         plugin::WorldAnnounce($announceString);
 
         # Store the current time
-        $client->SetBucket("LastLoginTime", $today_6am);
-        $client->SummonItem(40605, 1);
-        plugin::YellowText("You have been granted a daily log-in reward!");
+        $client->SetBucket("LastLoginTime", $today_6am);        
     }
-
-    #quest::debug($client->CharacterID());
-    #quest::debug(plugin::GetClassListString($client));
 }
 
 sub EVENT_ENTER_ZONE {

@@ -73,7 +73,7 @@ sub EVENT_ITEM {
                             }
                         }
                     }
-                }                
+                }
             }
         } else {               
             my $earned_points = 0;
