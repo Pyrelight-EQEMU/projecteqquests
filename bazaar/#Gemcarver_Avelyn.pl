@@ -43,7 +43,7 @@ sub EVENT_ITEM {
                         } else {
                             my @augs = @{ get_augs($base_id) };
                             my $aug_count = scalar @augs;
-                            my $cost = get_upgrade_cost($base_id) * (scalar @augs);
+                            my $cost = ceil(get_upgrade_cost($base_id) * (scalar @augs));
                             if (scalar @augs) {
                                 my $response = "We have some interesting components here. ";                           
                                 if (@augs == 1) {
@@ -227,7 +227,7 @@ sub EVENT_SAY {
         if ($item_id) {
             my $base_id = get_base_id($item_id);            
             my @augs = @{ get_augs($base_id) };
-            my $cost = get_upgrade_cost($base_id) * (scalar @augs);
+            my $cost = ceil(get_upgrade_cost($base_id) * (scalar @augs));
             my $cmc  = plugin::get_cmc();
             if (scalar @augs && $cmc >= $cost) {
                plugin::NPCTell("Excellent, lets do it.");
@@ -281,7 +281,7 @@ sub item_exists_in_db {
 sub get_upgrade_cost {
    my $item_id = shift or return 0;
    my $stat_sum = calculate_heroic_stat_sum($item_id);
-   my $cost = $stat_sum;
+   my $cost = ceil($stat_sum);
 
    return $cost;
 }
