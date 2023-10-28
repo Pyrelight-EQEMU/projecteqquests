@@ -171,7 +171,7 @@ sub HandleSay {
 
             my $descData = quest::GetZoneLongNameByID($npc->GetZoneID()) . " ($npcName)";
             my $locData = [quest::GetZoneShortName($npc->GetZoneID()), $client->GetX(), $client->GetY(), $client->GetZ(), $client->GetHeading()];
-            my $suffix = get_continent_fix(quest::GetZoneShortName($npc->GetZoneID()));
+            my $suffix = plugin::get_continent_fix(quest::GetZoneShortName($npc->GetZoneID()));
 
 
             quest::message(15, "You feel a tug on your soul. Your have become attuned to this location.");
