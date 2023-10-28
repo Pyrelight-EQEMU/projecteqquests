@@ -281,7 +281,7 @@ sub item_exists_in_db {
 sub get_upgrade_cost {
    my $item_id = shift or return 0;
    my $stat_sum = calculate_heroic_stat_sum($item_id);
-   my $cost = int(0.25 * $stat_sum);
+   my $cost = $stat_sum;
 
    return $cost;
 }
