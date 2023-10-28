@@ -80,6 +80,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
         $new_name = $row->{Name} . $suffix;
     }
 
+    print "Creating item with Name: $new_name\n";
 
     $base_data->{id}            = $row->{id} + $id_offset;
     $base_data->{Name}          = $new_name;    
