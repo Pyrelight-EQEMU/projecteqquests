@@ -56,29 +56,26 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT items.*, spells_new.Name as spell_name
+    SELECT spells_new.Name as spell_name, items.* 
     FROM items 
-    INNER JOIN spells_new ON items.clickeffect = spells_new.id
-    WHERE items.clickeffect > 0 
+    INNER JOIN spells_new ON items.focuseffect = spells_new.id
+    WHERE items.focuseffect > 0 
       AND items.slots > 0 
       AND items.slots < 4194304 
       AND items.classes > 0 
-      AND items.races > 0 
-      AND items.maxcharges = -1
+      AND items.races > 0
       AND items.itemtype != 54
-      AND items.id <= 999999
       AND items.norent != 0
-      AND NOT items.clicktype = 3
+      AND items.id <= 999999
       ORDER BY items.id;
 SQL
 
 $select_query->execute() or die;
 
 # Create an array of the possible icon values based on the ranges
-my @possible_icons = (1940..2002, 6464..6473, 944..965, 1429..1443);
+my @possible_icons = (967, 1562..1469);
 
-# Start inserting with ID 901000
-my $id_offset = 120000000;
+my $id_offset = 150000000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
@@ -87,22 +84,17 @@ while (my $row = $select_query->fetchrow_hashref()) {
 
     # Set New Attributes
     $base_data->{id} = $row->{id} + $id_offset;
-    $base_data->{Name} = "Spellstone: " . $row->{spell_name};
-    $base_data->{clickeffect} = $row->{clickeffect};
-    $base_data->{casttime} = $row->{casttime};
-    $base_data->{casttime_} = $row->{casttime_};
-    $base_data->{recastdelay} = max(60, ($row->{recastdelay} || 0));
-    $base_data->{recasttype} = $row->{recasttype} || -1;    
+    $base_data->{Name} = "Arcane Glyph: " . $row->{spell_name};
+    $base_data->{worneffect} = $row->{worneffect};
     $base_data->{slots} = $row->{slots};
     $base_data->{classes} = $row->{classes};
     $base_data->{deity} = $row->{deity};
-    $base_data->{augtype} = 2;
+    $base_data->{augtype} = 4;
     $base_data->{augrestrict} = 0;
     $base_data->{idfile} = 'IT63';
     $base_data->{icon} = $possible_icons[$index];
     $base_data->{lore} = $row->{Name};
-    $base_data->{clicktype} = 4;
-    $base_data->{maxcharges} = $row->{maxcharges} || -1;
+
 
     # Construct dynamic SQL for insertion
     my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
@@ -127,4 +119,3 @@ while (my $row = $select_query->fetchrow_hashref()) {
 
 $select_query->finish();
 $dbh->disconnect();
-

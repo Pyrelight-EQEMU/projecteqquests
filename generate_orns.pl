@@ -3,9 +3,6 @@ use warnings;
 use DBI;
 use POSIX;
 use JSON;
-use List::Util 'min';
-use List::Util 'max';
-use Digest::MD5 qw(md5_hex);
 
 sub LoadMysql {
         use DBI;
@@ -56,53 +53,41 @@ $base_data_query->finish();
 
 # Prepare statement to select rows based on your criteria
 my $select_query = $dbh->prepare(<<SQL);
-    SELECT items.*, spells_new.Name as spell_name
-    FROM items 
-    INNER JOIN spells_new ON items.clickeffect = spells_new.id
-    WHERE items.clickeffect > 0 
-      AND items.slots > 0 
-      AND items.slots < 4194304 
-      AND items.classes > 0 
-      AND items.races > 0 
-      AND items.maxcharges = -1
-      AND items.itemtype != 54
-      AND items.id <= 999999
-      AND items.norent != 0
-      AND NOT items.clicktype = 3
-      ORDER BY items.id;
+    SELECT *
+    FROM items
+    WHERE (slots & 2048 OR slots & 8192 OR slots & 16384)
+    AND (itemtype IN (0,1,2,3,4,5,7,8,10,35,36,45,10,23,24,25,26))
+    AND NOT (name LIKE 'Apocryphal %' OR name LIKE 'Rose-Colored %' OR name LIKE 'Fabled %')
+    AND NOT clicktype = 3
+    AND id < 999999 ORDER BY id;
 SQL
 
-$select_query->execute() or die;
+$select_query->execute();
 
-# Create an array of the possible icon values based on the ranges
-my @possible_icons = (1940..2002, 6464..6473, 944..965, 1429..1443);
-
-# Start inserting with ID 901000
-my $id_offset = 120000000;
+my $id_offset = 200000000;
 
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
-    my $hash = md5_hex($row->{id});
-    my $index = hex(substr($hash, 0, 8)) % scalar(@possible_icons);
 
-    # Set New Attributes
-    $base_data->{id} = $row->{id} + $id_offset;
-    $base_data->{Name} = "Spellstone: " . $row->{spell_name};
-    $base_data->{clickeffect} = $row->{clickeffect};
-    $base_data->{casttime} = $row->{casttime};
-    $base_data->{casttime_} = $row->{casttime_};
-    $base_data->{recastdelay} = max(60, ($row->{recastdelay} || 0));
-    $base_data->{recasttype} = $row->{recasttype} || -1;    
-    $base_data->{slots} = $row->{slots};
-    $base_data->{classes} = $row->{classes};
-    $base_data->{deity} = $row->{deity};
-    $base_data->{augtype} = 2;
-    $base_data->{augrestrict} = 0;
-    $base_data->{idfile} = 'IT63';
-    $base_data->{icon} = $possible_icons[$index];
-    $base_data->{lore} = $row->{Name};
-    $base_data->{clicktype} = 4;
-    $base_data->{maxcharges} = $row->{maxcharges} || -1;
+    my $new_name = "'" . $row->{Name} . "' Glamour-Stone";
+
+    $base_data->{id}            = $row->{id} + $id_offset;
+    $base_data->{Name}          = $new_name;
+    $base_data->{idfile}        = $row->{idfile};
+    $base_data->{icon}          = $row->{icon};
+    
+    # Set augrestrict based on $row->{itemtype}
+    if (grep { $_ == $row->{itemtype} } (0, 2, 3, 4, 45, 35)) {
+        $base_data->{augrestrict} = 2;
+    } elsif ($row->{itemtype} == 8) {
+        $base_data->{augrestrict} = 13;
+    } elsif ($row->{itemtype} == 5) {
+        $base_data->{augrestrict} = 12;
+    } else {
+        $base_data->{augrestrict} = 0;
+    }
+    
+    $base_data->{slots}         = 26624;
 
     # Construct dynamic SQL for insertion
     my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
@@ -124,7 +109,5 @@ while (my $row = $select_query->fetchrow_hashref()) {
     $insert->finish();
 }
 
-
 $select_query->finish();
 $dbh->disconnect();
-

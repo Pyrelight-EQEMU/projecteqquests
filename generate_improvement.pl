@@ -138,19 +138,18 @@ for my $tier (1..10) {
                 }
 
                 if ($row->{proceffect} > 0) {
-                    if ($row->{proceffect} > 0 && $row->{procrate} == 0) {
-                        $row->{procrate} = $row->{procrate} + 5;
-                    }
-                    $row->{procrate} = $row->{procrate} + ($row->{procrate} * $modifier);
+                    $row->{procrate} += abs($row->{procrate}) * $modifier;
                 }
 
 
-                $row->{hp} = ceil_to_nearest_5($row->{hp} + ($modifier * $row->{hp}));
-                $row->{ac} = $row->{ac} + $tier + ceil($row->{ac} * $modifier_minor);
+                $row->{hp} = ceil_to_nearest_5($row->{hp} + abs($modifier * $row->{hp}));
+                $row->{ac} += max($row->{ac} ? $tier : 0, ceil(abs($row->{ac} * $modifier_minor)));
+
 				
                 # Adjusting Heroic Stats
-                foreach my $stat (qw(heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_fr heroic_cr heroic_dr heroic_pr)) {
-                    $row->{$stat} += max($row->{$stat} ? $tier : 0, ceil($row->{$stat} * $modifier));
+                foreach my $stat (qw(heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_fr heroic_cr heroic_dr heroic_pr
+                                     avoidance accuracy spellshield dotshielding shielding strikethrough manaregen regen stunresist combateffects)) {
+                    $row->{$stat} += max($row->{$stat} ? $tier : 0, ceil(abs($row->{$stat} * $modifier)));
                 }
 
                 # Create an INSERT statement dynamically
