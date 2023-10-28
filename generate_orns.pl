@@ -71,10 +71,15 @@ while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
 
     my $suffix = "' Glamour-Stone";
-    my $max_original_length = 64 - length($suffix);  # Calculate the maximum length for the original name
+    my $ellipsis = '...';
+    my $max_original_length = 64 - length($suffix) - length($ellipsis);
 
-    # Truncate the original name and append the suffix
-    $new_name = substr($row->{Name}, 0, $max_original_length) . $suffix;
+    if (length($row->{Name}) > $max_original_length) {
+        $new_name = substr($row->{Name}, 0, $max_original_length) . $ellipsis . $suffix;
+    } else {
+        $new_name = $row->{Name} . $suffix;
+    }
+
 
     $base_data->{id}            = $row->{id} + $id_offset;
     $base_data->{Name}          = $new_name;    
