@@ -12,7 +12,7 @@ sub EVENT_TICK
 {
     CHECK_CHARM_STATUS();
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) { 
-        UPDATE_PET($npc);
+        UPDATE_PET($npc);        
     }
 }
 
@@ -25,7 +25,7 @@ sub EVENT_SPAWN {
     }
     
     # Check for FoS Instance
-    if ($instanceversion == 10) {
+    if ($instanceversion == 10 && !($npc->IsPet() and $npc->GetOwner()->IsClient())) {
         my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
         plugin::ModifyInstanceNPC();
         plugin::ModifyInstanceLoot($npc);  
@@ -75,10 +75,61 @@ sub EVENT_DAMAGE_GIVEN
 
 sub EVENT_COMBAT 
 {
+    quest::debug("combat_state " . $combat_state);
+    my $ID = $npc->GetID();
     CHECK_CHARM_STATUS();
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
         quest::respawn($npc->GetNPCTypeID(), $npc->GetGrid());
     }
+
+    # Pet Stuff
+    if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
+        my $owner = $npc->GetOwner()->CastToClient();
+        if ($combat_state == 1) {            
+                $npc->SetTimer("Pet_Abilities", 18);
+        } else {
+            $npc->StopTimer("Pet_Abilities");
+        }        
+    }
+}
+
+sub EVENT_TIMER {
+	# NPC-EVENT_TIMER
+	# Exported event variables
+	quest::debug("timer " . $timer);
+
+
+    if ($timer eq "Pet_Abilities") {
+        my $owner       = $npc->GetOwner()->CastToClient();
+        my $target      = $npc->GetTarget();
+        my @close_list  = $entity_list->GetCloseMobList($npc, 100);
+
+        my $servant_of_earth    = "4403";
+        my $servant_of_fire     = "4401";
+        my $servant_of_water    = "4402";
+        my $servant_of_air      = "4400";
+
+        my $AoE_Spell;
+        if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
+            $AoE_Spell = "15617"; #Earthen Menance
+            for $m (@close_list) {
+                if ($m) {
+                    my $m_target = $m->GetTarget();
+                    if ($m_target->GetID() == $owner->GetID()) {
+                        $m->AddToHateList($npc, 1000);
+                    }
+                }
+            }        
+        }
+        if (plugin::is_focus_equipped($owner, $servant_of_fire)) {
+            $AoE_Spell = "1655"; # Jyll's Wave of Heat
+        }
+        if (plugin::is_focus_equipped($owner, $servant_of_water)) {
+            $AoE_Spell = "15618"; # Healing Waters
+        }
+
+        $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
+    }   
 }
 
 sub EVENT_ITEM
@@ -339,30 +390,47 @@ sub APPLY_FOCUS {
     my $total_focus_scale = 1.0;
     my $true_race = $owner->GetBucket("pet_race");
 
-    #Mage Epic 1.0 - Orb of Mastery
-    my $mage_epic = 0;
+    my $mage_epic_focus_id  = "1936";
+    my $mag_epic_buff       = "847";
 
-    foreach my $i (0..10) {
-        if ($inventory->HasAugmentEquippedByID(28034 + ($i * 1000000))) {
-            $mage_epic = 1;
-            last; # Exit the loop if we found the item
-        }
-    }
+    my $minion_of_darkness  = "4407";
+    my $darkness_buff       = "359";
 
-    if ($mage_epic) {
-        if (!$npc->FindBuff(847)) {
-            $npc->CastSpell(847, $npc->GetID());
-            $npc->AddMeleeProc(5234, 100);
-            $npc->AddMeleeProc(848, 100);
+    my $summoners_boon      = "4409";
+    my $ritual_summoning    = "4410";
+    
+    if (plugin::is_focus_equipped($owner, $mage_epic_focus_id)) { 
+        if (!$npc->FindBuff($mag_epic_buff)) {
+            $npc->CastSpell($mag_epic_buff, $npc->GetID());
         }
         $total_focus_scale += 0.30;
     } else {
-        if ($npc->FindBuff(847)) {
-            $npc->BuffFadeBySpellID(847);
-            $owner->BuffFadeBySpellID(847);
+        if ($npc->FindBuff($mag_epic_buff)) {
+            $npc->BuffFadeBySpellID($mag_epic_buff);
         }
-        $npc->RemoveMeleeProc(5234);
-        $npc->RemoveMeleeProc(848);
+    }
+
+    if (plugin::is_focus_equipped($owner, $minion_of_darkness)) { 
+        if (!$npc->FindBuff($darkness_buff)) {
+            $npc->CastSpell($darkness_buff, $npc->GetID(), 0, 0);
+        }
+        $total_focus_scale += 0.05;
+    } else {
+        if ($npc->FindBuff($darkness_buff)) {
+            $npc->BuffFadeBySpellID($darkness_buff);
+        }
+    }
+
+    if (plugin::is_focus_equipped($owner, $summoners_boon)) {
+        $total_focus_scale += 0.10;
+    }
+
+    if (plugin::is_focus_equipped($owner, $ritual_summoning)) {
+        $total_focus_scale += 0.25;
+    }
+    
+    if (plugin::is_focus_equipped($owner, $servant_of_air)) {
+        $total_focus_scale += 0.50;
     }
 
     return $total_focus_scale;

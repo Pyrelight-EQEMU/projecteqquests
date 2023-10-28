@@ -12,7 +12,7 @@ sub NPCTell {
 sub YellowText {
 	my $message     = shift;
     my $client      = shift || plugin::val('client');
-    my $tellColor   = 15;
+    my $tellColor   = 335;
 	
     $client->Message($tellColor, $message);
 }
@@ -20,7 +20,7 @@ sub YellowText {
 sub RedText {
 	my $message     = shift;
     my $client      = shift || plugin::val('client');
-    my $tellColor   = 13;
+    my $tellColor   = 287;
 	
     $client->Message($tellColor, $message);
 }
@@ -36,7 +36,7 @@ sub PurpleText {
 sub WorldAnnounce {
 	my $message = shift;
 	quest::discordsend("ooc", $message);
-	quest::we(15, $message);
+	quest::we(335, $message);
 }
 
 # Usage: WorldAnnounceItem($message, $item_id)
@@ -67,7 +67,7 @@ sub WorldAnnounceItem {
     $message =~ s/\{item\}/$eqgitem_link/g;
 
     # Send the message with the game link to the EQ world
-    quest::we(15, $message);
+    quest::we(335, $message);
 
     # Replace the game link with the Discord link
     $message =~ s/\Q$eqgitem_link\E/$discord_link/g;
@@ -137,9 +137,10 @@ sub GetPotName {
 
 sub UnlockClass {
     my ($client, $class_id) = @_;
-    my $class_ability_base = 20000;
-    my $character_id = $client->CharacterID();
-    my $unlocksAvailable = $client->GetBucket("ClassUnlocksAvailable") || 0;
+    my $class_name          = quest::getclassname($class_id);
+    my $class_ability_base  = 20000;
+    my $character_id        = $client->CharacterID();
+    my $unlocksAvailable    = $client->GetBucket("ClassUnlocksAvailable") || 0;
 
     if ($unlocksAvailable >= 1) {
 
@@ -157,7 +158,9 @@ sub UnlockClass {
             return 0;
         } else { 
             $client->SetBucket("ClassUnlocksAvailable", --$unlocksAvailable);
-            plugin::YellowText("You have spent a Class Unlock point.");
+            plugin::YellowText("You have spent a Class Unlock point.");            
+            plugin::YellowText("You are now " . ( (grep { $_ eq lc(substr($class_name, 0, 1)) } ('a', 'e', 'i', 'o', 'u')) ? "an" : "a") . " $class_name.");
+            quest::ding();
 
             # Insert data into multiclass_data table for the new class
             $sth = $dbh->prepare("INSERT INTO multiclass_data (id, class) VALUES (?, ?)");
@@ -233,6 +236,48 @@ sub GetLockedClasses {
     my @locked_classes = grep { not exists $unlocked_classes{$_} } @all_classes;
 
     return @locked_classes;
+}
+
+sub GetClassID {
+    my $class_name = shift;
+
+    # Mapping from the provided table
+    my %class_name_to_id = (
+        'Warrior'       => 1,
+        'Cleric'        => 2,
+        'Paladin'       => 3,
+        'Ranger'        => 4,
+        'Shadow Knight' => 5,
+        'Druid'         => 6,
+        'Monk'          => 7,
+        'Bard'          => 8,
+        'Rogue'         => 9,
+        'Shaman'        => 10,
+        'Necromancer'   => 11,
+        'Wizard'        => 12,
+        'Magician'      => 13,
+        'Enchanter'     => 14,
+        'Beastlord'     => 15,
+        'Berserker'     => 16,
+    );
+
+    return $class_name_to_id{$class_name};
+}
+
+sub IsClassUnlocked {
+    my ($client, $class_name) = @_;
+    
+    # Convert class name to class ID
+    my $class_id = GetClassID($class_name);
+    
+    # Return undef if we can't find the class ID
+    return unless defined $class_id;
+
+    # Fetch all unlocked classes
+    my %unlocked_classes = GetUnlockedClasses($client);
+
+    # Check if the class_id exists in unlocked_classes
+    return exists $unlocked_classes{$class_id};
 }
 
 sub GetClassListString {
@@ -889,3 +934,62 @@ sub get_global_aug {
    $dbh->disconnect();
    return $random_item_id;   
 }
+
+sub get_cmc {
+    my $client  = plugin::val('client');
+    return $client->GetBucket("Artificer_CMC") || 0;
+}
+
+sub display_cmc {
+    my $cmc     = get_cmc();
+    plugin::YellowText("You currently have $cmc Concentrated Mana Crystals available.");
+}
+
+sub set_cmc {
+    my $val     = shift;
+    my $client  = plugin::val('client');
+    
+    $client->SetBucket("Artificer_CMC", $val);
+}
+
+sub add_cmc {
+    my $val     = shift;
+    my $cmc     = get_cmc();
+    set_cmc($cmc + $val);
+
+    plugin::YellowText("You have gained $val Concentrated Mana Crystals. You now have " . ($cmc + $val) . " available.");
+}
+
+sub spend_cmc {
+    my $val = shift;
+    my $cmc = get_cmc();    
+    set_cmc($cmc - $val);
+
+    plugin::YellowText("You have lost $val Concentrated Mana Crystals. You now have " . ($cmc - $val) . " available.");
+}
+
+sub is_focus_equipped {
+    my ($client, $desired_focus_id) = @_;
+
+    # Return immediately if necessary parameters aren't provided
+    return unless ($client && defined $desired_focus_id);
+
+    # Check if any of the equipped augments in the items have the desired focus effect
+    for my $slot_index (0..22) {
+        my $item_id    = $client->GetItemIDAt($slot_index);
+        my $item_focus = $client->GetItemStat($item_id, 'focuseffect');
+        return 1 if ($item_focus == $desired_focus_id);
+        for my $aug_index (0..6) {
+            my $augment_id      = $client->GetAugmentIDAt($slot_index, $aug_index);
+            my $augment_focus   = $client->GetItemStat($augment_id, 'focuseffect');
+            return 1 if ($augment_focus == $desired_focus_id);
+        }
+    }
+
+    # If neither items nor augments have the focus, return 0
+    return 0;
+}
+
+
+
+return 1;

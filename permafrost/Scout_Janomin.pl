@@ -14,6 +14,7 @@ sub EVENT_ITEM {
   if (plugin::check_handin(\%itemcount, 9036 => 1)) {
     quest::say("Perfect work, $name! I am glad the Elders made such a wise choice in sending you. I must admit, I was rather scared during the exploration of these halls. This lair is quite foul, quite foul indeed! Take this wrapped totem and place it in the case that you were given. Once you have all of the totems, seal the case and make your way back to Shar Vahl. I work my way back as well. Thank you again.");
     quest::summonitem(9037); # Item: Wrapped Ice Bear Totem
+    quest::summonitem(9031);
   }
   plugin::return_items(\%itemcount);
 }

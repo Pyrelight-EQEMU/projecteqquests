@@ -3,6 +3,7 @@ use POSIX;
 
 my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 my $trade_cost = 1;
+my $id_offset  = 200000000;
 
 sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
@@ -24,57 +25,55 @@ sub EVENT_ITEM {
             } elsif ($itemcount{'0'} < 3) {             
                 plugin::NPCTell("I'm only interested in considering one item at a time, $clientName.");
             } else {
-               foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
-                  my $base_id = get_base_id($item_id);
-                  my $itemlink = quest::varlink($item_id);
-                  if (grep { $_ == $base_id } @epics) {
-                     plugin::NPCTell("I'm sorry, $clientName. This item is far too precious, I'm not going to touch it.");
-                  } elsif (plugin::is_global_aug($base_id)) {
-                    
+                foreach my $item_id (grep { $_ != 0 } keys %itemcount) {
+                    if ($item_id <= 110000000) {
+                        my $base_id = get_base_id($item_id);
+                        my $itemlink = quest::varlink($item_id);
+                        if (grep { $_ == $base_id } @epics) {
+                            plugin::NPCTell("I'm sorry, $clientName. This item is far too precious, I'm not going to touch it.");
+                        } elsif (plugin::is_global_aug($base_id)) {
+                            if ($CMC_Available > $trade_cost) {
+                            plugin::NPCTell("I'd be happy to take this in trade. Here, try this one on for size!");
+                            plugin::spend_cmc($trade_cost);
+                            $client->SummonItem(plugin::get_global_aug(), 1, 1);
+                            return;
+                            } else {
+                                plugin::NPCTell("I'd be happy to take this in trade, but I do require $trade_cost $link_converted_mana_crystals.");
+                            }
+                        } else {
+                            my @augs = @{ get_augs($base_id) };
+                            my $aug_count = scalar @augs;
+                            my $cost = calculate_heroic_stat_sum($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
+                            if (scalar @augs) {
+                                my $response = "We have some interesting components here. ";                           
+                                if (@augs == 1) {
+                                    $response .= "I see a " . quest::varlink($augs[0]) . ".";
+                                } elsif (@augs == 2) {
+                                    $response .= "I see a " . quest::varlink($augs[0]) . " and " . quest::varlink($augs[1]) . ".";
+                                } else {
+                                    $response .= "I see a ";
+                                    for my $i (0 .. $#augs - 1) {
+                                        $response .= quest::varlink($augs[$i]) . ", ";
+                                    }
+                                    $response .= "and " . quest::varlink($augs[-1]) . ".";
+                                }
+                            
+                                $response .= " It will cost you $cost Concentrated Mana Crystals";
+                                if ($CMC_Available >= $cost) {
+                                    plugin::NPCTell($response . ". Would you like to $link_proceed, or $link_cancel?");
+                                    $client->SetBucket("Gemcarver-WorkOrder", $item_id);
+                                    return;                              
+                                } else {
+                                    plugin::NPCTell($response . ", but you only have $CMC_Available. Do you need to $link_obtain_more?");
+                                }
 
-
-
-                    if ($CMC_Available > $trade_cost) {
-                       plugin::NPCTell("I'd be happy to take this in trade. Here, try this one on for size!");
-                       plugin::spend_cmc($trade_cost);
-                       $client->SummonItem(plugin::get_global_aug(), 1, 1);
-                       return;
-                    } else {
-                        plugin::NPCTell("I'd be happy to take this in trade, but I do require $trade_cost $link_converted_mana_crystals.");
+                            } else {
+                                plugin::NPCTell("Unfortunately, I don't think that I can extract anything from that $itemlink, $clientName. 
+                                                Bring me something more interesting next time.");
+                            }
+                        }
                     }
-                  } else {
-                     my @augs = @{ get_augs($base_id) };
-                     my $aug_count = scalar @augs;
-                     my $cost = calculate_heroic_stat_sum($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
-                     if (scalar @augs) {
-                           my $response = "We have some interesting components here. ";                           
-                           if (@augs == 1) {
-                              $response .= "I see a " . quest::varlink($augs[0]) . ".";
-                           } elsif (@augs == 2) {
-                              $response .= "I see a " . quest::varlink($augs[0]) . " and " . quest::varlink($augs[1]) . ".";
-                           } else {
-                              $response .= "I see a ";
-                              for my $i (0 .. $#augs - 1) {
-                                 $response .= quest::varlink($augs[$i]) . ", ";
-                              }
-                              $response .= "and " . quest::varlink($augs[-1]) . ".";
-                           }
-                     
-                           $response .= " It will cost you $cost Concentrated Mana Crystals";
-                           if ($CMC_Available >= $cost) {
-                              plugin::NPCTell($response . ". Would you like to $link_proceed, or $link_cancel?");
-                              $client->SetBucket("Gemcarver-WorkOrder", $item_id);
-                              return;                              
-                           } else {
-                              plugin::NPCTell($response . ", but you only have $CMC_Available. Do you need to $link_obtain_more?");
-                           }
-
-                     } else {
-                           plugin::NPCTell("Unfortunately, I don't think that I can extract anything from that $itemlink, $clientName. 
-                                          Bring me something more interesting next time.");
-                     }
-                  }
-               }
+                }
             }
         } else {               
             my $earned_points = 0;
@@ -352,7 +351,8 @@ sub get_augs {
         WHERE id > 900000 
         AND id < 999999 
         AND (name LIKE 'Eldritch Binding:%' OR name LIKE 'Spellstone:%' OR name LIKE 'Arcane Glyph:%')
-        AND lore LIKE ?");
+        AND lore LIKE ?
+        AND id >= 200000000");
     
     # Execute the statement with the desired parameter
     $sth->execute(quest::getitemname($item_id));
