@@ -152,6 +152,12 @@ for my $tier (1..10) {
                     $row->{$stat} += max($row->{$stat} ? $tier : 0, ceil(abs($row->{$stat} * $modifier)));
                 }
 
+                if ($row->{hp} == 0) {
+                    $row->{heroic_int} += abs(floor($row->{mana} / 10));
+                    $row->{heroic_wis} += abs(floor($row->{mana} / 10));
+                    $row->{heroic_cha} += abs(floor($row->{mana} / 10));
+                }
+
                 # Create an INSERT statement dynamically
                 my $columns = join(",", map { $dbh->quote_identifier($_) } keys %$row);
                 my $values  = join(",", map { $dbh->quote($_) } values %$row);
