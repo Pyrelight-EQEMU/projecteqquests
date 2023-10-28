@@ -73,8 +73,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
     my $new_name = "'" . $row->{Name} . "' Glamour-Stone";
 
     $base_data->{id}            = $row->{id} + $id_offset;
-    $base_data->{Name}          = $new_name;
-    $base_data->{idfile}        = $row->{idfile};
+    $base_data->{Name}          = $new_name;    
     $base_data->{icon}          = $row->{icon};
     
     # Set augrestrict based on $row->{itemtype}
@@ -89,6 +88,33 @@ while (my $row = $select_query->fetchrow_hashref()) {
     }
     
     $base_data->{slots}         = 26624;
+
+    if (grep { $_ == $row->{id} } (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034)) {
+        if ($row->{id} == 5532) { # water sprinkler of nem ankh
+            $base_data->{idfile} = 'IT156';
+        } elsif ($row->{id} == 8495) { # claw of the savage spirit
+            $base_data->{idfile} = 'IT10029';
+        } elsif ($row->{id} == 10099) { # fiery defender
+            $base_data->{idfile} = 'IT160';
+        } elsif ($row->{id} == 10650) { 
+            $base_data->{idfile} = 'IT157';
+        } elsif ($row->{id} == 10651) { 
+            $base_data->{idfile} = 'IT154';
+        } elsif ($row->{id} == 14383) { 
+            $base_data->{idfile} = 'IT145';
+        } elsif ($row->{id} == 20488) { 
+            $base_data->{idfile} = 'IT149';
+        } elsif ($row->{id} == 20490) { 
+            $base_data->{idfile} = 'IT150';
+        } elsif ($row->{id} == 20544) {
+            $base_data->{idfile} = 'IT153';
+        } elsif ($row->{id} == 28034) {
+            $base_data->{idfile} = 'IT151';
+        }
+    } else {
+        $base_data->{idfile}        = $row->{idfile};
+    }
+
 
     # Construct dynamic SQL for insertion
     my $columns = join(", ", map { "`$_`" } keys %$base_data);  # Add backticks around column names
