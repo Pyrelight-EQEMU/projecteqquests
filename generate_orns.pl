@@ -70,7 +70,11 @@ my $id_offset = 200000000;
 while (my $row = $select_query->fetchrow_hashref()) {
     # Set data for id, name, and idfile from current row
 
-    my $new_name = "'" . $row->{Name} . "' Glamour-Stone";
+    my $suffix = "' Glamour-Stone";
+    my $max_original_length = 64 - length($suffix);  # Calculate the maximum length for the original name
+
+    # Truncate the original name and append the suffix
+    $new_name = substr($row->{Name}, 0, $max_original_length) . $suffix;
 
     $base_data->{id}            = $row->{id} + $id_offset;
     $base_data->{Name}          = $new_name;    
@@ -131,8 +135,6 @@ while (my $row = $select_query->fetchrow_hashref()) {
     if ($@) {
         print "Failed to insert Name: $new_name\n";  # <-- Add this line to output the problematic name
     }
-
-    $new_id++;
     $insert->finish();
 }
 
