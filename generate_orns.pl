@@ -103,7 +103,7 @@ while (my $row = $select_query->fetchrow_hashref()) {
         $insert->execute(@$values);
     };
     if ($@) {
-        die "Error inserting for new ID $new_id. Perhaps it already exists? Error message: $@";
+        print "Failed to insert Name: $new_name\n";  # <-- Add this line to output the problematic name
     }
 
     $new_id++;
