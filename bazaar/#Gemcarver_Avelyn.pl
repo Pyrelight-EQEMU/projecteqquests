@@ -352,7 +352,7 @@ sub get_augs {
         AND id < 999999 
         AND (name LIKE 'Eldritch Binding:%' OR name LIKE 'Spellstone:%' OR name LIKE 'Arcane Glyph:%')
         AND lore LIKE ?
-        AND id >= 200000000");
+        AND id >= 120000000");
     
     # Execute the statement with the desired parameter
     $sth->execute(quest::getitemname($item_id));
