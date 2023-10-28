@@ -341,32 +341,11 @@ sub get_effects {
 sub get_augs {
     my $item_id = shift or return [];
     
-    # Get the database handle
-    my $dbh = plugin::LoadMysql();
+    # Calculate potential aug IDs based on the new schema
+    my @potential_ids = map { $_ + $item_id } (120000000, 130000000, 140000000, 150000000);
 
-    # Prepare the SQL statement
-    my $sth = $dbh->prepare("
-        SELECT id 
-        FROM items 
-        WHERE id > 900000 
-        AND id < 999999 
-        AND (name LIKE 'Eldritch Binding:%' OR name LIKE 'Spellstone:%' OR name LIKE 'Arcane Glyph:%')
-        AND lore LIKE ?
-        AND id >= 120000000");
-    
-    # Execute the statement with the desired parameter
-    $sth->execute(quest::getitemname($item_id));
+    # Filter potential IDs that exist in the database
+    my @existing_ids = grep { plugin::item_exists_in_db($_) } @potential_ids;
 
-    # Fetch the results
-    my @item_ids;
-    while (my $row = $sth->fetchrow_hashref()) {
-        push @item_ids, $row->{id};
-        my $id = $row->{id};
-    }
-
-    # Cleanup
-    $sth->finish();
-    $dbh->disconnect();
-
-    return \@item_ids; # Return a reference to the list of item ids
+    return \@existing_ids; # Return a reference to the list of existing item ids
 }
