@@ -227,6 +227,7 @@ sub HandleTaskComplete
                     plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
                     plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward_total, $client);
+                    plugin::Add_FoS_Heroic_Tokens($reward_total, $client);
                     $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
                     my $group = $client->GetGroup();
                     if($group) {
