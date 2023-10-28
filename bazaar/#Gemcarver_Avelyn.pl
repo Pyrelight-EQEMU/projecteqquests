@@ -43,7 +43,7 @@ sub EVENT_ITEM {
                         } else {
                             my @augs = @{ get_augs($base_id) };
                             my $aug_count = scalar @augs;
-                            my $cost = calculate_heroic_stat_sum($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
+                            my $cost = ceil(get_upgrade_cost($base_id) * (scalar @augs));
                             if (scalar @augs) {
                                 my $response = "We have some interesting components here. ";                           
                                 if (@augs == 1) {
@@ -227,7 +227,7 @@ sub EVENT_SAY {
         if ($item_id) {
             my $base_id = get_base_id($item_id);            
             my @augs = @{ get_augs($base_id) };
-            my $cost = get_upgrade_cost($base_id) * (scalar @augs) + plugin::GetTotalLevels($client);
+            my $cost = ceil(get_upgrade_cost($base_id) * (scalar @augs));
             my $cmc  = plugin::get_cmc();
             if (scalar @augs && $cmc >= $cost) {
                plugin::NPCTell("Excellent, lets do it.");
@@ -280,9 +280,8 @@ sub item_exists_in_db {
 
 sub get_upgrade_cost {
    my $item_id = shift or return 0;
-   my $item_tier = get_upgrade_tier($item_id);
    my $stat_sum = calculate_heroic_stat_sum($item_id);
-   my $cost = int(0.25 * ($stat_sum * $item_tier) + $item_tier);
+   my $cost = ceil($stat_sum);
 
    return $cost;
 }
@@ -341,32 +340,11 @@ sub get_effects {
 sub get_augs {
     my $item_id = shift or return [];
     
-    # Get the database handle
-    my $dbh = plugin::LoadMysql();
+    # Calculate potential aug IDs based on the new schema
+    my @potential_ids = map { $_ + $item_id } (120000000, 130000000, 140000000, 150000000);
 
-    # Prepare the SQL statement
-    my $sth = $dbh->prepare("
-        SELECT id 
-        FROM items 
-        WHERE id > 900000 
-        AND id < 999999 
-        AND (name LIKE 'Eldritch Binding:%' OR name LIKE 'Spellstone:%' OR name LIKE 'Arcane Glyph:%')
-        AND lore LIKE ?
-        AND id >= 200000000");
-    
-    # Execute the statement with the desired parameter
-    $sth->execute(quest::getitemname($item_id));
+    # Filter potential IDs that exist in the database
+    my @existing_ids = grep { plugin::item_exists_in_db($_) } @potential_ids;
 
-    # Fetch the results
-    my @item_ids;
-    while (my $row = $sth->fetchrow_hashref()) {
-        push @item_ids, $row->{id};
-        my $id = $row->{id};
-    }
-
-    # Cleanup
-    $sth->finish();
-    $dbh->disconnect();
-
-    return \@item_ids; # Return a reference to the list of item ids
+    return \@existing_ids; # Return a reference to the list of existing item ids
 }
