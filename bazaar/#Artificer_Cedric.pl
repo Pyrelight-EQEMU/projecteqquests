@@ -1,6 +1,3 @@
-use Data::Dumper;
-use POSIX;
-
 my @epics    = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
 sub EVENT_ITEM {
