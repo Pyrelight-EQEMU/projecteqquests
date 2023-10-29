@@ -1,7 +1,3 @@
-        use DBI;
-        use DBD::mysql;
-        use JSON;
-
 sub NPCTell {	
 	my $npc = plugin::val('npc');
     my $client = plugin::val('client');
