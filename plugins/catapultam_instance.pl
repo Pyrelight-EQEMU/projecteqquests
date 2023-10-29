@@ -309,7 +309,8 @@ sub AddToLeaderboard {
     $zone_leaderboard{$client_id} = $wins;
 
     # Sort the keys of %zone_leaderboard by wins (values) in descending order
-    my @sorted_keys = sort { $zone_leaderboard{$b} <=> $zone_leaderboard{$a} } keys %zone_leaderboard;
+    my @sorted_keys = sort { $zone_leaderboard{$b} <=> $zone_leaderboard{$a} } keys %zone_leaderboard;    
+    my $previous_top_score = $zone_leaderboard{$sorted_keys[0]};
 
     # Reconstruct %zone_leaderboard using sorted keys
     %zone_leaderboard = map { $_ => $zone_leaderboard{$_} } @sorted_keys;
@@ -332,11 +333,13 @@ sub AddToLeaderboard {
 
     # Check conditions
     if ($wins > $top_score) {
-        $announce_string .= ", surpassing the previous top score!";
+        $announce_string .= ", surpassing all challengers!";
+    } elsif ($wins == $top_score && $wins == $previous_top_score && $client_id == $sorted_keys[0]) {
+        $announce_string .= ", defending their position as champion!";
     } elsif ($wins == $top_score) {
-        $announce_string .= ", tying with the top score for that zone!";
+        $announce_string .= ", becoming a condender for foremost challenger!";
     } elsif ($wins >= $top_score - 5) {
-        $announce_string .= ", coming close to the top score!";
+        $announce_string .= ", approaching greatness!";
     } else {
         undef $announce_string;  # Reset to undef if none of the conditions are met
     }
