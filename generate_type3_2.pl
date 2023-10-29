@@ -59,7 +59,7 @@ my $select_query = $dbh->prepare(<<SQL);
     SELECT spells_new.Name as spell_name, items.* 
     FROM items 
     INNER JOIN spells_new ON items.focuseffect = spells_new.id
-    WHERE items.focuseffect > 0 
+    WHERE items.worneffect > 0 
       AND items.slots > 0 
       AND items.slots < 4194304 
       AND items.classes > 0 
