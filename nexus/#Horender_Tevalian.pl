@@ -1,3 +1,5 @@
+use Data::Dumper;
+
 sub EVENT_SAY {
   my $characterID = $client->CharacterID();
   my $suffix = "A";
@@ -10,7 +12,8 @@ sub EVENT_SAY {
   
   # Dark Elf
   if ($client->GetRace() == 6) {
-        quest::debug("Dark Elf");
+        quest::debug(Data::Dumper::Dumper($teleport_zones));
+
         $teleport_zones{"Neriak - Foreign Quarter (The Smuggler's Inn)"} = ["neriaka", -91, 75, 16, 6];
   }
 
