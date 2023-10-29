@@ -145,22 +145,7 @@ sub EVENT_DEATH_COMPLETE {
     CHECK_CHARM_STATUS();  
 
     # Global Upgrade Chance
-    if ($corpse) {
-        my @lootlist = $corpse->GetLootList();
-        foreach my $item_id (@lootlist) {
-            my $chance = rand();
 
-            if ($chance < 0.03) {
-                plugin::upgrade_item_corpse($item_id, 3, $corpse);
-            }
-            elsif ($chance < 0.11) {
-                plugin::upgrade_item_corpse($item_id, 2, $corpse);
-            }
-            elsif ($chance < 0.33) {
-                plugin::upgrade_item_corpse($item_id, 1, $corpse);
-            }
-        }
-    }
 }
 
 sub CHECK_CHARM_STATUS
