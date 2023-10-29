@@ -345,7 +345,7 @@ sub AddToLeaderboard {
     plugin::WorldAnnounce($announce_string) if defined $announce_string;
 
     # Save the updated leaderboard
-    plugin::set_data("$zone-$type-leaderboard", plugin::SerializeHash(%zone_leaderboard));
+    quest::set_data("$zone-$type-leaderboard", plugin::SerializeHash(%zone_leaderboard));
 }
 
 
