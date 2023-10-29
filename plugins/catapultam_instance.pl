@@ -297,7 +297,13 @@ sub AddToLeaderboard {
     my $client_id = $client->CharacterID();
     my $type = ($task_name =~ /\(Escalation\)$/) ? 'solo' : 'group';
 
-    my %zone_leaderboard = plugin::DeserializeHash(quest::get_data("$zone-$type-leaderboard"));
+    my $data = quest::get_data("$zone-$type-leaderboard");
+    my %zone_leaderboard = $data ? plugin::DeserializeHash($data) : ();
+
+    # Additional check to ensure deserialization returned a hash reference
+    unless (ref \%zone_leaderboard eq 'HASH') {
+        %zone_leaderboard = ();
+    }
 
     # Set or update character wins in the leaderboard
     $zone_leaderboard{$client_id} = $wins;
