@@ -10,7 +10,7 @@ sub EVENT_SAY {
 
     # Iksar
     if ($client->GetRace() == 128) {
-        $teleport_zones{"Cabilis (The Block)"} = ["cabeast", 63, 679, -10, 285];
+        $teleport_zones->{"Cabilis (The Block)"} = ["cabeast", 63, 679, -10, 285];
     }
 
     if ($text =~ /hail/i) {

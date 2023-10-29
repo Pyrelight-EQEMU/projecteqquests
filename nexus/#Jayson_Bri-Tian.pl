@@ -6,7 +6,7 @@ sub EVENT_SAY {
   my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
 
   if ($client->GetRace() == 128) {
-      $teleport_zones{"Shar Vahl (The Tavern)"} = ["sharvahl", -254, -281, -188, 46];
+      $teleport_zones->{"Shar Vahl (The Tavern)"} = ["sharvahl", -254, -281, -188, 46];
   }
 
   if ($text =~ /hail/i) {

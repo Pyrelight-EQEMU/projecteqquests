@@ -10,8 +10,8 @@ sub EVENT_SAY {
 
   # Erudite
   if ($client->GetRace() == 3) {
-      $teleport_zones{"Paineel (Darkglow Palace)"} = ["paineel", 768, 1218, -38, 313];
-      $teleport_zones{"Erudin (The Vasty Deep Inn)"} = ["erudnext", -76, -1098, 67, 176];
+      $teleport_zones->{"Paineel (Darkglow Palace)"} = ["paineel", 768, 1218, -38, 313];
+      $teleport_zones->{"Erudin (The Vasty Deep Inn)"} = ["erudnext", -76, -1098, 67, 176];
   }
 
   if ($text =~ /hail/i) {

@@ -10,22 +10,22 @@ sub EVENT_SAY {
 
   # High Elf
   if ($client->GetRace() == 5) {
-      $teleport_zones{"Northern Felwithe (Traveler's Home)"} = ["felwithea", -370, 214, 3, 259];
+      $teleport_zones->{"Northern Felwithe (Traveler's Home)"} = ["felwithea", -370, 214, 3, 259];
   }
 
   # Wood Elf
   if ($client->GetRace() == 4) {
-      $teleport_zones{"Kelethin (Sleepy Willow Inn)"} = ["gfaydark", 489, 730, 76, 422];
+      $teleport_zones->{"Kelethin (Sleepy Willow Inn)"} = ["gfaydark", 489, 730, 76, 422];
   }
 
   # Dwarf
   if ($client->GetRace() == 8) {
-      $teleport_zones{"Kaladim (Pub Kal)"} = ["kaladima", 214, 76, 3, 52];
+      $teleport_zones->{"Kaladim (Pub Kal)"} = ["kaladima", 214, 76, 3, 52];
   }
 
   # Gnome
   if ($client->GetRace() == 12) {
-      $teleport_zones{"Ak`Anon (The Market)"} = ["akanon", -912, 1304, -28, 215];
+      $teleport_zones->{"Ak`Anon (The Market)"} = ["akanon", -912, 1304, -28, 215];
   }
 
   if ($text =~ /hail/i) {
