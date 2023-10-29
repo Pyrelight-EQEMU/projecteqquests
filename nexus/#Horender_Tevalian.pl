@@ -12,7 +12,7 @@ sub EVENT_SAY {
   
   # Dark Elf
   if ($client->GetRace() == 6) {      
-        $teleport_zones{"Neriak - Foreign Quarter (The Smuggler's Inn)"} = ["neriaka", -91, 75, 16, 6];
+        $teleport_zones->{"Neriak - Foreign Quarter (The Smuggler's Inn)"} = ["neriaka", -91, 75, 16, 6];
         quest::debug(Data::Dumper::Dumper($teleport_zones));
   }
 
