@@ -1,10 +1,3 @@
-use List::Util qw(max);
-use List::Util qw(min);
-use POSIX;
-use DBI;
-use DBD::mysql;
-use JSON;
-
 my $modifier        = 0.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
