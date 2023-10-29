@@ -11,10 +11,9 @@ sub EVENT_SAY {
   my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
   
   # Dark Elf
-  if ($client->GetRace() == 6) {
-        quest::debug(Data::Dumper::Dumper($teleport_zones));
-
+  if ($client->GetRace() == 6) {      
         $teleport_zones{"Neriak - Foreign Quarter (The Smuggler's Inn)"} = ["neriaka", -91, 75, 16, 6];
+        quest::debug(Data::Dumper::Dumper($teleport_zones));
   }
 
   # Barbarian
