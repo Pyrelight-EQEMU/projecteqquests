@@ -345,7 +345,7 @@ sub AddToLeaderboard {
     plugin::WorldAnnounce($announce_string) if defined $announce_string;
 
     # Save the updated leaderboard
-    quest::set_data("$zone-$type-leaderboard", plugin::SerializeHash(%zone_leaderboard));
+    plugin::set_data("$zone-$type-leaderboard", plugin::SerializeHash(%zone_leaderboard));
 }
 
 
@@ -389,7 +389,7 @@ sub upgrade_item_npc {
         quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
         if (plugin::item_exists_in_db($target_item)) {
             if ($npc && $npc->CountItem($item_id)) {            
-                $npc->RemoveItem($item_id,);
+                $npc->RemoveItem($item_id);
             } else {quest::debug("The npc didn't exist?");} 
             quest::debug("adding $target_item to $npc");           
             $npc->AddItem($target_item);
