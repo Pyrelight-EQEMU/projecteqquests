@@ -245,11 +245,12 @@ sub HandleTaskComplete
                 if ($old_diff < $difficulty_rank) {
                     my $reward_total = ($difficulty_rank - $old_diff) * $reward;
 
-                    plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");                
+                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
                     plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
                     plugin::Add_FoS_Tokens($reward_total, $client);
                     plugin::Add_FoS_Heroic_Tokens($reward_total, $client);
-                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
+                    plugin::AddToLeaderboard($client, $zone_name, $difficulty_rank, $task_name);
+
                     my $group = $client->GetGroup();
                     if($group) {
                         for ($count = 0; $count < $group->GroupCount(); $count++) {
@@ -266,12 +267,10 @@ sub HandleTaskComplete
                 if ($old_diff < $difficulty_rank) {
                     my $reward_total = ($difficulty_rank - $old_diff) * $reward;
 
-
-                    plugin::WorldAnnounce("$charname has successfully challenged the $task_name (Difficulty: $difficulty_rank).");
-                    plugin::TrySetLeaderForZone($task_name, $charname, $difficulty_rank);
-                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);
-                    plugin::Add_FoS_Tokens($reward_total, $client);
                     $client->SetBucket("$zone_name-solo-escalation", $difficulty_rank);
+                    plugin::YellowText("Your Difficulty Rank has increased to $difficulty_rank.", $client);                    
+                    plugin::Add_FoS_Tokens($reward_total, $client);
+                    plugin::AddToLeaderboard($client, $zone_name, $difficulty_rank, $task_name);                                     
                 }
             }
         }
@@ -293,43 +292,56 @@ sub GetLeaderForZone {
     return ($leader_data{'player'}, $leader_data{'score'});    
 }
 
-sub SetLeaderForZone {
-    my ($zone, $player, $score) = @_;
-        
-    my %leader_data = (
-        'player' => $player,
-        'score'  => $score
-    );
-    
-    my $data = plugin::SerializeHash(%leader_data);
-    
-    quest::set_data("$zone-TopDiff", $data);
-}
+sub AddToLeaderboard {
+    my ($client, $zone, $wins, $task_name) = @_;
+    my $client_id = $client->CharacterID();
+    my $type = ($task_name =~ /\(Escalation\)$/) ? 'solo' : 'group';
 
-sub TrySetLeaderForZone {
-    my ($zone, $player, $score) = @_;
+    my %zone_leaderboard = plugin::DeserializeHash(quest::get_data("$zone-$type-leaderboard"));
 
-    # Get the current top score and player for the zone.
-    my ($current_leader, $current_score) = GetLeaderForZone($zone);
+    # Set or update character wins in the leaderboard
+    $zone_leaderboard{$client_id} = $wins;
 
-    # Check if the new score is higher than the current top score.
-    if ($score > $current_score) {
-        # If so, set the new player and score as the top score.
-        SetLeaderForZone($zone, $player, $score);
-        if ($current_leader ne 'None' and $current_leader ne $player) {
-            plugin::WorldAnnounce("$player surpassed $current_leader as the undisputed champion of $zone.");
-        } elsif ($current_leader eq $player) {
-            plugin::WorldAnnounce("$player has solidified their lead as the undisputed champion of $zone.");
-        } else {
-            plugin::WorldAnnounce("$player has become the undisputed champion of $zone.");
-        }
-        return 1;  # Return true indicating the top score was updated.
-    } elsif ($score == $current_score) {
-        plugin::WorldAnnounce("$player has tied with $current_leader to be the champion of $zone.");
+    # Sort the keys of %zone_leaderboard by wins (values) in descending order
+    my @sorted_keys = sort { $zone_leaderboard{$b} <=> $zone_leaderboard{$a} } keys %zone_leaderboard;
+
+    # Reconstruct %zone_leaderboard using sorted keys
+    %zone_leaderboard = map { $_ => $zone_leaderboard{$_} } @sorted_keys;
+
+    # Determine the top score on the leaderboard
+    my $top_score = $zone_leaderboard{$sorted_keys[0]};
+
+    # Array of synonyms for "completed"
+    my @completed_synonyms  = ('conquered', 'vanquished', 'overcome', 'overpowered', 
+                               'fulfilled', 'bested', 'outshined', 'eclipsed', 
+                               'surmounted', 'concluded', 'dominated', 'overwhelmed', 
+                               'subdued', 'defeated');
+
+    # Choose a random synonym
+    my $random_synonym = $completed_synonyms[int(rand(@completed_synonyms))];
+
+    # Prepare announcement string
+    my $charname = $client->GetCleanName();
+    my $announce_string = "$charname has $random_synonym the $task_name at Difficulty $wins";
+
+    # Check conditions
+    if ($wins > $top_score) {
+        $announce_string .= ", surpassing the previous top score!";
+    } elsif ($wins == $top_score) {
+        $announce_string .= ", tying with the top score for that zone!";
+    } elsif ($wins >= $top_score - 5) {
+        $announce_string .= ", coming close to the top score!";
+    } else {
+        undef $announce_string;  # Reset to undef if none of the conditions are met
     }
 
-    return 0;  # Return false indicating the top score was not updated.
+    # Send the announcement if a condition is met
+    plugin::WorldAnnounce($announce_string) if defined $announce_string;
+
+    # Save the updated leaderboard
+    plugin::set_data("$zone-$type-leaderboard", plugin::SerializeHash(%zone_leaderboard));
 }
+
 
 sub Add_AA_Reward {
     my $amount = shift or return;

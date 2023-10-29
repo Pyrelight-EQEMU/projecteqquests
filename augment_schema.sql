@@ -108,3 +108,10 @@ UPDATE items
    	 items.augslot6type     = 0,
    	 items.idfile = 'IT64'
 WHERE items.id % 100000 IN (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
+
+UPDATE items SET items.reclevel = 0, items.reqlevel = 0 WHERE items.itemtype = 54;
+
+UPDATE items
+SET augtype = augtype | 16  -- This sets the bit for type 5.
+WHERE (augtype & 4) > 0  -- Checks if the bit for type 3 is set.
+   OR (augtype & 8) > 0;  -- Checks if the bit for type 4 is set.
