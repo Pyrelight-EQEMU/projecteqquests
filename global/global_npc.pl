@@ -427,6 +427,7 @@ sub APPLY_FOCUS {
     }
     
     if (plugin::is_focus_equipped($owner, $servant_of_air)) {
+        quest::debug("Detected air focus");
         $total_focus_scale += 0.50;
     }
 
