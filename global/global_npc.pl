@@ -108,7 +108,7 @@ sub EVENT_TIMER {
 
         my $AoE_Spell;
         if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
-            $AoE_Spell = "15617"; #Earthen Menance
+            $AoE_Spell = "21691"; #Earthen Menance
             for $m (@close_list) {
                 if ($m) {
                     my $m_target = $m->GetTarget();
