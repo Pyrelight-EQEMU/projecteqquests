@@ -84,8 +84,6 @@ sub EVENT_LEVEL_UP {
     }
 
     my %unlocked_classes = plugin::GetUnlockedClasses($client);
-    my $total_level = 0;
-    my @class_strings;
 
     # Create an array of hashes to hold the class data for sorting
     my @class_data;
