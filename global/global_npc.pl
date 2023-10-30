@@ -75,7 +75,6 @@ sub EVENT_DAMAGE_GIVEN
 
 sub EVENT_COMBAT 
 {
-    quest::debug("combat_state " . $combat_state);
     my $ID = $npc->GetID();
     CHECK_CHARM_STATUS();
     if ($combat_state == 0 && $npc->GetCleanName() =~ /^The Fabled/) {
@@ -94,24 +93,15 @@ sub EVENT_COMBAT
 }
 
 sub EVENT_TIMER {
-	# NPC-EVENT_TIMER
-	# Exported event variables
-	quest::debug("timer " . $timer);
-
-
-    if ($timer eq "Pet_Abilities") {
+    if ($npc->IsPet() && $npc->GetOwner()->IsClient() && $timer eq "Pet_Abilities" && $npc->IsTaunting()) {
         my $owner       = $npc->GetOwner()->CastToClient();
         my $target      = $npc->GetTarget();
         my @close_list  = $entity_list->GetCloseMobList($npc, 100);
 
-        my $servant_of_earth    = "4403";
-        my $servant_of_fire     = "4401";
-        my $servant_of_water    = "4402";
-        my $servant_of_air      = "4400";
+        my $mage_epic = "1936";
 
-        my $AoE_Spell;
-        if (plugin::is_focus_equipped($owner, $servant_of_earth)) {
-            $AoE_Spell = "15617"; #Earthen Menance
+        $AoE_Spell = "21690"; #Earthen Menance
+        if (plugin::is_focus_equipped($owner, $mage_epic)) {            
             for $m (@close_list) {
                 if ($m) {
                     my $m_target = $m->GetTarget();
@@ -120,12 +110,6 @@ sub EVENT_TIMER {
                     }
                 }
             }        
-        }
-        if (plugin::is_focus_equipped($owner, $servant_of_fire)) {
-            $AoE_Spell = "1655"; # Jyll's Wave of Heat
-        }
-        if (plugin::is_focus_equipped($owner, $servant_of_water)) {
-            $AoE_Spell = "15618"; # Healing Waters
         }
 
         $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
@@ -371,51 +355,45 @@ sub GET_BAG_CONTENTS {
 sub APPLY_FOCUS {
     my $owner = $npc->GetOwner()->CastToClient();
     my $inventory = $owner->GetInventory();
-
-    my $total_focus_scale = 1.0;
     my $true_race = $owner->GetBucket("pet_race");
+    my $total_focus_scale = 1.0;
 
-    my $mage_epic_focus_id  = "1936";
-    my $mag_epic_buff       = "847";
-
-    my $minion_of_darkness  = "4407";
-    my $darkness_buff       = "359";
-
-    my $summoners_boon      = "4409";
-    my $ritual_summoning    = "4410";
-    
-    if (plugin::is_focus_equipped($owner, $mage_epic_focus_id)) { 
-        if (!$npc->FindBuff($mag_epic_buff)) {
-            $npc->CastSpell($mag_epic_buff, $npc->GetID());
-        }
+    if (grep { $_ == $owner->GetClass() } (13, 15, 11)) {
         $total_focus_scale += 0.30;
-    } else {
-        if ($npc->FindBuff($mag_epic_buff)) {
-            $npc->BuffFadeBySpellID($mag_epic_buff);
-        }
     }
 
-    if (plugin::is_focus_equipped($owner, $minion_of_darkness)) { 
-        if (!$npc->FindBuff($darkness_buff)) {
-            $npc->CastSpell($darkness_buff, $npc->GetID(), 0, 0);
-        }
-        $total_focus_scale += 0.05;
-    } else {
-        if ($npc->FindBuff($darkness_buff)) {
-            $npc->BuffFadeBySpellID($darkness_buff);
-        }
-    }
-
-    if (plugin::is_focus_equipped($owner, $summoners_boon)) {
-        $total_focus_scale += 0.10;
-    }
-
-    if (plugin::is_focus_equipped($owner, $ritual_summoning)) {
-        $total_focus_scale += 0.25;
-    }
+    my %focus_data = (
+        'Manifest Elements'   => { 'focus' => 1936, 'buff' => 847,   'factor' => 0.50 },
+        'Minion of Air'       => { 'focus' => 4396, 'buff' => undef, 'factor' => 0.05 },
+        'Minion of Fire'      => { 'focus' => 4397, 'buff' => undef, 'factor' => 0.05 },
+        'Minion of Water'     => { 'focus' => 4398, 'buff' => undef, 'factor' => 0.05 },
+        'Minion of Earth'     => { 'focus' => 4399, 'buff' => undef, 'factor' => 0.05 },
+        'Minion of Hate'      => { 'focus' => 4404, 'buff' => undef, 'factor' => 0.05 },
+        'Servant of Fire'     => { 'focus' => 4401, 'buff' => undef, 'factor' => 0.10 },
+        'Servant of Water'    => { 'focus' => 4402, 'buff' => undef, 'factor' => 0.10 },
+        'Servant of Earth'    => { 'focus' => 4403, 'buff' => undef, 'factor' => 0.10 },
+        'Servant of Air'      => { 'focus' => 4400, 'buff' => undef, 'factor' => 0.10 },
+        'Summoner\'s Boon'    => { 'focus' => 4400, 'buff' => undef, 'factor' => 0.15 },
+        'Ritual Summoning'    => { 'focus' => 4410, 'buff' => undef, 'factor' => 0.15 },
+        'Minion of Eternity'  => { 'focus' => 4405, 'buff' => undef, 'factor' => 0.40 },
+        'Minion of Discord'   => { 'focus' => 5061, 'buff' => undef, 'factor' => 0.20 },
+        'Servant of Chaos'    => { 'focus' => 6089, 'buff' => undef, 'factor' => 0.30 },
+        'Spire Servant'       => { 'focus' => 8399, 'buff' => undef, 'factor' => 0.20 },
+        'Servitor of Scale'   => { 'focus' => 9618, 'buff' => undef, 'factor' => 0.20 },
+    );
     
-    if (plugin::is_focus_equipped($owner, $servant_of_air)) {
-        $total_focus_scale += 0.50;
+    # Loop through each focus item in the focus_data hash
+    foreach my $focus_name (keys %focus_data) {
+        my $focus_id = $focus_data{$focus_name}{'focus'};
+        my $buff_id = $focus_data{$focus_name}{'buff'};
+        my $factor = $focus_data{$focus_name}{'factor'};
+
+        if (plugin::is_focus_equipped($owner, $focus_id)) { 
+            if ($buff_id && !$npc->FindBuff($buff_id)) {
+                $npc->CastSpell($buff_id, $npc->GetID());
+            }
+            $total_focus_scale += $factor;
+        }
     }
 
     return $total_focus_scale;
@@ -427,7 +405,7 @@ sub SAVE_PET_STATS
     my $owner = $pet->GetOwner()->CastToClient();
 
     if ($owner) {     
-        my @stat_list = qw(atk accuracy hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
+        my @stat_list = qw(atk accuracy avoidance hp_regen min_hit max_hit max_hp ac mr fr cr dr pr);
         foreach my $stat (@stat_list) {
             $owner->SetBucket("pet_$stat", $pet->GetNPCStat($stat));
         }

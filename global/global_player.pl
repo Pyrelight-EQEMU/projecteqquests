@@ -87,12 +87,23 @@ sub EVENT_LEVEL_UP {
     my $total_level = 0;
     my @class_strings;
 
+    # Create an array of hashes to hold the class data for sorting
+    my @class_data;
+
     foreach my $class_id (keys %unlocked_classes) {
         my $class_name = quest::getclassname($class_id, $unlocked_classes{$class_id});
         my $class_level = $unlocked_classes{$class_id};
-        push @class_strings, "Level $class_level $class_name";
-        $total_level += $class_level;
+        push @class_data, { 'id' => $class_id, 'name' => $class_name, 'level' => $class_level };
     }
+
+    # Sort by class ID in ascending order
+    @class_data = sort { $a->{'id'} <=> $b->{'id'} } @class_data;
+
+    # Convert the sorted class data into the desired string format
+    my @class_strings = map { "Level $_->{'level'} $_->{'name'}" } @class_data;
+
+    # Calculate total level
+    my $total_level = sum(map { $_->{'level'} } @class_data);
 
     my $name = $client->GetCleanName();
     my $announceString = "$name has reached Level $total_level (" . join(", ", @class_strings) . ")!";
