@@ -395,6 +395,11 @@ sub APPLY_FOCUS {
 
     my $summoners_boon      = "4409";
     my $ritual_summoning    = "4410";
+
+    my $servant_of_earth    = "4403";
+    my $servant_of_fire     = "4401";
+    my $servant_of_water    = "4402";
+    my $servant_of_air      = "4400";
     
     if (plugin::is_focus_equipped($owner, $mage_epic_focus_id)) { 
         if (!$npc->FindBuff($mag_epic_buff)) {
