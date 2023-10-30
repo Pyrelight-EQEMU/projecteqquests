@@ -1,4 +1,6 @@
 use POSIX;
+use List::Util qw(max);
+use List::Util qw(min);
 
 my $dz_duration     = 604800; # 7 Days
 
