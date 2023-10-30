@@ -74,7 +74,6 @@ sub EVENT_TASK_COMPLETE {
     plugin::HandleTaskComplete($client, $task_id);
 }
 
-# This event fires when the player levels up.
 sub EVENT_LEVEL_UP {
     my $free_skills = [0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76];
 
@@ -84,17 +83,20 @@ sub EVENT_LEVEL_UP {
         }
     }
 
-    if ($client->GetLevel() % 5 == 0) {
-        my $name             = $client->GetCleanName();
-        my $level            = $client->GetLevel();
-        my $active_class     = quest::getclassname($client->GetClass(), $level);
-        my $inactive_classes = plugin::GetInactiveClasses($client);
+    my %unlocked_classes = GetUnlockedClasses($client);
+    my $total_level = 0;
+    my @class_strings;
 
-        my $announceString = "$name has reached level $level $active_class!"
-                           . ($inactive_classes ? " ($inactive_classes)" : "");
-
-        plugin::WorldAnnounce($announceString);
+    foreach my $class_id (keys %unlocked_classes) {
+        my $class_name = quest::getclassname($class_id, $unlocked_classes{$class_id});
+        my $class_level = $unlocked_classes{$class_id};
+        push @class_strings, "Level $class_level $class_name";
+        $total_level += $class_level;
     }
+
+    my $name = $client->GetCleanName();
+    my $announceString = "$name has reached Level $total_level (" . join(", ", @class_strings) . ")!";
+    plugin::WorldAnnounce($announceString);
 }
 
 sub EVENT_DISCOVER_ITEM {
