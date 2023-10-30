@@ -83,7 +83,7 @@ sub EVENT_LEVEL_UP {
         }
     }
 
-    my %unlocked_classes = GetUnlockedClasses($client);
+    my %unlocked_classes = plugin::GetUnlockedClasses($client);
     my $total_level = 0;
     my @class_strings;
 
