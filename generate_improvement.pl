@@ -107,6 +107,11 @@ for my $tier (1..20) {
                     
                 } elsif ($row->{damage} > 0 && $row->{itemtype} == 54) {
                     $row->{damage} += floor($row->{damage} * $modifier);
+                    if ($row->{augtype} & (1 | 2 | 4)) {
+                        $row->{hp} += max(ceil_to_nearest_5(abs($modifier * $row->{hp})), (10 * $tier)); 
+                        $row->{mana} += max(ceil_to_nearest_5(abs($modifier * $row->{hp})), (10 * $tier));
+                        $row->{ac} += $tier;
+                    }
                 }
 
                 if ($row->{proceffect} > 0) {
