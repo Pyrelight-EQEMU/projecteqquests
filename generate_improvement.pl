@@ -96,7 +96,7 @@ for my $tier (1..20) {
                 $row->{skillmodvalue} = $row->{skillmodvalue} + ($row->{skillmodvalue}*$modifier);
 				
 				# Basic Stats                                
-                if ($row->{damage} > 0 && $row->{delay} > 0 && $row->{itemtype} != 54) {
+                if ($row->{damage} > 0 && $row->{delay} > 0 && $row->{itemtype} != 54 && grep { $_ == $row->{itemtype} } (0, 1, 2, 3, 4, 5, 7, 35, 45)) {
                     my $current_ratio = $row->{damage} / $row->{delay};  # Calculate the current damage/delay ratio
                     my $new_ratio = $current_ratio * (1 + $modifier_minor);   # Compute the new ratio
 
@@ -105,7 +105,7 @@ for my $tier (1..20) {
                     
                     $row->{damage} += $additional_damage;
                     
-                } elsif ($row->{damage} > 0 && grep { $_ == $row->{itemtype} } (0, 1, 2, 3, 4, 5, 7, 35, 45)) {
+                } elsif ($row->{damage} > 0 && $row->{itemtype} == 54) {
                     $row->{damage} += floor($row->{damage} * $modifier);
                 }
 
