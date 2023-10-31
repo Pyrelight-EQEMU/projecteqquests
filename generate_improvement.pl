@@ -110,7 +110,7 @@ for my $tier (1..20) {
                 }
 
                 if ($row->{proceffect} > 0) {
-                    $row->{procrate} += (abs($row->{procrate}) * $modifier) || (5*$tier);
+                    $row->{procrate} += ((abs($row->{procrate}) * $modifier) || (5*$tier));
                 }
 
 
