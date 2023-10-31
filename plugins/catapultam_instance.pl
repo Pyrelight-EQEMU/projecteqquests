@@ -8,7 +8,7 @@ use JSON;
 my $modifier        = 0.25;
 my $zone_duration   = 604800;
 my $zone_version    = 10;
-my $max_upgrade     = 20;
+my $max_upgrade     = 10;
 
 sub HandleTaskAccept
 {
