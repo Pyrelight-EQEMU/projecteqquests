@@ -427,9 +427,7 @@ sub ModifyInstanceNPC
     my $heroic      = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
     my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 10 : 0);    
     my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
-    my $reward      = $info_bucket{'reward'};
-
-    
+    my $reward      = $info_bucket{'reward'};    
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
