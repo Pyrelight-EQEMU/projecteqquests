@@ -9,6 +9,10 @@ sub EVENT_CONNECT {
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
+    if ($client->GetLevel() < 2) {
+        $client->SetLevel(2);
+    }
+
     # Get the current time as a Unix timestamp
     my $current_time = time();
 
