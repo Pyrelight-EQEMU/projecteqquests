@@ -470,33 +470,13 @@ sub get_total_attunements {
     my $client = shift;
     my @suffixes = ('A', 'O', 'F', 'K', 'V', 'L'); # Add more suffixes as needed
     my $total = 0;
+
     foreach my $suffix (@suffixes) {
-        $total += count_teleport_zones($client, $suffix);
+        my $zone_data = get_zone_data_for_account($client->AccountID(), $suffix);
+        $total += scalar(keys %$zone_data);
     }
 
     return $total;
-}
-
-sub count_teleport_zones {
-    my ($client, $suffix) = @_;
-
-    # Check for a provided suffix or default to 'A'
-    $suffix //= 'A';
-
-    my $charKey = $client->AccountID() . "-TL-Account";
-    my $charTargetsString = quest::get_data($charKey . "-" . $suffix);
-
-    my %teleport_zones = ();
-    
-    my @zones = split /:/, $charTargetsString;
-    foreach my $z (@zones) {      
-        my @tokens = split /,/, $z;
-        if ($tokens[1]) {
-            $teleport_zones{$tokens[1]} = [ @tokens ];
-        }
-    }
-    
-    return scalar(keys %teleport_zones);
 }
 
 sub is_item_upgradable {
