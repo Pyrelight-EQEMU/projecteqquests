@@ -14,7 +14,7 @@ sub EVENT_CONNECT {
     }
 
     for my $suffix ('A', 'O', 'F', 'K', 'V', 'L') {
-        add_char_zone_data_to_account($client->CharacterID(), $client->AccountID(), $suffix);
+        plugin::add_char_zone_data_to_account($client->CharacterID(), $client->AccountID(), $suffix);
     }
 
     # Get the current time as a Unix timestamp

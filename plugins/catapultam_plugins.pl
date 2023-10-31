@@ -853,7 +853,7 @@ sub get_zone_data_for_character {
 # Get character's saved zone data
 sub get_zone_data_for_account {
     my ($accountID, $suffix) = @_;
-    my $charKey = $accountID . "-TL-" . $suffix;
+    my $charKey = $accountID . "-TL-Account-" . $suffix;
 
     my $charDataString = quest::get_data($charKey);
 
@@ -873,7 +873,7 @@ sub get_zone_data_for_account {
 
 sub set_zone_data_for_account {
     my ($accountID, $zone_data_hash_ref, $suffix) = @_;
-    my $charKey = $accountID . "-TL-" . $suffix;
+    my $charKey = $accountID . "-TL-Account-" . $suffix;
 
     # Debug: Print the key used to store data
     #quest::debug("Setting data with key: $charKey");
