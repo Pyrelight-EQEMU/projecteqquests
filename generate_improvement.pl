@@ -103,18 +103,18 @@ for my $tier (1..20) {
                     # Calculate the additional damage required to achieve the new ratio
                     my $additional_damage = ($new_ratio * $row->{delay}) - $row->{damage};
                     
-                    $row->{damage} = max($tier, $row->{damage} + $additional_damage);
+                    $row->{damage} += $additional_damage;
                     
                 } elsif ($row->{damage} > 0 && grep { $_ == $row->{itemtype} } (0, 1, 2, 3, 4, 5, 7, 35, 45)) {
-                    $row->{damage} = $row->{damage} + $tier;
+                    $row->{damage} += floor($row->{damage} * $modifier);
                 }
 
                 if ($row->{proceffect} > 0) {
-                    $row->{procrate} += ((abs($row->{procrate}) * $modifier) || (5*$tier));
+                    $row->{procrate} += ((abs($row->{procrate}) * $modifier) || (5 * $tier));
                 }
 
 
-                $row->{hp} = ceil_to_nearest_5($row->{hp} + abs($modifier * $row->{hp}));
+                $row->{hp} += max(ceil_to_nearest_5(abs($modifier * $row->{hp})), (10 * $tier));        
                 $row->{ac} += max($row->{ac} ? $tier : 0, ceil(abs($row->{ac} * $modifier_minor)));
 
 				
