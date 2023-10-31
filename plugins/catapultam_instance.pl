@@ -391,7 +391,8 @@ sub ModifyInstanceLoot {
     # Get the packed data for the instance
     my $owner_id     = GetSharedTaskLeaderByInstance($instanceid);    
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
-    my $difficulty   = $info_bucket{'difficulty'};
+    my $heroic       = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
+    my $difficulty   = $info_bucket{'difficulty'} + ($group_mode ? 10 : 0);
 
     if ($npc) {
         my @lootlist = $npc->GetLootList();
@@ -423,8 +424,8 @@ sub ModifyInstanceNPC
 
     # Get the packed data for the instance
     my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
-    my $group_mode  = $info_bucket{'heroic'};
-    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 4 : 0);    
+    my $heroic      = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
+    my $difficulty  = $info_bucket{'difficulty'} + ($group_mode ? 10 : 0);    
     my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
     my $reward      = $info_bucket{'reward'};
 
