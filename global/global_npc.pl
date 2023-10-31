@@ -373,7 +373,7 @@ sub APPLY_FOCUS {
     }
 
     my %focus_data = (
-        'Manifest Elements'   => { 'focus' => 1936, 'buff' => 847,   'factor' => 0.50 },
+        'Manifest Elements'   => { 'focus' => 1936, 'buff' => 847,   'factor' => 0.30 },
         'Minion of Air'       => { 'focus' => 4396, 'buff' => undef, 'factor' => 0.05 },
         'Minion of Fire'      => { 'focus' => 4397, 'buff' => undef, 'factor' => 0.05 },
         'Minion of Water'     => { 'focus' => 4398, 'buff' => undef, 'factor' => 0.05 },
