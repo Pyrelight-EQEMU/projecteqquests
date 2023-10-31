@@ -22,28 +22,28 @@ sub EVENT_SPAWN {
         SAVE_PET_STATS(); 
         UPDATE_PET();
         $npc->Heal();
-    }
-    
-    # Check for FoS Instance
-    if ($instanceversion == 10 && !($npc->IsPet() and $npc->GetOwner()->IsClient())) {
-        my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
-        plugin::ModifyInstanceNPC();
-        plugin::ModifyInstanceLoot($npc);  
-    }
+    } else {
+        # Check for FoS Instance
+        if ($instanceversion == 10) {
+            my $owner_id   = plugin::GetSharedTaskLeaderByInstance($instanceid);
+            plugin::ModifyInstanceNPC();
+            plugin::ModifyInstanceLoot($npc);  
+        }
 
-    # Do item upgrade variance
-    my @lootlist = $npc->GetLootList();
-    foreach my $item_id (@lootlist) {
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.15;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.001;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0001;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00001;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000001;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0000001;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00000001;
-        plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000000001;
+        # Do item upgrade variance
+        my @lootlist = $npc->GetLootList();
+        foreach my $item_id (@lootlist) {
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.15;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0000001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00000001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000000001;
+        }
     }
 }
 
