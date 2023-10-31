@@ -87,7 +87,7 @@ for my $tier (1..20) {
                 $row->{attuneable} = 1;
                 $row->{nodrop} = 0;
 
-                $row->{price} = floor($row->{price} * $modifier * $tier);
+                $row->{price} += floor($row->{price} * $modifier * $tier);
 
                 if ($row->{skillmodvalue} > 0 && $row->{skillmodmax} > 0) {
                     $row->{skillmodmax} = $row->{skillmodmax} + ceil($row->{skillmodmax}*$modifier);
