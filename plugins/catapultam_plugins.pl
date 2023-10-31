@@ -483,7 +483,7 @@ sub count_teleport_zones {
     # Check for a provided suffix or default to 'A'
     $suffix //= 'A';
 
-    my $charKey = $client->CharacterID() . "-TL";
+    my $charKey = $client->AccountID() . "-TL-Account-";
     my $charTargetsString = quest::get_data($charKey . "-" . $suffix);
 
     my %teleport_zones = ();
