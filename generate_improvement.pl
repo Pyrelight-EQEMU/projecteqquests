@@ -24,7 +24,7 @@ sub LoadMysql {
 
         #::: Set MySQL Connection vars
         $db   = $config->{"server"}{"database"}{"db"};
-        $host = $config->{"server"}{"database"}{"host"};
+        $host = '10.10.20.220'; #$config->{"server"}{"database"}{"host"};
         $user = $config->{"server"}{"database"}{"username"};
         $pass = $config->{"server"}{"database"}{"password"};
 
@@ -45,35 +45,6 @@ unless ($dbh) {
     die "Failed to connect to database.";
 }
 
-sub slots {
-    my ($bitmask, @slots) = @_;
-    my %slot_to_bitmask = (
-        'Secondary' => 16384,
-        'Head' => 4,
-        'Face' => 8,
-        'Shoulder' => 64,
-        'Arms' => 128,
-        'Back' => 256,
-        'Bracer 1' => 512,
-        'Bracer 2' => 1024,
-        'Hands' => 4096,
-        'Chest' => 131072,
-        'Legs' => 262144,
-        'Feet' => 524288,
-        'Ear 1' => 2,
-        'Ear 2' => 16,
-        'Neck' => 32,
-        'Primary' => 8192,
-        'Ring 1' => 32768,
-        'Ring 2' => 65536,
-        'Waist' => 1048576
-    );
-    foreach my $slot (@slots) {
-        return 1 if ($bitmask & $slot_to_bitmask{$slot});
-    }
-    return 0;
-}
-
 sub ceil_to_nearest_5 {
     my ($value) = @_;
     return ceil($value / 5) * 5;
@@ -82,14 +53,14 @@ sub ceil_to_nearest_5 {
 my $max_id = 200000;
 my $chunk_size = 1000;
 
-for my $tier (1..10) {
+for my $tier (1..20) {
     for (my $id = 0; $id < $max_id; $id += $chunk_size) {
         # Fetch data from the table
         my $sth = $dbh->prepare("SELECT * FROM items WHERE items.id BETWEEN ? AND ?");
         $sth->execute($id, $id + $chunk_size - 1) or die $DBI::errstr;
 
         while (my $row = $sth->fetchrow_hashref()) {
-            if ($row->{slots} > 0 and $row->{classes} > 0 and $row->{Name} !~ /^Apocryphal/) {
+            if ($row->{slots} > 0 and $row->{classes} > 0) {
 
                 my @keys = qw(hp mana endur proceffect damage mr cr fr pr dr astr asta adex aagi aint awis heroic_str heroic_sta heroic_dex heroic_agi heroic_int heroic_wis heroic_cha heroic_mr heroic_cr heroic_fr heroic_dr heroic_pr);
 
@@ -115,7 +86,8 @@ for my $tier (1..10) {
 
                 $row->{attuneable} = 1;
                 $row->{nodrop} = 0;
-                $row->{price} = $row->{price} * $modifier + $tier;
+
+                $row->{price} = floor($row->{price} * $modifier * $tier);
 
                 if ($row->{skillmodvalue} > 0 && $row->{skillmodmax} > 0) {
                     $row->{skillmodmax} = $row->{skillmodmax} + ceil($row->{skillmodmax}*$modifier);
