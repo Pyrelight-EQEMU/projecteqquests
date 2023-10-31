@@ -360,27 +360,6 @@ sub Add_AA_Reward {
     $client->Message(334, "You have gained $amount Alternate Experience points as a bonus reward!");    
 }
 
-sub upgrade_item_corpse {
-    my ($item_id, $tier, $corpse)  = @_;
-    if (plugin::is_item_upgradable($item_id)) {
-        my $base_id    = plugin::get_base_id($item_id);
-        my $curtier    = plugin::get_upgrade_tier($item_id);
-
-        my $target_tier = min(10, $tier + $curtier);
-        my $target_item = $base_id + (1000000 * $target_tier);
-        quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
-        if (plugin::item_exists_in_db($target_item)) {
-            if ($corpse && $corpse->CountItem($item_id) > 1) {            
-                $corpse->RemoveItemByID($item_id);
-            } else {quest::debug("The corpse didn't exist?");} 
-            quest::debug("adding $target_item to $corpse");           
-            $corpse->AddItem($target_item, 1);
-        } 
-    } else {
-        quest::debug("item: $item_id was not upgradable");
-    }
-}
-
 sub upgrade_item_npc {
     my ($item_id, $tier, $npc)  = @_;
     quest::debug("upgrade_item_npc called for $item_id, $tier, $npc");
