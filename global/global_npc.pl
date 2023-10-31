@@ -124,10 +124,9 @@ sub EVENT_TIMER {
                         $m->AddToHateList($npc, 1000);
                     }
                 }
-            }        
+            }
+            $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
         }
-
-        $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
     }   
 }
 
