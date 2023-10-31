@@ -13,6 +13,10 @@ sub EVENT_CONNECT {
         $client->SetLevel(2);
     }
 
+    for my $suffix ('A', 'O', 'F', 'K', 'V', 'L') {
+        add_char_zone_data_to_account($client->CharacterID(), $client->AccountID(), $suffix);
+    }
+
     # Get the current time as a Unix timestamp
     my $current_time = time();
 

@@ -827,6 +827,97 @@ sub set_zone_data_for_character {
     quest::set_data($charKey, $charDataString);
 }
 
+# Get character's saved zone data
+sub get_zone_data_for_character {
+    my ($characterID, $suffix) = @_;
+    my $charKey = $characterID . "-TL-" . $suffix;
+
+    fix_zone_data($characterID, $suffix);
+
+    my $charDataString = quest::get_data($charKey);
+
+    # Debug: Print the raw string data
+    #quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
+
+    my %teleport_zones;
+    my @zone_entries = split /:/, $charDataString;
+
+    foreach my $entry (@zone_entries) {
+        my @tokens = split /,/, $entry;
+        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
+    }
+
+    return \%teleport_zones;
+}
+
+# Get character's saved zone data
+sub get_zone_data_for_account {
+    my ($accountID, $suffix) = @_;
+    my $charKey = $accountID . "-TL-" . $suffix;
+
+    my $charDataString = quest::get_data($charKey);
+
+    # Debug: Print the raw string data
+    #quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
+
+    my %teleport_zones;
+    my @zone_entries = split /:/, $charDataString;
+
+    foreach my $entry (@zone_entries) {
+        my @tokens = split /,/, $entry;
+        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
+    }
+
+    return \%teleport_zones;
+}
+
+sub set_zone_data_for_account {
+    my ($accountID, $zone_data_hash_ref, $suffix) = @_;
+    my $charKey = $accountID . "-TL-" . $suffix;
+
+    # Debug: Print the key used to store data
+    #quest::debug("Setting data with key: $charKey");
+
+    my @data_entries;
+
+    while (my ($desc, $zone_data) = each %{$zone_data_hash_ref}) {
+        my $entry = join(",", $desc, @{$zone_data});
+        push @data_entries, $entry;
+    }
+
+    my $charDataString = join(":", @data_entries);
+
+    # Debug: Print the data string being set
+    #quest::debug("Setting Raw Data: $charDataString");
+
+    quest::set_data($charKey, $charDataString);
+}
+
+sub add_char_zone_data_to_account {
+    my ($characterID, $accountID, $suffix) = @_;
+
+    # Get the character's zone data
+    my $char_zone_data = get_zone_data_for_character($characterID, $suffix);
+
+    # Get the account's current zone data
+    my $account_zone_data = get_zone_data_for_account($accountID, $suffix);
+
+    # Add the character's zone data to the account's zone data
+    while (my ($zone, $data) = each %{$char_zone_data}) {
+        if (exists $account_zone_data->{$zone}) {
+            # If the zone already exists in the account's data, you can choose how to merge the data.
+            # For example, you could skip, replace, or merge the data. Here, we simply replace.
+            $account_zone_data->{$zone} = $data;
+        } else {
+            # If the zone does not exist in the account's data, add it.
+            $account_zone_data->{$zone} = $data;
+        }
+    }
+
+    # Save the updated zone data back to the account
+    set_zone_data_for_account($accountID, $account_zone_data, $suffix);
+}
+
 # Serializes the data structure for storage
 # Usage:
 #    my %zone_data = ('Zone1' => ['data1', 'data2'], 'Zone2' => ['data3', 'data4']);
