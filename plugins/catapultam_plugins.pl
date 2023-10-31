@@ -931,8 +931,8 @@ sub deserialize_zone_data {
 
 # Check if a particular piece of data (by zone description) is present
 sub has_zone_entry {
-    my ($characterID, $zone_desc, $suffix) = @_;
-    my $teleport_zones = plugin::get_zone_data_for_account($characterID, $suffix);
+    my ($accountID, $zone_desc, $suffix) = @_;
+    my $teleport_zones = plugin::get_zone_data_for_account($accountID, $suffix);
 
     #quest::debug("Checking for description: $zone_desc");
     #quest::debug("Current Data: " . join(", ", keys %{$teleport_zones}));
