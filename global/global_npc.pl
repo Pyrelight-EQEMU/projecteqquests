@@ -140,11 +140,7 @@ sub EVENT_ITEM
 }
 
 sub EVENT_DEATH_COMPLETE {
-    my $corpse = $entity_list->GetCorpseByID($killed_corpse_id);
-    CHECK_CHARM_STATUS();  
-
-    # Global Upgrade Chance
-
+    CHECK_CHARM_STATUS(); 
 }
 
 sub CHECK_CHARM_STATUS
