@@ -952,7 +952,7 @@ sub deserialize_zone_data {
 # Check if a particular piece of data (by zone description) is present
 sub has_zone_entry {
     my ($characterID, $zone_desc, $suffix) = @_;
-    my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
+    my $teleport_zones = plugin::get_zone_data_for_account($characterID, $suffix);
 
     #quest::debug("Checking for description: $zone_desc");
     #quest::debug("Current Data: " . join(", ", keys %{$teleport_zones}));
@@ -964,10 +964,10 @@ sub has_zone_entry {
 # Usage:
 #    add_zone_entry(12345, "Zone4", ['data7', 'data8'], '-K');
 sub add_zone_entry {
-    my ($characterID, $zone_name, $zone_data, $suffix) = @_;
-    my $teleport_zones = get_zone_data_for_character($characterID, $suffix);
+    my ($accountID, $zone_name, $zone_data, $suffix) = @_;
+    my $teleport_zones = get_zone_data_for_account($accountID, $suffix);
     $teleport_zones->{$zone_name} = $zone_data;
-    set_zone_data_for_character($characterID, $teleport_zones, $suffix);
+    set_zone_data_for_account($accountID, $teleport_zones, $suffix);
 }
 
 sub fix_zone_data {

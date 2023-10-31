@@ -1,12 +1,14 @@
 sub EVENT_SAY {
-    my $characterID = $client->CharacterID();
     my $suffix = "K";
+    my $accountID   = $client->AccountID();
+    my $characterID = $client->CharacterID();   
 
-    # Add static data
-    plugin::add_zone_entry($characterID, "The Dreadlands (Great Combine Spires)", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
+    plugin::fix_zone_data($characterID, $suffix);
+    plugin::add_char_zone_data_to_account($characterID, $accountID, $suffix);
+    plugin::add_zone_entry($accountID, "The Dreadlands (Great Combine Spires)", ["dreadlands", 9651, 3052, 1048, 489], $suffix);
 
     # Fetch the zone data using our abstracted function
-    my $teleport_zones = plugin::get_zone_data_for_character($characterID, $suffix);
+    my $teleport_zones = plugin::get_zone_data_for_account($accountID, $suffix);
 
     # Iksar
     if ($client->GetRace() == 128) {
