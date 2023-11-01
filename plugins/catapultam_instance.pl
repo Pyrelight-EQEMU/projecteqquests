@@ -33,7 +33,10 @@ sub HandleTaskAccept
         plugin::YellowText("You have started an Incursion task. You will recieve no additional rewards upon completion. 
                             You may add additional players until you select a difficulty.");
     }
-
+    quest::debug("$client");
+    quest::debug("($task_id)");
+    quest::debug("$solo_escalation_level");
+    quest::debug("$task_name");
     ShowDifficultyOptions($client, ($task_id), $solo_escalation_level, $task_name);
 }
 
