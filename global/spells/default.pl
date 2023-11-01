@@ -19,12 +19,10 @@ sub CHECK_CHARM_STATUS
 sub EVENT_SPELL_FADE {
 	# Spell-EVENT_SPELL_FADE
 	# Exported event variables
-	quest::debug("spell_id " . $spell_id);
-	quest::debug("caster_id " . $caster_id);
-	quest::debug("tics_remaining " . $tics_remaining);
-	quest::debug("caster_level " . $caster_level);
-	quest::debug("buff_slot " . $buff_slot);
-	quest::debug("spell " . $spell);
 
-    CHECK_CHARM_STATUS();
+    my $name = $npc->GetCleanName();
+
+    if (quest::IsCharmSpell($spell_id)) {
+        quest::Debug("I am: $name, and I am a recovering charm pet.");
+    }
 }
