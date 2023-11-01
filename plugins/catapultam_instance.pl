@@ -336,7 +336,7 @@ sub ShowDifficultyOptions {
     my ($client, @task_id, $solo_escalation_level, $task_name) = @_;
 
     foreach my $task (@task_id) {
-        if ($client->IsTaskActive($task)) {
+        if ($task && $client->IsTaskActive($task)) {
             my $start_level = 0;
             if ($task_name =~ /\(Escalation\)$/ ) {
                 $start_level = $solo_escalation_level + 1;         
@@ -346,8 +346,8 @@ sub ShowDifficultyOptions {
 
             my $diff_string = join(' ', map { "[ ".quest::saylink("select_diff_$_", 1, "$_")." ]" } $start_level .. ($solo_escalation_level + 5));
 
-            plugin::NPCTell("You must select the degree of difficulty which you intend to face. $diff_string");
-            plugin::YellowText("Choose: ". $diff_string);
+            plugin::NPCTell("You must select the degree of difficulty which you intend to face.");
+            plugin::PurpleText("Choose: ". $diff_string);
             return 1;
         }
     }
