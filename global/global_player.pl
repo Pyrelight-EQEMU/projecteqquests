@@ -4,13 +4,12 @@ use Time::Seconds; # for ONE_DAY constant
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, 1);
-    fix_palshd_horse($client);
-
+    
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
-    if ($client->GetLevel() < 2) {
-        $client->SetLevel(2);
+    if ($client->GetLevel() < 5) {
+        $client->SetLevel(5);
     }
 
     for my $suffix ('A', 'O', 'F', 'K', 'V', 'L') {
@@ -25,27 +24,30 @@ sub EVENT_CONNECT {
     # Determine the start of the 'new day' (6 am CST)
     my $today_6am = (localtime->truncate(to => 'day') + ONE_DAY * 6/24)->epoch;
 
-    if ($stored_time) {        
-        # Determine if the stored time is before today's 6 am
-        if ($stored_time < $today_6am) {
-            # The stored time is from yesterday (or earlier), announce the login
+    # Calculate the seconds until the next 6 am
+    my $seconds_until_next_6am;
+    if ($current_time >= $today_6am) {
+        $seconds_until_next_6am = $today_6am + ONE_DAY - $current_time;
+    } else {
+        $seconds_until_next_6am = $today_6am - $current_time;
+    }
 
-            my $name             = $client->GetCleanName();
-            my $level            = $client->GetLevel();
-            my $active_class     = quest::getclassname($client->GetClass(), $level);
-            my $inactive_classes = plugin::GetInactiveClasses($client);
+    if (!$stored_time) {
+        my $name             = $client->GetCleanName();
+        my $level            = $client->GetLevel();
+        my $active_class     = quest::getclassname($client->GetClass(), $level);
+        my $inactive_classes = plugin::GetInactiveClasses($client);
 
-            my $announceString = "$name (Level $level $active_class"
-                               . ($inactive_classes ? ", $inactive_classes)" : ")")
-                               . " has logged in for the first time today!";
+        my $announceString = "$name (Level $level $active_class"
+                            . ($inactive_classes ? ", $inactive_classes)" : ")")
+                            . " has logged in for the first time today!";
 
-            plugin::WorldAnnounce($announceString);
+        #plugin::WorldAnnounce($announceString);
 
-            # Update the stored time with the current time
-            $client->SetBucket("LastLoginTime", $today_6am);
-            $client->SummonItem(40605, 1);
-            plugin::YellowText("You have been granted a daily log-in reward!");
-        }
+        # Update the stored time with the current time
+        $client->SetBucket("LastLoginTime", $current_time, $seconds_until_next_6am);
+        $client->SummonItem(40605, 1);
+        plugin::YellowText("You have been granted a daily log-in reward!");        
     }
     else {
         # No stored time, it's the user's first login
@@ -55,9 +57,7 @@ sub EVENT_CONNECT {
         my $active_class     = quest::getclassname($client->GetClass(), $level);
         my $inactive_classes = plugin::GetInactiveClasses($client);
 
-        my $announceString = "$name (Level $level $active_class"
-                           . ($inactive_classes ? ", $inactive_classes)" : ")")
-                           . " has logged in for the first time!";
+        my $announceString = "$name ($active_class) has logged in for the first time!";
 
         plugin::WorldAnnounce($announceString);
 
