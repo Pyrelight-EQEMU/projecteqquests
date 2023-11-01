@@ -333,6 +333,7 @@ sub upgrade_item_npc {
 
 sub ShowDifficultyOptions {
     my ($client, @task_id, $solo_escalation_level) = @_;
+    quest::debug("$client, $task_id, $solo_escalation_level");
 
     foreach my $task (@task_id) {
         if ($client->IsTaskActive($task)) {
