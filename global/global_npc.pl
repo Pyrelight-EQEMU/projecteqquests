@@ -14,10 +14,6 @@ sub EVENT_TICK
     }
 }
 
-sub EVENT_DAMAGE_GIVEN {
-    CHECK_CHARM_STATUS();
-}
-
 sub EVENT_SPAWN {
     #Pet Scaling
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
@@ -85,7 +81,8 @@ sub EVENT_DAMAGE_GIVEN
 {
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->IsTaunting()) {
         $entity_list->GetMobByID($entity_id)->AddToHateList($npc->GetOwner());
-    }        
+    }
+    CHECK_CHARM_STATUS();
 }
 
 sub EVENT_COMBAT 
