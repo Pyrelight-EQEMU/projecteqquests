@@ -136,8 +136,21 @@ sub EVENT_DISCOVER_ITEM {
     #quest::debug("item " . $item);
 
     my $name = $client->GetCleanName();
-
     plugin::WorldAnnounceItem("$name has discovered: {item}.",$itemid);    
+}
+
+sub EVENT_LOOT {
+    quest::debug("looted_id " . $looted_id);
+    quest::debug("looted_charges " . $looted_charges);
+    quest::debug("corpse_name " . $corpse_name);
+    quest::debug("corpse_id " . $corpse_id);
+    quest::debug("item " . $item);
+    quest::debug("corpse " . $corpse);
+
+    if (quest::getitemname($looted_id) =~ /^Fabled /) {
+        my $name = $client->GetCleanName();
+        plugin::WorldAnnounceItem("$name has claimed: {item}.", $looted_id);  
+    }  
 }
 
 sub EVENT_COMBINE_VALIDATE {

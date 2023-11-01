@@ -32,21 +32,13 @@ sub EVENT_SPAWN {
         my @lootlist = $npc->GetLootList();
         foreach my $item_id (@lootlist) {
             my $fabled_id = plugin::upgrade_item_to_fabled($item_id);
-            if ($fabled_id) {
+            if ($fabled_id && rand() <= 1) {
                 quest::debug(quest::varlink($fabled_id));
+            } else {                
+                plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.10;
+                plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
+                plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
             }
-
-
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.15;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0000001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00000001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000000001;
         }
     }
 }
