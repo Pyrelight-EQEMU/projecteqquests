@@ -23,6 +23,6 @@ sub EVENT_SPELL_FADE {
     my $name = $npc->GetCleanName();
 
     if (quest::IsCharmSpell($spell_id)) {
-        quest::Debug("I am: $name, and I am a recovering charm pet.");
-    }
+        quest::debug("I am: $name, and I am a recovering charm pet.");
+    } 
 }
