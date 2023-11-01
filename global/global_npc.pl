@@ -141,6 +141,7 @@ sub EVENT_DEATH_COMPLETE {
 sub EVENT_CAST_ON {
     if (quest::IsCharmSpell($spell_id) && $entity_list->GetClientByID($caster_id)) {
         quest::debug("I WAS CHARMED!");
+        $npc->ScaleNPC($entity_list->GetClientByID($caster_id)->GetLevel());
     }
 }
 
