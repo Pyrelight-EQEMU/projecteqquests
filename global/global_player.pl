@@ -1,5 +1,6 @@
 use Time::Piece;
 use Time::Seconds; # for ONE_DAY constant
+use List::Util qw(sum);
 
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
