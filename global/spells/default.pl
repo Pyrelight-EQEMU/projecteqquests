@@ -24,5 +24,10 @@ sub EVENT_SPELL_FADE {
 
     if (quest::IsCharmSpell($spell_id)) {
         quest::debug("I am: $name, and I am a recovering charm pet.");
-    } 
+        CHECK_CHARM_STATUS();
+
+        if ($npc) {
+            $npc->Kill();
+        }
+    }
 }
