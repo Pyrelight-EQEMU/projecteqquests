@@ -9,7 +9,7 @@ sub EVENT_CONNECT {
     plugin::CheckClassAA($client);
 
     if ($client->GetLevel() < 5) {
-        $client->AddEXP(10000);
+        $client->AddEXP(100000);
     }
 
     for my $suffix ('A', 'O', 'F', 'K', 'V', 'L') {
