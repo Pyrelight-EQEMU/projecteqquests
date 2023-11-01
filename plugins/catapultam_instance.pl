@@ -39,7 +39,7 @@ sub HandleTaskAccept
     quest::debug("$solo_escalation_level");
     quest::debug("$task_name");
 
-    ShowDifficultyOptions($client, ($task_id), $solo_escalation_level, $task_name);
+    ShowDifficultyOptions($client, [$task_id], $solo_escalation_level, $task_name);
 }
 
 sub HandleSay {
@@ -120,7 +120,7 @@ sub HandleSay {
     if ($text =~ /hail/i) {
         #Show Difficulty Options if we haven't previously selected them, then exit this
         if (!plugin::HasDynamicZoneAssigned($client)) {            
-            return if ShowDifficultyOptions($client, @task_id, $solo_escalation_level, $task_name);
+            return if ShowDifficultyOptions($client, \@task_id, $solo_escalation_level, $task_name);
         } else {
             plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
             return;
@@ -338,7 +338,8 @@ sub upgrade_item_npc {
 }
 
 sub ShowDifficultyOptions {
-    my ($client, @task_id, $solo_escalation_level, $task_name) = @_;
+    my ($client, $task_id_ref, $solo_escalation_level, $task_name) = @_;
+    my @task_id = @{$task_id_ref};
 
     quest::debug("$client");
     quest::debug("@task_id");
