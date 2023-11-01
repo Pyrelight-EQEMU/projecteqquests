@@ -347,10 +347,10 @@ sub ShowDifficultyOptions {
 
             plugin::NPCTell("You must select the degree of difficulty which you intend to face. $diff_string");
             plugin::YellowText("Choose: ". $diff_string);
-            return true;
+            return 1;
         }
     }
-    return false;
+    return 0;
 }
 
 sub ModifyInstanceLoot {
