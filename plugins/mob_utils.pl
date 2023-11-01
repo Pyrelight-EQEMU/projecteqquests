@@ -62,7 +62,7 @@ sub SpawnInPlaceByEnt{
 	my $EntityID = $_[0]; my $DontDie = $_[1];
 	my $x = $EntityID->GetX(); my $y = $EntityID->GetY(); my $z = $EntityID->GetZ(); my $h = $EntityID->GetHeading();
 	my $NPCID = $EntityID->GetNPCTypeID();
-	if(!$DontDie){ $EntityID->Depop(0); }
+	if(!$DontDie){ $EntityID->Depop(); }
 	quest::spawn2($NPCID, 0, 0, $x, $y, $z, $h);
 }
 
