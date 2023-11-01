@@ -163,7 +163,7 @@ sub CHECK_CHARM_STATUS
         plugin::SEV($npc, "is_charmed", $data);
 
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {        
-        plugin::SpawnInPlaceByEnt($npc);
+        #plugin::SpawnInPlaceByEnt($npc);
     }
 }
 
