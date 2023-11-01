@@ -1,6 +1,3 @@
-#!/usr/bin/perl
-use DBI;
-
 sub GetRatLocation
 {
 	
