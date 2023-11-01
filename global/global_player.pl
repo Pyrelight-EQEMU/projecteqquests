@@ -48,13 +48,12 @@ sub EVENT_CONNECT {
         $client->SetBucket("LastLoginTime", $current_time, $seconds_until_next_6am);
         $client->SummonItem(40605, 1);
         plugin::YellowText("You have been granted a daily log-in reward!");        
-    }
-    else {
+    } else  if ($client->GetBucket("FirstLoginTime")) {
         # No stored time, it's the user's first login
 
         my $name             = $client->GetCleanName();
         my $level            = $client->GetLevel();
-        my $active_class     = quest::getclassname($client->GetClass(), $level);
+        my $active_class     = quest::getclassname($client->GetClass());
         my $inactive_classes = plugin::GetInactiveClasses($client);
 
         my $announceString = "$name ($active_class) has logged in for the first time!";
@@ -62,7 +61,8 @@ sub EVENT_CONNECT {
         plugin::WorldAnnounce($announceString);
 
         # Store the current time
-        $client->SetBucket("LastLoginTime", $today_6am);        
+        $client->SetBucket("LastLoginTime", $today_6am);  
+        $client->SetBucket("FirstLoginTime");       
     }
 }
 
