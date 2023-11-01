@@ -1038,7 +1038,7 @@ sub is_focus_equipped {
     return 0;
 }
 
-sub upgrade_item_to_fabled {
+sub get_fabled_id {
     my ($item_id)   = @_;
     my $base_id     = plugin::get_base_id($item_id);
     my $item_name   = quest::getitemname($base_id);
@@ -1057,6 +1057,14 @@ sub upgrade_item_to_fabled {
     return $fabled_id;
 }
 
+sub upgrade_item_to_fabled {
+    my ($item_id, $npc)     = @_;
+    my $fabled_id           = plugin::get_fabled_id($item_id);
 
+    if ($npc && $npc->CountItem($item_id)) {
+        $npc->RemoveItem($item_id);
+        $npc->AddItem($fabled_id);
+    } else { quest::debug("The npc didn't exist?"); } 
+}
 
 return 1;
