@@ -164,7 +164,6 @@ sub CHECK_CHARM_STATUS
 
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {        
         plugin::SpawnInPlaceByEnt($npc);
-        $npc->Depop(0);
     }
 }
 
