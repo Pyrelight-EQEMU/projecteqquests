@@ -14,7 +14,7 @@ sub EVENT_ENTER {
     my $accountID   = $client->AccountID();
 
     my $TLDesc = "";
-    if ($tokens[1] && $tokens[1] eq "") {
+    if (!$tokens[1] || $tokens[1] eq "") {
         $TLDesc = quest::GetZoneLongNameByID($npc->GetZoneID());
     } else {
         $TLDesc = quest::GetZoneLongNameByID($npc->GetZoneID()) . " " . $tokens[1];
