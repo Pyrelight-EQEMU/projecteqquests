@@ -52,6 +52,9 @@ sub HandleSay {
     if ($text =~ /^select_diff_(\d+)$/) {
         $selected_difficulty = $1;
         plugin::YellowText("You have selected Difficulty: $selected_difficulty");
+        
+        $client->DeleteBucket("temp-zone-cache");
+
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
                 if (!plugin::HasDynamicZoneAssigned($client)) {
