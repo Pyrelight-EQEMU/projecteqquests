@@ -46,7 +46,8 @@ sub EVENT_CONNECT {
 
         # Store the current time
         $client->SetBucket("LastLoginTime", $today_6am);  
-        $client->SetBucket("FirstLoginTime");       
+        $client->SetBucket("FirstLoginTime", $current_time);
+
     } elsif (!$stored_time) {
         my $name             = $client->GetCleanName();
         my $level            = $client->GetLevel();
