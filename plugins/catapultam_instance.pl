@@ -440,6 +440,10 @@ sub ModifyInstanceNPC
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
         }      
     }
+    
+    foreach my $stat (@stat_names) {
+        $npc->SetEntityVariable($stat, $npc_stats{$stat});
+    }
 
     #Recale stats
     if ($difficulty > 0) {
