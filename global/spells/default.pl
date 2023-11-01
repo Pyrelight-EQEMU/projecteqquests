@@ -18,7 +18,7 @@ sub EVENT_SPELL_FADE {
         my $name = $npc->GetCleanName();
         my $hp   = $npc->GetHP();
         quest::debug("I am: $name, and I am a recovering charm pet. I have $hp left");
-        if ($hp >= 0) {
+        if ($hp > 0) {
             plugin::SpawnInPlaceByEnt($npc);
         }      
     }
