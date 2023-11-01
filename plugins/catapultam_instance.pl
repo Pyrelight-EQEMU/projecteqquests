@@ -416,6 +416,15 @@ sub ModifyInstanceNPC
     my $npc_stats_perlevel;
 
     foreach my $stat (@stat_names) {
+        if ($npc->EntityVariableExists($stat)) {
+            $npc_stats{$stat} = $npc->GetEntityVariable($stat);
+        } else {
+            $npc_stats{$stat} = $npc->GetNPCStat($stat);
+            $npc->SetEntityVariable($stat, $npc_stats{$stat});
+        }
+    }
+
+    foreach my $stat (@stat_names) {
         $npc_stats_perlevel{$stat} = ($npc_stats{$stat} / $npc->GetLevel());
     }
 
@@ -431,11 +440,9 @@ sub ModifyInstanceNPC
             $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
         }      
     }
-
+    
     foreach my $stat (@stat_names) {
-        if ($npc->EntityVariableExists($stat)) {
-            $npc_stats{$stat} = $npc->GetEntityVariable($stat);
-        }
+        $npc->SetEntityVariable($stat, $npc_stats{$stat});
     }
 
     #Recale stats
