@@ -158,26 +158,8 @@ sub CHECK_CHARM_STATUS
         my $data = @inventory ? join(",", @inventory) : "EMPTY";
         plugin::SEV($npc, "is_charmed", $data);
 
-    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {
-        
-        my $data = plugin::REV($npc, "is_charmed");
-        my @inventory = split(",", $data);
-
-        my @lootlist = $npc->GetLootList();
-        while (@lootlist) { # While lootlist has elements
-            foreach my $item_id (@lootlist) {
-                $npc->RemoveItem($item_id);
-            }
-            @lootlist = $npc->GetLootList(); # Update the lootlist after removing items
-        }
-
-        foreach my $item (@inventory) {
-            my ($item_id, $quantity) = split(":", $item);
-            #quest::debug("Adding: $item_id x $quantity");
-            $npc->AddItem($item_id, $quantity);
-        }
-
-        plugin::SEV($npc, "is_charmed", "");
+    } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {        
+        plugin::SpawnInPlaceByEnt($npc);
     }
 }
 
