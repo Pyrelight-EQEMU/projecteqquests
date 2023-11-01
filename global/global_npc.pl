@@ -139,13 +139,6 @@ sub EVENT_DEATH {
     CHECK_CHARM_STATUS(); 
 }
 
-sub EVENT_CAST_ON {
-    if (quest::IsCharmSpell($spell_id) && $entity_list->GetClientByID($caster_id)) {
-        quest::debug("I WAS CHARMED!");
-        $npc->ScaleNPC($entity_list->GetClientByID($caster_id)->GetLevel(), 1);
-    }
-}
-
 sub CHECK_CHARM_STATUS
 {
     if ($npc->Charmed() and not plugin::REV($npc, "is_charmed")) {     
