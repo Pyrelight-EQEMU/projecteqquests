@@ -115,7 +115,10 @@ sub EVENT_LEVEL_UP {
 
     my $name = $client->GetCleanName();
     my $announceString = "$name has reached Level $total_level (" . join(", ", @class_strings) . ")!";
-    plugin::WorldAnnounce($announceString);
+
+    if ($total_level % 10 == 0 || $client->GetLevel() % 10 == 0) {
+        plugin::WorldAnnounce($announceString);
+    }
 }
 
 sub EVENT_DISCOVER_ITEM {
