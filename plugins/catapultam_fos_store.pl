@@ -3,7 +3,7 @@ use List::Util qw(min);
 use POSIX;
 use JSON;
 
-sub get_equipment_index {
+sub get_equipment_incdex {
     %umbral_seals = (
         '33407' => '5',
         '33408' => '5',

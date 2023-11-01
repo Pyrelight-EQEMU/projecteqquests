@@ -808,29 +808,6 @@ sub set_zone_data_for_character {
 }
 
 # Get character's saved zone data
-sub get_zone_data_for_character {
-    my ($characterID, $suffix) = @_;
-    my $charKey = $characterID . "-TL-" . $suffix;
-
-    fix_zone_data($characterID, $suffix);
-
-    my $charDataString = quest::get_data($charKey);
-
-    # Debug: Print the raw string data
-    #quest::debug("characterID: $characterID suffix: $suffix Raw Data: $charDataString");
-
-    my %teleport_zones;
-    my @zone_entries = split /:/, $charDataString;
-
-    foreach my $entry (@zone_entries) {
-        my @tokens = split /,/, $entry;
-        $teleport_zones{$tokens[0]} = [@tokens[1..$#tokens]];
-    }
-
-    return \%teleport_zones;
-}
-
-# Get character's saved zone data
 sub get_zone_data_for_account {
     my ($accountID, $suffix) = @_;
     my $charKey = $accountID . "-TL-Account-" . $suffix;
