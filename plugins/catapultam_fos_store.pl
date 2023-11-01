@@ -46,7 +46,7 @@ sub ApplyExpPenalty {
 
 sub ApplyExpBonus {
     my $client  = shift or plugin::val('client');
-    my $expRate = $client->GetEXPModifier(0) / 0.75;
+    my $expRate = $client->GetEXPModifier(0) / 0.95;
 
     $client->SetEXPModifier(0, $expRate);
     $client->SetAAEXPModifier(0, $expRate);
