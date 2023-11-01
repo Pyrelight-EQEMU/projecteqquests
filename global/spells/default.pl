@@ -9,7 +9,8 @@ sub EVENT_SPELL_EFFECT_NPC {
 sub EVENT_SPELL_FADE {    
     if ($npc && quest::IsCharmSpell($spell_id)) {
         my $name = $npc->GetCleanName();
-        quest::debug("I am: $name, and I am a recovering charm pet.");
+        my $hp   = $npc->GetHP();
+        quest::debug("I am: $name, and I am a recovering charm pet. I have $hp");
         plugin::SpawnInPlaceByEnt($npc);        
     }
 }
