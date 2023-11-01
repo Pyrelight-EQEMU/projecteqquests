@@ -27,7 +27,7 @@ sub EVENT_SPELL_FADE {
         CHECK_CHARM_STATUS();
 
         if ($npc) {
-            $npc->Depop();
+            $npc->Kill();
         }
     }
 }
