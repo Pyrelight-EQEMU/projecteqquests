@@ -27,7 +27,7 @@ sub EVENT_SPELL_EFFECT_NPC {
             foreach my $stat (@stat_names) {
                 # Skip processing for 'spellscale' and 'healscale'
                 next if ($stat eq 'spellscale' or $stat eq 'healscale');
-                $npc->ModifyNPCStat($stat, $npc->GetNPCStat($stat) + ceil($npc_stats_perlevel{$stat} * $level_diff));
+                $npc->ModifyNPCStat($stat, ceil($npc_stats_perlevel{$stat} * $client->GetLevel()));
             }      
         }
     }
