@@ -1038,6 +1038,25 @@ sub is_focus_equipped {
     return 0;
 }
 
+sub upgrade_item_to_fabled {
+    my ($item_id)   = @_;
+    my $base_id     = plugin::get_base_id($item_id);
+    my $item_name   = quest::getitemname($base_id);
+    my $fabled_name = "Fabled " . $item_name;
+
+    my $dbh         = plugin::LoadMysql();
+    my $sth         = $dbh->prepare("SELECT id FROM items WHERE items.name LIKE ? AND id <= 999999");
+
+    $sth->execute($fabled_name) or die;
+
+    my $fabled_id = $sth->fetchrow() or 0;
+
+    $sth->finish();
+    $dbh->disconnect();
+
+    return $fabled_id;
+}
+
 
 
 return 1;

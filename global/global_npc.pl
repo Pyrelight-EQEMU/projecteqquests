@@ -31,6 +31,10 @@ sub EVENT_SPAWN {
         # Do item upgrade variance
         my @lootlist = $npc->GetLootList();
         foreach my $item_id (@lootlist) {
+            
+            quest::debug(quest::varlink(plugin::upgrade_item_to_fabled($item_id)));
+
+
             plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.15;
             plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
             plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
