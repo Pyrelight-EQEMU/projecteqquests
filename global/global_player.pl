@@ -110,7 +110,7 @@ sub EVENT_LEVEL_UP {
     my @class_strings = map { "Level $_->{'level'} $_->{'name'}" } @class_data;
 
     # Calculate total level
-    my $total_level = sum(map { $_->{'level'} } @class_data);
+    my $total_level = sum(map { $_->{'level'} } @class_data) || $client->GetLevel();
 
     my $name = $client->GetCleanName();
     my $announceString = "$name has reached Level $total_level (" . join(", ", @class_strings) . ")!";
