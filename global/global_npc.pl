@@ -14,6 +14,10 @@ sub EVENT_TICK
     }
 }
 
+sub EVENT_DAMAGE_GIVEN {
+    CHECK_CHARM_STATUS();
+}
+
 sub EVENT_SPAWN {
     #Pet Scaling
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->Charmed()) {
@@ -160,6 +164,7 @@ sub CHECK_CHARM_STATUS
 
     } elsif (not $npc->Charmed() and plugin::REV($npc, "is_charmed")) {        
         plugin::SpawnInPlaceByEnt($npc);
+        $npc->Depop(0);
     }
 }
 
