@@ -3,7 +3,7 @@ sub EVENT_SPELL_EFFECT_NPC {
     if (quest::IsCharmSpell($spell_id) && $client) {
         my $name = $npc->GetCleanName();
         quest::debug("I am: $name, and this is my life now. - SCALED");
-        $npc->ScaleNPC($npc->GetLevel());
+        $npc->ScaleNPC($npc->GetLevel(),1);
     }
 }
 
