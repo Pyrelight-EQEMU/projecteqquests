@@ -16,16 +16,11 @@ sub CHECK_CHARM_STATUS
     }
 }
 
-sub EVENT_SPELL_FADE {
-	# Spell-EVENT_SPELL_FADE
-	# Exported event variables
-
-    my $name = $npc->GetCleanName();
-
-    if (quest::IsCharmSpell($spell_id)) {
+sub EVENT_SPELL_FADE {    
+    if ($npc && quest::IsCharmSpell($spell_id)) {
+        my $name = $npc->GetCleanName();
         quest::debug("I am: $name, and I am a recovering charm pet.");
-        CHECK_CHARM_STATUS();
-
+        plugin::SpawnInPlaceByEnt($npc);
         if ($npc) {
             $npc->Kill();
         }
