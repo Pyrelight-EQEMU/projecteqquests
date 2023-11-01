@@ -32,13 +32,13 @@ sub EVENT_SPAWN {
         my @lootlist = $npc->GetLootList();
         foreach my $item_id (@lootlist) {
             my $fabled_id = plugin::get_fabled_id($item_id);
-            if ($fabled_id && rand() <= 1) {
+            if ($fabled_id && rand() <= 0.001) {
                 plugin::upgrade_item_to_fabled($item_id, $npc);
-            } else {                
-                plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.10;
-                plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
-                plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
             }
+
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.10;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;            
         }
     }
 }
