@@ -449,8 +449,8 @@ sub EVENT_SAY
     }
 
     elsif ($text eq 'link_unlock_expBonus' && $progress > 3 && $met_befo) {
-        my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 3;
-        my $exp_bonus_cost      = min($costs[$exp_bonus_index]*2,9999);
+        my $exp_bonus_index     = $client->GetBucket("exp_bonus_index") || 2;
+        my $exp_bonus_cost      = min($costs[$exp_bonus_index] * 2, 9999);
         if ($exp_bonus_index <= $#costs) {
             if ($FoS_Token >= $exp_bonus_cost) {
                 plugin::Spend_FoS_Tokens($exp_bonus_cost, $client);
