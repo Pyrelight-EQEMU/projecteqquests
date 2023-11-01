@@ -83,7 +83,7 @@ sub EVENT_ENTER_ZONE {
 }
 
 sub EVENT_TASKACCEPTED {
-    plugin::HandleTaskAccept($task_id);
+    plugin::HandleTaskAccept($task_id, $client);
 }
 
 sub EVENT_TASK_COMPLETE {
