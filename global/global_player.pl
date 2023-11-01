@@ -1,5 +1,6 @@
 use Time::Piece;
 use Time::Seconds; # for ONE_DAY constant
+use List::Util qw(sum);
 
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
@@ -7,10 +8,6 @@ sub EVENT_CONNECT {
 
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
-
-    if ($client->GetLevel() < 5) {
-        $client->SetLevel(5);
-    }
 
     for my $suffix ('A', 'O', 'F', 'K', 'V', 'L') {
         plugin::add_char_zone_data_to_account($client->CharacterID(), $client->AccountID(), $suffix);
@@ -64,6 +61,10 @@ sub EVENT_CONNECT {
         $client->SetBucket("LastLoginTime", $current_time, $seconds_until_next_6am);
         $client->SummonItem(40605, 1);
         plugin::YellowText("You have been granted a daily log-in reward!");        
+    }    
+
+    if ($client->GetLevel() < 5) {
+        $client->AddEXP(100000);
     }
 }
 
@@ -120,11 +121,14 @@ sub EVENT_LEVEL_UP {
     my @class_strings = map { "Level $_->{'level'} $_->{'name'}" } @class_data;
 
     # Calculate total level
-    my $total_level = sum(map { $_->{'level'} } @class_data);
+    my $total_level = sum(map { $_->{'level'} } @class_data) || $client->GetLevel();
 
     my $name = $client->GetCleanName();
     my $announceString = "$name has reached Level $total_level (" . join(", ", @class_strings) . ")!";
-    plugin::WorldAnnounce($announceString);
+
+    if ($total_level % 10 == 0 || $client->GetLevel() % 10 == 0) {
+        plugin::WorldAnnounce($announceString);
+    }
 }
 
 sub EVENT_DISCOVER_ITEM {
