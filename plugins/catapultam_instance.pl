@@ -34,7 +34,7 @@ sub HandleTaskAccept
                             You may add additional players until you select a difficulty.");
     }
 
-    ShowDifficultyOptions($client, ($task_id), $solo_escalation_level);
+    ShowDifficultyOptions($client, ($task_id), $solo_escalation_level, $task_name);
 }
 
 sub HandleSay {
@@ -112,7 +112,7 @@ sub HandleSay {
     if ($text =~ /hail/i) {
         #Show Difficulty Options if we haven't previously selected them, then exit this
         if (!plugin::HasDynamicZoneAssigned($client)) {            
-            return if ShowDifficultyOptions($client, @task_id, $solo_escalation_level);
+            return if ShowDifficultyOptions($client, @task_id, $solo_escalation_level, $task_name);
         } else {
             plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
             return;
@@ -330,7 +330,7 @@ sub upgrade_item_npc {
 }
 
 sub ShowDifficultyOptions {
-    my ($client, @task_id, $solo_escalation_level) = @_;
+    my ($client, @task_id, $solo_escalation_level, $task_name) = @_;
 
     foreach my $task (@task_id) {
         if ($client->IsTaskActive($task)) {
