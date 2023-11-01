@@ -341,11 +341,6 @@ sub ShowDifficultyOptions {
     my ($client, $task_id_ref, $solo_escalation_level, $task_name) = @_;
     my @task_id = @{$task_id_ref};
 
-    quest::debug("$client");
-    quest::debug("@task_id");
-    quest::debug("$solo_escalation_level");
-    quest::debug("$task_name");
-
     foreach my $task (@task_id) {
         if ($task && $client->IsTaskActive($task)) {
             my $start_level = 0;
