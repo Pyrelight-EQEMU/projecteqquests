@@ -70,8 +70,10 @@ sub EVENT_CONNECT {
 sub EVENT_TIMER {
     quest::debug("timer " . $timer);
     if ($timer eq 'Remove-SharedTask') {
-        $client->StopTimer('Remove-SharedTask');
-        $client->EndSharedTask();        
+        if ($client->GetAggroCount() == 0) {
+            $client->StopTimer('Remove-SharedTask');
+            $client->EndSharedTask();
+        }        
     }
 }
 
