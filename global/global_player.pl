@@ -4,7 +4,7 @@ use Time::Seconds; # for ONE_DAY constant
 sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, 1);
-    
+
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
@@ -42,7 +42,7 @@ sub EVENT_CONNECT {
                             . ($inactive_classes ? ", $inactive_classes)" : ")")
                             . " has logged in for the first time today!";
 
-        #plugin::WorldAnnounce($announceString);
+        plugin::WorldAnnounce($announceString);
 
         # Update the stored time with the current time
         $client->SetBucket("LastLoginTime", $current_time, $seconds_until_next_6am);
