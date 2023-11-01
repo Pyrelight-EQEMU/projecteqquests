@@ -7,7 +7,7 @@ sub EVENT_SPELL_EFFECT_NPC {
 
         foreach my $stat (@stat_names) {
             if ($npc->EntityVariableExists($stat)) {
-                $npc_stats{$stat} = $npc->GetEntityVariable($stat);
+                $npc->ModifyNPCStat($stat, $npc->GetEntityVariable($stat));
             }
         }
     }
