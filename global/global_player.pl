@@ -9,10 +9,6 @@ sub EVENT_CONNECT {
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
-    if ($client->GetLevel() < 5) {
-        $client->AddEXP(100000);
-    }
-
     for my $suffix ('A', 'O', 'F', 'K', 'V', 'L') {
         plugin::add_char_zone_data_to_account($client->CharacterID(), $client->AccountID(), $suffix);
     }
@@ -65,6 +61,10 @@ sub EVENT_CONNECT {
         $client->SetBucket("LastLoginTime", $current_time, $seconds_until_next_6am);
         $client->SummonItem(40605, 1);
         plugin::YellowText("You have been granted a daily log-in reward!");        
+    }    
+
+    if ($client->GetLevel() < 5) {
+        $client->AddEXP(100000);
     }
 }
 
