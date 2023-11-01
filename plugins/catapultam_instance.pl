@@ -357,7 +357,7 @@ sub ShowDifficultyOptions {
 
             my $diff_string = join(' ', map { "[ ".quest::saylink("select_diff_$_", 1, "$_")." ]" } $start_level .. ($solo_escalation_level + 5));
 
-            plugin::NPCTell("You must select the degree of difficulty which you intend to face.");
+            plugin::PurpleText("You must select the degree of difficulty which you intend to face.");
             plugin::PurpleText("Choose: ". $diff_string);
             return 1;
         }
