@@ -12,46 +12,31 @@ my $max_upgrade     = 10;
 
 sub HandleTaskAccept
 {
-    my $task_id             = shift || plugin::val('task_id');
-    my $task_name           = quest::gettaskname($task_id);
-    my $type                = 0;
-    my $target_difficulty   = 0;
-    my $client              = shift || plugin::val('client');
-    my $zone_name           = $client->GetBucket("temp-zone-cache");
+    my $task_id                 = shift || plugin::val('task_id');
+    my $client                  = shift || plugin::val('client');
+    my $task_name               = quest::gettaskname($task_id);
+    my $solo_escalation_level   = $client->GetBucket("$zone_name-solo-escalation")  || 0;
+    my $zone_name               = $client->GetBucket("temp-zone-cache");
+    my $type                    = 0;
+    my $target_difficulty       = 0;    
     my $menu_string;
-    my @difficulties;
-    
+    my @difficulties; 
 
     if ($task_name =~ /\(Escalation\)$/ ) {
         $type = 1;
         $target_difficulty  = $client->GetBucket("$zone_name-solo-escalation") || 0;
         $target_difficulty++;
 
-        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently increase your Difficulty Rank for this zone upon completion.");
+        plugin::YellowText("You have started an Escalation task. You will recieve [Tokens of Strength] and permanently 
+                            increase your Difficulty Rank for this zone upon completion. You may not add any additional 
+                            players to this task.");
         
-    } elsif ($task_name =~ /\(Heroic\)$/ ) {
-        $type = 2;
-        $target_difficulty  = $client->GetBucket("$zone_name-group-escalation") || 0;
-        $target_difficulty++;
-
-        plugin::YellowText("You have started a Heroic task. You will recieve [Heroic Tokens of Strength] and permanently increase your Heroic Difficulty Rank for this zone upon completion.");        
-    } else {
-        plugin::YellowText("You have started an Instance task. You will recieve no additional rewards upon completion.");
+    } elsif ($task_name =~ /\(Incursion\)$/ ) {
+        plugin::YellowText("You have started an Incursion task. You will recieve no additional rewards upon completion. 
+                            You may add additional players until you select a difficulty.");
     }
 
-    if ($type > 0) {
-        @difficulties       = grep { $_ > 0 } ($target_difficulty .. $target_difficulty + 4);
-
-        plugin::YellowText("Would you like to adjust your difficulty? You must select an option below before any further action.");
-    } else {
-        @difficulties       = grep { $_ > 0 } ($target_difficulty - 4 .. $target_difficulty);
-    }
-
-    foreach my $difficulty (@difficulties) {
-        $menu_string .= "[ ".quest::saylink("select_diff_$difficulty", 1, "$difficulty")." ]";
-    }
-
-    plugin::YellowText("Select: " . $menu_string);
+    ShowDifficultyOptions($client, ($task_id), $solo_escalation_level);
 }
 
 sub HandleSay {
@@ -63,71 +48,50 @@ sub HandleSay {
     my $decrease            = quest::saylink("decrease_info", 1, "decrease");
     my $Proceed             = quest::saylink("instance_proceed", 1, "Proceed");
 
-    my $solo_escalation_level  = $client->GetBucket("$zone_name-solo-escalation")  || 0;
-    my $group_escalation_level = $client->GetBucket("$zone_name-group-escalation") || 0;
-
+    
     my $escalation_target      = $client->GetBucket("Escalation-Target") || 0;
-
     my $selected_difficulty;
 
-    # TO-DO Handle this differently based on introductory flag from Theralon.
-    if ($text =~ /hail/i || $text =~ /^select_diff_(\d+)$/) {
-        if ($text =~ /^select_diff_(\d+)$/) {
-            $selected_difficulty = $1;
-            plugin::YellowText("You have selected Difficulty: $selected_difficulty");
-        }
+    if ($text =~ /^select_diff_(\d+)$/) {
+        $selected_difficulty = $1;
+        plugin::YellowText("You have selected Difficulty: $selected_difficulty");
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
                 if (!plugin::HasDynamicZoneAssigned($client)) {
                     my $task_name       = quest::gettaskname($task);
                     my $task_leader_id  = plugin::GetSharedTaskLeader($client);
-                    my $heroic          = 0;
                     my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
                     my $challenge       = 0; 
+                    
+                    if ($task_name =~ /\(Escalation\)$/ ) {
+                        $difficulty_rank = max($difficulty_rank++, $selected_difficulty);
+                    } 
 
-                    if (not plugin::HasDynamicZoneAssigned($client)) {
-                        if ($task_name =~ /\(Escalation\)$/ ) {
-                            $difficulty_rank++;
+                    elsif ($task_name =~ /\(Incursion\)$/ ) {
+                        $difficulty_rank = $selected_difficulty;
+                    }
+                    
+                    my %zone_info = ( 
+                                        "difficulty" => $difficulty_rank, 
+                                        "minimum_level" => $npc->GetLevel()
+                                    );
 
-                            if ($selected_difficulty > $difficulty_rank) {
-                                $difficulty_rank = $selected_difficulty;
-                            }
-                        } 
-                        
-                        elsif ($task_name =~ /\(Heroic\)$/ ) {                        
-                            $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-group-escalation") || 0;
-                            $difficulty_rank++;
-                            $heroic++;
+                    quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info), $zone_duration);
 
-                            if ($selected_difficulty > $difficulty_rank) {
-                                $difficulty_rank = $selected_difficulty;
-                            }
-                        }
-
-                        else {
-                            if ($selected_difficulty < $difficulty_rank) {
-                                $difficulty_rank = $selected_difficulty;
-                            }
-                        }
-                        
-                        my %zone_info = ( "difficulty" => $difficulty_rank, "heroic" => $heroic, "minimum_level" => $npc->GetLevel());
-                        quest::set_data("character-$task_leader_id-$zone_name", plugin::SerializeHash(%zone_info), $zone_duration);
-
-                        my %dz = (
-                            "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
-                            "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
-                            "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
-                        );
-                        
-                        $client->CreateTaskDynamicZone($task, \%dz);
-                    }                   
+                    my %dz = (
+                                "instance"      => { "zone" => $zone_name, "version" => $zone_version, "duration" => $zone_duration },
+                                "compass"       => { "zone" => plugin::val('zonesn'), "x" => $npc->GetX(), "y" => $npc->GetY(), "z" => $npc->GetZ() },
+                                "safereturn"    => { "zone" => plugin::val('zonesn'), "x" => $client->GetX(), "y" => $client->GetY(), "z" => $client->GetZ(), "h" => $client->GetHeading() }
+                    );
+                    
+                    $client->CreateTaskDynamicZone($task, \%dz);                                     
 
                     my %instance_data = ("reward"           => $reward, 
-                                        "zone_name"         => $zone_name, 
-                                        "difficulty_rank"   => $difficulty_rank, 
-                                        "task_id"           => $task, 
-                                        "leader_id"         => $task_leader_id,
-                                        "entered"           => 0);                
+                                         "zone_name"         => $zone_name, 
+                                         "difficulty_rank"   => $difficulty_rank, 
+                                         "task_id"           => $task, 
+                                         "leader_id"         => $task_leader_id,
+                                         "entered"           => 0);                
 
                     my $group = $client->GetGroup();
                     if($group) {
@@ -146,19 +110,24 @@ sub HandleSay {
                 return;
             }
         }
-
-        my $say_string = "Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?";
-
-        if ($solo_escalation_level > 0 || $group_escalation_level > 0) {
-            $say_string .= " You have previously completed this task. Would you like to [attune] to this location?";
-        }
-
-        plugin::NPCTell($say_string);
-
-        return;
     }
 
-    elsif ($text eq 'debug') {
+    if ($text =~ /hail/i) {
+        #Show Difficulty Options if we haven't previously selected them, then exit this
+        if (!plugin::HasDynamicZoneAssigned($client)) {            
+            return if ShowDifficultyOptions($client, @task_id, $solo_escalation_level);
+        } else {
+            plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
+            return;
+        }
+
+        # Default Hail Response
+        my $say_string = "Adventurer. Master Theralon has provided me with a task for you to accomplish. Do you wish to hear the [$details] about it?";        
+        $say_string .= " You have previously completed this task. Would you like to [attune] to this location?" if ($solo_escalation_level > 0);
+        plugin::NPCTell($say_string);
+    }
+
+    elsif ($text eq 'debug' && $client->GetGM()) {
        $npc->Say("Shared Task Leader ID is: " . plugin::GetSharedTaskLeader($client));
        $npc->Say("HasDynamicZoneAssigned: "   . plugin::HasDynamicZoneAssigned($client));
     }
@@ -184,17 +153,19 @@ sub HandleSay {
         $client->TaskSelector(@task_id);
         $client->SetBucket("temp-zone-cache", $zone_name);
         $client->DeleteBucket("$zone_name-override-escalation");
-        plugin::YellowText("Feat of Strength instances are scaled up by completing either Escalation (Solo) or Heroic (Group) versions. You will recieve [$tokens_of_strength] 
-                            only once per difficulty rank. You may also journey into this dungeon without challenging it, at your highest previously completed difficulty level.");
-        plugin::YellowText("Difficulty Rank: $solo_escalation_level, Heroic Difficulty Rank: $group_escalation_level");
+        plugin::YellowText("Feat of Strength instances may be embarked upon as an [Escalation] or an [Incursion]. Escalations must be completed alone 
+                            and each will be more difficult than the last, but will reward [Tokens] each time you successfully complete it. In contrast,
+                            Incursions may be embarked upon either with allies or by yourself, and may be attempted at either a lower or higher difficulty
+                            than you have conqurered in Escalations.");
     }
 
     # From [Proceed]
     elsif ($text eq 'instance_proceed') {
+        $client->LockSharedTask(1);
         $client->MovePCDynamicZone($zone_name);
     }
 
-    elsif ($text eq 'tokens_of_strength') {
+    elsif ($text eq 'tokens_of_strength' || $text eq 'Tokens') {
         plugin::YellowText("These tokens may be exchanged with others among the Brotherhood for a variety of services. They are a scarce commodity and should be carefully guarded.");
         plugin::Display_FoS_Tokens($client);
         plugin::Display_FoS_Heroic_Tokens($client);
@@ -232,36 +203,13 @@ sub HandleTaskComplete
     my $zone_name           = $instance_data{'zone_name'};
     my $task_id_stored      = $instance_data{'task_id'};
     my $leader_id           = $instance_data{'leader_id'};
-    my $task_name           = quest::gettaskname($task_id);  
-    my $heroic              = ($task_name =~ /\(Heroic\)$/) ? 1 : 0;
+    my $task_name           = quest::gettaskname($task_id);
     my $escalation          = ($task_name =~ /\(Escalation\)$/) ? 1 : 0;
 
     my $charname = $client->GetCleanName();
 
     if ($task_id == $task_id_stored) {
-        if ($client->CharacterID() == $leader_id) {         
-            if ($heroic) {                        
-                my $old_diff = $client->GetBucket("$zone_name-group-escalation") || 0;
-                if ($old_diff < $difficulty_rank) {
-                    my $reward_total = ($difficulty_rank - $old_diff) * $reward;
-
-                    $client->SetBucket("$zone_name-group-escalation", $difficulty_rank);
-                    plugin::YellowText("Your Heroic Difficulty Rank has increased to $difficulty_rank.", $client);
-                    plugin::Add_FoS_Tokens($reward_total, $client);
-                    plugin::Add_FoS_Heroic_Tokens($reward_total, $client);
-                    plugin::AddToLeaderboard($client, $zone_name, $difficulty_rank, $task_name);
-
-                    my $group = $client->GetGroup();
-                    if($group) {
-                        for ($count = 0; $count < $group->GroupCount(); $count++) {
-                            $player = $group->GetMember($count);
-                            if($player) {
-                                plugin::Add_FoS_Heroic_Tokens($reward_total, $client);
-                            }
-                        }
-                    }                    
-                }
-            } 
+        if ($client->CharacterID() == $leader_id) {
             if ($escalation) {    
                 my $old_diff = $client->GetBucket("$zone_name-solo-escalation") || 0;
                 if ($old_diff < $difficulty_rank) {
@@ -274,8 +222,11 @@ sub HandleTaskComplete
                 }
             }
         }
+
+        plugin::YellowText("You have completed this task. You will be removed from it in two minutes.");
         
         $client->DeleteBucket("instance-data");
+        $client->SetTimer("Remove-SharedTask", 120);
     }
 }
 
@@ -382,6 +333,28 @@ sub upgrade_item_npc {
     }
 }
 
+sub ShowDifficultyOptions {
+    my ($client, @task_id, $solo_escalation_level) = @_;
+
+    foreach my $task (@task_id) {
+        if ($client->IsTaskActive($task)) {
+            my $start_level = 0;
+            if ($task_name =~ /\(Escalation\)$/ ) {
+                $start_level = $solo_escalation_level + 1;         
+            } else {
+                $start_level = max(0, $solo_escalation_level - 5);
+            }
+
+            my $diff_string = join(' ', map { "[ ".quest::saylink("select_diff_$_", 1, "$_")." ]" } $start_level .. ($solo_escalation_level + 5));
+
+            plugin::NPCTell("You must select the degree of difficulty which you intend to face. $diff_string");
+            plugin::YellowText("Choose: ". $diff_string);
+            return true;
+        }
+    }
+    return false;
+}
+
 sub ModifyInstanceLoot {
     my $npc         = shift or return;
     my $client      = plugin::val('client');
@@ -425,7 +398,6 @@ sub ModifyInstanceNPC
     my %info_bucket = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty  = $info_bucket{'difficulty'};    
     my $min_level   = $info_bucket{'minimum_level'} + floor($difficulty / 3);
-    my $reward      = $info_bucket{'reward'};    
 
     # Get initial mob stat values
     my @stat_names = qw(max_hp min_hit max_hit atk mr cr fr pr dr spellscale healscale accuracy avoidance heroic_strikethrough);  # Add more stat names here if needed
