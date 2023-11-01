@@ -122,7 +122,13 @@ sub HandleSay {
         if (!plugin::HasDynamicZoneAssigned($client)) {            
             return if ShowDifficultyOptions($client, \@task_id, $solo_escalation_level, $task_name);
         } else {
-            plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
+            my %instance_data       = plugin::DeserializeHash($client->GetBucket("instance-data"));
+            my $stored_zone_name    = $instance_data{'zone_name'};
+            if ($zone_name eq $stored_zone_name) {
+                plugin::NPCTell("The way before you is clear. [$Proceed] when you are ready.");
+            } else {
+                plugin::NPCTell("You already have a task assigned to you by another Servant. Finish or abandon it before speaking to me.");
+            }
             return;
         }
 
