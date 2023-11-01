@@ -44,11 +44,10 @@ sub HandleSay {
     my $details             = quest::saylink("instance_details", 1, "details");
     my $tokens_of_strength  = quest::saylink("tokens_of_strength", 1, "Tokens of Strength");
     my $decrease            = quest::saylink("decrease_info", 1, "decrease");
-    my $Proceed             = quest::saylink("instance_proceed", 1, "Proceed");
-
-    
-    my $escalation_target      = $client->GetBucket("Escalation-Target") || 0;
+    my $Proceed             = quest::saylink("instance_proceed", 1, "Proceed");    
     my $selected_difficulty;
+
+    my $solo_escalation_level   = $client->GetBucket("$zone_name-solo-escalation")  || 0;
 
     if ($text =~ /^select_diff_(\d+)$/) {
         $selected_difficulty = $1;
@@ -333,7 +332,6 @@ sub upgrade_item_npc {
 
 sub ShowDifficultyOptions {
     my ($client, @task_id, $solo_escalation_level) = @_;
-    quest::debug("$client, $task_id, $solo_escalation_level");
 
     foreach my $task (@task_id) {
         if ($client->IsTaskActive($task)) {
