@@ -13,8 +13,8 @@ sub HandleTaskAccept
     my $task_id                 = shift || plugin::val('task_id');
     my $client                  = shift || plugin::val('client');
     my $task_name               = quest::gettaskname($task_id);
-    my $solo_escalation_level   = $client->GetBucket("$zone_name-solo-escalation")  || 0;
     my $zone_name               = $client->GetBucket("temp-zone-cache");
+    my $solo_escalation_level   = $client->GetBucket("$zone_name-solo-escalation")  || 0;    
     my $type                    = 0;
     my $target_difficulty       = 0;    
     my $menu_string;
@@ -149,7 +149,6 @@ sub HandleSay {
         plugin::NPCTell($explain_details);
         $client->TaskSelector(@task_id);
         $client->SetBucket("temp-zone-cache", $zone_name);
-        $client->DeleteBucket("$zone_name-override-escalation");
         plugin::YellowText("Feat of Strength instances may be embarked upon as an [Escalation] or an [Incursion]. Escalations must be completed alone 
                             and each will be more difficult than the last, but will reward [Tokens] each time you successfully complete it. In contrast,
                             Incursions may be embarked upon either with allies or by yourself, and may be attempted at either a lower or higher difficulty
