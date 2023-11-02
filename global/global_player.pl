@@ -6,6 +6,7 @@ sub EVENT_CONNECT {
     # Grant Max Eyes Wide Open AA
     $client->GrantAlternateAdvancementAbility(938, 8, 1);
 
+    plugin::build_spellpool($client);
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
@@ -317,6 +318,7 @@ sub EVENT_COMBINE_SUCCESS {
 
 sub EVENT_SCRIBE_SPELL {
     add_illusions($client);
+    plugin::build_spellpool($client);
 }
 
 sub EVENT_UNSCRIBE_SPELL {
