@@ -1082,6 +1082,7 @@ sub build_spellpool {
         }
     }
 
+    quest::debug(plugin::SerializeHash(%spellbook));
     $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
 }
 
