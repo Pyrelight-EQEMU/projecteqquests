@@ -161,28 +161,7 @@ function event_say(e)
 end
 
 function getSpellCost(spellID, SPELL_CLASS_ID)
-    local spell_info = eq.get_spell(spellID)
-    local spell_level = spell_info:Classes(SPELL_CLASS_ID)
-    
-    if (spell_level >= 1 and spell_level <= 10) then
-        return 0
-    elseif (spell_level >= 11 and spell_level <= 20) then
-        return 0
-    elseif (spell_level >= 21 and spell_level <= 30) then
-        return 0
-    elseif (spell_level >= 31 and spell_level <= 40) then
-        return 0
-    elseif (spell_level >= 41 and spell_level <= 50) then
-        return 0
-    elseif (spell_level >= 51 and spell_level <= 60) then
-        return 100
-    elseif (spell_level >= 61 and spell_level <= 65) then
-        return 500
-    elseif (spell_level >= 66 and spell_level <= 70) then
-        return 1000
-    elseif (spell_level >= 71 and spell_level <= 75) then
-        return 2500
-    end
+    return 0;
 end
 
 -- Define the custom comparison function
