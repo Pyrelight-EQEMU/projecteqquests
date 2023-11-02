@@ -1080,7 +1080,7 @@ sub build_spellpool {
         }
     }
 
-    $client->SetBucket("unlocked-spellbook", %spellbook);
+    $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
 }
 
 sub GetSpellLevelByClass {
