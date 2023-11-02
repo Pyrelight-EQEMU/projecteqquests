@@ -1067,4 +1067,57 @@ sub upgrade_item_to_fabled {
     } else { quest::debug("The npc didn't exist?"); } 
 }
 
+sub build_spellpool {
+    my ($client) = @_;
+
+    my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+
+    for my $slot (0..720) {
+        my $spell_id    = $client->GetSpellIDByBookSlot($slot);
+        my $spell_level =  plugin::GetSpellLevelByClass($spell_id, $client->GetClass());
+        if ($spell_level > -1 && $spell_level < $spellbook{$spell_id}) {
+            $spellbook{$spell_id} = $spell_level;
+        }
+    }
+
+    $client->SetBucket("unlocked-spellbook", %spellbook);
+}
+
+sub GetSpellLevelByClass {
+    my ($spellid, $class_id) = @_;
+
+    # Load database handler
+    my $dbh = plugin::LoadMysql();
+
+    # Define bitmask based on class_id
+    my %id_to_bitmask = (
+        1  => 1,
+        2  => 2,
+        3  => 4,
+        4  => 8,
+        5  => 16,
+        6  => 32,
+        7  => 64,
+        8  => 128,
+        9  => 256,
+        10 => 512,
+        11 => 1024,
+        12 => 2048,
+        13 => 4096,
+        14 => 8192,
+        15 => 16384,
+        16 => 32768,
+    );
+    
+    # Prepare SQL statement
+    my $sth = $dbh->prepare("SELECT items.reqlevel FROM items WHERE items.scrolleffect = ? AND (items.classes & ?) = ?");
+    $sth->execute($spellid, $id_to_bitmask{$class_id}, $id_to_bitmask{$class_id});
+    
+    # Fetch the result
+    my $result = $sth->fetchrow_arrayref();
+
+    # Return the reqlevel or undef if not found
+    return defined $result ? $result->[0] : -1;
+}
+
 return 1;
