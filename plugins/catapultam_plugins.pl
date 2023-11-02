@@ -1070,7 +1070,7 @@ sub upgrade_item_to_fabled {
 sub build_spellpool {
     my ($client) = @_;
 
-    my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+    my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook")) || {};
 
     for my $slot (0..720) {
         my $spell_id    = $client->GetSpellIDByBookSlot($slot);
