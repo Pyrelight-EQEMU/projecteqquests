@@ -1075,11 +1075,13 @@ sub build_spellpool {
 
     for my $slot (0..720) {
         my $spell_id    = $client->GetSpellIDByBookSlot($slot);
-        my $spell_level =  plugin::GetSpellLevelByClass($spell_id, $client->GetClass());
-        quest::debug("$spell_id : $spell_level");
-        if ($spell_level > -1 && $spell_level < $spellbook{$spell_id}) {
-            $spellbook{$spell_id} = $spell_level;
-            quest::debug("Pushing $spell_id at level $spell_level");
+        if ($spell_id > 0 && $spell_id <= 44000) {
+            my $spell_level =  plugin::GetSpellLevelByClass($spell_id, $client->GetClass());
+            quest::debug("$spell_id : $spell_level");
+            if ($spell_level > -1 && $spell_level < $spellbook{$spell_id}) {
+                $spellbook{$spell_id} = $spell_level;
+                quest::debug("Pushing $spell_id at level $spell_level");
+            }
         }
     }
 
