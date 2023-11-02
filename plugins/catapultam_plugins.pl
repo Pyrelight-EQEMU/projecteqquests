@@ -1077,6 +1077,7 @@ sub build_spellpool {
         my $spell_level =  plugin::GetSpellLevelByClass($spell_id, $client->GetClass());
         if ($spell_level > -1 && $spell_level < $spellbook{$spell_id}) {
             $spellbook{$spell_id} = $spell_level;
+            quest::debug("Pushing $spell_id at level $spell_level");
         }
     }
 
