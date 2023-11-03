@@ -27,7 +27,8 @@ sub EVENT_SAY {
             $response_string .= " Would you like me to [list the spells] which you know, but don't currently have in your book? Alternatively, I can show you
                                 how you can [automatically add spells] that you know to your active book.";           
         } else {
-            $response_string .= " I see that you are already automatically adding spells. Do you want to [stop doing that], and add them manually going forward?";
+            $response_string .= " However, I see that you have already chosen to automatically try to add all of the spells you learn to all of your spellbooks.
+                                Do you want to [stop doing that], and add them manually going forward?";
         }
         plugin::NPCTell($response_string);
         plugin::YellowText("You know a total of $spell_count spells and have $active_count in your active spellbook. It can fit $remain_space additional spells.");
