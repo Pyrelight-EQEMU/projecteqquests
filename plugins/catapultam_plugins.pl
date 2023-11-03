@@ -1131,6 +1131,9 @@ sub GetSpellLevelsByClass {
         $spell_levels{$spell_id} = $level;
     }
 
+    $sth->finish();
+    $dbh->disconnect();
+
     return %spell_levels;
 }
 
