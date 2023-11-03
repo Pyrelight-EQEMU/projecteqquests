@@ -1,4 +1,3 @@
--- Cross-Class Spell Facilitator
 my $my_name = $npc->GetCleanName();
 
 sub EVENT_SAY {
