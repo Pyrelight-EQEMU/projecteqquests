@@ -1085,8 +1085,127 @@ sub build_spellpool {
         }
     }
 
+    $client->GetSpellBookSlotBySpellID(uint32 spell_id)
+    $client->GetFreeSpellBookSlot()
+    $client->ScribeSpell(uint16 spell_id, int slot, bool update_client)
+
     quest::debug(plugin::SerializeHash(%spellbook));
     $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
+}
+
+sub autopopulate_spellbook {
+    my ($client) = @_;
+
+    # Deserialize the unlocked-spellbook bucket to get the spellbook hash
+    my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+
+    # Loop through each spell_id in the spellbook hash
+    foreach my $spell_id (keys %spellbook) {
+        # Check if the character already knows the spell
+        my $known_slot = $client->GetSpellBookSlotBySpellID($spell_id);
+
+        # If the spell isn't known (assuming a return value outside the 0-720 range indicates this)
+        if ($known_slot < 0 || $known_slot > 720) {
+            # Get a free spellbook slot
+            my $free_slot = $client->GetFreeSpellBookSlot();
+
+            # If a free slot is available, scribe the spell into that slot
+            if ($free_slot >= 0 && $free_slot <= 720 && $spellbook{$spell_id} <= $client->GetLevel()) {
+                $client->ScribeSpell($spell_id, $free_slot, 1);
+            } else {
+                # No more free slots available, can't scribe further spells
+                plugin::RedText("No additional free spellbook slots available for this class.");
+                last;
+            }
+        }
+    }
+}
+
+sub scribe_specific_spell {
+    my ($client, $specific_spell_id) = @_;
+
+    # Deserialize the unlocked-spellbook bucket to get the spellbook hash
+    my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+
+    # Check if the specific spell ID exists in the spellbook hash
+    if (exists $spellbook{$specific_spell_id}) {
+        # Check if the character already knows the spell
+        my $known_slot = $client->GetSpellBookSlotBySpellID($specific_spell_id);
+
+        # If the spell isn't known (assuming a return value outside the 0-720 range indicates this)
+        if ($known_slot < 0 || $known_slot > 720) {
+            # Get a free spellbook slot
+            my $free_slot = $client->GetFreeSpellBookSlot();
+
+            # If a free slot is available, scribe the spell into that slot
+            if ($free_slot >= 0 && $free_slot <= 720) {
+                $client->ScribeSpell($specific_spell_id, $free_slot, 1);
+                quest::debug("Successfully scribed spell ID $specific_spell_id.");
+            } else {
+                # No free slots available
+                plugin::RedText("No additional free spellbook slots available for this class.");
+            }
+        } else {
+            quest::debug("Character already knows spell ID $specific_spell_id.");
+        }
+    } else {
+        quest::debug("Spell ID $specific_spell_id not found in unlocked-spellbook hash.");
+    }
+}
+
+sub get_spells_in_level_range {
+    my ($client, $min_level, $max_level) = @_;
+
+    # Deserialize the unlocked-spellbook bucket to get the spellbook hash
+    my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+
+    # Filter the spells that fall within the given level range
+    my @filtered_spells = grep { $spellbook{$_} >= $min_level && $spellbook{$_} <= $max_level } keys %spellbook;
+
+    # Return the filtered spell IDs
+    return @filtered_spells;
+}
+
+sub spellbook_difference {
+    my ($client) = @_;
+
+    # just in case, flush current book into stored hash
+    plugin::populate_spellbook($client);
+
+    # Deserialize the unlocked-spellbook bucket to get the stored spellbook hash
+    my %stored_spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+
+    # Get the total number of spells in the stored hash
+    my $stored_spell_count = keys %stored_spellbook;
+
+    # Count the number of spells in the active spellbook
+    my $active_spell_count = 0;
+    for my $slot (0..720) {
+        my $spell_id = $client->GetSpellIDByBookSlot($slot);
+        if ($spell_id > 0 && $spell_id <= 44000) {  # Assuming 0xFFFFFFFF indicates an empty slot
+            $active_spell_count++;
+        }
+    }
+
+    # Calculate the difference
+    my $difference = abs($stored_spell_count - $active_spell_count);
+
+    return $difference;
+}
+
+sub active_spellbook_count {
+    my ($client) = @_;
+
+    # Count the number of spells in the active spellbook
+    my $active_spell_count = 0;
+    for my $slot (0..720) {
+        my $spell_id = $client->GetSpellIDByBookSlot($slot);
+        if ($spell_id > 0 && $spell_id <= 44000) {
+            $active_spell_count++;
+        }
+    }
+
+    return $active_spell_count;
 }
 
 sub GetSpellLevelByClass {

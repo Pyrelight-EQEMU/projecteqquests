@@ -112,6 +112,10 @@ for my $tier (1..20) {
                         $row->{mana} += max(ceil_to_nearest_5(abs($modifier * $row->{hp})), (10 * $tier));
                         $row->{ac} += $tier;
                     }
+                } else {
+                    if ($row->{damage} > 0) {
+                        $row->{damage} += $tier;
+                    }
                 }
 
                 if ($row->{proceffect} > 0) {
