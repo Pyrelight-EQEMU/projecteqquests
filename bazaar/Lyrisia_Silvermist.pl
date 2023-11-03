@@ -59,7 +59,7 @@ sub EVENT_SAY {
             my @learnable_spellbook;  # Initialize as an empty array
             foreach my $spell_id (@sorted_spellbook) {
                 my $active_slot = $client->GetSpellBookSlotBySpellID($spell_id);
-                if (!($active_slot < 0 || $active_slot > 720)) {
+                if (($active_slot < 0 || $active_slot > 720)) {
                     push @learnable_spellbook, $spell_id;  # Add spell_id to the array
                 }
             }
