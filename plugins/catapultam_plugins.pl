@@ -1096,6 +1096,8 @@ sub build_spellpool {
 
 sub GetSpellLevelsByClass {
     my ($spellids_ref, $class_id) = @_;
+
+    quest::debug("executing GetSpellLevelsByClass");
     
     # Load database handler
     my $dbh = plugin::LoadMysql();
