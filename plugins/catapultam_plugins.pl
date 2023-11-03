@@ -1068,7 +1068,7 @@ sub upgrade_item_to_fabled {
 }
 
 sub build_spellpool {
-    my ($client) = @_;
+    my $client = shift;
 
     my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook")) || {};
 
