@@ -5,7 +5,7 @@ sub EVENT_SAY {
 
     my $charname            = $client->GetCleanName();
     my %spellbook           = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
-    my @sorted_spellbook    = sort { $spellbook{$a} <=> $spellbook{$b} } keys %spellbook;
+    my @sorted_spellbook    = sort {($spellbook{$a} // 0) <=> ($spellbook{$b} // 0)} keys %spellbook;
     my $spell_count         = keys %spellbook;
     my $active_count        = active_spellbook_count($client);
     my $remain_space        = 720 - $active_count;    
