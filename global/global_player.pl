@@ -78,6 +78,11 @@ sub EVENT_TIMER {
             $client->EndSharedTask();
         }        
     }
+    elsif ($timer eq 'update-spells') {        
+        plugin::build_spellpool($client);
+        plugin::autopopulate_spellbook($client) if $client->GetBucket("autoadd-unlocked-spells");
+        $client-StopTimer('update-spells');
+    }
 }
 
 sub EVENT_ENTER_ZONE {
@@ -321,7 +326,7 @@ sub EVENT_COMBINE_SUCCESS {
 
 sub EVENT_SCRIBE_SPELL {
     add_illusions($client);
-    plugin::build_spellpool($client);
+    $client->SetTimer("update-spells", 10);
 }
 
 sub EVENT_UNSCRIBE_SPELL {
