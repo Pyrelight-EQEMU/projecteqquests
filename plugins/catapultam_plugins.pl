@@ -1071,19 +1071,67 @@ sub build_spellpool {
     my $client = shift;
 
     my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
-
+    
+    # Step 1: Create an array of all spell IDs.
+    my @spell_ids;
     for my $slot (0..720) {
-        my $spell_id    = $client->GetSpellIDByBookSlot($slot);
+        my $spell_id = $client->GetSpellIDByBookSlot($slot);
         if ($spell_id > 0 && $spell_id <= 44000) {
-            my $spell_level =  plugin::GetSpellLevelByClass($spell_id, $client->GetClass());
-            quest::debug("$spell_id : $spell_level");
-            if ($spell_level > -1 && (!exists $spellbook{$spell_id} || $spell_level < $spellbook{$spell_id})) {
-                $spellbook{$spell_id} = $spell_level;
-            }
+            push @spell_ids, $spell_id;
+        }
+    }
+
+    # Step 2 and 3: Fetch results from database
+    my %spell_levels = GetSpellLevelsByClass(\@spell_ids, $client->GetClass());
+
+    # Step 4: Update the %spellbook hash based on fetched results
+    while (my ($spell_id, $spell_level) = each %spell_levels) {
+        if ($spell_level > -1 && (!exists $spellbook{$spell_id} || $spell_level < $spellbook{$spell_id})) {
+            $spellbook{$spell_id} = $spell_level;
         }
     }
 
     $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
+}
+
+sub GetSpellLevelsByClass {
+    my ($spellids_ref, $class_id) = @_;
+    
+    # Load database handler
+    my $dbh = plugin::LoadMysql();
+    
+    # Define bitmask based on class_id
+    my %id_to_bitmask = (
+        1  => 1,
+        2  => 2,
+        3  => 4,
+        4  => 8,
+        5  => 16,
+        6  => 32,
+        7  => 64,
+        8  => 128,
+        9  => 256,
+        10 => 512,
+        11 => 1024,
+        12 => 2048,
+        13 => 4096,
+        14 => 8192,
+        15 => 16384,
+        16 => 32768,
+    );    
+
+    # Prepare SQL statement
+    my $placeholders = join(',', ('?') x @$spellids_ref);
+    my $sth = $dbh->prepare("SELECT items.scrolleffect, items.reqlevel FROM items WHERE items.scrolleffect IN ($placeholders) AND (items.classes & ?) = ?");
+    $sth->execute(@$spellids_ref, $id_to_bitmask{$class_id}, $id_to_bitmask{$class_id});
+    
+    # Fetch the results and build a hash
+    my %spell_levels;
+    while (my ($spell_id, $level) = $sth->fetchrow_array()) {
+        $spell_levels{$spell_id} = $level;
+    }
+
+    return %spell_levels;
 }
 
 sub autopopulate_spellbook {
@@ -1199,43 +1247,6 @@ sub active_spellbook_count {
     }
 
     return $active_spell_count;
-}
-
-sub GetSpellLevelByClass {
-    my ($spellid, $class_id) = @_;
-
-    # Load database handler
-    my $dbh = plugin::LoadMysql();
-
-    # Define bitmask based on class_id
-    my %id_to_bitmask = (
-        1  => 1,
-        2  => 2,
-        3  => 4,
-        4  => 8,
-        5  => 16,
-        6  => 32,
-        7  => 64,
-        8  => 128,
-        9  => 256,
-        10 => 512,
-        11 => 1024,
-        12 => 2048,
-        13 => 4096,
-        14 => 8192,
-        15 => 16384,
-        16 => 32768,
-    );
-    
-    # Prepare SQL statement
-    my $sth = $dbh->prepare("SELECT items.reqlevel FROM items WHERE items.scrolleffect = ? AND (items.classes & ?) = ?");
-    $sth->execute($spellid, $id_to_bitmask{$class_id}, $id_to_bitmask{$class_id});
-    
-    # Fetch the result
-    my $result = $sth->fetchrow_arrayref();
-
-    # Return the reqlevel or undef if not found
-    return defined $result ? $result->[0] : -1;
 }
 
 return 1;
