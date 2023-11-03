@@ -81,7 +81,7 @@ sub EVENT_TIMER {
     elsif ($timer eq 'update-spells') {        
         plugin::build_spellpool($client);
         plugin::autopopulate_spellbook($client) if $client->GetBucket("autoadd-unlocked-spells");
-        $client-StopTimer('update-spells');
+        $client->StopTimer('update-spells');
     }
 }
 
