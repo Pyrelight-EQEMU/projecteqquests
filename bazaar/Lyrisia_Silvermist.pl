@@ -76,4 +76,19 @@ sub EVENT_SAY {
         }
     }
 
+    elsif ($text =~ /^scribe_(\d+)$/) {
+        my $spell_id = $1; # Extract the spell_id from the matched pattern
+        if (defined $spellbook{$spell_id}) { # Check if the spell_id exists in our spellbook
+            my $free_slot = $client->GetFreeSpellBookSlot();
+            if ($free_slot >= 0 && $free_slot <= 720) {
+                $client->ScribeSpell($spell_id, $free_slot, 1);
+                plugin::NPCTell("You have successfully scribed the spell: " . quest::getspellname($spell_id));
+            } else {
+                plugin::NPCTell("Your spellbook is full, $charname. Make some space and try again.");
+            }
+        } else {
+            plugin::NPCTell("Hmm, something went wrong. I couldn't find that spell for you.");
+        }
+    }
+
 }
