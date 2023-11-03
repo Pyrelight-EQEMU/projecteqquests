@@ -322,7 +322,6 @@ sub EVENT_COMBINE_SUCCESS {
 sub EVENT_SCRIBE_SPELL {
     add_illusions($client);
     plugin::build_spellpool($client);
-    plugin::autopopulate_spellbook($client) if $client->GetBucket("autoadd-unlocked-spells");
 }
 
 sub EVENT_UNSCRIBE_SPELL {
