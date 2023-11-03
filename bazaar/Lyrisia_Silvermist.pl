@@ -4,7 +4,7 @@ sub EVENT_SAY {
     plugin::build_spellpool($client);
 
     my $charname            = $client->GetCleanName();
-    my %spellbook           = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook")) || {};
+    my %spellbook           = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
     my @sorted_spellbook    = sort { $spellbook{$a} <=> $spellbook{$b} } keys %spellbook;
     my $spell_count         = keys %spellbook;
     my $active_count        = active_spellbook_count($client);
