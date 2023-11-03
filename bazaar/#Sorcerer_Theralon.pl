@@ -1,5 +1,3 @@
-use DBI;
-use DBD::mysql;
 use List::Util qw(max);
 use List::Util qw(min);
 
