@@ -48,7 +48,7 @@ sub EVENT_SAY {
     elsif ($text=~/stop doing that/i) {
         if ($client->GetBucket("autoadd-unlocked-spells")) {
             plugin::NPCTell("Consider it done, $charname. Going forward, you'll need to come see me in order to add specific spells to your spellbook.");
-            $client->SetBucket("autoadd-unlocked-spells", 1);
+            $client->DeleteBucket("autoadd-unlocked-spells");
         } else {
             plugin::NPCTell("You are already set up to do that, $charname.");
         }
