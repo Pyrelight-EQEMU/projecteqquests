@@ -17,10 +17,10 @@ sub EVENT_SAY {
     elsif ($text=~/magical abilities/i) {
         my $response_string;
         if ($remain_space <= 10) {
-            $response_string = "You don't have many more spellbook slots, $charname.";
+            $response_string = "You don't have many more spellbook slots, $charname. ";
         }
 
-        $response_string .= " The spellbook that you carry around is limited by both your level and in total size (720), so it isn't possible to simply know 
+        $response_string .= "The spellbook that you carry around is limited by both your level and in total size (720), so it isn't possible to simply know 
                             every concieveable spell simultaneously.";
 
         if (!$client->GetBucket("autoadd-unlocked-spells")) {
@@ -58,7 +58,7 @@ sub EVENT_SAY {
             my @learnable_spellbook;  # Initialize as an empty array
             foreach my $spell_id (@sorted_spellbook) {
                 my $active_slot = $client->GetSpellBookSlotBySpellID($spell_id);
-                if (($active_slot < 0 || $active_slot > 720)) {
+                if (!($active_slot < 0 || $active_slot > 720)) {
                     push @learnable_spellbook, $spell_id;  # Add spell_id to the array
                 }
             }
