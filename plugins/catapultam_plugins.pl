@@ -1085,9 +1085,9 @@ sub build_spellpool {
         }
     }
 
-    $client->GetSpellBookSlotBySpellID(uint32 spell_id)
-    $client->GetFreeSpellBookSlot()
-    $client->ScribeSpell(uint16 spell_id, int slot, bool update_client)
+    $client->GetSpellBookSlotBySpellID(uint32 spell_id);
+    $client->GetFreeSpellBookSlot();
+    $client->ScribeSpell(uint16 spell_id, int slot, bool update_client);
 
     quest::debug(plugin::SerializeHash(%spellbook));
     $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
