@@ -7,7 +7,7 @@ sub EVENT_SAY {
     my %spellbook           = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
     my @sorted_spellbook    = sort {($spellbook{$a} // 0) <=> ($spellbook{$b} // 0)} keys %spellbook;
     my $spell_count         = keys %spellbook;
-    my $active_count        = active_spellbook_count($client);
+    my $active_count        = plugin::active_spellbook_count($client);
     my $remain_space        = 720 - $active_count;    
     
     if($text=~/hail/i) {
