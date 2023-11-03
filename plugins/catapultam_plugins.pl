@@ -1079,12 +1079,10 @@ sub build_spellpool {
             quest::debug("$spell_id : $spell_level");
             if ($spell_level > -1 && (!exists $spellbook{$spell_id} || $spell_level < $spellbook{$spell_id})) {
                 $spellbook{$spell_id} = $spell_level;
-                quest::debug("Pushing $spell_id at level $spell_level");
             }
         }
     }
 
-    quest::debug(plugin::SerializeHash(%spellbook));
     $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
 }
 
