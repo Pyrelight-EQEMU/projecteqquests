@@ -7,6 +7,7 @@ sub EVENT_CONNECT {
     $client->GrantAlternateAdvancementAbility(938, 8, 1);
 
     plugin::build_spellpool($client);
+    plugin::autopopulate_spellbook($client) if $client->GetBucket("autoadd-unlocked-spells");
     plugin::CheckLevelFlags();
     plugin::CheckClassAA($client);
 
@@ -104,6 +105,8 @@ sub EVENT_LEVEL_UP {
         }
     }
 
+    plugin::autopopulate_spellbook($client) if $client->GetBucket("autoadd-unlocked-spells");
+
     my %unlocked_classes = plugin::GetUnlockedClasses($client);
 
     # Create an array of hashes to hold the class data for sorting
@@ -130,7 +133,7 @@ sub EVENT_LEVEL_UP {
     if ($total_level % 10 == 0 || $client->GetLevel() % 10 == 0) {
         plugin::WorldAnnounce($announceString);
     }
-}
+    }
 
 sub EVENT_DISCOVER_ITEM {
     #quest::debug("itemid " . $itemid);
@@ -319,6 +322,7 @@ sub EVENT_COMBINE_SUCCESS {
 sub EVENT_SCRIBE_SPELL {
     add_illusions($client);
     plugin::build_spellpool($client);
+    plugin::autopopulate_spellbook($client) if $client->GetBucket("autoadd-unlocked-spells");
 }
 
 sub EVENT_UNSCRIBE_SPELL {
