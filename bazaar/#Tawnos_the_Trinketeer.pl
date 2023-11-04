@@ -57,7 +57,7 @@ sub EVENT_ITEM {
 
          # Use a prepared statement to prevent SQL injection
          my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
-         $sth->execute("'" . $item_name . "' Glamour-Stone");
+         $sth->execute($item_name . " Glamour-Stone");
          if (my $row = $sth->fetchrow_hashref()) {                
                if ($total_money >= (5000 * 1000)) {
                   if (grep { $_ == $item_id } @epics) {
