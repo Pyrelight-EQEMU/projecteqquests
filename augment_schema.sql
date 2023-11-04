@@ -7,8 +7,8 @@ UPDATE db_str SET value = "20 (Weapon Ornamentation)"       WHERE id = 20 AND ty
 UPDATE db_str SET value = "21 (Armor Ornamentation)"        WHERE id = 21 AND type = 16;
 
 UPDATE items
-   SET augslot1type     = 0, 
-	    augslot2type     = 0, 
+   SET 	augslot1type     = 0, 
+		augslot2type     = 0, 
 	    augslot3type     = 0, 
 	    augslot4type     = 0, 
 	    augslot5type     = 0,
@@ -39,12 +39,12 @@ UPDATE items
 
 -- All Items
 UPDATE items
-SET      augslot1type       = 1, -- Type 1
-	      augslot2type      = 2, -- Type 2
-	      augslot3type      = 3, -- Type 3
-	      augslot1visible   = 1,
-	      augslot2visible   = 1,
-	      augslot3visible   = 1
+SET     augslot1type      = 1, -- Type 1
+	    augslot2type      = 2, -- Type 2
+	    augslot3type      = 3, -- Type 3
+	    augslot1visible   = 1,
+	    augslot2visible   = 1,
+	    augslot3visible   = 1
  WHERE itemtype != 54
    AND slots > 0
    AND races > 0
