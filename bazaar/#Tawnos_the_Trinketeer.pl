@@ -44,37 +44,32 @@ sub EVENT_ITEM {
       if ($item_id != 0 && $item_id <= 110000000) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
          
-         my $item_id = plugin::get_base_id($item_id);
-         my $item_name = quest::getitemname($item_id);
+         my $item_id    = plugin::get_base_id($item_id);
+         my $item_name  = quest::getitemname($item_id);
+         my $special    = grep { $_ == $item_id } @epics ? 1 : 0;
 
-         # Strip prefix with possible whitespace
-         $item_name =~ s/^\s*(Rose Colored|Apocryphal|Fabled)\s*//;
+         my @ornament;
 
-         # Strip suffix with possible whitespace
-         $item_name =~ s/\s*\+\d{1,2}\s*$//;
+         if ($special) {
+            @ornament = GetOrnamentsForEpic($item_id);
+            plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
+         } elsif (plugin::item_exists_in_db($item_id + 200000000)) {            
+            push @ornament, ($item_id + 200000000)
+         } else {
+            plugin::NPCTell("I don't know how to convert $item_name into a Glamour-Stone, $clientName");
+         }
 
-         #quest::debug("looking for: '" . $item_name . "' Glamour-Stone");
-
-         # Use a prepared statement to prevent SQL injection
-         my $sth = $dbh->prepare('SELECT id FROM items WHERE name LIKE ?');
-         $sth->execute($item_name . " Glamour-Stone");
-         if (my $row = $sth->fetchrow_hashref()) {                
-               if ($total_money >= (5000 * 1000)) {
-                  if (grep { $_ == $item_id } @epics) {
-                     plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
-                  } else {
-                     # Remove the $item_id from the hash %itemcount
-                     delete $itemcount{$item_id}; 
-                  }
-
-                  $total_money -= (5000 * 1000);
-                  plugin::NPCTell("Perfect! Here, I had a Glamour-Stone almost ready. I'll just need to attune it to your $item_name! Enjoy!");
-                  $client->SummonItem($row->{id});
-                  $client->SummonItem(902386) if ($row->{id} == 902385); #Special Case of handle offhand beastlord epic         
-                 
-               } else {
-                  plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
+         if (@ornament) {
+            if ($total_money >= (5000 * 1000)) { # 5000 platinum
+               for my $item (@ornament) {
+                  $client-SummonItem($item);
                }
+               $total_money -= (5000 * 1000);
+               plugin::NPCTell("Here you, go, $clientName!"); 
+               delete $itemcount{$item_id};
+            } else {
+               plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
+            }
          } else {
                plugin::NPCTell("I don't think that I can create a Glamour-Stone for that item, $clientName. It must be something that you hold in your hand, such as a weapon or shield.");
          }
@@ -95,4 +90,30 @@ sub EVENT_ITEM {
 
     $client->AddMoneyToPP($copper_remainder, $silver_remainder, $gold_remainder, $platinum_remainder, 1);
     plugin::return_items(\%itemcount); 
+}
+
+sub GetOrnamentsForEpic {
+   my ($item_id) = @_;  # Get the input item_id
+
+   my %ornaments_map = (
+      5532  => [127916],         # Cleric
+      8495  => [127964, 127914], # Beastlord
+      10099 => [127923],         # Paladin
+      10650 => [127918],         # Enchanter
+      10651 => [127926],         # Shaman
+      14383 => [127927],         # Shadowknight
+      20488 => [127924, 127963], # Ranger
+      20490 => [127917],         # Druid
+      20544 => [127921],         # Necromancer
+      28034 => [127919],         # Magician
+   );
+
+   # Check if the item_id exists in the map
+   if (exists $ornaments_map{$item_id}) {
+      # Return the array reference directly
+      return @{ $ornaments_map{$item_id} };
+   } else {
+      # If the item_id does not exist, return an empty array or handle the error as desired
+      return ();  # or die "Item ID not found";
+   }
 }
