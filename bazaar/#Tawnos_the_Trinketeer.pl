@@ -46,7 +46,7 @@ sub EVENT_ITEM {
          
          my $base_id    = plugin::get_base_id($item_id);
          my $item_name  = quest::getitemname($item_id);
-         my $special    = grep { $_ == $item_id } @epics ? 1 : 0;
+         my $special    = grep { $_ == $base_id } @epics ? 1 : 0;
 
          my @ornament;
 
