@@ -377,20 +377,17 @@ sub ModifyInstanceLoot {
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'};
 
+    my $min_upgrade = floor($difficulty / 9);
+    my $max_upgrade = floor($difficulty / 3);
+
     if ($npc) {
         my @lootlist = $npc->GetLootList();
-        my $upgrade_base = floor($difficulty/3);
-
         foreach my $item_id (@lootlist) {
             # Get the count of this item ID in the loot
             my $item_count = $npc->CountItem($item_id);
-            my $item_type  = quest::getitemstat($item_id, 'itemtype') == 54;
-
-            quest::debug("item:$item_id, count:$item_count, difficulty:$difficulty");
 
             for (my $i = 0; $i < $item_count; $i++) {
-                $upgrade_base = ($item_type) ? int(rand($upgrade_base + 1)) : $upgrade_base;
-                plugin::upgrade_item_npc($item_id, $upgrade_base, $npc);
+                plugin::upgrade_item_npc($item_id, floor($min_upgrade + sqrt(rand()) * ($max_upgrade - $min_upgrade + 1));, $npc);
             }
         }
     }
@@ -449,12 +446,18 @@ sub ModifyInstanceNPC
     if ($difficulty > 0) {
         foreach my $stat (@stat_names) {
             my $difficulty_modifier = 1 + ($modifier * $difficulty);
-            if      (grep { $_ eq $stat } ('hp')) {
-                $difficulty_modifier *= 1.5;
+            if (grep { $_ eq $stat } ('hp', 'avoidance', 'accuracy', 'atk', 'ac')) {
+                $difficulty_modifier *= 2;
             } elsif (grep { $_ eq $stat } ('fr', 'cr', 'mr', 'dr', 'pr')) {
                 $difficulty_modifier /= 2;
             } elsif (grep { $_ eq $stat } ('spellscale')) {
-                $difficulty_modifier /= 4;
+                $difficulty_modifier /= 10;
+            } elsif (grep { $_ eq $stat } ('min_hit', 'max_hit' )) {
+                $difficulty_modifier /= 3;
+            } elsif (grep { $_ eq $stat } ('accuracy')) {
+                $stat = max($stat, (10 * $difficulty));
+            } elsif (grep { $_ eq $stat } ('heroic_strikethrough')) {
+                $stat = max($stat, ($difficulty - 10));
             }
 
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
