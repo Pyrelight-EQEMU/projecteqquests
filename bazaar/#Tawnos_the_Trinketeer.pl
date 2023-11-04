@@ -41,7 +41,7 @@ sub EVENT_ITEM {
     my $dbh = plugin::LoadMysql();
 
    foreach my $item_id (keys %itemcount) {
-      if ($item_id != 0 && $item_id <= 110000000 && quest::getitemstat($item_id, "itemtype") eq '54') {        
+      if ($item_id != 0 && $item_id <= 110000000) {        
          
          my $base_id    = plugin::get_base_id($item_id);
          my $item_name  = quest::getitemname($item_id);
