@@ -1,7 +1,8 @@
+my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
+
 sub EVENT_SAY {
    my $response = "";
-   my $clientName = $client->GetCleanName();
-   my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
+   my $clientName = $client->GetCleanName();  
 
    my $link_services = "[".quest::saylink("link_services", 1, "services")."]";
    my $link_services_2 = "[".quest::saylink("link_services", 1, "do for you")."]";
