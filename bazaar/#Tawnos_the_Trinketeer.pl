@@ -44,17 +44,17 @@ sub EVENT_ITEM {
       if ($item_id != 0 && $item_id <= 110000000) {
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
          
-         my $item_id    = plugin::get_base_id($item_id);
+         my $base_id    = plugin::get_base_id($item_id);
          my $item_name  = quest::getitemname($item_id);
          my $special    = grep { $_ == $item_id } @epics ? 1 : 0;
 
          my @ornament;
 
          if ($special) {
-            @ornament = GetOrnamentsForEpic($item_id);
+            @ornament = GetOrnamentsForEpic($base_id);
             plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
-         } elsif (plugin::item_exists_in_db($item_id + 200000000)) {            
-            push @ornament, ($item_id + 200000000)
+         } elsif (plugin::item_exists_in_db($base_id + 200000000)) {            
+            push @ornament, ($base_id + 200000000)
          } else {
             plugin::NPCTell("I don't know how to convert $item_name into a Glamour-Stone, $clientName");
          }
