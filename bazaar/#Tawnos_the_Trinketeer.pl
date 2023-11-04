@@ -46,6 +46,7 @@ sub EVENT_ITEM {
          my $item_name  = quest::getitemname($item_id);
          my $special    = grep { $_ == $base_id } @epics ? 1 : 0;
 
+
          quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}, $base_id:$special");
 
          my @ornament;
