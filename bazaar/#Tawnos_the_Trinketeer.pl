@@ -62,7 +62,7 @@ sub EVENT_ITEM {
          if (@ornament) {
             if ($total_money >= (5000 * 1000)) { # 5000 platinum
                for my $item (@ornament) {
-                  $client-SummonItem($item);
+                  $client->SummonItem($item);
                }
                $total_money -= (5000 * 1000);
                plugin::NPCTell("Here you, go, $clientName!"); 
