@@ -1,5 +1,3 @@
-my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
-
 sub EVENT_SAY {
    my $response = "";
    my $clientName = $client->GetCleanName();  
@@ -39,7 +37,7 @@ sub EVENT_ITEM {
     my $clientName = $client->GetCleanName();
 
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
-    my $dbh = plugin::LoadMysql();
+    my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
    foreach my $item_id (keys %itemcount) {
       if ($item_id != 0 && $item_id <= 110000000) {        
