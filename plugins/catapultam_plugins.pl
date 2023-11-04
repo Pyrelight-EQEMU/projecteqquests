@@ -597,6 +597,7 @@ sub get_continent_fix {
         'tox'           => 'O',
         'warrens'       => 'O',
         'stonebrunt'    => 'O',
+        'erudnext'      => 'O',
 
         # Kunark
         'burningwood'   => 'K',
