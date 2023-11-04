@@ -41,12 +41,13 @@ sub EVENT_ITEM {
     my $dbh = plugin::LoadMysql();
 
    foreach my $item_id (keys %itemcount) {
-      if ($item_id != 0 && $item_id <= 110000000) {
-         quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}");
+      if ($item_id != 0 && $item_id <= 110000000 && quest::getitemstat($item_id, "itemtype") eq '54') {        
          
          my $base_id    = plugin::get_base_id($item_id);
          my $item_name  = quest::getitemname($item_id);
          my $special    = grep { $_ == $base_id } @epics ? 1 : 0;
+
+         quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}, $special");
 
          my @ornament;
 
