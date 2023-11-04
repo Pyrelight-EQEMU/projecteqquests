@@ -66,10 +66,10 @@ sub EVENT_ITEM {
             } else {
                   plugin::NPCTell("I don't think that I can create a Glamour-Stone for that item, $clientName. It must be something that you hold in your hand, such as a weapon or shield.");
             }
-         } else {
-               plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
          }
-      }
+      } else {
+            plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
+      }      
    }
 
     # After processing all items, return any remaining money
