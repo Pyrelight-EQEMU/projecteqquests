@@ -39,14 +39,14 @@ sub EVENT_ITEM {
     my $total_money = ($platinum * 1000) + ($gold * 100) + ($silver * 10) + $copper;
     my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
+    
+   my $base_id    = plugin::get_base_id($item_id);
+   my $item_name  = quest::getitemname($item_id);   
+   my @ornament   = GetOrnamentsForEpic($base_id);
+
    foreach my $item_id (keys %itemcount) {
       if ($total_money >= (5000 * 1000)) { # 5000 platinum
-         if ($item_id != 0 && $item_id <= 110000000) {        
-            
-            my $base_id    = plugin::get_base_id($item_id);
-            my $item_name  = quest::getitemname($item_id);
-            my @ornament   = GetOrnamentsForEpic($base_id);
-
+         if ($item_id != 0 && $item_id <= 110000000) {
             if (@ornament) {
                plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
             } elsif (plugin::item_exists_in_db($base_id + 200000000)) {            
@@ -54,7 +54,6 @@ sub EVENT_ITEM {
             } else {
                plugin::NPCTell("I don't know how to convert $item_name into a Glamour-Stone, $clientName");
             }
-
             if (@ornament) {            
                   for my $item (@ornament) {
                      $client->SummonItem($item);
