@@ -40,36 +40,34 @@ sub EVENT_ITEM {
     my @epics      = (5532, 8495, 10099, 10650, 10651, 14383, 20488, 20490, 20544, 28034);
 
    foreach my $item_id (keys %itemcount) {
-      if ($item_id != 0 && $item_id <= 110000000) {        
-         
-         my $base_id    = plugin::get_base_id($item_id);
-         my $item_name  = quest::getitemname($item_id);
+      if ($total_money >= (5000 * 1000)) { # 5000 platinum
+         if ($item_id != 0 && $item_id <= 110000000) {        
+            
+            my $base_id    = plugin::get_base_id($item_id);
+            my $item_name  = quest::getitemname($item_id);
+            my @ornament   = GetOrnamentsForEpic($base_id);
 
-         quest::debug("I was handed: $item_id with a count of $itemcount{$item_id}, $base_id:$special");
-
-         my @ornament = GetOrnamentsForEpic($base_id);
-
-         if (@ornament) {
-            plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
-         } elsif (plugin::item_exists_in_db($base_id + 200000000)) {            
-            push @ornament, ($base_id + 200000000)
-         } else {
-            plugin::NPCTell("I don't know how to convert $item_name into a Glamour-Stone, $clientName");
-         }
-
-         if (@ornament) {
-            if ($total_money >= (5000 * 1000)) { # 5000 platinum
-               for my $item (@ornament) {
-                  $client->SummonItem($item);
-               }
-               $total_money -= (5000 * 1000);
-               plugin::NPCTell("Here you, go, $clientName!"); 
-               delete $itemcount{$item_id};
+            if (@ornament) {
+               plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
+            } elsif (plugin::item_exists_in_db($base_id + 200000000)) {            
+               push @ornament, ($base_id + 200000000)
             } else {
-               plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
+               plugin::NPCTell("I don't know how to convert $item_name into a Glamour-Stone, $clientName");
+            }
+
+            if (@ornament) {            
+                  for my $item (@ornament) {
+                     $client->SummonItem($item);
+                  }
+                  $total_money -= (5000 * 1000);
+                  plugin::NPCTell("Here you, go, $clientName!"); 
+                  delete $itemcount{$item_id};
+
+            } else {
+                  plugin::NPCTell("I don't think that I can create a Glamour-Stone for that item, $clientName. It must be something that you hold in your hand, such as a weapon or shield.");
             }
          } else {
-               plugin::NPCTell("I don't think that I can create a Glamour-Stone for that item, $clientName. It must be something that you hold in your hand, such as a weapon or shield.");
+               plugin::NPCTell("I must insist upon my fee $clientName for the $item_name, I do have to pay my bills. Please ensure you have enough for all your items.");
          }
       }
    }
