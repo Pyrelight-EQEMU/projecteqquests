@@ -1144,6 +1144,7 @@ sub autopopulate_spellbook {
 
     # Deserialize the unlocked-spellbook bucket to get the spellbook hash
     my %spellbook = plugin::DeserializeHash($client->GetBucket("unlocked-spellbook"));
+    my $added;
 
     # Loop through each spell_id in the spellbook hash
     foreach my $spell_id (keys %spellbook) {
@@ -1158,9 +1159,7 @@ sub autopopulate_spellbook {
             # If a free slot is available, scribe the spell into that slot
             if ($free_slot >= 0 && $free_slot <= 720 && $spellbook{$spell_id} <= $client->GetLevel()) {
                 $client->ScribeSpell($spell_id, $free_slot, 1);
-            } else {
-                # No more free slots available, can't scribe further spells
-                plugin::RedText("No additional free spellbook slots available for this class.");
+            } else {                
                 last;
             }
         }
@@ -1187,9 +1186,6 @@ sub scribe_specific_spell {
             if ($free_slot >= 0 && $free_slot <= 720) {
                 $client->ScribeSpell($specific_spell_id, $free_slot, 1);
                 quest::debug("Successfully scribed spell ID $specific_spell_id.");
-            } else {
-                # No free slots available
-                plugin::RedText("No additional free spellbook slots available for this class.");
             }
         } else {
             quest::debug("Character already knows spell ID $specific_spell_id.");
