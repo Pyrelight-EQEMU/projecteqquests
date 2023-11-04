@@ -96,8 +96,9 @@ sub EVENT_COMBAT
     # Pet Stuff
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
         my $owner = $npc->GetOwner()->CastToClient();
+        if ($owner->)
         if ($combat_state == 1) {            
-                $npc->SetTimer("Pet_Abilities", 18);
+                $npc->SetTimer("Pet_Abilities", 6);
         } else {
             $npc->StopTimer("Pet_Abilities");
         }        
@@ -112,7 +113,7 @@ sub EVENT_TIMER {
         if ($owner->GetClass() == 13 && $npc->IsTaunting()) {
             my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
             for $m (@close_list) {
-                if ($m) {
+                if (plugin::is_focus_equipped($owner, 28034)) {
                     my $m_target = $m->GetTarget();
                     if ($m_target->GetID() == $owner->GetID()) {
                         $m->AddToHateList($npc, 1000);
