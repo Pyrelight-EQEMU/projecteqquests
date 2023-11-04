@@ -47,6 +47,7 @@ sub EVENT_ITEM {
    foreach my $item_id (keys %itemcount) {
       if ($total_money >= (5000 * 1000)) { # 5000 platinum
          if ($item_id != 0 && $item_id <= 110000000) {
+            quest::debug("examining item $item_id, base $base_id");
             if (@ornament) {
                plugin::NPCTell("Oh my! This is an absolute relic. I believe that I can create a Glamour-Stone without destroying this item, if I try hard enough... Let's see..");
             } elsif (plugin::item_exists_in_db($base_id + 200000000)) {            
