@@ -111,7 +111,9 @@ sub EVENT_TIMER {
         my $target      = $npc->GetTarget();
         
         if ($npc->IsTaunting()) {
-            if (plugin::is_focus_equipped($owner, 28034)) {
+            my $epic_equipped = plugin::is_focus_equipped($owner, 28034);
+            quest::debug("AoE Taunt Eval: $epic_equipped");
+            if ($epic_equipped) {
                 my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
                 for $m (@close_list) {                
                     my $m_target = $m->GetTarget();
@@ -121,9 +123,8 @@ sub EVENT_TIMER {
                 }
                 $AoE_Spell = "21690"; #Enhanced Area Taunt
                 $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
+                quest::debug("AoE Taunt Triggered");
             }
-
-
         }
     }   
 }
