@@ -100,7 +100,7 @@ sub EVENT_COMBAT
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
         my $owner = $npc->GetOwner()->CastToClient();
         if ($combat_state == 1) {            
-                $npc->SetTimer("Pet_Abilities", 18);
+                $npc->SetTimer("Pet_Abilities", 6);
         } else {
             $npc->StopTimer("Pet_Abilities");
         }        
@@ -113,13 +113,13 @@ sub EVENT_TIMER {
         my $target      = $npc->GetTarget();
         
         if ($npc->IsTaunting()) {
-            my $epic_equipped = plugin::is_focus_equipped($owner, 28034);
+            my $epic_equipped = plugin::is_focus_equipped($owner, 1936);
             quest::debug("AoE Taunt Eval: $epic_equipped");
             if ($epic_equipped) {
                 my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
                 for $m (@close_list) {                
                     my $m_target = $m->GetTarget();
-                    if ($m_target->GetID() == $owner->GetID()) {
+                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
                         $m->AddToHateList($npc, 1000);
                     }
                 }
