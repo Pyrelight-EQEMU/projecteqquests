@@ -108,24 +108,25 @@ sub EVENT_COMBAT
 }
 
 sub EVENT_TIMER {
-    if ($npc->IsPet() && $npc->GetOwner()->IsClient() && $timer eq "Pet_Abilities" && $npc->IsTaunting()) {
+    if ($npc->IsPet() && $npc->GetOwner()->IsClient() && $timer eq "Pet_Abilities") {
         my $owner       = $npc->GetOwner()->CastToClient();
         my $target      = $npc->GetTarget();
-        my @close_list  = $entity_list->GetCloseMobList($npc, 100);
-
-        my $mage_epic = "1936";
-
-        $AoE_Spell = "21690"; #Earthen Menance
-        if (plugin::is_focus_equipped($owner, $mage_epic)) {            
-            for $m (@close_list) {
-                if ($m) {
+        
+        if ($npc->IsTaunting()) {
+            my $epic_equipped = plugin::is_focus_equipped($owner, 28034);
+            quest::debug("AoE Taunt Eval: $epic_equipped");
+            if ($epic_equipped) {
+                my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
+                for $m (@close_list) {                
                     my $m_target = $m->GetTarget();
                     if ($m_target->GetID() == $owner->GetID()) {
                         $m->AddToHateList($npc, 1000);
                     }
                 }
+                $AoE_Spell = "21690"; #Enhanced Area Taunt
+                $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
+                quest::debug("AoE Taunt Triggered");
             }
-            $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
         }
     }   
 }
