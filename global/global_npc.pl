@@ -1,8 +1,6 @@
 use List::Util qw(max);
 use List::Util qw(min);
 use POSIX;
-use DBI;
-use DBD::mysql;
 use JSON;
 
 my $dz_duration     = 604800; # 7 Days
