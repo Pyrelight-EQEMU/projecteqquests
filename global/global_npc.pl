@@ -117,7 +117,7 @@ sub EVENT_TIMER {
                 my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
                 for $m (@close_list) {                
                     my $m_target = $m->GetTarget();
-                    if ($m_target->GetID() == $owner->GetID()) {
+                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
                         $m->AddToHateList($npc, 1000);
                     }
                 }
