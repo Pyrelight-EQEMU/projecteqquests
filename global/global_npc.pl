@@ -112,7 +112,7 @@ sub EVENT_TIMER {
         
         if ($npc->IsTaunting()) {
             my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
-            for $m (@close_list) {
+            for my $m (@close_list) {
                 if ($m) {             
                     my $m_target = $m->GetTarget();
                     if ($m_target->GetID() == $owner->GetID()) {
