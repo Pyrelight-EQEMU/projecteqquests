@@ -96,7 +96,6 @@ sub EVENT_COMBAT
     # Pet Stuff
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
         my $owner = $npc->GetOwner()->CastToClient();
-        if ($owner->)
         if ($combat_state == 1) {            
                 $npc->SetTimer("Pet_Abilities", 6);
         } else {
