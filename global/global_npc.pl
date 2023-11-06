@@ -110,17 +110,14 @@ sub EVENT_TIMER {
         my $owner       = $npc->GetOwner()->CastToClient();
         my $target      = $npc->GetTarget();
         
-        if ($owner->GetClass() == 13 && $npc->IsTaunting()) {
+        if ($npc->IsTaunting()) {
             my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
-            for $m (@close_list) {
-                if (plugin::is_focus_equipped($owner, 28034)) {
-                    my $m_target = $m->GetTarget();
-                    if ($m_target->GetID() == $owner->GetID()) {
-                        $m->AddToHateList($npc, 1000);
-                    }
-                }
+            for $m (@close_list) {                
+                my $m_target = $m->GetTarget();
+                if ($m_target->GetID() == $owner->GetID()) {
+                    $m->AddToHateList($npc, 1000);
+                }                
             }
-
             $AoE_Spell = "21690";
             $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
         }
