@@ -62,7 +62,7 @@ sub HandleSay {
 
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
-                if (!plugin::HasDynamicZoneAssigned($client)) {
+                if (!HasDynamicZoneAssigned($client)) {
                     my $task_name       = quest::gettaskname($task);
                     my $task_leader_id  = plugin::GetSharedTaskLeader($client);
                     my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
@@ -455,7 +455,6 @@ sub ModifyInstanceNPC
             } elsif (grep { $_ eq $stat } ('min_hit', 'max_hit' )) {
                 $difficulty_modifier /= 3;
             }
-
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
     }
