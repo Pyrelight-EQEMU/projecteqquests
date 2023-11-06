@@ -119,6 +119,7 @@ sub EVENT_TIMER {
                     }
                 }                
             }
+            
             my $AoE_Spell = "21690";
             $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
         }

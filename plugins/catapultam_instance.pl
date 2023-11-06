@@ -327,7 +327,9 @@ sub upgrade_item_npc {
     if (plugin::is_item_upgradable($item_id)) {
         my $base_id    = plugin::get_base_id($item_id);
         my $curtier    = plugin::get_upgrade_tier($item_id);
-
+        
+        quest::debug("WTF?: $base_id");
+        quest::debug("WTF2?: $curtier");
         my $target_tier = min($max_upgrade, $tier + $curtier);
         my $target_item = $base_id + (1000000 * $target_tier);
         quest::debug("base: $base_id, target: $target_item, tier: $tier, curtier: $curtier");
