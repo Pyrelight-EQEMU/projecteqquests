@@ -62,7 +62,7 @@ sub HandleSay {
 
         foreach my $task (@task_id) {
             if ($client->IsTaskActive($task)) {
-                if (!HasDynamicZoneAssigned($client)) {
+                if (!plugin::HasDynamicZoneAssigned($client)) {
                     my $task_name       = quest::gettaskname($task);
                     my $task_leader_id  = plugin::GetSharedTaskLeader($client);
                     my $difficulty_rank = quest::get_data("character-$task_leader_id-$zone_name-solo-escalation") || 0;
