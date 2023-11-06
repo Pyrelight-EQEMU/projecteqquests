@@ -31,16 +31,14 @@ sub EVENT_SPAWN {
         # Do item upgrade variance
         my @lootlist = $npc->GetLootList();
         foreach my $item_id (@lootlist) {
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.15;
+            my $fabled_id = plugin::get_fabled_id($item_id);
+            if ($fabled_id && rand() <= 0.001) {
+                plugin::upgrade_item_to_fabled($item_id, $npc);
+            }
+
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.10;
             plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.05;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.0000001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.00000001;
-            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.000000001;
+            plugin::upgrade_item_npc($item_id, 1, $npc) if rand() <= 0.01;            
         }
     }
 }
@@ -83,7 +81,8 @@ sub EVENT_DAMAGE_GIVEN
 {
     if ($npc->IsPet() and $npc->GetOwner()->IsClient() and not $npc->IsTaunting()) {
         $entity_list->GetMobByID($entity_id)->AddToHateList($npc->GetOwner());
-    }        
+    }
+    CHECK_CHARM_STATUS();
 }
 
 sub EVENT_COMBAT 
@@ -97,6 +96,7 @@ sub EVENT_COMBAT
     # Pet Stuff
     if ($npc->IsPet() and $npc->GetOwner()->IsClient()) {
         my $owner = $npc->GetOwner()->CastToClient();
+        if ($owner->)
         if ($combat_state == 1) {            
                 $npc->SetTimer("Pet_Abilities", 6);
         } else {
@@ -110,21 +110,19 @@ sub EVENT_TIMER {
         my $owner       = $npc->GetOwner()->CastToClient();
         my $target      = $npc->GetTarget();
         
-        if ($npc->IsTaunting()) {
-            my $epic_equipped = plugin::is_focus_equipped($owner, 1936);
-            quest::debug("AoE Taunt Eval: $epic_equipped");
-            if ($epic_equipped) {
-                my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
-                for $m (@close_list) {                
+        if ($owner->GetClass() == 13 && $npc->IsTaunting()) {
+            my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
+            for $m (@close_list) {
+                if (plugin::is_focus_equipped($owner, 28034)) {
                     my $m_target = $m->GetTarget();
-                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
+                    if ($m_target->GetID() == $owner->GetID()) {
                         $m->AddToHateList($npc, 1000);
                     }
                 }
-                $AoE_Spell = "21690"; #Enhanced Area Taunt
-                $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
-                quest::debug("AoE Taunt Triggered");
             }
+
+            $AoE_Spell = "21690";
+            $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
         }
     }   
 }
@@ -137,7 +135,7 @@ sub EVENT_ITEM
     }
 }
 
-sub EVENT_DEATH_COMPLETE {
+sub EVENT_DEATH {
     CHECK_CHARM_STATUS(); 
 }
 
