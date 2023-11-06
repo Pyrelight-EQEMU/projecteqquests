@@ -112,13 +112,15 @@ sub EVENT_TIMER {
         
         if ($npc->IsTaunting()) {
             my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
-            for $m (@close_list) {                
-                my $m_target = $m->GetTarget();
-                if ($m_target->GetID() == $owner->GetID()) {
-                    $m->AddToHateList($npc, 1000);
+            for $m (@close_list) {
+                if ($m) {             
+                    my $m_target = $m->GetTarget();
+                    if ($m_target->GetID() == $owner->GetID()) {
+                        $m->AddToHateList($npc, 1000);
+                    }
                 }                
             }
-            $AoE_Spell = "21690";
+            my $AoE_Spell = "21690";
             $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
         }
     }   
