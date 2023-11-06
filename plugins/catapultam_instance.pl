@@ -379,8 +379,8 @@ sub ModifyInstanceLoot {
     my %info_bucket  = plugin::DeserializeHash(quest::get_data("character-$owner_id-$zonesn"));
     my $difficulty   = $info_bucket{'difficulty'};
 
-    my $min_upgrade = floor($difficulty / 9);
-    my $max_upgrade = floor($difficulty / 3);
+    my $upgrade_min = floor($difficulty / 9);
+    my $upgrade_max = floor($difficulty / 3);
 
     if ($npc) {
         my @lootlist = $npc->GetLootList();
@@ -389,7 +389,7 @@ sub ModifyInstanceLoot {
             my $item_count = $npc->CountItem($item_id);
 
             for (my $i = 0; $i < $item_count; $i++) {
-                plugin::upgrade_item_npc($item_id, floor($min_upgrade + sqrt(rand()) * ($max_upgrade - $min_upgrade + 1));, $npc);
+                plugin::upgrade_item_npc($item_id, floor($upgrade_min + sqrt(rand()) * ($upgrade_max - $upgrade_min + 1)), $npc);
             }
         }
     }
