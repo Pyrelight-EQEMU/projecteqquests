@@ -325,8 +325,8 @@ sub upgrade_item_npc {
     my ($item_id, $tier, $npc)  = @_;
     quest::debug("upgrade_item_npc called for $item_id, $tier, $npc");
     if (plugin::is_item_upgradable($item_id)) {
-        my $base_id    = plugin::get_base_id($item_id);
-        my $curtier    = plugin::get_upgrade_tier($item_id);
+        my $base_id    = plugin::get_base_id($item_id) || $item_id;
+        my $curtier    = plugin::get_upgrade_tier($item_id) || 0;
         
         quest::debug("WTF?: $base_id");
         quest::debug("WTF2?: $curtier");
