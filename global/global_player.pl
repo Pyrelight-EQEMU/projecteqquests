@@ -15,6 +15,14 @@ sub EVENT_CONNECT {
         plugin::add_char_zone_data_to_account($client->CharacterID(), $client->AccountID(), $suffix);
     }
 
+    my $free_skills = [0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,27,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76,77];
+
+    foreach my $skill (@$free_skills) {
+        if ($client->MaxSkill($skill) > 0 && $client->GetRawSkill($skill) < 1 && $client->CanHaveSkill($skill)) {
+            $client->SetSkill($skill, 1);
+        }
+    }
+
     # Get the current time as a Unix timestamp
     my $current_time = time();
 
@@ -102,7 +110,7 @@ sub EVENT_TASK_COMPLETE {
 }
 
 sub EVENT_LEVEL_UP {
-    my $free_skills = [0,1,2,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76];
+    my $free_skills = [0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,28,27,29,30,31,32,33,34,36,37,38,39,41,42,43,44,45,46,47,49,51,52,54,67,70,71,72,73,74,76,77];
 
     foreach my $skill (@$free_skills) {
         if ($client->MaxSkill($skill) > 0 && $client->GetRawSkill($skill) < 1 && $client->CanHaveSkill($skill)) {
