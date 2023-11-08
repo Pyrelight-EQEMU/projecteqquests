@@ -1082,17 +1082,19 @@ sub build_spellpool {
         }
     }
 
-    # Step 2 and 3: Fetch results from database
-    my %spell_levels = GetSpellLevelsByClass(\@spell_ids, $client->GetClass());
+    if (@spell_ids) {
+        # Step 2 and 3: Fetch results from database
+        my %spell_levels = GetSpellLevelsByClass(\@spell_ids, $client->GetClass());
 
-    # Step 4: Update the %spellbook hash based on fetched results
-    while (my ($spell_id, $spell_level) = each %spell_levels) {
-        if ($spell_level > -1 && (!exists $spellbook{$spell_id} || $spell_level < $spellbook{$spell_id})) {
-            $spellbook{$spell_id} = $spell_level;
+        # Step 4: Update the %spellbook hash based on fetched results
+        while (my ($spell_id, $spell_level) = each %spell_levels) {
+            if ($spell_level > -1 && (!exists $spellbook{$spell_id} || $spell_level < $spellbook{$spell_id})) {
+                $spellbook{$spell_id} = $spell_level;
+            }
         }
-    }
 
-    $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
+        $client->SetBucket("unlocked-spellbook", plugin::SerializeHash(%spellbook));
+    }
 }
 
 sub GetSpellLevelsByClass {
