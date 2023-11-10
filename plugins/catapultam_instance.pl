@@ -472,7 +472,7 @@ sub ModifyInstanceNPC
 
         # Reduce attack speed to either randomly reduced based on difficulty, 1 second, or original attack speed (for vanilla mobs with crazy low attack speeds)
         my $new_attack_delay = max(1000, $npc->GetNPCStat('attack_delay') - ceil(rand() * $difficulty * 100));
-        $npc->ModifyNPCStat("attack_delay", max(min(10, round($npc->GetNPCStat('attack_delay') / 100)) , ceil($new_attack_delay / 100)));
+        $npc->ModifyNPCStat("attack_delay", max(min(10, ceil($npc->GetNPCStat('attack_delay') / 100)) , ceil($new_attack_delay / 100)));
     }
 
     $npc->Heal();
