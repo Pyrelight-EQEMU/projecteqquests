@@ -471,7 +471,7 @@ sub ModifyInstanceNPC
 
         $npc->ModifyNPCStat("attack_delay", max(
                                                 1000, 
-                                                ($npc->GetNPCStat("attack_delay") / 10) - (10 * $difficulty)
+                                                ($npc->GetNPCStat("attack_delay")) - (10 * $difficulty)
                                             ) / 10
                                             );
     }
