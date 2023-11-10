@@ -114,7 +114,7 @@ sub EVENT_TIMER {
             if (1) {
                 my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
                 for $mob (@close_list) {                
-                    if ($mob->IsOnHatelist($owner)) {
+                    if ($mob->CastToNPC()->IsOnHatelist($owner)) {
                         $npc->Shout("My owner is on " . $mob->GetName() ." hate list!");
                     } else {
                         $npc->Shout("My owner is not on " . $mob->GetName() ." hate list!");
