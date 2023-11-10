@@ -469,7 +469,7 @@ sub ModifyInstanceNPC
 
         
         $npc->ModifyNPCStat('slow_mitigation', $npc->GetNPCStat('slow_mitigation') + floor(rand() * $difficulty));
-        quest::debug("Attack Speed: ". $npc->GetNPCStat('attacK_speed') ." Attack Delay: ". $npc->GetNPCStat('attack_delay'));
+        $npc->ModifyNPCStat("attack_delay", max(1000, $npc->GetNPCStat('attack_delay') - ceil(rand() * $difficulty * 25)));
     }
 
     $npc->Heal();
