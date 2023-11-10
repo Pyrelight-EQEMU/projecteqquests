@@ -449,7 +449,7 @@ sub ModifyInstanceNPC
         foreach my $stat (@stat_names) {
             my $difficulty_modifier = 1 + ($modifier * $difficulty);
             if (grep { $_ eq $stat } ('hp', 'avoidance', 'accuracy', 'atk', 'ac')) {
-                $difficulty_modifier *= 2;
+                $difficulty_modifier *= 3;
             } elsif (grep { $_ eq $stat } ('fr', 'cr', 'mr', 'dr', 'pr')) {
                 $difficulty_modifier /= 2;
             } elsif (grep { $_ eq $stat } ('spellscale')) {
@@ -466,6 +466,8 @@ sub ModifyInstanceNPC
         $npc->ModifyNPCStat('accuracy', $npc->GetNPCStat('accuracy') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
         $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
         $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10)) + $difficulty));
+
+        $npc->ModifyNPCStat('slow_mitigation', min(75, $npc->GetNPCStat('slow_mitigation') + (rand() * $difficulty)));
     }
 
     $npc->Heal();
