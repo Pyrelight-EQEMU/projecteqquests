@@ -462,10 +462,10 @@ sub ModifyInstanceNPC
         }
 
         # Final Modifications
-        $npc->ModifyNPCStat('min_hit', $npc->GetNPCStat('max_hit') / 2);
-        $npc->ModifyNPCStat('accuracy', $npc->GetNPCStat('accuracy') + (ceil(rand() * 100) * $difficulty));
-        $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty));
-        $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10))));
+        $npc->ModifyNPCStat('min_hit', ceil($npc->GetNPCStat('max_hit') / 2) + $difficulty);
+        $npc->ModifyNPCStat('accuracy', $npc->GetNPCStat('accuracy') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
+        $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
+        $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10)) + $difficulty));
     }
 
     $npc->Heal();
