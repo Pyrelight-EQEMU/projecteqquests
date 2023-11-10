@@ -467,7 +467,7 @@ sub ModifyInstanceNPC
         $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
         $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10)) + $difficulty));
 
-        my $new_attack_delay = $npc->GetNPCStat('attack_delay') - ceil(rand() * $difficulty * 100);
+        my $new_attack_delay = max(1000, $npc->GetNPCStat('attack_delay') - ceil(rand() * $difficulty * 100));
         quest::debug("ATTACK DELAY MOD: $new_attack_delay");
 
         $npc->ModifyNPCStat('slow_mitigation', $npc->GetNPCStat('slow_mitigation') + floor(rand() * $difficulty));
