@@ -469,11 +469,8 @@ sub ModifyInstanceNPC
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
 
-        $npc->ModifyNPCStat("attack_delay", max(
-                                                1000, 
-                                                ($npc->GetNPCStat("attack_delay")) - (10 * $difficulty)
-                                            ) / 100
-                                            );
+        # Final Modifications
+        $npc->ModifyNPCStat('accuracy', max($npc->GetNPCStat('accuracy'), (10 * $difficulty)))
     }
 
     $npc->Heal();
