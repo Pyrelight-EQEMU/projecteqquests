@@ -116,8 +116,7 @@ sub EVENT_TIMER {
                 for $mob (@close_list) {                
                     if ($mob->CastToNPC()->IsOnHatelist($owner)) {
                         $npc->Shout("My owner is on " . $mob->GetName() ." hate list!");
-                    } else {
-                        $npc->Shout("My owner is not on " . $mob->GetName() ." hate list!");
+                        $mob->AddToHateList($npc->CastToMob(), 1000);
                     }
                 }
                 $AoE_Spell = "21690"; #Enhanced Area Taunt
