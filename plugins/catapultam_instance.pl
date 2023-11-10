@@ -458,13 +458,13 @@ sub ModifyInstanceNPC
                 $difficulty_modifier /= 2;
             } 
 
-            if (grep { $_ eq $stat } ('accuracy')) {
-                $npc_stats{$stat} = max( $npc_stats{$stat}, (10 * $difficulty));
-            } elsif (grep { $_ eq $stat } ('heroic_strikethrough')) {
-                $npc_stats{$stat} = max( $npc_stats{$stat}, ($difficulty - 10));
-            } elsif (grep { $_ eq $stat } ('min_hit')) {
-                $npc_stats{$stat} = max($npc_stats{'max_hit'} / 2, $npc_stats{'min_hit'});
-            }
+#            if (grep { $_ eq $stat } ('accuracy')) {
+#                $npc_stats{$stat} = max( $npc->GetNPCStat($stat), (10 * $difficulty));
+#            } elsif (grep { $_ eq $stat } ('heroic_strikethrough')) {
+#                $npc_stats{$stat} = max( $npc->GetNPCStat($stat), ($difficulty - 10));
+#            } elsif (grep { $_ eq $stat } ('min_hit')) {
+#                $npc_stats{$stat} = max($npc->GetNPCStat('max_hit') / 2, $npc->GetNPCStat($stat));
+#f            }
 
             $npc->ModifyNPCStat($stat, ceil($npc->GetNPCStat($stat) * $difficulty_modifier));            
         }
@@ -472,7 +472,7 @@ sub ModifyInstanceNPC
         $npc->ModifyNPCStat("attack_delay", max(
                                                 1000, 
                                                 ($npc->GetNPCStat("attack_delay")) - (10 * $difficulty)
-                                            ) / 10
+                                            ) / 100
                                             );
     }
 
