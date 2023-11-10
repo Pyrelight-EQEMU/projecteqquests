@@ -467,8 +467,7 @@ sub ModifyInstanceNPC
         $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
         $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10)) + $difficulty));
 
-        
-        quest::debug("ATTACK DELAY MOD: $new_attack_delay");
+        # Add slow mitigation from 0->$diffulty, randomly
         $npc->ModifyNPCStat('slow_mitigation', $npc->GetNPCStat('slow_mitigation') + floor(rand() * $difficulty));
 
         # Reduce attack speed to either randomly reduced based on difficulty, 1 second, or original attack speed (for vanilla mobs with crazy low attack speeds)
