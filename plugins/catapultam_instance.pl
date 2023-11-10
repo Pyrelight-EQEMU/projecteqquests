@@ -455,7 +455,7 @@ sub ModifyInstanceNPC
             } elsif (grep { $_ eq $stat } ('spellscale')) {
                 $difficulty_modifier /= 10;
             } elsif (grep { $_ eq $stat } ('min_hit', 'max_hit' )) {
-                $difficulty_modifier /= 3;
+                $difficulty_modifier /= 2;
             } elsif (grep { $_ eq $stat } ('accuracy')) {
                 $stat = max($stat, (10 * $difficulty));
             } elsif (grep { $_ eq $stat } ('heroic_strikethrough')) {
