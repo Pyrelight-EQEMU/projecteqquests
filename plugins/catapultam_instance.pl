@@ -467,8 +467,10 @@ sub ModifyInstanceNPC
         $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
         $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10)) + $difficulty));
 
-        my $slowmit = $npc->GetNPCStat('slow_mitigation');
+        my $slowmit = $npc->GetNPCStat('slow_mitigation') + $difficulty;
         quest::debug("Slow Mit: $slowmit");
+
+        $npc->ModifyNPCStat('slow_mitigation', $slowmit);
     }
 
     $npc->Heal();
