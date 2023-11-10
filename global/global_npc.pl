@@ -98,6 +98,7 @@ sub EVENT_COMBAT
         my $owner = $npc->GetOwner()->CastToClient();
         if ($combat_state == 1) {            
                 $npc->SetTimer("Pet_Abilities", 6);
+                $npc->SetTimer("Pet_Abilities", 6);
         } else {
             $npc->StopTimer("Pet_Abilities");
         }        
@@ -114,7 +115,7 @@ sub EVENT_TIMER {
             for my $m (@close_list) {
                 if ($m) {             
                     my $m_target = $m->GetTarget();
-                    if ($m_target->GetID() == $owner->GetID()) {
+                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
                         $m->AddToHateList($npc, 1000);
                     }
                 }                

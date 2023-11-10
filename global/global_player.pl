@@ -21,6 +21,12 @@ sub EVENT_CONNECT {
         }
     }
 
+    foreach my $skill (1..77) {
+        if ($client->MaxSkill($skill) > 0 && $client->GetRawSkill($skill) < 1 && $client->CanHaveSkill($skill)) {
+            $client->SetSkill($skill, 1);
+        }
+    }
+
     # Get the current time as a Unix timestamp
     my $current_time = time();
 
