@@ -117,8 +117,8 @@ sub EVENT_TIMER {
                 if ($m) {             
                     my $m_target = $m->GetTarget();
                     if ($m_target && $m_target->GetID() == $owner->GetID()) {
-                        $m->AddToHateList($npc->GetID(), 100000);
-                        $m->RemoveFromHateList($owner);
+                        $m->AddToHateList($npc);
+                        $npc->Shout("Adding myself to a hate list!");
                     }
                 }                
             }
