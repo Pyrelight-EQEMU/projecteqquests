@@ -117,7 +117,7 @@ sub EVENT_TIMER {
                 if ($mob) {             
                     my $m_target = $mob->GetTarget();
                     if ($m_target && $m_target->GetID() == $owner->GetID()) {
-                        $mob->AddToHateList($npc);
+                        $mob->AddToHateList($npc, $mob->GetNPCHate($owner) + 1000);
                         $mob->Shout("I hate ". $npc->GetCleanName() . " now.");
                     }
                 }                
