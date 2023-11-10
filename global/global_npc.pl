@@ -113,10 +113,9 @@ sub EVENT_TIMER {
         if ($npc->IsTaunting()) {
             if (1) {
                 my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
-                for $m (@close_list) {                
-                    my $m_target = $m->GetTarget();
-                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
-                        $m->AddToHateList($npc, 1000);
+                for $mob (@close_list) {                
+                    if ($mob->IsOnHatelist($owner)) {
+                        $npc->Shout("My owner is on " . $mob->GetName() ." hate list!");
                     }
                 }
                 $AoE_Spell = "21690"; #Enhanced Area Taunt
