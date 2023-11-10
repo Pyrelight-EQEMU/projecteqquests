@@ -470,7 +470,7 @@ sub ModifyInstanceNPC
         }
 
         # Final Modifications
-        $npc->ModifyNPCStat('accuracy', $npc->GetNPCStat('accuracy') + ((rand() * 100) * $difficulty));
+        $npc->ModifyNPCStat('accuracy', $npc->GetNPCStat('accuracy') + (ceil(rand() * 100) * $difficulty));
     }
 
     $npc->Heal();
