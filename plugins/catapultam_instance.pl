@@ -467,8 +467,8 @@ sub ModifyInstanceNPC
         $npc->ModifyNPCStat('avoidance', $npc->GetNPCStat('avoidance') + (ceil(rand() * 100) * $difficulty) + ($difficulty * 10));
         $npc->ModifyNPCStat('heroic_strikethrough', $npc->GetNPCStat('heroic_strikethrough') + max(0,(ceil(rand() * 25) * ($difficulty - 10)) + $difficulty));
 
-        my $SlowMitigation = $npc->GetNPCStat('slow_mitigation') + (rand() * $difficulty);
-        $npc->ModifyNPCStat('slow_mitigation', $SlowMitigation);
+        
+        $npc->ModifyNPCStat('slow_mitigation', $npc->GetNPCStat('slow_mitigation') + floor(rand() * $difficulty));
     }
 
     $npc->Heal();
