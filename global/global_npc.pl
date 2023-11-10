@@ -111,25 +111,18 @@ sub EVENT_TIMER {
         my $target      = $npc->GetTarget();
         
         if ($npc->IsTaunting()) {
-            $npc->Shout("TAUNTING!");
-            my @close_list  = $entity_list->GetCloseMobList($npc, 500);   
-            for my $mob (@close_list) {
-                if ($mob) {
-                    my @hate_list = $mob->GetHateListClients();
-                    foreach my $ent (@hate_list) {
-                        if ($end->GetEnt()->GetID() == $owner->GetID()) {
-                            my $hate = $ent->GetHate();
-                            $mob->AddToHateList($npc, $hate + 1000);
-                        }                        
+            if (1) {
+                my @close_list  = $entity_list->GetCloseMobList($npc, 100);   
+                for $m (@close_list) {                
+                    my $m_target = $m->GetTarget();
+                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
+                        $m->AddToHateList($npc, 1000);
                     }
-                }                
+                }
+                $AoE_Spell = "21690"; #Enhanced Area Taunt
+                $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
+                quest::debug("AoE Taunt Triggered");
             }
-            
-            my $AoE_Spell = "21690";
-            $npc->CastSpell($AoE_Spell, $npc->GetID(), 0, 0);
-        }
-        else {
-            $npc->Shout("I was ordered not to taunt!");
         }
     }   
 }
