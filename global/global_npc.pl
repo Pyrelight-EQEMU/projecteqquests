@@ -114,11 +114,13 @@ sub EVENT_TIMER {
             $npc->Shout("TAUNTING!");
             my @close_list  = $entity_list->GetCloseMobList($npc, 500);   
             for my $mob (@close_list) {
-                if ($mob) {             
-                    my $m_target = $mob->GetTarget();
-                    if ($m_target && $m_target->GetID() == $owner->GetID()) {
-                        $mob->AddToHateList($npc, $mob->GetNPCHate($owner) + 1000);
-                        $mob->Shout("I hate ". $npc->GetCleanName() . " now.");
+                if ($mob) {
+                    my @hate_list = $mob->GetHateListClients();
+                    foreach my $ent (@hate_list) {
+                        if ($end->GetEnt()->GetID() == $owner->GetID()) {
+                            my $hate = $ent->GetHate();
+                            $mob->AddToHateList($npc, $hate + 1000);
+                        }                        
                     }
                 }                
             }
