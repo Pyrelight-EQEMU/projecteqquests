@@ -75,6 +75,24 @@ sub EVENT_KILLED_MERIT {
         $npc->AddItem(40605); # Exp Pot
         $client->SetBucket("ExpPotionDrop", 1, 24 * 60 * 60);
     }
+
+    my %item_drops = (
+        1001 => {
+            'drop_chance' => 1, # 50% chance to drop
+            'min_level'   => 0, # Minimum level to drop from
+            'max_level'   => 99, # Maximum level to drop from
+        }
+    );
+
+    for my $item_id (keys %item_drops) {
+        if ($npc->GetLevel() >= $item_drops{$item_id}{'min_level'} && 
+            $npc->GetLevel() <= $item_drops{$item_id}{'max_level'}) {                    
+            if (rand() < $item_drops{$item_id}{'drop_chance'}) {
+                $npc->AddItem($item_id); # Add the item to the NPC's inventory
+                quest::ding(); # Play the 'ding' sound, indicating an item drop or another significant event
+            }
+        }
+    }
 }
 
 sub EVENT_DAMAGE_GIVEN 
