@@ -46,7 +46,7 @@ function event_trade(e)
 		e.other:Faction(5001,3,0); -- Anti Mage
 		e.other:AddEXP(500);
 	elseif(item_lib.check_turn_in(e.trade, {item1 = 12330,item2 = 12329,item3 = 13227})) then -- A Large Locked Crate, Blue Orc Head, Black Heart
-		e.self:Say("'A noble deed has been done and the alliance of evil has been stalled. I present you with the falchion of the Koada`Vie. You are now an honorable member of our order. Hail Felwithe, and may you defender her with honor.");
+		e.self:Say("'A noble deed has been done and the alliance of evil has been stalled. I present you a falchion of the Koada`Vie. You are now an honorable member of our order. Hail Felwithe, and may you defend her with honor. To complete the consecration of your blade, take it to Opal Leganyn in the forge, she will instruct you further.");
 		e.other:SummonItem(5379); -- Falchion of the Koada'Vie 
 		e.other:Ding();
 		e.other:Faction(226,5,0); -- Clerics of Tunare
